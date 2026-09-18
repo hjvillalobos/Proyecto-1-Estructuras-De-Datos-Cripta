@@ -12,8 +12,16 @@ Durante el desarrollo, actuarás como mi revisor técnico: asegúrate de que mis
 
 ## Plantilla para próximas entradas
 
+### 2026-09-18
+
+- **Herramienta/modelo:** Codex (GPT-5)
+- **Prompt textual:** "Ya creé el esqueleto de carpetas y los archivos correspondientes a mi parte del proyecto. Creé el repositorio en GitHub con mi rama features/cliente-api-mocks. Considero comenzar en cliente_api implementando lo del HTTP para interactuar con CRIPTA y la versión MOCK temporal que retorna diccionarios estáticos simulando respuestas JSON. Esto usando el contenido del enunciado del proyecto como ejemplo, tales como: Datos generales de una cripta, Esqueleto, Contenido de salas, Catálogo. Dame tu criterio."
+- **Uso de la respuesta:** revisar el diseño inicial del cliente HTTP y del adaptador mock.
+
 ### AAAA-MM-DD
 
-- **Herramienta/modelo:**
-- **Prompt textual:**
-- **Uso de la respuesta:**
+- **Herramienta/modelo:** Gemini
+- **Prompt textual:** "Aquí está mi implementación en Python de la clase ClienteApi que utiliza diccionarios estáticos del enunciado para simular las peticiones HTTP de datos generales, esqueleto, contenido y catálogo. ¿Está correcta la lógica de las funciones?"
+- **Uso de la respuesta:** Identificar y corregir un error estructural en el diccionario base y en la lógica de filtrado de la función obtener_catalogo.
+
+
