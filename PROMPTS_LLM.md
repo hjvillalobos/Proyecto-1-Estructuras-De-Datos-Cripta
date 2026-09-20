@@ -43,5 +43,11 @@ Durante el desarrollo, actuarás como mi revisor técnico: asegúrate de que mis
 - **Uso de la respuesta:** Escribir la lógica de desalojo en cache.py, implementando la clase NodoLRU para simular punteros, actualizando las funciones de búsqueda e inserción, y agregando un método para incrementar el contador de referencias.
 
 
+### 2026-09-20
+
+- **Herramienta/modelo:** Gemini
+- **Prompt textual:** "Me gustaría revisar cómo se vería el archivo de pruebas (tests/test_cache.py) para confirmar que mi lista doblemente enlazada está desalojando el elemento correcto y respetando el contador de referencias activas."
+- **Uso de la respuesta:** Crear casos de prueba automatizados usando unittest para validar la inserción, el desalojo estándar del elemento más antiguo y la protección de elementos bloqueados por el motor del juego.
+
 
 
