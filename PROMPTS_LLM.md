@@ -25,6 +25,23 @@ Durante el desarrollo, actuarás como mi revisor técnico: asegúrate de que mis
 
 ### 2026-09-20
 
-- **Herramienta/modelo:** Codex (GPT-5)
-- **Prompt textual:** "Podemos seguir con catalogo." (Implícito del contexto: "Proporciona la estructura del archivo catalogo.py para resolver referencias, filtrar duplicados en memoria y agrupar peticiones HTTP en lotes de 10, según las reglas del proyecto."
-- **Uso de la respuesta:** Definir la clase GestorCatalogo que conecta el cliente API con la caché e instancia los objetos formales FichaCatalogo.
+- **Herramienta/modelo:** Gemini
+- **Prompt textual:** "Ahora sigamos con el archivo catalogo.py. ¿Cómo hago la clase para revisar qué IDs faltan en la caché, pedirlos a la API en grupos de 10 y convertirlos en objetos FichaCatalogo?"
+- **Uso de la respuesta:** Escribir la estructura de la clase GestorCatalogo para organizar las peticiones en lotes y mapear los JSON a los objetos del contrato.
+
+### 2026-09-20
+
+- **Herramienta/modelo:** Gemini
+- **Prompt textual:** "Tengo que programar la tabla hash para la caché desde cero en Python, sin usar diccionarios (dict). Pensaba usar listas como si fueran arreglos estáticos en C++ y manejar las colisiones por encadenamiento. ¿Me ayudas con la estructura inicial y una función hash sencilla para llaves de texto?"
+- **Uso de la respuesta:** Obtener la estructura base de la tabla hash usando listas nativas de Python para cumplir con las reglas del proyecto.
+
+
+### 2026-09-20
+
+- **Herramienta/modelo:** Gemini
+- **Prompt textual:** "Necesito agregar una política de reemplazo (LRU) que controle que elementos deben salir de cache cuando este alcanza su capacidad máxima a la tabla hash previamente creada. Se debe verificar si el elemento se encuentra actualmente en uso, es decir si el ID tiene referencias activas ( en_uso > 0 ), esto con el fin de que el LRU no borre elementos que siguen vivos en el juego. Si dicho elemento tiene una referencia activa se debe pasar al siguiente y así sucesivamente hasta encontrar un elemento que no tenga esta particularidad. El método de orden será una lista doblemente enlazada, la implementación de la lista debe incluir una clase Nodo.  La misma será utilizada para llevar un control cada que vez que se inserta un ID. El fondo de la lista me dirá el candidato a ser eliminado."
+- **Uso de la respuesta:** Escribir la lógica de desalojo en cache.py, implementando la clase NodoLRU para simular punteros, actualizando las funciones de búsqueda e inserción, y agregando un método para incrementar el contador de referencias.
+
+
+
+
