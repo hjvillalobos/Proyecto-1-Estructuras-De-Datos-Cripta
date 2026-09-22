@@ -16,16 +16,9 @@ class ClienteApi:
         url = f"{self.base_url}{endpoint}"
         headers = {"X-Cripta-Client-Id": self.cliente_id}
 
-        print(f"\n[DEBUG] Intentando acceder a: {url}")
-        print(f"[DEBUG] Encabezados que se van a enviar: {headers}")
-
         while True:
 
             respuesta = requests.get(url, headers=headers, timeout=5)
-
-            if respuesta.status_code == 400:
-                print(f"\n[DEBUG] URL que falló: {url}")
-                print(f"[DEBUG] Respuesta del servidor: {respuesta.text}\n")
 
             if respuesta.status_code == 200:
                 return respuesta.json()
