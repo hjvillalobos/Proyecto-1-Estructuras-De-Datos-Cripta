@@ -54,7 +54,15 @@ Durante el desarrollo, actuarás como mi revisor técnico: asegúrate de que mis
 
 - **Herramienta/modelo:** Gemini
 - **Prompt textual:** "Implemente la logica de los request en la funcion def _hacer_peticion_get manejando el error 429 con un tiempo de espera prudencial, ademas he completado las funciones actualizadas de cliente_api para usar la función central que maneja requests: obtener_datos_generales, obtener_esqueleto, obtener_contenido_salas y obtener_catalogo. Utilicé f-strings y join para los parámetros haciendo un llamado a la funcion _hacer_peticion_get previamente creada"
-- **Validar la refactorización de las rutas, corrigiendo los endpoints /salas y /catalogo para coincidir con la especificación del servidor.
+-  **Uso de la respuesta:** Validar la refactorización de las rutas, corrigiendo los endpoints /salas y /catalogo para coincidir con la especificación del servidor.
+
+
+### 2026-09-22
+
+- **Herramienta/modelo:** Gemini
+- **Prompt textual:** "Al probar la conexión HTTP real me da un error 400. Agregué un print de depuración y la respuesta del servidor dice: 'Invalid request: missing or malformed X-Cripta-Client-Id'. El encabezado que se va a enviar es {'X-Cripta-Cliente-Id': '0e56e27d-d6fd-43de-8b10-d6955e625f65'}."
+-  **Uso de la respuesta:** Identificar y corregir un error tipográfico en la llave del diccionario del encabezado ("Cliente" en lugar de "Client") y validar la correcta generación de identificadores UUID4.
+
 
 
 
