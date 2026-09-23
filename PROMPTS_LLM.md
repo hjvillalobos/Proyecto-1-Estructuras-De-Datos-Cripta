@@ -50,4 +50,25 @@ Durante el desarrollo, actuarás como mi revisor técnico: asegúrate de que mis
 - **Uso de la respuesta:** Crear casos de prueba automatizados usando unittest para validar la inserción, el desalojo estándar del elemento más antiguo y la protección de elementos bloqueados por el motor del juego.
 
 
+### 2026-09-22
+
+- **Herramienta/modelo:** Gemini
+- **Prompt textual:** "Implemente la logica de los request en la funcion def _hacer_peticion_get manejando el error 429 con un tiempo de espera prudencial, ademas he completado las funciones actualizadas de cliente_api para usar la función central que maneja requests: obtener_datos_generales, obtener_esqueleto, obtener_contenido_salas y obtener_catalogo. Utilicé f-strings y join para los parámetros haciendo un llamado a la funcion _hacer_peticion_get previamente creada"
+-  **Uso de la respuesta:** Validar la refactorización de las rutas, corrigiendo los endpoints /salas y /catalogo para coincidir con la especificación del servidor.
+
+
+### 2026-09-22
+
+- **Herramienta/modelo:** Gemini
+- **Prompt textual:** "Al probar la conexión HTTP real me da un error 400. Agregué un print de depuración y la respuesta del servidor dice: 'Invalid request: missing or malformed X-Cripta-Client-Id'. El encabezado que se va a enviar es {'X-Cripta-Cliente-Id': '0e56e27d-d6fd-43de-8b10-d6955e625f65'}."
+-  **Uso de la respuesta:** Identificar y corregir un error tipográfico en la llave del diccionario del encabezado ("Cliente" en lugar de "Client") y validar la correcta generación de identificadores UUID4.
+
+
+### 2026-09-22
+
+- **Herramienta/modelo:** Gemini
+- **Prompt textual:** "Necesito implementar el módulo de precarga (GestorPrecarga). Debe usar el ClienteApi para descargar los datos generales, el esqueleto de la primera página y el contenido de esas salas. Luego, debe extraer todos los IDs de objetos, enemigos y trampas de ese contenido, eliminar los duplicados, y enviarlos al GestorCatalogo para que los precargue en la tabla hash."
+-  **Uso de la respuesta:** Implementar la clase GestorPrecarga en red/precarga.py para inicializar el estado del juego, coordinando las peticiones HTTP iniciales y el poblamiento de la memoria caché mediante inyección de dependencias.
+
+
 
