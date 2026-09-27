@@ -1,0 +1,218 @@
+# modelo/inventario.py
+
+from modelo.tipos import ObjetoInstancia
+
+
+class NodoInventario:
+    """Nodo de la lista doblemente enlazada del inventario."""
+
+    def __init__(self, objeto: ObjetoInstancia):
+        self.objeto = objeto
+        self.anterior = None
+        self.siguiente = None
+
+
+class Inventario:
+    """
+    Lista doblemente enlazada propia (§2.7, §4.5). Usa el mismo patrón de
+    centinelas vacíos que red/cache.py (cabeza/cola) para simplificar la
+    inserción/eliminación en los bordes.
+
+    - Recorrido adelante/atrás desde la posición actual (`cursor`).
+    - Soltar el objeto que se está viendo cuesta O(1) sin importar su
+      posición, porque `cursor` ya apunta directo al nodo.
+    - Equipar mueve el nodo al frente del orden real.
+    - Las vistas ordenadas (vista_ordenada) no alteran este orden real.
+    """
+
+    def __init__(self, capacidad_max: int):
+        self.capacidad_max = capacidad_max
+        self.tamaño = 0
+
+        self.cabeza = NodoInventario(None)
+        self.cola = NodoInventario(None)
+        self.cabeza.siguiente = self.cola
+        self.cola.anterior = self.cabeza
+
+        self.cursor = None  # NodoInventario actual, o None si está vacío
+
+        self.arma_equipada = None    # NodoInventario, o None
+        self.armadura_equipada = None
+
+    def esta_vacio(self) -> bool:
+        return self.tamaño == 0
+
+    def esta_lleno(self) -> bool:
+        return self.tamaño >= self.capacidad_max
+
+    # --- primitivas de bajo nivel (las usa historial.py para deshacer) ---
+
+    def insertar_despues(self, nodo_referencia: "NodoInventario", objeto: ObjetoInstancia) -> "NodoInventario":
+        """Inserta `objeto` justo después de `nodo_referencia` (o de la
+        cabeza si `nodo_referencia` es None) y devuelve el nodo nuevo."""
+        if nodo_referencia is None:
+            nodo_referencia = self.cabeza
+
+        nuevo = NodoInventario(objeto)
+        siguiente = nodo_referencia.siguiente
+
+        nodo_referencia.siguiente = nuevo
+        nuevo.anterior = nodo_referencia
+        nuevo.siguiente = siguiente
+        siguiente.anterior = nuevo
+
+        self.tamaño += 1
+        if self.cursor is None:
+            self.cursor = nuevo
+        return nuevo
+
+    def quitar_nodo(self, nodo: "NodoInventario") -> None:
+        """Desconecta `nodo` de la lista sin tocar el objeto en sí."""
+        nodo.anterior.siguiente = nodo.siguiente
+        nodo.siguiente.anterior = nodo.anterior
+        self.tamaño -= 1
+
+        if self.cursor is nodo:
+            if nodo.siguiente is not self.cola:
+                self.cursor = nodo.siguiente
+            elif nodo.anterior is not self.cabeza:
+                self.cursor = nodo.anterior
+            else:
+                self.cursor = None
+
+        if self.arma_equipada is nodo:
+            self.arma_equipada = None
+        if self.armadura_equipada is nodo:
+            self.armadura_equipada = None
+
+    def mover_despues(self, nodo: "NodoInventario", nodo_referencia: "NodoInventario") -> None:
+        """Reubica `nodo` (ya en la lista) justo después de `nodo_referencia`
+        sin crear ni destruir nodos."""
+        nodo.anterior.siguiente = nodo.siguiente
+        nodo.siguiente.anterior = nodo.anterior
+
+        if nodo_referencia is None:
+            nodo_referencia = self.cabeza
+        siguiente = nodo_referencia.siguiente
+        nodo_referencia.siguiente = nodo
+        nodo.anterior = nodo_referencia
+        nodo.siguiente = siguiente
+        siguiente.anterior = nodo
+
+    # --- navegación ---
+
+    def avanzar(self) -> ObjetoInstancia | None:
+        if self.cursor is not None and self.cursor.siguiente is not self.cola:
+            self.cursor = self.cursor.siguiente
+        return self.objeto_actual()
+
+    def retroceder(self) -> ObjetoInstancia | None:
+        if self.cursor is not None and self.cursor.anterior is not self.cabeza:
+            self.cursor = self.cursor.anterior
+        return self.objeto_actual()
+
+    def objeto_actual(self) -> ObjetoInstancia | None:
+        return self.cursor.objeto if self.cursor is not None else None
+
+    # --- operaciones del jugador (§4.5, Apéndice B) ---
+
+    def recoger(self, objeto: ObjetoInstancia) -> "NodoInventario | None":
+        """Agrega `objeto` al final del orden real. Devuelve None (y no
+        consume tiempo virtual: eso lo decide quien llama) si el inventario
+        ya está lleno."""
+        if self.esta_lleno():
+            return None
+        objeto.ubicacion = "inventario"
+        objeto.sala = None
+        return self.insertar_despues(self.cola.anterior, objeto)
+
+    def soltar_actual(self) -> ObjetoInstancia | None:
+        """Quita el objeto que se está viendo (cursor), sin importar su
+        posición: O(1) porque no hay que buscarlo."""
+        if self.cursor is None:
+            return None
+        nodo = self.cursor
+        objeto = nodo.objeto
+        self.quitar_nodo(nodo)
+        return objeto
+
+    def equipar_actual(self, clase: str) -> bool:
+        """Mueve el objeto actual al frente del orden real y lo marca como
+        equipado. `clase` la resuelve quien llama (arma/armadura) contra el
+        catálogo, ya que Inventario no conoce fichas de catálogo."""
+        if self.cursor is None:
+            return False
+
+        nodo = self.cursor
+        self.mover_despues(nodo, self.cabeza)
+        self.cursor = nodo
+
+        if clase == "arma":
+            self.arma_equipada = nodo
+        elif clase == "armadura":
+            self.armadura_equipada = nodo
+        return True
+
+    def contar(self, tipo_catalogo: str) -> int:
+        """Cuenta cuántas instancias de un tipo hay en el inventario (p.ej.
+        pergaminos de retroceso disponibles)."""
+        total = 0
+        nodo = self.cabeza.siguiente
+        while nodo is not self.cola:
+            if nodo.objeto.tipo_catalogo == tipo_catalogo:
+                total += 1
+            nodo = nodo.siguiente
+        return total
+
+    def quitar_primero_de_tipo(self, tipo_catalogo: str) -> ObjetoInstancia | None:
+        """Consume una instancia de `tipo_catalogo` (p.ej. al usar un
+        pergamino de retroceso) sin depender de la posición del cursor.
+        Devuelve None si no hay ninguna."""
+        nodo = self.cabeza.siguiente
+        while nodo is not self.cola:
+            if nodo.objeto.tipo_catalogo == tipo_catalogo:
+                objeto = nodo.objeto
+                self.quitar_nodo(nodo)
+                return objeto
+            nodo = nodo.siguiente
+        return None
+
+    # --- vistas ordenadas (§4.5, §4.9) ---
+
+    def _recolectar(self) -> list[ObjetoInstancia]:
+        elementos = []
+        nodo = self.cabeza.siguiente
+        while nodo is not self.cola:
+            elementos.append(nodo.objeto)
+            nodo = nodo.siguiente
+        return elementos
+
+    def vista_ordenada(self, clave: str, resolver_ficha) -> list[ObjetoInstancia]:
+        """
+        Devuelve una lista nueva (no toca el orden real) ordenada por
+        "peso", "valor" o "nombre". `resolver_ficha(tipo_catalogo)` debe
+        devolver la FichaCatalogo correspondiente (la entrega quien conecte
+        este módulo con red/catalogo.py).
+
+        No usa sort()/sorted() (§4.9): ordenamiento por inserción propio.
+        Costo aceptable aquí porque el inventario es pequeño
+        (inventario_max); si se requiere algo más elaborado, se sustituye
+        por utilidades/ordenamiento.py de Persona D sin cambiar esta firma.
+        """
+
+        def valor_clave(objeto: ObjetoInstancia):
+            ficha = resolver_ficha(objeto.tipo_catalogo)
+            if clave == "nombre":
+                return ficha.nombre
+            return ficha.atributos.get(clave, 0)
+
+        elementos = self._recolectar()
+        for i in range(1, len(elementos)):
+            actual = elementos[i]
+            clave_actual = valor_clave(actual)
+            j = i - 1
+            while j >= 0 and valor_clave(elementos[j]) > clave_actual:
+                elementos[j + 1] = elementos[j]
+                j -= 1
+            elementos[j + 1] = actual
+        return elementos
