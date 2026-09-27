@@ -74,6 +74,8 @@ class TestInventario(unittest.TestCase):
         vista = [o.id_instancia for o in self.inventario._recolectar()]
         self.assertEqual(vista, ["o2", "o1"])
         self.assertEqual(self.inventario.arma_equipada.objeto.id_instancia, "o2")
+        self.assertEqual(self.inventario.arma_equipada_objeto.id_instancia, "o2")
+        self.assertIsNone(self.inventario.armadura_equipada_objeto)
 
     def test_contar_y_quitar_primero_de_tipo(self):
         self.inventario.recoger(_objeto("o1", "itm_pergamino"))

@@ -114,6 +114,18 @@ class Inventario:
     def objeto_actual(self) -> ObjetoInstancia | None:
         return self.cursor.objeto if self.cursor is not None else None
 
+    @property
+    def arma_equipada_objeto(self) -> ObjetoInstancia | None:
+        """El ObjetoInstancia del arma equipada (no el nodo interno), o None.
+        Para que quien calcule daño (Persona A) no tenga que conocer
+        NodoInventario."""
+        return self.arma_equipada.objeto if self.arma_equipada is not None else None
+
+    @property
+    def armadura_equipada_objeto(self) -> ObjetoInstancia | None:
+        """Igual que arma_equipada_objeto, pero para la armadura equipada."""
+        return self.armadura_equipada.objeto if self.armadura_equipada is not None else None
+
     # --- operaciones del jugador (§4.5, Apéndice B) ---
 
     def recoger(self, objeto: ObjetoInstancia) -> "NodoInventario | None":
