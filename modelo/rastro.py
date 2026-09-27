@@ -62,3 +62,15 @@ class RegistroRastro:
                 mejor_id = sala_id
                 mejor_tiempo = tiempo
         return mejor_id
+
+    # --- adaptador hacia modelo/snapshots.py (SalaGuardada.rastro usa -1, no None) ---
+
+    def exportar(self, sala_id: int) -> int:
+        """Para SalaGuardada.rastro (§4.10): -1 si la sala nunca fue
+        visitada, igual que ya lo define modelo/snapshots.py."""
+        tiempo = self.tiempo_de(sala_id)
+        return -1 if tiempo is None else tiempo
+
+    def importar(self, sala_id: int, valor: int) -> None:
+        """Inverso de exportar(): -1 vuelve a ser 'sin rastro'."""
+        self.marcar_visita(sala_id, None if valor == -1 else valor)

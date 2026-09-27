@@ -1,6 +1,7 @@
 # modelo/inventario.py
 
 from modelo.tipos import ObjetoInstancia
+from modelo.snapshots import ItemVista, ItemInventarioGuardado
 
 
 class NodoInventario:
@@ -222,3 +223,77 @@ class Inventario:
 
         elementos = self._recolectar()
         return ordenar(elementos, clave=valor_clave, descendente=descendente)
+
+    # --- adaptadores hacia el contrato compartido (controlador/contrato.py, modelo/snapshots.py) ---
+
+    def _esta_equipado(self, objeto: ObjetoInstancia) -> bool:
+        return objeto is self.arma_equipada_objeto or objeto is self.armadura_equipada_objeto
+
+    def _a_item_vista(self, objeto: ObjetoInstancia, resolver_ficha) -> ItemVista:
+        ficha = resolver_ficha(objeto.tipo_catalogo)
+        return ItemVista(
+            instancia=objeto.id_instancia,
+            nombre=ficha.nombre,
+            clase=ficha.clase,
+            peso=ficha.atributos.get("peso", 0),
+            valor=ficha.atributos.get("valor", 0),
+            equipado=self._esta_equipado(objeto),
+        )
+
+    def vista(self, resolver_ficha, orden: str | None = None, descendente: bool = False) -> list[ItemVista]:
+        """Implementa ModeloJuego.inventario_vista de controlador/contrato.py:
+        orden=None -> orden real; "peso"/"valor"/"nombre" -> vista ordenada
+        sin alterar el orden real (delega en vista_ordenada)."""
+        elementos = (
+            self.vista_ordenada(orden, resolver_ficha, descendente)
+            if orden is not None
+            else self._recolectar()
+        )
+        return [self._a_item_vista(o, resolver_ficha) for o in elementos]
+
+    def cursor_vista(self, movimiento: str, resolver_ficha) -> ItemVista | None:
+        """Implementa ModeloJuego.inventario_cursor de controlador/contrato.py.
+        movimiento: "actual" | "siguiente" | "anterior"."""
+        if movimiento == "siguiente":
+            objeto = self.avanzar()
+        elif movimiento == "anterior":
+            objeto = self.retroceder()
+        else:
+            objeto = self.objeto_actual()
+        if objeto is None:
+            return None
+        return self._a_item_vista(objeto, resolver_ficha)
+
+    def a_lista_guardado(self) -> list[ItemInventarioGuardado]:
+        """Orden real -> JugadorGuardado.inventario (§4.10): el primer
+        elemento es el frente de la lista, tal como pide modelo/snapshots.py."""
+        resultado = []
+        nodo = self.cabeza.siguiente
+        while nodo is not self.cola:
+            resultado.append(ItemInventarioGuardado(
+                instancia=nodo.objeto.id_instancia,
+                tipo=nodo.objeto.tipo_catalogo,
+                equipado=nodo is self.arma_equipada or nodo is self.armadura_equipada,
+            ))
+            nodo = nodo.siguiente
+        return resultado
+
+    def restaurar_desde_guardado(self, items: list[ItemInventarioGuardado], resolver_clase) -> None:
+        """Inverso de a_lista_guardado(). `resolver_clase(tipo_catalogo)`
+        debe devolver la `clase` de catálogo ("arma"/"armadura"/...) para
+        volver a marcar qué estaba equipado, ya que ItemInventarioGuardado
+        solo guarda un booleano `equipado`, no cuál puntero es."""
+        for item in items:
+            objeto = ObjetoInstancia(
+                id_instancia=item.instancia,
+                tipo_catalogo=item.tipo,
+                ubicacion="inventario",
+            )
+            nodo = self.insertar_despues(self.cola.anterior, objeto)
+            if item.equipado:
+                clase = resolver_clase(item.tipo)
+                if clase == "arma":
+                    self.arma_equipada = nodo
+                elif clase == "armadura":
+                    self.armadura_equipada = nodo
+        self.cursor = self.cabeza.siguiente if self.cabeza.siguiente is not self.cola else None

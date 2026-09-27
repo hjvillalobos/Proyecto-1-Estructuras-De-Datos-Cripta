@@ -107,6 +107,62 @@ class TestInventario(unittest.TestCase):
         orden_real = [o.id_instancia for o in self.inventario._recolectar()]
         self.assertEqual(orden_real, ["o1", "o2"])
 
+    def test_vista_orden_none_devuelve_itemvista_en_orden_real(self):
+        fichas = {
+            "itm_a": FichaCatalogo("itm_a", "pocion", "Poción A", {"peso": 1, "valor": 5}),
+            "itm_b": FichaCatalogo("itm_b", "pocion", "Poción B", {"peso": 2, "valor": 3}),
+        }
+        self.inventario.recoger(_objeto("o1", "itm_a"))
+        self.inventario.recoger(_objeto("o2", "itm_b"))
+
+        vista = self.inventario.vista(lambda t: fichas[t])
+        self.assertEqual([i.instancia for i in vista], ["o1", "o2"])
+        self.assertEqual(vista[0].nombre, "Poción A")
+        self.assertEqual(vista[0].clase, "pocion")
+
+    def test_vista_ordenada_por_valor_devuelve_itemvista_ordenado(self):
+        fichas = {
+            "itm_a": FichaCatalogo("itm_a", "pocion", "Poción A", {"peso": 1, "valor": 5}),
+            "itm_b": FichaCatalogo("itm_b", "pocion", "Poción B", {"peso": 2, "valor": 3}),
+        }
+        self.inventario.recoger(_objeto("o1", "itm_a"))
+        self.inventario.recoger(_objeto("o2", "itm_b"))
+
+        vista = self.inventario.vista(lambda t: fichas[t], orden="valor")
+        self.assertEqual([i.instancia for i in vista], ["o2", "o1"])
+
+    def test_cursor_vista_marca_equipado(self):
+        fichas = {"itm_espada": FichaCatalogo("itm_espada", "arma", "Espada", {"peso": 4, "valor": 30, "ataque_bonus": 5})}
+        self.inventario.recoger(_objeto("o1", "itm_espada"))
+        self.inventario.equipar_actual("arma")
+
+        item = self.inventario.cursor_vista("actual", lambda t: fichas[t])
+        self.assertEqual(item.instancia, "o1")
+        self.assertTrue(item.equipado)
+
+    def test_cursor_vista_devuelve_none_si_vacio(self):
+        self.assertIsNone(self.inventario.cursor_vista("actual", lambda t: None))
+
+    def test_guardado_y_restauracion_preservan_orden_y_equipado(self):
+        fichas = {
+            "itm_espada": FichaCatalogo("itm_espada", "arma", "Espada", {}),
+            "itm_pocion": FichaCatalogo("itm_pocion", "pocion", "Poción", {}),
+        }
+        self.inventario.recoger(_objeto("o1", "itm_espada"))
+        self.inventario.recoger(_objeto("o2", "itm_pocion"))
+        self.inventario.equipar_actual("arma")  # o1 pasa al frente y queda equipada
+
+        guardado = self.inventario.a_lista_guardado()
+        self.assertEqual([g.instancia for g in guardado], ["o1", "o2"])
+        self.assertTrue(guardado[0].equipado)
+        self.assertFalse(guardado[1].equipado)
+
+        restaurado = Inventario(capacidad_max=3)
+        restaurado.restaurar_desde_guardado(guardado, lambda t: fichas[t].clase)
+
+        self.assertEqual([o.id_instancia for o in restaurado._recolectar()], ["o1", "o2"])
+        self.assertEqual(restaurado.arma_equipada_objeto.id_instancia, "o1")
+
 
 if __name__ == '__main__':
     unittest.main()

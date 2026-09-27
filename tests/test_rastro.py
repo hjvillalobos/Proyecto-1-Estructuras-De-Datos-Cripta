@@ -48,6 +48,24 @@ class TestRegistroRastro(unittest.TestCase):
         mejor = self.rastro.sala_mas_fresca([1, 2, 3], tiempo_actual=50)
         self.assertIsNone(mejor)
 
+    def test_exportar_sala_sin_rastro_da_menos_uno(self):
+        # modelo/snapshots.py (SalaGuardada.rastro) usa -1, no None
+        self.assertEqual(self.rastro.exportar(4), -1)
+
+    def test_exportar_e_importar_es_reversible(self):
+        self.rastro.marcar_visita(3, 250)
+        valor = self.rastro.exportar(3)
+        self.assertEqual(valor, 250)
+
+        otro = RegistroRastro(salas_total=5)
+        otro.importar(3, valor)
+        self.assertEqual(otro.tiempo_de(3), 250)
+
+    def test_importar_menos_uno_deja_sin_rastro(self):
+        self.rastro.marcar_visita(2, 100)
+        self.rastro.importar(2, -1)
+        self.assertIsNone(self.rastro.tiempo_de(2))
+
 
 if __name__ == '__main__':
     unittest.main()
