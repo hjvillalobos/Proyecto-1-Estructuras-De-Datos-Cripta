@@ -187,18 +187,20 @@ class Inventario:
             nodo = nodo.siguiente
         return elementos
 
-    def vista_ordenada(self, clave: str, resolver_ficha) -> list[ObjetoInstancia]:
+    def vista_ordenada(self, clave: str, resolver_ficha, descendente: bool = False) -> list[ObjetoInstancia]:
         """
         Devuelve una lista nueva (no toca el orden real) ordenada por
         "peso", "valor" o "nombre". `resolver_ficha(tipo_catalogo)` debe
         devolver la FichaCatalogo correspondiente (la entrega quien conecte
         este módulo con red/catalogo.py).
 
-        No usa sort()/sorted() (§4.9): ordenamiento por inserción propio.
-        Costo aceptable aquí porque el inventario es pequeño
-        (inventario_max); si se requiere algo más elaborado, se sustituye
-        por utilidades/ordenamiento.py de Persona D sin cambiar esta firma.
+        Usa utilidades.ordenamiento.ordenar (§4.9) en vez de sort()/sorted()
+        o un algoritmo propio: es lo que pide explícitamente
+        controlador/contrato.py para inventario_vista, así toda vista
+        ordenada del proyecto pasa por la misma selección inserción/fusión
+        medida con --bench.
         """
+        from utilidades.ordenamiento import ordenar
 
         def valor_clave(objeto: ObjetoInstancia):
             ficha = resolver_ficha(objeto.tipo_catalogo)
@@ -207,12 +209,4 @@ class Inventario:
             return ficha.atributos.get(clave, 0)
 
         elementos = self._recolectar()
-        for i in range(1, len(elementos)):
-            actual = elementos[i]
-            clave_actual = valor_clave(actual)
-            j = i - 1
-            while j >= 0 and valor_clave(elementos[j]) > clave_actual:
-                elementos[j + 1] = elementos[j]
-                j -= 1
-            elementos[j + 1] = actual
-        return elementos
+        return ordenar(elementos, clave=valor_clave, descendente=descendente)
