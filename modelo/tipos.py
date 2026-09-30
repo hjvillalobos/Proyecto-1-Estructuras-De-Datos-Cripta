@@ -9,6 +9,7 @@ class Sala:
     id: int
     nombre: str
     salidas: Dict[str, Any]  # Ej: {"N": {"sala": 2, "cerrada": True, "llave": "itm_llave_bronce"}}
+    trampa: Any = None
 
 # 2. Definición del Actor base
 @dataclass
