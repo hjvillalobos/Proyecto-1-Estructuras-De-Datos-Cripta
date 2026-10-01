@@ -51,6 +51,91 @@ class Motor:
         self.sala_de_enemigo = {}          # {id(enemigo): id_sala} — C lo necesita, vos lo mantenés
         self.registro_rastro = RegistroRastro()
         self.registro_rastro.marcar_visita(self.jugador.posicion_actual, 0)  # sala inicial, tiempo 0 (§2.9)
+
+    def estado_vista(self):
+        from modelo.snapshots import EstadoVista, SalidaVista, EnemigoVista
+
+        sala = self.salas[self.jugador.posicion_actual]
+
+        salidas = [
+            SalidaVista(
+                direccion=direccion,
+                destino=info["sala"],
+                cerrada=info.get("cerrada", False),
+                llave=info.get("llave"),
+            )
+            for direccion, info in sala.salidas.items()
+        ]
+
+        enemigos_vista = [
+            EnemigoVista(
+                instancia=enemigo.id_instancia,
+                nombre=f"{enemigo.tipo_catalogo} #{indice + 1}",
+                vida=enemigo.vida,
+                vida_max=enemigo.vida_max,
+            )
+            for indice, enemigo in enumerate(self.enemigos_por_sala.get(sala.id, []))
+            if enemigo.vida > 0
+        ]
+
+        return EstadoVista(
+            reloj=self.reloj,
+            sala_id=sala.id,
+            sala_nombre=sala.nombre,
+            salidas=salidas,
+            enemigos=enemigos_vista,
+            objetos_suelo=[],  # pendiente: depende de ObjetoInstancia (C/B)
+            vida=self.jugador.vida,
+            vida_max=self.jugador.vida_max,
+            ataque=self.jugador.ataque,
+            defensa=self.jugador.defensa,
+            velocidad=self.jugador.velocidad,
+            inventario_usado=0,  # pendiente: lo llena Juan con su inventario real
+            inventario_max=0,  # pendiente: viene de los datos generales de la cripta (B)
+            efectos=[],  # opcional, para más adelante
+        )
+
+    def ejecutar(self, accion, argumento=None):
+        from modelo.snapshots import ResultadoAccion
+        from modelo.enemigos import decidir_accion
+
+        if accion == "mover":
+            ok, error = self.mover(argumento, contenido_sala_destino_cargado=True)
+        elif accion == "abrir":
+            ok, error = self.abrir_puerta(argumento)
+        elif accion == "atacar":
+            enemigo = self._buscar_enemigo_en_sala_actual(argumento)
+            if enemigo is None:
+                return ResultadoAccion(ok=False, mensaje="Ese enemigo no está en tu sala")
+            self.atacar(self.jugador, enemigo)
+            ok, error = True, None
+        elif accion == "esperar":
+            self._avanzar_actor(self.jugador, COSTOS["esperar"])
+            ok, error = True, None
+        elif accion in ("recoger", "usar", "equipar", "soltar", "retroceso"):
+            # pendiente: estas acciones las maneja el inventario/historial de Juan
+            return ResultadoAccion(ok=False, mensaje=f"Acción '{accion}' aún no integrada")
+        else:
+            return ResultadoAccion(ok=False, mensaje="Acción desconocida")
+
+        if not ok:
+            return ResultadoAccion(ok=False, mensaje=error)
+
+        # corre la agenda hasta que le vuelva a tocar decidir al jugador (§2.3)
+        while True:
+            evento = self.ejecutar_ciclo(decidir_accion)
+            if evento is None or evento.tipo == "turno_jugador":
+                break
+
+        return ResultadoAccion(ok=True)
+
+    def _buscar_enemigo_en_sala_actual(self, id_instancia):
+        for enemigo in self.enemigos_por_sala.get(self.jugador.posicion_actual, []):
+            if enemigo.id_instancia == id_instancia:
+                return enemigo
+        return None
+
+
     def activar_enemigos_de_sala(self, id_sala, enemigos_de_la_sala):
         """
         Activa (agenda su primera acción) a los enemigos "dormidos" de una sala
@@ -209,7 +294,7 @@ class Motor:
         self.reloj = evento.tiempo
 
         if evento.tipo == "turno_enemigo":
-            decidir_accion_enemigo(evento.referencia, self)
+            self._ejecutar_turno_enemigo(evento.referencia, decidir_accion_enemigo)
         elif evento.tipo == "pulso_veneno":
             self.efectos.ejecutar_pulso_veneno(evento.referencia)
         elif evento.tipo == "fin_veneno":
