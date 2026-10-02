@@ -9,6 +9,7 @@ class Sala:
     id: int
     nombre: str
     salidas: Dict[str, Any]  # Ej: {"N": {"sala": 2, "cerrada": True, "llave": "itm_llave_bronce"}}
+    trampa: Any = None
 
 # 2. Definición del Actor base
 @dataclass
@@ -42,3 +43,20 @@ class FichaCatalogo:
     nombre: str
     # Los demás atributos dependen del tipo, puedes usar un dict para los datos extra
     atributos: Dict[str, Any]
+
+# 6. Evento programado en el reloj virtual
+@dataclass
+class Evento:
+    tiempo: int              # instante del reloj virtual en que debe ejecutarse
+    secuencia: int           # desempate determinista si el tiempo coincide con otro evento
+    tipo: str                # ej: "accion_jugador", "ataque_enemigo", "veneno", "cierre_puerta"
+    referencia: Any          # el actor o efecto al que pertenece (para poder cancelarlo o reprogramarlo)
+    cancelado: bool = False  # invalidación perezosa: se marca así en lugar de borrarlo del heap
+
+# 7. Instancia de un objeto en el mundo (inventario o suelo de una sala)
+@dataclass
+class ObjetoInstancia:
+    id_instancia: str        # identificador único de esta instancia concreta
+    tipo_catalogo: str       # referencia al id en el catálogo (ej: "itm_daga_oxidada")
+    ubicacion: str           # "inventario" o "suelo"
+    sala: int = None         # id de la sala, solo si ubicacion == "suelo"
