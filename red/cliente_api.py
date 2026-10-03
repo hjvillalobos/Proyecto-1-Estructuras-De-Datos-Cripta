@@ -1,53 +1,122 @@
-import uuid
-import requests
+import math
 import time
+import uuid
+from threading import RLock
+from urllib.parse import quote
+
+from red.errores import DatosInvalidos, ErrorRed, PresupuestoAgotado
+from red.validacion import entero, identificador, lote
+
+
+CLIENTE_ID = str(uuid.uuid4())
+
 
 class ClienteApi:
+    def __init__(self, base_url=None, transporte=None, esperar=time.sleep,
+                 timeout=10, max_reintentos=3):
+        if transporte is None:
+            import requests
+            transporte = requests.Session()
+        self.transporte = transporte
+        self.base_url = (base_url or
+                         "https://cripta-api.kad06a0zhgs84.us-east-2.cs.amazonlightsail.com/v1").rstrip("/")
+        self.cliente_id = CLIENTE_ID
+        self.esperar = esperar
+        if not isinstance(timeout, (int, float)) or not math.isfinite(timeout) or timeout <= 0:
+            raise ValueError("El timeout debe ser positivo y finito.")
+        self.timeout = timeout
+        self.max_reintentos = entero(max_reintentos)
+        self.solicitudes_realizadas = 0
+        self.presupuesto_solicitudes = None
+        self._candado = RLock()
 
-    def __init__(self):
+    def configurar_presupuesto(self, limite):
+        with self._candado:
+            self.presupuesto_solicitudes = entero(limite)
+            if self.solicitudes_realizadas > limite:
+                raise PresupuestoAgotado(
+                    f"El inicio ya usó {self.solicitudes_realizadas} solicitudes; "
+                    f"la cripta declara un presupuesto de {limite}."
+                )
 
-        # Genera un ID unico
-        self.cliente_id = str(uuid.uuid4())
+    def _comprobar_presupuesto(self):
+        if (self.presupuesto_solicitudes is not None
+                and self.solicitudes_realizadas >= self.presupuesto_solicitudes):
+            raise PresupuestoAgotado(
+                f"Presupuesto agotado: {self.solicitudes_realizadas}/"
+                f"{self.presupuesto_solicitudes} solicitudes."
+            )
 
-        self.base_url = "https://cripta-api.kad06a0zhgs84.us-east-2.cs.amazonlightsail.com/v1"
+    def _hacer_peticion_get(self, endpoint, parametros=None):
+        import requests
+        with self._candado:
+            for intento in range(self.max_reintentos + 1):
+                self._comprobar_presupuesto()
+                self.solicitudes_realizadas += 1
+                respuesta = None
+                try:
+                    respuesta = self.transporte.get(
+                        self.base_url + endpoint, params=parametros,
+                        headers={"X-Cripta-Client-Id": self.cliente_id},
+                        timeout=self.timeout, allow_redirects=False
+                    )
+                    estado = respuesta.status_code
+                    try:
+                        datos = respuesta.json()
+                    except ValueError as error:
+                        raise ErrorRed(f"GET {endpoint}: HTTP {estado}, JSON inválido.") from error
+                except requests.RequestException as error:
+                    raise ErrorRed(f"GET {endpoint}: fallo de conexión o timeout: {error}") from error
+                finally:
+                    if respuesta is not None:
+                        respuesta.close()
+                if not isinstance(datos, dict):
+                    raise DatosInvalidos(f"GET {endpoint}: se esperaba un objeto JSON.")
+                if estado == 200:
+                    return datos
+                if estado != 429:
+                    raise ErrorRed(f"GET {endpoint}: HTTP {estado}: {datos.get('error', 'sin detalle')}")
+                if intento == self.max_reintentos:
+                    raise ErrorRed(f"GET {endpoint}: HTTP 429 después de {intento} reintentos.")
+                espera = datos.get("reintentar_en")
+                if type(espera) is not int or espera < 1:
+                    raise DatosInvalidos(f"GET {endpoint}: reintentar_en debe indicar segundos positivos.")
+                self._comprobar_presupuesto()
+                self.esperar(espera)
 
-    def _hacer_peticion_get(self, endpoint: str) -> dict:
+    def listar_criptas(self):
+        return self._hacer_peticion_get("/criptas")
 
-        url = f"{self.base_url}{endpoint}"
-        headers = {"X-Cripta-Client-Id": self.cliente_id}
+    def obtener_datos_generales(self, cripta_id):
+        ruta = f"/criptas/{quote(identificador(cripta_id), safe='')}"
+        datos = self._hacer_peticion_get(ruta)
+        if "presupuesto_solicitudes" not in datos:
+            raise DatosInvalidos(f"GET {ruta}: falta presupuesto_solicitudes.")
+        self.configurar_presupuesto(datos["presupuesto_solicitudes"])
+        return datos
 
-        while True:
+    def obtener_esqueleto(self, cripta_id, pagina=1):
+        ruta = f"/criptas/{quote(identificador(cripta_id), safe='')}/salas"
+        return self._hacer_peticion_get(ruta, {"pagina": entero(pagina, 1)})
 
-            respuesta = requests.get(url, headers=headers, timeout=5)
+    def obtener_contenido_salas(self, cripta_id, salas_ids):
+        ids = lote(salas_ids, salas=True)
+        ruta = f"/criptas/{quote(identificador(cripta_id), safe='')}/contenido"
+        return self._hacer_peticion_get(ruta, {"salas": ",".join(map(str, ids))})
 
-            if respuesta.status_code == 200:
-                return respuesta.json()
+    def obtener_catalogo(self, ids):
+        ids = lote(ids)
+        return self._hacer_peticion_get("/catalogo", {"ids": ",".join(ids)})
 
-            if respuesta.status_code == 429:
-                datos_error = respuesta.json()
-                espera_ms = datos_error.get("reintenta_en", 1000)
-                time.sleep(espera_ms / 1000)
-                continue # Vuelve al inicio del while
-
-            # Muestra cualquier otro error
-            respuesta.raise_for_status()
-
-
-    def obtener_datos_generales(self,cripta_id: str) -> dict:
-        ruta = f"/criptas/{cripta_id}"
+    def obtener_version_cripta(self, cripta_id):
+        ruta = f"/criptas/{quote(identificador(cripta_id), safe='')}/version"
         return self._hacer_peticion_get(ruta)
 
-    def obtener_esqueleto(self, cripta_id: str, pagina: int = 1) -> dict:
-        ruta = f"/criptas/{cripta_id}/salas?pagina={pagina}"
-        return self._hacer_peticion_get(ruta)
+    def obtener_version_catalogo(self):
+        return self._hacer_peticion_get("/catalogo/version")
 
-    def obtener_contenido_salas(self, cripta_id: str, salas_ids: list[int]) -> dict:
-        ruta = f"/criptas/{cripta_id}/contenido?salas={','.join(map(str, salas_ids))}"
-        return self._hacer_peticion_get(ruta)
-
-    def obtener_catalogo(self, ids: list[str]) -> dict:
-        ruta = f"/catalogo?ids={','.join(ids)}"
-        return self._hacer_peticion_get(ruta)
+    def cerrar(self):
+        self.transporte.close()
 
 
 
