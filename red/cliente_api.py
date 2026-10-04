@@ -12,8 +12,7 @@ CLIENTE_ID = str(uuid.uuid4())
 
 
 class ClienteApi:
-    def __init__(self, base_url=None, transporte=None, esperar=time.sleep,
-                 timeout=10, max_reintentos=3):
+    def __init__(self, base_url=None, transporte=None, esperar=time.sleep, timeout=10, max_reintentos=3):
         if transporte is None:
             import requests
             transporte = requests.Session()
