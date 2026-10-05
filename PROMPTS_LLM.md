@@ -53,7 +53,7 @@ Durante el desarrollo, actuarás como mi revisor técnico: asegúrate de que mis
 ### 2026-09-22
 
 - **Herramienta/modelo:** Gemini
-- **Prompt textual:** "Implemente la logica de los request en la funcion def _hacer_peticion_get manejando el error 429 con un tiempo de espera prudencial, ademas he completado las funciones actualizadas de cliente_api para usar la función central que maneja requests: obtener_datos_generales, obtener_esqueleto, obtener_contenido_salas y obtener_catalogo. Utilicé f-strings y join para los parámetros haciendo un llamado a la funcion _hacer_peticion_get previamente creada"
+- **Prompt textual:** "Implementa la logica de los request en la funcion def _hacer_peticion_get manejando el error 429 con un tiempo de espera prudencial, ademas he completado las funciones actualizadas de cliente_api para usar la función central que maneja requests: obtener_datos_generales, obtener_esqueleto, obtener_contenido_salas y obtener_catalogo. Utilicé f-strings y join para los parámetros haciendo un llamado a la funcion _hacer_peticion_get previamente creada"
 -  **Uso de la respuesta:** Validar la refactorización de las rutas, corrigiendo los endpoints /salas y /catalogo para coincidir con la especificación del servidor.
 
 
@@ -70,6 +70,17 @@ Durante el desarrollo, actuarás como mi revisor técnico: asegúrate de que mis
 - **Prompt textual:** "Necesito implementar el módulo de precarga (GestorPrecarga). Debe usar el ClienteApi para descargar los datos generales, el esqueleto de la primera página y el contenido de esas salas. Luego, debe extraer todos los IDs de objetos, enemigos y trampas de ese contenido, eliminar los duplicados, y enviarlos al GestorCatalogo para que los precargue en la tabla hash."
 -  **Uso de la respuesta:** Implementar la clase GestorPrecarga en red/precarga.py para inicializar el estado del juego, coordinando las peticiones HTTP iniciales y el poblamiento de la memoria caché mediante inyección de dependencias.
 
+### 2026-10-01
+
+- **Herramienta/modelo:** Codex (GPT-6)
+- **Prompt textual:** "No es posible el uso de tablas hash, siendo asi, que opciones de cambio tengo y por que ?"
+- **Uso de la respuesta:** Comparar una búsqueda lineal, un arreglo ordenado y un árbol AVL como alternativas al índice hash de la caché, conservando la política LRU y la protección de fichas en uso.
+
+### 2026-10-01
+
+- **Herramienta/modelo:** Codex (GPT-6)
+- **Prompt textual:** "Implementa un arreglo ordenado frente a búsqueda lineal en las mediciones y considera AVL si los resultados justifican su complejidad en el codigo"
+- **Uso de la respuesta:** Sustituir el índice hash por un arreglo ordenado con búsqueda binaria, conservar y probar LRU, comparar contra búsqueda lineal con cargas reproducibles y documentar la evidencia y el criterio para evaluar AVL.
 
 ### 2026-09-21 (Persona C)
 
@@ -91,4 +102,46 @@ Durante el desarrollo, actuarás como mi revisor técnico: asegúrate de que mis
 - **Prompt textual:** Le pedí ayuda para escribir las secciones de DECISIONES.md que me corresponden (inventario, historial, rastro), con evidencia real medida con --bench y no números inventados.
 - **Uso de la respuesta:** Redactar las 3 secciones del Documento de Decisiones, con las mediciones reales que se obtuvieron corriendo utilidades/medicion.py sobre mis propios módulos.
 
+
+### 2026-10-03
+
+- **Herramienta/modelo:** Codex (GPT-6)
+- **Prompt textual:** "Implementa ClienteApi para consultar el listado de criptas, datos generales, versiones, páginas del esqueleto, contenido de salas y catálogo. Mantén el mismo X-Cripta-Client-Id durante la ejecución. Cuenta cada intento contra el presupuesto, incluidos reintentos y consultas de versión. Maneja el error 429 usando reintentar_en, limita los reintentos y valida las respuestas. Las esperas de red no deben modificar el reloj virtual. Permite inyectar un transporte falso para las pruebas."
+- **Uso de la respuesta:** Implementar el cliente HTTP, el control del presupuesto, los reintentos y las validaciones, permitiendo probarlo sin conexión real.
+
+### 2026-10-03
+
+- **Herramienta/modelo:** Codex (GPT-6)
+- **Prompt textual:** "Implementa CacheCatalogoOrdenado con capacidad de 25 fichas, configurable. Usa un arreglo ordenado con búsqueda binaria propia y una lista doblemente enlazada LRU que compartan nodos. No uses bisect ni ordenamiento automático. Protege las fichas con referencias activas y desaloja la menos recientemente utilizada que tenga referencias == 0. Si ninguna puede salir, lanza CacheSinEspacioError sin superar la capacidad. Valida las actualizaciones de referencias."
+- **Uso de la respuesta:** Implementar la caché con búsqueda binaria y reemplazo LRU, respetando la capacidad y protegiendo las fichas utilizadas por el juego.
+
+### 2026-10-03
+
+- **Herramienta/modelo:** Codex (GPT-6)
+- **Prompt textual:** "Implementa AlmacenLocal para guardar el listado, metadatos, páginas, contenido y fichas en archivos JSON separados por versión e ID. Guarda las fichas descargadas para recuperarlas después de un desalojo sin repetir solicitudes. Administra por separado las versiones de cripta y catálogo y evita mezclar datos incompatibles. Usa archivos temporales antes de reemplazar el destino y reporta archivos ausentes o inválidos. No confundas este almacenamiento con el guardado de una partida."
+- **Uso de la respuesta:** Implementar el almacenamiento local y la separación de versiones para reutilizar datos descargados y recuperar fichas desalojadas sin recurrir nuevamente a la red.
+
+### 2026-10-03
+
+- **Herramienta/modelo:** Codex (GPT-6)
+- **Prompt textual:** "Agrega GestorCatalogo para buscar primero en memoria y después en disco, solicitando solo los faltantes en lotes de hasta 10 IDs distintos. Deduplica mediante listas y revisa las dependencias de suelta sin repetir descargas ni entrar en ciclos. Valida las respuestas y conserva el orden solicitado. Precarga en disco sin llenar la caché con fichas todavía inactivas. Permite retener, liberar y fijar referencias, y reporta aciertos, fallos, recuperaciones desde disco y solicitudes."
+- **Uso de la respuesta:** Coordinar las consultas del catálogo entre caché, disco y API, resolver dependencias y administrar las referencias y métricas de uso.
+
+### 2026-10-03
+
+- **Herramienta/modelo:** Codex (GPT-6)
+- **Prompt textual:** "Implementa GestorPrecarga para descargar todas las páginas del esqueleto, de hasta 50 salas por página, y cargar contenido en lotes de hasta 10 IDs distintos. Anticipa salas conectadas con listas y un recorrido por anchura de orden fijo. Reutiliza contenido válido, utiliza un solo hilo de precarga e incorpora los resultados de forma determinista. Si falta contenido necesario, espera antes de permitir confirmar la entrada. No actives enemigos ni avances el reloj virtual al descargar datos."
+- **Uso de la respuesta:** Implementar la carga inicial y anticipada de salas, evitando solicitudes repetidas y separando la descarga de datos de las acciones del motor.
+
+### 2026-10-03
+
+- **Herramienta/modelo:** Codex (GPT-6)
+- **Prompt textual:** "Necesito ClienteOffline con los mismos métodos que ClienteApi, leyendo los archivos locales sin realizar solicitudes HTTP. Informa claramente si faltan datos. Agrega al punto de entrada las opciones para listar, seleccionar cripta, configurar caché, seleccionar versiones, descargar contenido y trabajar offline. Mantén este punto de entrada como preparación de datos, sin implementar el motor. Deja explícita la validación pendiente del formato offline oficial."
+- **Uso de la respuesta:** Incorporar el funcionamiento sin conexión y las opciones de ejecución de la parte B, dejando pendiente la integración con el motor y la verificación del paquete oficial.
+
+### 2026-10-03
+
+- **Herramienta/modelo:** Codex (GPT-6)
+- **Prompt textual:** "Ahora Agrega pruebas de presupuesto, reintentos, validación, paginación, lotes, reutilización, versiones, referencias activas, LRU, persistencia y modo offline. Compara búsqueda binaria y lineal usando el mismo arreglo ordenado y LRU, con cargas reproducibles de consultas e inserciones. Mide por separado la recuperación desde disco y comprueba que no use red. Reporta promedios y variación. Considera AVL solo si los resultados justifican su complejidad; no afirmes que estas mediciones prueban el límite de 20 ms del juego completo."
+- **Uso de la respuesta:** Crear pruebas automatizadas y mediciones reproducibles para validar la parte B, comparar las estrategias de búsqueda y evaluar la recuperación desde disco.
 
