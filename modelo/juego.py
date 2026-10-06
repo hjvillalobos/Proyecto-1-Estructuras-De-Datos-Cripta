@@ -5,6 +5,7 @@ from modelo.eventos import ColaEventos
 from modelo.efectos import GestorEfectos
 from modelo.tipos import Jugador, InstanciaEnemigo
 from modelo.rastro import RegistroRastro
+from modelo.historial import HistorialRetroceso
 
 
 # Costos base de cada acción (§2.3)
@@ -51,6 +52,15 @@ class Motor:
         self.sala_de_enemigo = {}          # {id(enemigo): id_sala} — C lo necesita, vos lo mantenés
         self.registro_rastro = RegistroRastro()
         self.registro_rastro.marcar_visita(self.jugador.posicion_actual, 0)  # sala inicial, tiempo 0 (§2.9)
+        self.historial = HistorialRetroceso(self.registro_rastro)
+        self.objetos_en_suelo = {}
+        self.acciones_jugador = 0
+        self.enemigos_derrotados = 0
+        self.terminado = False
+        self.resultado = None       # "victoria" | "derrota" | None
+        self.sala_salida = None     # lo llena crear_juego()
+        self.llave_salida = None    # lo llena crear_juego()
+        self.meta = None
 
     def estado_vista(self):
         from modelo.snapshots import EstadoVista, SalidaVista, EnemigoVista
@@ -90,7 +100,7 @@ class Motor:
             ataque=self.jugador.ataque,
             defensa=self.jugador.defensa,
             velocidad=self.jugador.velocidad,
-            inventario_usado=0,  # pendiente: lo llena Juan con su inventario real
+            inventario_usado=0,  # pendiente: D lo llena con su inventario real
             inventario_max=0,  # pendiente: viene de los datos generales de la cripta (B)
             efectos=[],  # opcional, para más adelante
         )
@@ -99,8 +109,19 @@ class Motor:
         from modelo.snapshots import ResultadoAccion
         from modelo.enemigos import decidir_accion
 
+        if accion == "retroceso":
+            if self.jugador.inventario.contar("itm_pergamino_retroceso") == 0:
+                return ResultadoAccion(ok=False, mensaje="No tenés pergaminos de retroceso")
+            reloj_anterior = self.historial.usar_pergamino(self.jugador.inventario)
+            if reloj_anterior is None:
+                return ResultadoAccion(ok=False, mensaje="No hay nada que deshacer")
+            self.reloj = reloj_anterior
+            return ResultadoAccion(ok=True)
+
+        self.historial.iniciar_turno(self.reloj)
+
         if accion == "mover":
-            ok, error = self.mover(argumento, contenido_sala_destino_cargado=True)
+            ok, error = self.mover(argumento)
         elif accion == "abrir":
             ok, error = self.abrir_puerta(argumento)
         elif accion == "atacar":
@@ -112,28 +133,98 @@ class Motor:
         elif accion == "esperar":
             self._avanzar_actor(self.jugador, COSTOS["esperar"])
             ok, error = True, None
-        elif accion in ("recoger", "usar", "equipar", "soltar", "retroceso"):
-            # pendiente: estas acciones las maneja el inventario/historial de Juan
-            return ResultadoAccion(ok=False, mensaje=f"Acción '{accion}' aún no integrada")
+        elif accion == "recoger":
+            objetos_sala = self.objetos_en_suelo.get(self.jugador.posicion_actual, [])
+            objeto = next((o for o in objetos_sala if o.id_instancia == argumento), None)
+            if objeto is None:
+                return ResultadoAccion(ok=False, mensaje="Ese objeto no está en el suelo de esta sala")
+            nodo = self.jugador.inventario.recoger(objeto)
+            if nodo is None:
+                return ResultadoAccion(ok=False, mensaje="Inventario lleno")
+            objetos_sala.remove(objeto)
+            if objeto.tipo_catalogo != "itm_pergamino_retroceso":  # excepción §2.11
+                self.historial.registrar_inventario(lambda n=nodo: self.jugador.inventario.quitar_nodo(n))
+            self._avanzar_actor(self.jugador, COSTOS["recoger"])
+            ok, error = True, None
+        elif accion == "soltar":
+            if not self._posicionar_cursor_en(argumento):
+                return ResultadoAccion(ok=False, mensaje="No tenés ese objeto en el inventario")
+            inventario = self.jugador.inventario
+            nodo_actual = inventario.cursor
+            anterior = nodo_actual.anterior if nodo_actual.anterior is not inventario.cabeza else None
+            objeto = inventario.soltar_actual()
+            objeto.ubicacion = "suelo"
+            objeto.sala = self.jugador.posicion_actual
+            self.objetos_en_suelo.setdefault(self.jugador.posicion_actual, []).append(objeto)
+            if objeto.tipo_catalogo != "itm_pergamino_retroceso":  # excepción §2.11
+                self.historial.registrar_inventario(lambda a=anterior, o=objeto: inventario.insertar_despues(a, o))
+            self._avanzar_actor(self.jugador, COSTOS["soltar"])
+            ok, error = True, None
+        elif accion in ("usar", "equipar"):
+            return ResultadoAccion(ok=False, mensaje=f"Acción '{accion}' pendiente: depende del catálogo (B)")
         else:
             return ResultadoAccion(ok=False, mensaje="Acción desconocida")
 
         if not ok:
             return ResultadoAccion(ok=False, mensaje=error)
 
-        # corre la agenda hasta que le vuelva a tocar decidir al jugador (§2.3)
         while True:
             evento = self.ejecutar_ciclo(decidir_accion)
-            if evento is None or evento.tipo == "turno_jugador":
+            if evento is None or evento.tipo == "turno_jugador" or self.terminado:
                 break
 
+        self.acciones_jugador += 1
+        self.historial.cerrar_turno()
         return ResultadoAccion(ok=True)
+
 
     def _buscar_enemigo_en_sala_actual(self, id_instancia):
         for enemigo in self.enemigos_por_sala.get(self.jugador.posicion_actual, []):
             if enemigo.id_instancia == id_instancia:
                 return enemigo
         return None
+    def _ids_en_uso(self):
+        ids = set()
+        for enemigos in self.enemigos_por_sala.values():
+            for enemigo in enemigos:
+                if enemigo.vida > 0:
+                    ids.add(enemigo.tipo_catalogo)
+        for objetos in self.objetos_en_suelo.values():
+            for objeto in objetos:
+                ids.add(objeto.tipo_catalogo)
+
+        inventario = self.jugador.inventario
+        if inventario is not None and not inventario.esta_vacio():
+            anterior = None
+            actual = inventario.objeto_actual()
+            while actual is not anterior:
+                anterior = actual
+                actual = inventario.retroceder()
+            while actual is not None:
+                ids.add(actual.tipo_catalogo)
+                siguiente = inventario.avanzar()
+                if siguiente is actual:
+                    break
+                actual = siguiente
+        return list(ids)
+
+    def _posicionar_cursor_en(self, id_instancia):
+        inventario = self.jugador.inventario
+        if inventario.esta_vacio():
+            return False
+        anterior = None
+        actual = inventario.objeto_actual()
+        while actual is not anterior:
+            anterior = actual
+            actual = inventario.retroceder()
+        while actual is not None:
+            if actual.id_instancia == id_instancia:
+                return True
+            siguiente = inventario.avanzar()
+            if siguiente is actual:
+                return False
+            actual = siguiente
+        return False
 
 
     def activar_enemigos_de_sala(self, id_sala, enemigos_de_la_sala):
@@ -173,6 +264,7 @@ class Motor:
         if llave_necesaria and llave_necesaria not in self.jugador.llaves_obtenidas:
             return False, "No tenés la llave correcta"  # se rechaza, no consume tiempo (Apéndice B)
 
+        self.historial.registrar_puerta(salida, "cerrada", salida.get("cerrada", False))
         salida["cerrada"] = False
         self._avanzar_actor(self.jugador, COSTOS["abrir_puerta"])
 
@@ -182,30 +274,31 @@ class Motor:
 
         return True, None
 
-    def mover(self, direccion, contenido_sala_destino_cargado):
-        """
-        contenido_sala_destino_cargado: True si B ya garantizó que el
-        contenido de la sala destino está en memoria (§4.2). El motor NO debe
-        confirmar el movimiento si esto es False.
-        """
+    def mover(self, direccion):
         puede, error = self.puede_moverse(direccion)
         if not puede:
             return False, error
-        if not contenido_sala_destino_cargado:
-            return False, "Contenido de la sala destino aún no disponible"
 
         id_destino = self.salas[self.jugador.posicion_actual].salidas[direccion]["sala"]
+
+        if id_destino not in self.enemigos_por_sala:
+            # contenido de la sala destino aún no existe en memoria: lo pedimos
+            # ahora mismo, bloqueando la confirmación del movimiento (§4.2)
+            sala_preparada = self.gestor_precarga.preparar_entrada(id_destino, self._ids_en_uso())
+            _incorporar_sala_preparada(self, sala_preparada)
+
         sala_destino = self.salas[id_destino]
         self.jugador.posicion_actual = id_destino
+        if id_destino == self.sala_salida and self.llave_salida in self.jugador.llaves_obtenidas:
+            self.terminado = True
+            self.resultado = "victoria"
         self._avanzar_actor(self.jugador, COSTOS["mover"])
         self.registro_rastro.marcar_visita(id_destino, self.reloj)
+        self.historial.registrar_rastro(id_destino, self.registro_rastro.tiempo_de(id_destino))
 
-        # activar enemigos dormidos de la sala destino, si los hay
         enemigos = self.enemigos_por_sala.get(id_destino, [])
         self.activar_enemigos_de_sala(id_destino, enemigos)
 
-        # activar trampa armada de la sala destino, inmediatamente después
-        # de completar el movimiento, antes de procesar el siguiente evento (§2.10)
         trampa = getattr(sala_destino, "trampa", None)
         if trampa is not None:
             self.efectos.activar_trampa(trampa, trampa.dano, trampa.rearme)
@@ -214,23 +307,35 @@ class Motor:
 
     def atacar(self, atacante, defensor):
         dano = calcular_dano(atacante, defensor, self.azar)
+        self.historial.registrar_vida(defensor, defensor.vida)
         defensor.vida = max(0, defensor.vida - dano)
-
         if defensor.vida == 0:
             self._matar(defensor)
-
         self._avanzar_actor(atacante, COSTOS["atacar"])
-
         return dano
 
     def _matar(self, actor):
-        """Cancela los eventos futuros del actor muerto (§2.6, §4.1)."""
         evento = self.evento_pendiente.get(id(actor))
         if evento is not None:
+            self.historial.registrar_evento_cancelado(evento)
             self.cola.cancelar(evento)
             del self.evento_pendiente[id(actor)]
 
+        if actor is self.jugador:
+            self.terminado = True
+            self.resultado = "derrota"
+        else:
+            self.enemigos_derrotados += 1
 
+    def resumen(self):
+        from modelo.snapshots import ResumenPartida
+        return ResumenPartida(
+            terminado=self.terminado,
+            resultado=self.resultado,
+            acciones=self.acciones_jugador,
+            derrotados=self.enemigos_derrotados,
+            reloj_final=self.reloj,
+        )
 
     def cambiar_velocidad(self, actor, velocidad_nueva):
         evento_viejo = self.evento_pendiente.get(id(actor))
@@ -250,9 +355,11 @@ class Motor:
         actor.tiempo_siguiente = self.reloj + intervalo
         evento_viejo = self.evento_pendiente.get(id(actor))
         if evento_viejo is not None:
+            self.historial.registrar_evento_cancelado(evento_viejo)
             self.cola.cancelar(evento_viejo)
         tipo_evento = "turno_jugador" if actor is self.jugador else "turno_enemigo"
         nuevo = self.cola.insertar(actor.tiempo_siguiente, tipo_evento, actor)
+        self.historial.registrar_evento_creado(nuevo)
         self.evento_pendiente[id(actor)] = nuevo
 
     def _ejecutar_turno_enemigo(self, enemigo, decidir_accion_enemigo):
@@ -313,3 +420,74 @@ class Motor:
             pass  # el jugador decide su acción vía la vista/controlador, no acá
 
         return evento
+
+def crear_juego(gestor_precarga, cripta_id, semilla, notificar=None):
+    from modelo.tipos import Jugador
+    from modelo.snapshots import MetaPartida
+    from modelo.inventario import Inventario
+
+    preparada = gestor_precarga.preparar_cripta(cripta_id)
+    generales = preparada.generales
+    salas = {sala.id: sala for sala in preparada.salas}
+
+    jug = generales["jugador"]
+    jugador = Jugador(
+        vida=jug["vida_max"], vida_max=jug["vida_max"],
+        ataque=jug["ataque"], defensa=jug["defensa"], velocidad=jug["velocidad"],
+        tiempo_siguiente=0,
+        inventario=Inventario(capacidad_max=generales["inventario_max"]),
+        posicion_actual=generales["sala_inicial"],
+        llaves_obtenidas=[],
+    )
+
+    motor = Motor(jugador=jugador, salas=salas, semilla=semilla)
+    motor.gestor_precarga = gestor_precarga   # lo necesita mover() para cargar salas nuevas (§4.2)
+    motor.meta = MetaPartida(
+        cripta_id=cripta_id,
+        cripta_version=generales.get("version", "desconocida"),
+        catalogo_version=preparada.version_catalogo,
+        semilla=semilla,
+    )
+    motor.sala_salida = generales["sala_salida"]
+    motor.llave_salida = generales["llave_salida"]
+
+    _incorporar_sala_preparada(motor, preparada.inicial)
+
+    if notificar:
+        notificar(f"Cripta '{cripta_id}' cargada: {len(salas)} salas.")
+
+    return motor
+
+
+def _incorporar_sala_preparada(motor, sala_preparada):
+    """Convierte el contenido crudo + fichas de UNA sala en InstanciaEnemigo /
+    ObjetoInstancia reales, y los registra en el motor."""
+    from modelo.tipos import InstanciaEnemigo, ObjetoInstancia
+
+    id_sala = sala_preparada.sala.id
+    fichas_por_id = {f.id: f for f in sala_preparada.fichas}
+    contenido = sala_preparada.contenido
+
+    enemigos_de_la_sala = []
+    for enemigo_json in contenido.get("enemigos", []):
+        ficha = fichas_por_id[enemigo_json["tipo"]]
+        enemigos_de_la_sala.append(InstanciaEnemigo(
+            vida=enemigo_json.get("vida", ficha.atributos["vida_max"]),
+            vida_max=ficha.atributos["vida_max"],
+            ataque=ficha.atributos["ataque"],
+            defensa=ficha.atributos["defensa"],
+            velocidad=ficha.atributos["velocidad"],
+            tiempo_siguiente=0,
+            id_instancia=enemigo_json["instancia"],
+            tipo_catalogo=enemigo_json["tipo"],
+            comportamiento=ficha.atributos["comportamiento"],
+        ))
+    motor.enemigos_por_sala[id_sala] = enemigos_de_la_sala
+
+    objetos_de_la_sala = []
+    for indice, tipo_objeto in enumerate(contenido.get("objetos", [])):
+        objetos_de_la_sala.append(ObjetoInstancia(
+            id_instancia=f"obj-{id_sala}-{indice}",
+            tipo_catalogo=tipo_objeto, ubicacion="suelo", sala=id_sala,
+        ))
+    motor.objetos_en_suelo[id_sala] = objetos_de_la_sala

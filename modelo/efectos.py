@@ -111,11 +111,9 @@ class GestorEfectos:
     def ejecutar_rearmar_trampa(self, trampa):
         trampa.armada = True
 
-    # ---------- cierre automático de puerta ----------
-    # (el AGENDAMIENTO ya está en juego.py -> Motor.abrir_puerta; acá solo
-    # va la EJECUCIÓN, que dispara el bucle principal cuando llega el evento)
 
     def ejecutar_cierre_puerta(self, sala, direccion):
         salida = sala.salidas.get(direccion)
         if salida is not None:
+            self.motor.historial.registrar_puerta(salida, "cerrada", salida.get("cerrada", False))
             salida["cerrada"] = True
