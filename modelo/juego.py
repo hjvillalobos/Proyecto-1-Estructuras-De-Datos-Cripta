@@ -3,7 +3,7 @@
 import random
 from modelo.eventos import ColaEventos
 from modelo.efectos import GestorEfectos
-from modelo.tipos import Jugador, InstanciaEnemigo
+from modelo.tipos import Jugador, InstanciaEnemigo, ObjetoInstancia
 from modelo.rastro import RegistroRastro
 from modelo.historial import HistorialRetroceso
 
@@ -160,8 +160,52 @@ class Motor:
                 self.historial.registrar_inventario(lambda a=anterior, o=objeto: inventario.insertar_despues(a, o))
             self._avanzar_actor(self.jugador, COSTOS["soltar"])
             ok, error = True, None
-        elif accion in ("usar", "equipar"):
-            return ResultadoAccion(ok=False, mensaje=f"Acción '{accion}' pendiente: depende del catálogo (B)")
+        elif accion == "equipar":
+            if not self._posicionar_cursor_en(argumento):
+                return ResultadoAccion(ok=False, mensaje="No tenés ese objeto en el inventario")
+            inventario = self.jugador.inventario
+            objeto = inventario.objeto_actual()
+            ficha = self.gestor_precarga.catalogo.obtener_fichas([objeto.tipo_catalogo])[0]
+            if ficha.clase not in ("arma", "armadura"):
+                return ResultadoAccion(ok=False, mensaje="Ese objeto no se puede equipar")
+
+            nodo_anterior = inventario.arma_equipada if ficha.clase == "arma" else inventario.armadura_equipada
+            if nodo_anterior is not None:
+                ficha_anterior = self.gestor_precarga.catalogo.obtener_fichas([nodo_anterior.objeto.tipo_catalogo])[0]
+                if ficha.clase == "arma":
+                    self.jugador.ataque -= ficha_anterior.atributos.get("ataque_bonus", 0)
+                else:
+                    self.jugador.defensa -= ficha_anterior.atributos.get("defensa_bonus", 0)
+
+            inventario.equipar_actual(ficha.clase)
+            if ficha.clase == "arma":
+                self.jugador.ataque += ficha.atributos.get("ataque_bonus", 0)
+            else:
+                self.jugador.defensa += ficha.atributos.get("defensa_bonus", 0)
+
+            self._avanzar_actor(self.jugador, COSTOS["equipar"])
+            ok, error = True, None
+        elif accion == "usar":
+            if not self._posicionar_cursor_en(argumento):
+                return ResultadoAccion(ok=False, mensaje="No tenés ese objeto en el inventario")
+            inventario = self.jugador.inventario
+            objeto = inventario.objeto_actual()
+            ficha = self.gestor_precarga.catalogo.obtener_fichas([objeto.tipo_catalogo])[0]
+
+            if ficha.clase == "pocion" and "cura" in ficha.atributos:
+                self.jugador.vida = min(self.jugador.vida_max, self.jugador.vida + ficha.atributos["cura"])
+            elif ficha.clase == "pocion" and "modificador_velocidad" in ficha.atributos:
+                return ResultadoAccion(ok=False, mensaje="Poción de velocidad: pendiente")
+            elif ficha.clase == "antidoto":
+                self.efectos.cancelar_veneno(self.jugador)
+            elif ficha.clase == "antorcha":
+                self.efectos.encender_antorcha(objeto, ficha.atributos.get("duracion", 0))
+            else:
+                return ResultadoAccion(ok=False, mensaje="Ese objeto no se puede usar")
+
+            inventario.quitar_nodo(inventario.cursor)
+            self._avanzar_actor(self.jugador, COSTOS["usar_objeto"])
+            ok, error = True, None
         else:
             return ResultadoAccion(ok=False, mensaje="Acción desconocida")
 
@@ -326,6 +370,19 @@ class Motor:
             self.resultado = "derrota"
         else:
             self.enemigos_derrotados += 1
+            self._soltar_botin(actor)
+
+    def _soltar_botin(self, enemigo):
+        ficha = self.gestor_precarga.catalogo.obtener_fichas([enemigo.tipo_catalogo])[0]
+        id_sala = self.sala_de_enemigo.get(id(enemigo))
+        if id_sala is None:
+            return
+        objetos_sala = self.objetos_en_suelo.setdefault(id_sala, [])
+        for indice, tipo_objeto in enumerate(ficha.atributos.get("suelta", [])):
+            objetos_sala.append(ObjetoInstancia(
+                id_instancia=f"botin-{enemigo.id_instancia}-{indice}",
+                tipo_catalogo=tipo_objeto, ubicacion="suelo", sala=id_sala,
+            ))
 
     def resumen(self):
         from modelo.snapshots import ResumenPartida
