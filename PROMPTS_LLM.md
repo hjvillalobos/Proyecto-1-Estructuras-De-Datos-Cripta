@@ -53,13 +53,10 @@ Durante el desarrollo, actuarás como mi revisor técnico: asegúrate de que mis
 ### 2026-09-18
 **Herramienta/modelo:** Claude (Anthropic, claude.ai) — Claude Sonnet 5
 
-<<<<<<< Updated upstream
 - **Herramienta/modelo:** Gemini
 - **Prompt textual:** "Implementa la logica de los request en la funcion def _hacer_peticion_get manejando el error 429 con un tiempo de espera prudencial, ademas he completado las funciones actualizadas de cliente_api para usar la función central que maneja requests: obtener_datos_generales, obtener_esqueleto, obtener_contenido_salas y obtener_catalogo. Utilicé f-strings y join para los parámetros haciendo un llamado a la funcion _hacer_peticion_get previamente creada"
 -  **Uso de la respuesta:** Validar la refactorización de las rutas, corrigiendo los endpoints /salas y /catalogo para coincidir con la especificación del servidor.
-=======
 **Prompt textual**:
->>>>>>> Stashed changes
 
 lee bien el enunciado paso a paso y la division de trabajo que mis compañeros y yo realizamos, dame el codigo por aca de la persona D que seria mi persona y que es lo que me toca, explicame y damelo comentado y sigue todo al pie de la letra.
 
@@ -68,7 +65,6 @@ Uso: generar la implementación inicial completa del módulo de la Persona D (or
 ### 2026-09-27
 **Herramienta/modelo:** Claude (Anthropic, claude.ai) — Claude Sonnet 5
 
-<<<<<<< Updated upstream
 ### 2026-10-01
 
 - **Herramienta/modelo:** Codex (GPT-6)
@@ -80,10 +76,28 @@ Uso: generar la implementación inicial completa del módulo de la Persona D (or
 - **Herramienta/modelo:** Codex (GPT-6)
 - **Prompt textual:** "Implementa un arreglo ordenado frente a búsqueda lineal en las mediciones y considera AVL si los resultados justifican su complejidad en el codigo"
 - **Uso de la respuesta:** Sustituir el índice hash por un arreglo ordenado con búsqueda binaria, conservar y probar LRU, comparar contra búsqueda lineal con cargas reproducibles y documentar la evidencia y el criterio para evaluar AVL.
-=======
 **Prompt textual**:
 Mi parte del proyecto esta dividida en 3 ramas, ayudame visualizandndo si lo realicé de manera correcta para subir mis clases a la rama principal.
->>>>>>> Stashed changes
+
+### 2026-09-21 (Persona C)
+
+- **Herramienta/modelo:** Claude Code (Sonnet 5)
+- **Prompt textual:** Le pasé el enunciado completo, la división de trabajo del equipo (documento CRIPTA_Division_de_trabajo) y la documentación Swagger del API, aclarando que a mí me toca Persona C (inventario, historial de retroceso, rastro y enemigos), y le pedí que primero entendiera bien el proyecto antes de proponerme un plan.
+- **Uso de la respuesta:** Entender el alcance completo de mi parte y armar el orden en que iba a implementar cada módulo (rastro -> inventario -> enemigos -> historial), verificado contra las secciones exactas del enunciado (§2.7-§2.9, §2.11, §4.5-§4.7).
+
+### 2026-09-27 (Persona C)
+
+- **Herramienta/modelo:** Claude Code (Sonnet 5)
+- **Prompt textual:** Le pedí implementar modelo/rastro.py, modelo/inventario.py, modelo/enemigos.py y modelo/historial.py según el plan que habíamos acordado, con pruebas unitarias, agregando solo la clase ObjetoInstancia a modelo/tipos.py de forma aditiva (idéntica a la que ya tenía Sebas en su rama) para no generar conflictos.
+- **Uso de la respuesta:** Base de mis 4 módulos con 34 pruebas unitarias (unittest), todas corriendo correctamente.
+
+- **Herramienta/modelo:** Claude Code (Sonnet 5)
+- **Prompt textual:** Le pedí revisar qué habían subido mis compañeros (a main y a sus ramas) y actualizar mi rama feature/estado-jugador sin romper nada de lo mío ni de lo de ellos.
+- **Uso de la respuesta:** Fusionar los cambios de main (cliente HTTP real, ordenamiento, snapshots, vista, guardado binario) y traer utilidades/medicion.py de la rama de Belén, verificando en cada paso que las pruebas siguieran pasando. También cambié mi vista_ordenada del inventario para usar utilidades.ordenamiento.ordenar en vez de un ordenamiento propio, tal como lo pedía controlador/contrato.py.
+
+- **Herramienta/modelo:** Claude Code (Sonnet 5)
+- **Prompt textual:** Le pedí ayuda para escribir las secciones de DECISIONES.md que me corresponden (inventario, historial, rastro), con evidencia real medida con --bench y no números inventados.
+- **Uso de la respuesta:** Redactar las 3 secciones del Documento de Decisiones, con las mediciones reales que se obtuvieron corriendo utilidades/medicion.py sobre mis propios módulos.
 
 Uso: repartir los archivos del módulo de D en las ramas de git del equipo, según sus dependencias internas y el orden correcto de merge.
 
