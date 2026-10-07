@@ -50,25 +50,20 @@ Durante el desarrollo, actuarás como mi revisor técnico: asegúrate de que mis
 - **Uso de la respuesta:** Crear casos de prueba automatizados usando unittest para validar la inserción, el desalojo estándar del elemento más antiguo y la protección de elementos bloqueados por el motor del juego.
 
 
-### 2026-09-22
+### 2026-09-18
+**Herramienta/modelo:** Claude (Anthropic, claude.ai) — Claude Sonnet 5
 
 - **Herramienta/modelo:** Gemini
 - **Prompt textual:** "Implementa la logica de los request en la funcion def _hacer_peticion_get manejando el error 429 con un tiempo de espera prudencial, ademas he completado las funciones actualizadas de cliente_api para usar la función central que maneja requests: obtener_datos_generales, obtener_esqueleto, obtener_contenido_salas y obtener_catalogo. Utilicé f-strings y join para los parámetros haciendo un llamado a la funcion _hacer_peticion_get previamente creada"
 -  **Uso de la respuesta:** Validar la refactorización de las rutas, corrigiendo los endpoints /salas y /catalogo para coincidir con la especificación del servidor.
+**Prompt textual**:
 
+lee bien el enunciado paso a paso y la division de trabajo que mis compañeros y yo realizamos, dame el codigo por aca de la persona D que seria mi persona y que es lo que me toca, explicame y damelo comentado y sigue todo al pie de la letra.
 
-### 2026-09-22
+Uso: generar la implementación inicial completa del módulo de la Persona D (ordenamiento, guardado binario, bitácora/replay, vista de consola, controlador, bench y main.py) y el contrato de dependencias con A, B y C.
 
-- **Herramienta/modelo:** Gemini
-- **Prompt textual:** "Al probar la conexión HTTP real me da un error 400. Agregué un print de depuración y la respuesta del servidor dice: 'Invalid request: missing or malformed X-Cripta-Client-Id'. El encabezado que se va a enviar es {'X-Cripta-Cliente-Id': '0e56e27d-d6fd-43de-8b10-d6955e625f65'}."
--  **Uso de la respuesta:** Identificar y corregir un error tipográfico en la llave del diccionario del encabezado ("Cliente" en lugar de "Client") y validar la correcta generación de identificadores UUID4.
-
-
-### 2026-09-22
-
-- **Herramienta/modelo:** Gemini
-- **Prompt textual:** "Necesito implementar el módulo de precarga (GestorPrecarga). Debe usar el ClienteApi para descargar los datos generales, el esqueleto de la primera página y el contenido de esas salas. Luego, debe extraer todos los IDs de objetos, enemigos y trampas de ese contenido, eliminar los duplicados, y enviarlos al GestorCatalogo para que los precargue en la tabla hash."
--  **Uso de la respuesta:** Implementar la clase GestorPrecarga en red/precarga.py para inicializar el estado del juego, coordinando las peticiones HTTP iniciales y el poblamiento de la memoria caché mediante inyección de dependencias.
+### 2026-09-27
+**Herramienta/modelo:** Claude (Anthropic, claude.ai) — Claude Sonnet 5
 
 ### 2026-10-01
 
@@ -81,6 +76,8 @@ Durante el desarrollo, actuarás como mi revisor técnico: asegúrate de que mis
 - **Herramienta/modelo:** Codex (GPT-6)
 - **Prompt textual:** "Implementa un arreglo ordenado frente a búsqueda lineal en las mediciones y considera AVL si los resultados justifican su complejidad en el codigo"
 - **Uso de la respuesta:** Sustituir el índice hash por un arreglo ordenado con búsqueda binaria, conservar y probar LRU, comparar contra búsqueda lineal con cargas reproducibles y documentar la evidencia y el criterio para evaluar AVL.
+**Prompt textual**:
+Mi parte del proyecto esta dividida en 3 ramas, ayudame visualizandndo si lo realicé de manera correcta para subir mis clases a la rama principal.
 
 ### 2026-09-21 (Persona C)
 
@@ -102,6 +99,7 @@ Durante el desarrollo, actuarás como mi revisor técnico: asegúrate de que mis
 - **Prompt textual:** Le pedí ayuda para escribir las secciones de DECISIONES.md que me corresponden (inventario, historial, rastro), con evidencia real medida con --bench y no números inventados.
 - **Uso de la respuesta:** Redactar las 3 secciones del Documento de Decisiones, con las mediciones reales que se obtuvieron corriendo utilidades/medicion.py sobre mis propios módulos.
 
+Uso: repartir los archivos del módulo de D en las ramas de git del equipo, según sus dependencias internas y el orden correcto de merge.
 
 ### 2026-10-03
 
