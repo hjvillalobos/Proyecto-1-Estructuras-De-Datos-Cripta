@@ -88,21 +88,34 @@ class Motor:
             if enemigo.vida > 0
         ]
 
+        from modelo.snapshots import ItemVista
+        objetos_vista = []
+        for objeto in self.objetos_en_suelo.get(self.jugador.posicion_actual, []):
+            ficha = self._resolver_ficha(objeto.tipo_catalogo)
+            objetos_vista.append(ItemVista(
+                instancia=objeto.id_instancia,
+                nombre=ficha.nombre,
+                clase=ficha.clase,
+                peso=ficha.atributos.get("peso", 0),
+                valor=ficha.atributos.get("valor", 0),
+                equipado=False,
+            ))
+
         return EstadoVista(
             reloj=self.reloj,
             sala_id=sala.id,
             sala_nombre=sala.nombre,
             salidas=salidas,
             enemigos=enemigos_vista,
-            objetos_suelo=[],  # pendiente: depende de ObjetoInstancia (C/B)
+            objetos_suelo=objetos_vista,
             vida=self.jugador.vida,
             vida_max=self.jugador.vida_max,
             ataque=self.jugador.ataque,
             defensa=self.jugador.defensa,
             velocidad=self.jugador.velocidad,
-            inventario_usado=0,  # pendiente: D lo llena con su inventario real
-            inventario_max=0,  # pendiente: viene de los datos generales de la cripta (B)
-            efectos=[],  # opcional, para más adelante
+            inventario_usado=self.jugador.inventario.tamaño,
+            inventario_max=self.jugador.inventario.capacidad_max,
+            efectos=[],
         )
 
     def ejecutar(self, accion, argumento=None):
@@ -195,7 +208,15 @@ class Motor:
             if ficha.clase == "pocion" and "cura" in ficha.atributos:
                 self.jugador.vida = min(self.jugador.vida_max, self.jugador.vida + ficha.atributos["cura"])
             elif ficha.clase == "pocion" and "modificador_velocidad" in ficha.atributos:
-                return ResultadoAccion(ok=False, mensaje="Poción de velocidad: pendiente")
+                modificador = ficha.atributos["modificador_velocidad"]
+                velocidad_base = self.jugador.velocidad
+                self.cambiar_velocidad(self.jugador, self.jugador.velocidad + modificador)
+                duracion = ficha.atributos.get("duracion", 300)
+                self.cola.insertar(
+                    self.reloj + duracion,
+                    "restaurar_velocidad",
+                    (self.jugador, velocidad_base),
+                )
             elif ficha.clase == "antidoto":
                 self.efectos.cancelar_veneno(self.jugador)
             elif ficha.clase == "antorcha":
@@ -221,6 +242,41 @@ class Motor:
         self.historial.cerrar_turno()
         return ResultadoAccion(ok=True)
 
+
+    def inventario_cursor(self, movimiento):
+        return self.jugador.inventario.cursor_vista(
+            movimiento,
+            self._resolver_ficha,
+        )
+
+    def inventario_vista(self, orden=None, descendente=False):
+        if orden not in (None, "nombre", "peso", "valor"):
+            raise ValueError(f"Orden inválido: {orden}")
+        return self.jugador.inventario.vista(
+            self._resolver_ficha,
+            orden,
+            descendente,
+        )
+
+    def _equipar_objeto(self, id_instancia):
+        inventario = self.jugador.inventario
+        if not self._posicionar_cursor_en(id_instancia):
+            return False, "No tienes ese objeto."
+        objeto = inventario.objeto_actual()
+        ficha = self._resolver_ficha(objeto.tipo_catalogo)
+        if ficha.clase not in ("arma", "armadura"):
+            return False, "Ese objeto no se puede equipar."
+        inventario.equipar_actual(ficha.clase)
+        return True, None
+
+    def _resolver_ficha(self, tipo_catalogo):
+        fichas = self.gestor_precarga.catalogo.obtener_fichas([tipo_catalogo])
+        if not fichas:
+            raise ValueError(f"No existe la ficha {tipo_catalogo}")
+        return fichas[0]
+
+    def _resolver_clase(self, tipo_catalogo):
+        return self._resolver_ficha(tipo_catalogo).clase
 
     def _buscar_enemigo_en_sala_actual(self, id_instancia):
         for enemigo in self.enemigos_por_sala.get(self.jugador.posicion_actual, []):
@@ -288,8 +344,7 @@ class Motor:
             evento = self.cola.insertar(enemigo.tiempo_siguiente, "turno_enemigo", enemigo)
             self.evento_pendiente[id(enemigo)] = evento
 
-        self.enemigos_por_sala.setdefault(id_sala, []).extend(enemigos_de_la_sala)
-
+    
     def puede_moverse(self, direccion):
         sala_actual = self.salas[self.jugador.posicion_actual]
         salida = sala_actual.salidas.get(direccion)
@@ -337,8 +392,9 @@ class Motor:
             self.terminado = True
             self.resultado = "victoria"
         self._avanzar_actor(self.jugador, COSTOS["mover"])
+        tiempo_anterior = self.registro_rastro.tiempo_de(id_destino)
+        self.historial.registrar_rastro(id_destino, tiempo_anterior)
         self.registro_rastro.marcar_visita(id_destino, self.reloj)
-        self.historial.registrar_rastro(id_destino, self.registro_rastro.tiempo_de(id_destino))
 
         enemigos = self.enemigos_por_sala.get(id_destino, [])
         self.activar_enemigos_de_sala(id_destino, enemigos)
@@ -473,6 +529,9 @@ class Motor:
         elif evento.tipo == "cierre_puerta":
             sala, direccion = evento.referencia
             self.efectos.ejecutar_cierre_puerta(sala, direccion)
+        elif evento.tipo == "restaurar_velocidad":
+            actor, velocidad_base = evento.referencia
+            self.cambiar_velocidad(actor, velocidad_base)
         elif evento.tipo == "turno_jugador":
             pass  # el jugador decide su acción vía la vista/controlador, no acá
 

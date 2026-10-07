@@ -70,22 +70,22 @@ class FuenteDatos(Protocol):
     """Lo que D necesita de PERSONA B (cliente de red / adaptador --offline)."""
 
     def listar_criptas(self) -> list:
-        """GET /criptas -> lista de {id, nombre, salas, dificultad}. OJO: cuenta como 1 solicitud
-        del presupuesto; por eso main.py acepta --cripta ID para saltársela."""
+        """GET /criptas -> lista de {id, nombre, salas, dificultad}."""
 
-    def version_cripta(self, cripta_id: str) -> str:
-        """GET /criptas/<id>/version (o su equivalente offline). Se usa al validar un replay
-        o un guardado."""
+    def obtener_datos_generales(self, cripta_id): ...
 
-    def version_catalogo(self) -> str:
-        """GET /catalogo/version (o su equivalente offline)."""
+    def obtener_esqueleto(self, cripta_id, *args, **kwargs): ...
+
+    def obtener_contenido_salas(self, cripta_id, ids_salas): ...
+
+    def obtener_catalogo(self, *args, **kwargs): ...
+
+    def obtener_version_cripta(self, cripta_id): ...
+
+    def obtener_version_catalogo(self): ...
 
     def estadisticas(self) -> EstadisticasRed:
         """solicitudes realizadas, presupuesto, aciertos y fallos de caché (§5.1)."""
-
-    # Opcional (D usa hasattr): si el log es de una versión vieja pero B guarda copia local
-    # compatible en disco, devolver True permite reproducirlo (§4.11).
-    # def tiene_copia_local(self, cripta_id, version_cripta, version_catalogo) -> bool: ...
 
 
 # Fábrica que A expone (nombre acordado: modelo.juego.crear_juego). Recibe:
