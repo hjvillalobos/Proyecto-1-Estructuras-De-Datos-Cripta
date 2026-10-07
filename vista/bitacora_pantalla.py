@@ -1,12 +1,5 @@
 """
-vista/bitacora_pantalla.py  —  PERSONA D  (§4.8)
-
-Requisitos
-  * La interfaz muestra SOLO los últimos 20 mensajes.
-  * Memoria CONSTANTE durante toda la partida.
-  * Agregar un mensaje NO debe desplazar físicamente los 19 anteriores.
-
-Solución: BUFFER CIRCULAR. Un arreglo de tamaño fijo reservado UNA vez y un índice `_cabeza`
+BUFFER CIRCULAR. Un arreglo de tamaño fijo reservado UNA vez y un índice `_cabeza`
 que apunta a la próxima posición de escritura. Agregar = escribir en `_cabeza` y avanzar el
 índice (módulo capacidad): O(1) sin mover nada. El mensaje más viejo simplemente se
 sobrescribe (y su memoria se libera).

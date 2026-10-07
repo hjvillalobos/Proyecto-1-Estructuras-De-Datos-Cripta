@@ -7,14 +7,10 @@ Los dos algoritmos
   2) FUSIÓN     : (merge sort ascendente, iterativo) siempre O(n log n), pocas comparaciones.
                   Necesita un arreglo auxiliar de n elementos. Estable.
 
-
-Los umbrales de abajo se CALIBRARON con `python main.py --bench ordenamiento`; vuelvan a
-correrlo en su equipo y ajusten si los números cambian (el Documento de Decisiones debe citar
-SUS mediciones, no las de este comentario).
 """
 from dataclasses import dataclass
 
-# --- Umbrales (calibrados con --bench, ver docstring) -----------------------------------
+# Umbrales (calibrados con --bench, ver docstring) 
 UMBRAL_PEQUENO = 16            # n <= esto -> inserción (comparaciones baratas)
 UMBRAL_PEQUENO_COSTOSO = 8     # n <= esto -> inserción (comparaciones costosas)
 DESORDEN_BAJO = 0.15           # <= esto se considera "casi ordenado"
@@ -34,7 +30,6 @@ class InfoOrden:
     abortado_por_presupuesto: bool = False
 
 
-# --- "a debe ir antes que b" ---------------------------------------------------------------
 # Todo el módulo compara con UNA sola función, así ascendente/descendente comparten código
 # y la estabilidad se mantiene también en descendente (a diferencia de invertir el resultado).
 def _asc(a, b):
@@ -44,11 +39,8 @@ def _asc(a, b):
 def _desc(a, b):
     return b < a
 
-
-# ============================================================================================
 # Algoritmo 1: INSERCIÓN
 # Trabaja sobre una lista de pares (clave, elemento). Solo mira la clave (par[0]).
-# ============================================================================================
 def _insercion(pares, antes, presupuesto=None):
     """Ordena `pares` en el lugar. Devuelve True si terminó, False si abortó por presupuesto.
 
@@ -61,6 +53,7 @@ def _insercion(pares, antes, presupuesto=None):
         actual = pares[i]
         clave = actual[0]
         j = i - 1
+
         # Se mueve hacia la derecha todo lo que deba ir DESPUÉS de `actual`.
         # Usar "antes(clave, previo)" estricto mantiene la estabilidad (iguales no se cruzan).
         while j >= 0 and antes(clave, pares[j][0]):
@@ -116,9 +109,7 @@ def _fusionar(origen, destino, inicio, medio, fin, antes):
         k += 1
 
 
-# ============================================================================================
 # Medición de propiedades y decisión automática
-# ============================================================================================
 def medir_desorden(pares, antes=_asc):
     """Fracción de descensos entre vecinos, estimada con a lo sumo MUESTRA_MAX pares
     equiespaciados (determinista: no usa azar). Costo: O(min(n, MUESTRA_MAX)) comparaciones."""
@@ -146,9 +137,7 @@ def elegir_algoritmo(n, desorden, comparacion_costosa=False):
     return FUSION                 # caso general: cota O(n log n) garantizada
 
 
-# ============================================================================================
 # API pública
-# ============================================================================================
 def ordenar_con_info(datos, clave=None, descendente=False,
                      comparacion_costosa=False, algoritmo=None):
     """Devuelve (lista_nueva_ordenada, InfoOrden). NO modifica `datos` (las vistas del

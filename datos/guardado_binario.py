@@ -4,6 +4,7 @@ import os
 import struct
 import zlib
 
+
 from modelo.snapshots import (
     EstadoGuardado, MetaPartida, JugadorGuardado, ItemInventarioGuardado, EventoGuardado,
     SalaGuardada, PuertaGuardada, EnemigoGuardado, ObjetoGuardado, TrampaGuardada)

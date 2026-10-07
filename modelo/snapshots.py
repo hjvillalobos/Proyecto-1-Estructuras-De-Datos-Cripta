@@ -7,9 +7,7 @@
 from dataclasses import dataclass, field, asdict
 
 
-# ---------------------------------------------------------------------------
 # Identidad de la partida (va al encabezado del log y del archivo de guardado)
-# ---------------------------------------------------------------------------
 @dataclass
 class MetaPartida:
     cripta_id: str
@@ -17,10 +15,7 @@ class MetaPartida:
     catalogo_version: str
     semilla: int
 
-
-# ---------------------------------------------------------------------------
 # Estado de guardado (lo llena el modelo con exportar_estado())
-# ---------------------------------------------------------------------------
 @dataclass
 class PuertaGuardada:
     direccion: str          # "N", "S", "E", "O"
@@ -109,7 +104,7 @@ class EstadoGuardado:
     eventos: list[EventoGuardado] = field(default_factory=list)
     salas: list[SalaGuardada] = field(default_factory=list)
 
-    # --- Solo para comparar contra JSON en --bench (§4.10) -------------------
+    #Solo para comparar contra JSON en --bench (§4.10)
     def a_dict(self):
         return asdict(self)
 
@@ -137,9 +132,7 @@ class EstadoGuardado:
             salas=salas)
 
 
-# ---------------------------------------------------------------------------
 # Estado para la vista (lo llena el modelo con estado_vista())
-# ---------------------------------------------------------------------------
 @dataclass
 class ItemVista:
     instancia: str
@@ -153,7 +146,7 @@ class ItemVista:
 @dataclass
 class EnemigoVista:
     instancia: str
-    nombre: str             # ej. "Rata gigante #1" (cada instancia identificable, §2.6)
+    nombre: str             
     vida: int
     vida_max: int
 
