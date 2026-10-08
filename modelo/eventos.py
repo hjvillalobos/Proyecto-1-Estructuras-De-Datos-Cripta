@@ -113,3 +113,20 @@ class ColaEventos:
         """
         self.cancelar(evento_viejo)
         return self.insertar(nuevo_tiempo, evento_viejo.tipo, evento_viejo.referencia)
+    def insertar_con_secuencia(self, tiempo, secuencia, tipo, referencia):
+        """Para restaurar una partida: reinserta un evento con SU número de secuencia original."""
+        evento = Evento(tiempo=tiempo, secuencia=secuencia, tipo=tipo,
+                        referencia=referencia, cancelado=False)
+        self._datos.append(evento)
+        self._sube(len(self._datos) - 1)
+        return evento
+
+    def pendientes(self):
+        """Eventos vigentes (no cancelados), para guardar la partida."""
+        return [e for e in self._datos if not e.cancelado]
+
+    def proxima_secuencia(self):
+        return self._contador
+
+    def fijar_contador(self, valor):
+        self._contador = valor

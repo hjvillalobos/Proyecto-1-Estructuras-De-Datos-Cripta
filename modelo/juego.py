@@ -42,7 +42,7 @@ class Motor:
         self.enemigos_por_sala = [[] for _ in range(salas_total + 1)]
         self.objetos_en_suelo = [[] for _ in range(salas_total + 1)]
         self.contenido_cargado = [False] * (salas_total + 1)
-        self.salas_activadas = [False] * (salas_total + 1)
+
 
         self.efectos = GestorEfectos(self)
         self.registro_rastro = RegistroRastro()
@@ -61,12 +61,8 @@ class Motor:
     # ---------- enemigos ----------
 
     def activar_enemigos_de_sala(self, id_sala, enemigos_de_la_sala):
-        if self.salas_activadas[id_sala]:
-            return
-        self.salas_activadas[id_sala] = True
-
-        enemigos_ordenados = sorted(enemigos_de_la_sala, key=lambda e: e.id_instancia)
-        for enemigo in enemigos_ordenados:
+        dormidos = [e for e in enemigos_de_la_sala if e.sala_actual is None]
+        for enemigo in sorted(dormidos, key=lambda e: e.id_instancia):
             enemigo.sala_actual = id_sala
             intervalo = calcular_intervalo(COSTOS["atacar"], enemigo.velocidad)
             enemigo.tiempo_siguiente = self.reloj + intervalo
@@ -337,6 +333,206 @@ class Motor:
         )
 
     # ---------- acciones del jugador ----------
+    # ---------- guardado: exportar / restaurar (§4.10) ----------
+    # JugadorGuardado.extras = [terminado(0/1), resultado(0=nada,1=victoria,2=derrota), *ids de salas con contenido cargado]
+
+    def _id_actor(self, actor):
+        return "jugador" if actor is self.jugador else actor.id_instancia
+
+    def _evento_a_guardado(self, e):
+        from modelo.snapshots import EventoGuardado
+        t = e.tipo
+        if t in ("turno_jugador", "turno_enemigo"):
+            return EventoGuardado(e.tiempo, e.secuencia, t, self._id_actor(e.referencia), [])
+        if t == "pulso_veneno" and e.referencia.veneno is not None:
+            return EventoGuardado(e.tiempo, e.secuencia, t, self._id_actor(e.referencia), [])
+        if t == "fin_veneno" and e.referencia.veneno is not None:
+            v = e.referencia.veneno
+            return EventoGuardado(e.tiempo, e.secuencia, t, self._id_actor(e.referencia),
+                                  [v.dano_por_pulso, v.intervalo])
+        if t == "pulso_regeneracion":
+            enemigo, cantidad, intervalo = e.referencia
+            return EventoGuardado(e.tiempo, e.secuencia, t, enemigo.id_instancia, [cantidad, intervalo])
+        if t == "apagar_antorcha":
+            return EventoGuardado(e.tiempo, e.secuencia, t, e.referencia.id_instancia, [])
+        if t == "rearmar_trampa":
+            return EventoGuardado(e.tiempo, e.secuencia, t, e.referencia.id_instancia, [])
+        if t == "cierre_puerta":
+            sala, direccion = e.referencia
+            return EventoGuardado(e.tiempo, e.secuencia, t, f"{sala.id}:{direccion}", [])
+        return None
+
+    def exportar_estado(self):
+        from modelo.snapshots import (EstadoGuardado, JugadorGuardado, SalaGuardada, PuertaGuardada,
+                                      EnemigoGuardado, ObjetoGuardado, TrampaGuardada)
+        j = self.jugador
+        codigo = 1 if self.resultado == "victoria" else (2 if self.resultado == "derrota" else 0)
+        extras = [1 if self.terminado else 0, codigo]
+        for id_sala in range(len(self.salas)):
+            if self.contenido_cargado[id_sala]:
+                extras.append(id_sala)
+
+        jugador = JugadorGuardado(
+            sala_id=j.posicion_actual, vida=j.vida, vida_max=j.vida_max, ataque=j.ataque,
+            defensa=j.defensa, velocidad=j.velocidad, tiempo_siguiente=j.tiempo_siguiente,
+            inventario=j.inventario.a_lista_guardado(), extras=extras,
+        )
+
+        eventos = []
+        for e in self.cola.pendientes():
+            guardado = self._evento_a_guardado(e)
+            if guardado is not None:
+                eventos.append(guardado)
+
+        salas = []
+        for id_sala in range(len(self.salas)):
+            sala = self.salas[id_sala]
+            if sala is None:
+                continue
+            rastro = self.registro_rastro.exportar(id_sala)
+            if not (self.contenido_cargado[id_sala] or self.enemigos_por_sala[id_sala]
+                    or self.objetos_en_suelo[id_sala] or rastro != -1):
+                continue
+            salas.append(SalaGuardada(
+                sala_id=id_sala, rastro=rastro,
+                puertas=[PuertaGuardada(direccion=d, cerrada=bool(info.get("cerrada", False)))
+                         for d, info in sala.salidas.items() if "cerrada" in info],
+                enemigos=[EnemigoGuardado(instancia=en.id_instancia, tipo=en.tipo_catalogo, vida=en.vida,
+                                          activo=en.sala_actual is not None,
+                                          tiempo_siguiente=en.tiempo_siguiente)
+                          for en in self.enemigos_por_sala[id_sala]],
+                objetos_suelo=[ObjetoGuardado(instancia=o.id_instancia, tipo=o.tipo_catalogo)
+                               for o in self.objetos_en_suelo[id_sala]],
+                trampas=([TrampaGuardada(instancia=sala.trampa.id_instancia,
+                                         tipo=sala.trampa.tipo_catalogo, armada=sala.trampa.armada)]
+                         if sala.trampa is not None else []),
+            ))
+
+        return EstadoGuardado(
+            meta=self.meta, reloj=self.reloj, siguiente_secuencia=self.cola.proxima_secuencia(),
+            acciones_jugador=self.acciones_jugador, enemigos_derrotados=self.enemigos_derrotados,
+            rng_estado=self.azar.getstate(), jugador=jugador, eventos=eventos, salas=salas,
+        )
+
+    def _actor_por_id(self, id_actor):
+        if id_actor == "jugador":
+            return self.jugador
+        for lista in self.enemigos_por_sala:
+            for enemigo in lista:
+                if enemigo.id_instancia == id_actor:
+                    return enemigo
+        return None
+
+    def _trampa_por_id(self, id_instancia):
+        for sala in self.salas:
+            if sala is not None and sala.trampa is not None and sala.trampa.id_instancia == id_instancia:
+                return sala.trampa
+        return None
+
+    def _restaurar_evento(self, eg):
+        from modelo.efectos import InfoVeneno
+        t = eg.tipo
+        ins = self.cola.insertar_con_secuencia
+        if t in ("turno_jugador", "turno_enemigo"):
+            actor = self._actor_por_id(eg.objetivo)
+            if actor is not None:
+                actor.evento_pendiente = ins(eg.tiempo, eg.secuencia, t, actor)
+        elif t == "fin_veneno":
+            actor = self._actor_por_id(eg.objetivo)
+            if actor is not None:
+                info = InfoVeneno(eg.parametros[0], eg.parametros[1], eg.tiempo)
+                info.evento_fin = ins(eg.tiempo, eg.secuencia, t, actor)
+                actor.veneno = info
+        elif t == "pulso_veneno":
+            actor = self._actor_por_id(eg.objetivo)
+            if actor is not None and actor.veneno is not None:
+                actor.veneno.evento_pulso = ins(eg.tiempo, eg.secuencia, t, actor)
+        elif t == "pulso_regeneracion":
+            enemigo = self._actor_por_id(eg.objetivo)
+            if enemigo is not None:
+                ins(eg.tiempo, eg.secuencia, t, (enemigo, eg.parametros[0], eg.parametros[1]))
+        elif t == "apagar_antorcha":
+            from modelo.tipos import ObjetoInstancia
+            ins(eg.tiempo, eg.secuencia, t,
+                ObjetoInstancia(id_instancia=eg.objetivo, tipo_catalogo="itm_antorcha", ubicacion="ninguna"))
+        elif t == "rearmar_trampa":
+            trampa = self._trampa_por_id(eg.objetivo)
+            if trampa is not None:
+                ins(eg.tiempo, eg.secuencia, t, trampa)
+        elif t == "cierre_puerta":
+            id_sala, direccion = eg.objetivo.split(":")
+            ins(eg.tiempo, eg.secuencia, t, (self.salas[int(id_sala)], direccion))
+
+    def restaurar_estado(self, estado):
+        from modelo.tipos import InstanciaEnemigo, ObjetoInstancia, Trampa
+        from modelo.inventario import Inventario
+
+        n = len(self.salas)
+        self.cola = ColaEventos()
+        self.reloj = estado.reloj
+        self.meta = estado.meta
+        self.azar.setstate(estado.rng_estado)
+        self.acciones_jugador = estado.acciones_jugador
+        self.enemigos_derrotados = estado.enemigos_derrotados
+        self.enemigos_por_sala = [[] for _ in range(n)]
+        self.objetos_en_suelo = [[] for _ in range(n)]
+        self.contenido_cargado = [False] * n
+        for sala in self.salas:
+            if sala is not None:
+                sala.trampa = None
+        for id_sala in range(n):
+            self.registro_rastro.importar(id_sala, -1)
+
+        # jugador (se modifica el mismo objeto, otros módulos pueden tener referencia)
+        jg = estado.jugador
+        j = self.jugador
+        j.posicion_actual = jg.sala_id
+        j.vida, j.vida_max, j.ataque, j.defensa = jg.vida, jg.vida_max, jg.ataque, jg.defensa
+        j.velocidad, j.tiempo_siguiente = jg.velocidad, jg.tiempo_siguiente
+        j.veneno = None
+        j.evento_pendiente = None
+        inventario = Inventario(capacidad_max=j.inventario.capacidad_max)
+        inventario.restaurar_desde_guardado(
+            jg.inventario,
+            lambda tipo: self.gestor_precarga.catalogo.obtener_fichas([tipo])[0].clase)
+        j.inventario = inventario
+
+        self.terminado = jg.extras[0] == 1
+        self.resultado = {0: None, 1: "victoria", 2: "derrota"}[jg.extras[1]]
+        for id_sala in jg.extras[2:]:
+            self.contenido_cargado[id_sala] = True
+
+        # salas: rastro, puertas, enemigos, objetos, trampas
+        for sg in estado.salas:
+            sala = self.salas[sg.sala_id]
+            self.registro_rastro.importar(sg.sala_id, sg.rastro)
+            for p in sg.puertas:
+                if p.direccion in sala.salidas:
+                    sala.salidas[p.direccion]["cerrada"] = p.cerrada
+            for eg in sg.enemigos:
+                ficha = self.gestor_precarga.catalogo.obtener_fichas([eg.tipo])[0]
+                a = ficha.atributos
+                self.enemigos_por_sala[sg.sala_id].append(InstanciaEnemigo(
+                    vida=eg.vida, vida_max=a["vida_max"], ataque=a["ataque"], defensa=a["defensa"],
+                    velocidad=a["velocidad"], tiempo_siguiente=eg.tiempo_siguiente,
+                    id_instancia=eg.instancia, tipo_catalogo=eg.tipo, comportamiento=a["comportamiento"],
+                    sala_actual=sg.sala_id if eg.activo else None))
+            for og in sg.objetos_suelo:
+                self.objetos_en_suelo[sg.sala_id].append(ObjetoInstancia(
+                    id_instancia=og.instancia, tipo_catalogo=og.tipo, ubicacion="suelo", sala=sg.sala_id))
+            for tg in sg.trampas:
+                sala.trampa = Trampa(id_instancia=tg.instancia, tipo_catalogo=tg.tipo, armada=tg.armada)
+
+        # eventos: primero fin_veneno (crea el veneno), después el resto
+        for eg in estado.eventos:
+            if eg.tipo == "fin_veneno":
+                self._restaurar_evento(eg)
+        for eg in estado.eventos:
+            if eg.tipo != "fin_veneno":
+                self._restaurar_evento(eg)
+        self.cola.fijar_contador(estado.siguiente_secuencia)
+
+        self.historial = HistorialRetroceso(self.registro_rastro)
 
     def ejecutar(self, accion, argumento=None):
         from modelo.snapshots import ResultadoAccion
@@ -547,7 +743,8 @@ def _incorporar_sala_preparada(motor, sala_preparada):
             tipo_catalogo=enemigo_json["tipo"],
             comportamiento=ficha.atributos["comportamiento"],
         ))
-    motor.enemigos_por_sala[id_sala] = enemigos_de_la_sala
+    visitantes = motor.enemigos_por_sala[id_sala]
+    motor.enemigos_por_sala[id_sala] = enemigos_de_la_sala + visitantes
 
     objetos_de_la_sala = []
     for indice, tipo_objeto in enumerate(contenido.get("objetos", [])):
@@ -555,7 +752,8 @@ def _incorporar_sala_preparada(motor, sala_preparada):
             id_instancia=f"obj-{id_sala}-{indice}",
             tipo_catalogo=tipo_objeto, ubicacion="suelo", sala=id_sala,
         ))
-    motor.objetos_en_suelo[id_sala] = objetos_de_la_sala
+    existentes = motor.objetos_en_suelo[id_sala]
+    motor.objetos_en_suelo[id_sala] = objetos_de_la_sala + existentes
 
     trampas_json = contenido.get("trampas", [])
     if trampas_json:
