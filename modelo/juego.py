@@ -8,10 +8,14 @@ from modelo.rastro import RegistroRastro
 from modelo.historial import HistorialRetroceso
 
 
-COSTOS = {
-    "mover": 100, "atacar": 100, "esperar": 100, "usar_objeto": 50,
-    "equipar": 50, "recoger": 25, "soltar": 25, "abrir_puerta": 50,
-}
+_COSTO_MOVER = 100
+_COSTO_ATACAR = 100
+_COSTO_ESPERAR = 100
+_COSTO_USAR_OBJETO = 50
+_COSTO_EQUIPAR = 50
+_COSTO_RECOGER = 25
+_COSTO_SOLTAR = 25
+_COSTO_ABRIR_PUERTA = 50
 
 
 def calcular_intervalo(costo, velocidad):
@@ -64,7 +68,7 @@ class Motor:
         dormidos = [e for e in enemigos_de_la_sala if e.sala_actual is None]
         for enemigo in sorted(dormidos, key=lambda e: e.id_instancia):
             enemigo.sala_actual = id_sala
-            intervalo = calcular_intervalo(COSTOS["atacar"], enemigo.velocidad)
+            intervalo = calcular_intervalo(_COSTO_ATACAR, enemigo.velocidad)
             enemigo.tiempo_siguiente = self.reloj + intervalo
             enemigo.evento_pendiente = self.cola.insertar(enemigo.tiempo_siguiente, "turno_enemigo", enemigo)
 
@@ -114,7 +118,7 @@ class Motor:
 
         self.historial.registrar_puerta(salida, "cerrada", salida.get("cerrada", False))
         salida["cerrada"] = False
-        self._avanzar_actor(self.jugador, COSTOS["abrir_puerta"])
+        self._avanzar_actor(self.jugador, _COSTO_ABRIR_PUERTA)
 
         if "cierre_automatico" in salida:
             tiempo_cierre = self.reloj + salida["cierre_automatico"]
@@ -134,8 +138,10 @@ class Motor:
             _incorporar_sala_preparada(self, sala_preparada)
 
         sala_destino = self.salas[id_destino]
+        pos_anterior = self.jugador.posicion_actual
+        self.historial.registrar_inventario(lambda p=pos_anterior: setattr(self.jugador, "posicion_actual", p))
         self.jugador.posicion_actual = id_destino
-        self._avanzar_actor(self.jugador, COSTOS["mover"])
+        self._avanzar_actor(self.jugador, _COSTO_MOVER)
         self.historial.registrar_rastro(id_destino, self.registro_rastro.tiempo_de(id_destino))
         self.registro_rastro.marcar_visita(id_destino, self.reloj)
 
@@ -144,6 +150,7 @@ class Motor:
             self.resultado = "victoria"
 
         self.activar_enemigos_de_sala(id_destino, self.enemigos_por_sala[id_destino])
+        self.gestor_precarga.anticipar(id_destino)
 
         trampa = sala_destino.trampa
         if trampa is not None:
@@ -159,7 +166,7 @@ class Motor:
         defensor.vida = max(0, defensor.vida - dano)
         if defensor.vida == 0:
             self._matar(defensor)
-        self._avanzar_actor(atacante, COSTOS["atacar"])
+        self._avanzar_actor(atacante, _COSTO_ATACAR)
         return dano
 
     def _matar(self, actor):
@@ -173,6 +180,9 @@ class Motor:
             self.resultado = "derrota"
         else:
             self.enemigos_derrotados += 1
+            self.historial.registrar_inventario(
+                lambda v=self.enemigos_derrotados: setattr(self, "enemigos_derrotados", v - 1)
+            )
             self._soltar_botin(actor)
 
     def _soltar_botin(self, enemigo):
@@ -181,10 +191,14 @@ class Motor:
         if id_sala is None:
             return
         for indice, tipo_objeto in enumerate(ficha.atributos.get("suelta", [])):
-            self.objetos_en_suelo[id_sala].append(ObjetoInstancia(
+            obj = ObjetoInstancia(
                 id_instancia=f"botin-{enemigo.id_instancia}-{indice}",
                 tipo_catalogo=tipo_objeto, ubicacion="suelo", sala=id_sala,
-            ))
+            )
+            self.objetos_en_suelo[id_sala].append(obj)
+            self.historial.registrar_inventario(
+                lambda lista=self.objetos_en_suelo[id_sala], o=obj: lista.remove(o)
+            )
 
     def cambiar_velocidad(self, actor, velocidad_nueva):
         evento_viejo = actor.evento_pendiente
@@ -225,13 +239,19 @@ class Motor:
             direccion = dato
             nuevo_id = sala_actual.salidas[direccion]["sala"]
             lista_origen = self.enemigos_por_sala[id_sala]
+            lista_destino = self.enemigos_por_sala[nuevo_id]
             if enemigo in lista_origen:
                 lista_origen.remove(enemigo)
-            self.enemigos_por_sala[nuevo_id].append(enemigo)
+            lista_destino.append(enemigo)
             enemigo.sala_actual = nuevo_id
-            self._avanzar_actor(enemigo, COSTOS["mover"])
+            self.historial.registrar_inventario(
+                lambda e=enemigo, lo=lista_origen, ld=lista_destino, s=id_sala: (
+                    ld.remove(e), lo.append(e), setattr(e, "sala_actual", s)
+                )
+            )
+            self._avanzar_actor(enemigo, _COSTO_MOVER)
         else:
-            self._avanzar_actor(enemigo, COSTOS["esperar"])
+            self._avanzar_actor(enemigo, _COSTO_ESPERAR)
 
     def _buscar_enemigo_en_sala_actual(self, id_instancia):
         for enemigo in self.enemigos_por_sala[self.jugador.posicion_actual]:
@@ -299,7 +319,7 @@ class Motor:
 
         enemigos_vista = []
         for indice, enemigo in enumerate(self.enemigos_por_sala[sala.id]):
-            if enemigo.vida <= 0:
+            if enemigo.vida <= 0 or enemigo.sala_actual is None:
                 continue
             nombre_base = enemigo.tipo_catalogo
             if self.gestor_precarga is not None:
@@ -313,6 +333,34 @@ class Motor:
         efectos_activos = []
         if self.jugador.veneno is not None:
             efectos_activos.append("veneno")
+
+        jug = self.jugador
+        ficha_velocidad = None
+        inventario = jug.inventario
+        if not inventario.esta_vacio():
+            anterior = None
+            actual = inventario.objeto_actual()
+            while actual is not anterior:
+                anterior = actual
+                actual = inventario.retroceder()
+            while actual is not None:
+                if actual.tipo_catalogo == "itm_antorcha" and getattr(actual, "encendida", False):
+                    efectos_activos.append("antorcha")
+                if self.gestor_precarga is not None:
+                    ficha = self.gestor_precarga.catalogo.obtener_fichas([actual.tipo_catalogo])[0]
+                    if ficha.clase == "pocion" and "modificador_velocidad" in ficha.atributos:
+                        ficha_velocidad = ficha
+                siguiente = inventario.avanzar()
+                if siguiente is actual:
+                    break
+                actual = siguiente
+        velocidad_base = jug.velocidad
+        if self.gestor_precarga and self.gestor_precarga.generales:
+            jugador_gen = self.gestor_precarga.generales.get("jugador")
+            if jugador_gen is not None:
+                velocidad_base = jugador_gen.get("velocidad", jug.velocidad)
+        if jug.velocidad != velocidad_base:
+            efectos_activos.append("velocidad")
 
         return EstadoVista(
             reloj=self.reloj, sala_id=sala.id, sala_nombre=sala.nombre,
@@ -498,7 +546,8 @@ class Motor:
         j.inventario = inventario
 
         self.terminado = jg.extras[0] == 1
-        self.resultado = {0: None, 1: "victoria", 2: "derrota"}[jg.extras[1]]
+        codigo = jg.extras[1]
+        self.resultado = None if codigo == 0 else ("victoria" if codigo == 1 else "derrota")
         for id_sala in jg.extras[2:]:
             self.contenido_cargado[id_sala] = True
 
@@ -560,7 +609,7 @@ class Motor:
             self.atacar(self.jugador, enemigo)
             ok, error = True, None
         elif accion == "esperar":
-            self._avanzar_actor(self.jugador, COSTOS["esperar"])
+            self._avanzar_actor(self.jugador, _COSTO_ESPERAR)
             ok, error = True, None
         elif accion == "recoger":
             objetos_sala = self.objetos_en_suelo[self.jugador.posicion_actual]
@@ -573,7 +622,7 @@ class Motor:
             objetos_sala.remove(objeto)
             if objeto.tipo_catalogo != "itm_pergamino_retroceso":
                 self.historial.registrar_inventario(lambda n=nodo: self.jugador.inventario.quitar_nodo(n))
-            self._avanzar_actor(self.jugador, COSTOS["recoger"])
+            self._avanzar_actor(self.jugador, _COSTO_RECOGER)
             ok, error = True, None
         elif accion == "soltar":
             if not self._posicionar_cursor_en(argumento):
@@ -587,7 +636,7 @@ class Motor:
             self.objetos_en_suelo[self.jugador.posicion_actual].append(objeto)
             if objeto.tipo_catalogo != "itm_pergamino_retroceso":
                 self.historial.registrar_inventario(lambda a=anterior, o=objeto: inventario.insertar_despues(a, o))
-            self._avanzar_actor(self.jugador, COSTOS["soltar"])
+            self._avanzar_actor(self.jugador, _COSTO_SOLTAR)
             ok, error = True, None
         elif accion == "equipar":
             if not self._posicionar_cursor_en(argumento):
@@ -606,13 +655,21 @@ class Motor:
                 else:
                     self.jugador.defensa -= ficha_anterior.atributos.get("defensa_bonus", 0)
 
+            ataque_antes = self.jugador.ataque
+            defensa_antes = self.jugador.defensa
+            self.historial.registrar_inventario(
+                lambda a=ataque_antes, d=defensa_antes: (
+                    setattr(self.jugador, "ataque", a),
+                    setattr(self.jugador, "defensa", d),
+                )
+            )
             inventario.equipar_actual(ficha.clase)
             if ficha.clase == "arma":
                 self.jugador.ataque += ficha.atributos.get("ataque_bonus", 0)
             else:
                 self.jugador.defensa += ficha.atributos.get("defensa_bonus", 0)
 
-            self._avanzar_actor(self.jugador, COSTOS["equipar"])
+            self._avanzar_actor(self.jugador, _COSTO_EQUIPAR)
             ok, error = True, None
         elif accion == "usar":
             if not self._posicionar_cursor_en(argumento):
@@ -622,6 +679,7 @@ class Motor:
             ficha = self.gestor_precarga.catalogo.obtener_fichas([objeto.tipo_catalogo])[0]
 
             if ficha.clase == "pocion" and "cura" in ficha.atributos:
+                self.historial.registrar_vida(self.jugador, self.jugador.vida)
                 self.jugador.vida = min(self.jugador.vida_max, self.jugador.vida + ficha.atributos["cura"])
             elif ficha.clase == "pocion" and "modificador_velocidad" in ficha.atributos:
                 return ResultadoAccion(ok=False, mensaje="Poción de velocidad: pendiente")
@@ -633,7 +691,7 @@ class Motor:
                 return ResultadoAccion(ok=False, mensaje="Ese objeto no se puede usar")
 
             inventario.quitar_nodo(inventario.cursor)
-            self._avanzar_actor(self.jugador, COSTOS["usar_objeto"])
+            self._avanzar_actor(self.jugador, _COSTO_USAR_OBJETO)
             ok, error = True, None
         else:
             return ResultadoAccion(ok=False, mensaje="Acción desconocida")
@@ -683,6 +741,11 @@ def crear_juego(gestor_precarga, cripta_id, semilla, notificar=None):
     from modelo.snapshots import MetaPartida
     from modelo.inventario import Inventario
 
+    gestor_precarga.generales = None
+    gestor_precarga.salas = []
+    gestor_precarga.contenidos = []
+    gestor_precarga.pendiente = None
+    gestor_precarga.red_compatible = True
     preparada = gestor_precarga.preparar_cripta(cripta_id)
     generales = preparada.generales
 
