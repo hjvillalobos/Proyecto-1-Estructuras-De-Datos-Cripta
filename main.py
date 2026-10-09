@@ -98,6 +98,12 @@ def main(argv=None):
         metavar="ARCHIVO",
     )
 
+    parser.add_argument(
+        "--gui",
+        action="store_true",
+        help="Jugar en una ventana gráfica (tkinter) en vez de la consola.",
+    )
+
     args = parser.parse_args(argumentos)
 
     cliente = None
@@ -131,7 +137,7 @@ def main(argv=None):
 
         if (
             args.listar
-            or (args.cripta is None and not args.replay)
+            or (args.cripta is None and not args.replay and not args.gui)
             or args.descargar_todo
         ):
             listado = cliente.listar_criptas()
@@ -147,7 +153,7 @@ def main(argv=None):
             )
 
         # Si no se indicó cripta
-        if args.cripta is None and not args.replay:
+        if args.cripta is None and not args.replay and not args.gui:
             print(
                 "Selecciona una cripta con --cripta ID."
             )
@@ -210,7 +216,6 @@ def main(argv=None):
 
         from controlador.controlador import ControladorJuego
         from modelo.juego import crear_juego
-        from vista.consola import VistaConsola
 
         semilla = (
             args.semilla
@@ -218,23 +223,47 @@ def main(argv=None):
             else random.randint(0, 2**32 - 1)
         )
 
-        vista = VistaConsola()
+        if args.gui:
+            from vista.grafica import VistaGrafica
 
-        # IMPORTANTE:
-        # No llamamos preparar_cripta() aquí.
-        # crear_juego() se encarga de hacerlo.
-        juego = crear_juego(
-            precarga,
-            args.cripta,
-            semilla,
-        )
+            vista = VistaGrafica()
+        else:
+            from vista.consola import VistaConsola
 
-        controlador = ControladorJuego(
-            modelo=juego,
-            vista=vista,
-        )
+            vista = VistaConsola()
 
-        controlador.iniciar()
+        try:
+            # Con --gui y sin --cripta se elige la cripta en una ventana.
+            if args.cripta is None:
+                listado = cliente.listar_criptas()
+                almacen.guardar_lista(listado)
+                lista = (
+                    listado["criptas"]
+                    if isinstance(listado, dict)
+                    else listado
+                )
+                args.cripta = vista.elegir_cripta(lista)
+                if args.cripta is None:
+                    return 0
+
+            # IMPORTANTE:
+            # No llamamos preparar_cripta() aquí.
+            # crear_juego() se encarga de hacerlo.
+            juego = crear_juego(
+                precarga,
+                args.cripta,
+                semilla,
+            )
+
+            controlador = ControladorJuego(
+                modelo=juego,
+                vista=vista,
+            )
+
+            controlador.iniciar()
+        finally:
+            if args.gui:
+                vista.cerrar()
 
         return 0
 
