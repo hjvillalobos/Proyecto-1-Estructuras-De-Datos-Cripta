@@ -262,7 +262,7 @@ def reproducir(
 
     if (
         str(version_cripta_actual)
-        != meta.cripta_version
+        != meta.version_cripta
     ):
         raise ReplayIncompatible(
             "La versión actual de la cripta "
@@ -271,7 +271,7 @@ def reproducir(
 
     if (
         str(version_catalogo_actual)
-        != meta.catalogo_version
+        != meta.version_catalogo
     ):
         raise ReplayIncompatible(
             "La versión actual del catálogo "
