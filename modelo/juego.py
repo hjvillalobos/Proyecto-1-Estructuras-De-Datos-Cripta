@@ -749,12 +749,15 @@ class Motor:
                 self.historial.registrar_vida(self.jugador, self.jugador.vida)
                 self.jugador.vida = min(self.jugador.vida_max, self.jugador.vida + ficha.atributos["cura"])
             elif ficha.clase == "pocion" and "modificador_velocidad" in ficha.atributos:
-                velocidad_anterior = self.jugador.velocidad
-                velocidad_nueva = int(velocidad_anterior * ficha.atributos["modificador_velocidad"])
-                self.historial.registrar_inventario(
-                    lambda v=velocidad_anterior: setattr(self.jugador, "velocidad", v)
+                velocidad_base = self.jugador.velocidad
+                duracion = ficha.atributos.get("duracion", 500)
+                nueva_velocidad = max(1, int(velocidad_base * ficha.atributos["modificador_velocidad"]))
+                self.cambiar_velocidad(self.jugador, nueva_velocidad)
+                self.cola.insertar(
+                    self.reloj + duracion,
+                    "restaurar_velocidad",
+                    (self.jugador, velocidad_base),
                 )
-                self.cambiar_velocidad(self.jugador, velocidad_nueva)
             elif ficha.clase == "antidoto":
                 self.efectos.cancelar_veneno(self.jugador)
             elif ficha.clase == "antorcha":
@@ -861,16 +864,26 @@ def _incorporar_sala_preparada(motor, sala_preparada):
     id_sala = sala_preparada.sala.id
     contenido = sala_preparada.contenido
 
+    # Si la sala ya fue cargada, conservar el estado del motor tal cual.
+    # No recrear enemigos derrotados ni objetos ya recogidos.
+    if motor.contenido_cargado[id_sala]:
+        return
+
     def ficha_de(id_tipo):
         for ficha in sala_preparada.fichas:
             if ficha.id == id_tipo:
                 return ficha
         return None
 
-    enemigos_de_la_sala = []
+    ids_enemigos_existentes = {
+        e.id_instancia for e in motor.enemigos_por_sala[id_sala]
+    }
+    enemigos_nuevos = []
     for enemigo_json in contenido.get("enemigos", []):
+        if enemigo_json["instancia"] in ids_enemigos_existentes:
+            continue
         ficha = ficha_de(enemigo_json["tipo"])
-        enemigos_de_la_sala.append(InstanciaEnemigo(
+        enemigos_nuevos.append(InstanciaEnemigo(
             vida=enemigo_json.get("vida", ficha.atributos["vida_max"]),
             vida_max=ficha.atributos["vida_max"],
             ataque=ficha.atributos["ataque"],
@@ -882,21 +895,25 @@ def _incorporar_sala_preparada(motor, sala_preparada):
             comportamiento=ficha.atributos["comportamiento"],
         ))
     visitantes = motor.enemigos_por_sala[id_sala]
-    if not motor.contenido_cargado[id_sala]:
-        motor.enemigos_por_sala[id_sala] = enemigos_de_la_sala + visitantes
+    motor.enemigos_por_sala[id_sala] = enemigos_nuevos + visitantes
 
-    objetos_de_la_sala = []
+    ids_objetos_existentes = {
+        o.id_instancia for o in motor.objetos_en_suelo[id_sala]
+    }
+    objetos_nuevos = []
     for indice, tipo_objeto in enumerate(contenido.get("objetos", [])):
-        objetos_de_la_sala.append(ObjetoInstancia(
-            id_instancia=f"obj-{id_sala}-{indice}",
+        id_instancia = f"obj-{id_sala}-{indice}"
+        if id_instancia in ids_objetos_existentes:
+            continue
+        objetos_nuevos.append(ObjetoInstancia(
+            id_instancia=id_instancia,
             tipo_catalogo=tipo_objeto, ubicacion="suelo", sala=id_sala,
         ))
     existentes = motor.objetos_en_suelo[id_sala]
-    if not motor.contenido_cargado[id_sala]:
-        motor.objetos_en_suelo[id_sala] = objetos_de_la_sala + existentes
+    motor.objetos_en_suelo[id_sala] = objetos_nuevos + existentes
 
     trampas_json = contenido.get("trampas", [])
-    if trampas_json:
+    if trampas_json and motor.salas[id_sala].trampa is None:
         trampa_json = trampas_json[0]
         motor.salas[id_sala].trampa = Trampa(
             id_instancia=trampa_json["instancia"],

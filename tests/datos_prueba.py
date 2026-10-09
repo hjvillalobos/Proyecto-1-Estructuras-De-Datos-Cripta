@@ -96,6 +96,9 @@ class ServidorFalso:
             elif clave == "pocion":
                 entidades.append({"id": clave, "clase": "pocion", "nombre": "Poción",
                                   "peso": 1, "valor": 2, "cura": 5})
+            elif clave == "pocion_vel":
+                entidades.append({"id": clave, "clase": "pocion", "nombre": "Poción de velocidad",
+                                  "peso": 1, "valor": 3, "modificador_velocidad": 2.0, "duracion": 300})
             else:
                 entidades.append({"id": clave, "clase": "arma", "nombre": self.version_catalogo,
                                   "peso": 1, "valor": 3, "ataque_bonus": 1})
