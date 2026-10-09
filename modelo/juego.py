@@ -738,7 +738,12 @@ class Motor:
                 self.historial.registrar_vida(self.jugador, self.jugador.vida)
                 self.jugador.vida = min(self.jugador.vida_max, self.jugador.vida + ficha.atributos["cura"])
             elif ficha.clase == "pocion" and "modificador_velocidad" in ficha.atributos:
-                return ResultadoAccion(ok=False, mensaje="Poción de velocidad: pendiente")
+                velocidad_anterior = self.jugador.velocidad
+                velocidad_nueva = int(velocidad_anterior * ficha.atributos["modificador_velocidad"])
+                self.historial.registrar_inventario(
+                    lambda v=velocidad_anterior: setattr(self.jugador, "velocidad", v)
+                )
+                self.cambiar_velocidad(self.jugador, velocidad_nueva)
             elif ficha.clase == "antidoto":
                 self.efectos.cancelar_veneno(self.jugador)
             elif ficha.clase == "antorcha":
@@ -866,7 +871,8 @@ def _incorporar_sala_preparada(motor, sala_preparada):
             comportamiento=ficha.atributos["comportamiento"],
         ))
     visitantes = motor.enemigos_por_sala[id_sala]
-    motor.enemigos_por_sala[id_sala] = enemigos_de_la_sala + visitantes
+    if not motor.contenido_cargado[id_sala]:
+        motor.enemigos_por_sala[id_sala] = enemigos_de_la_sala + visitantes
 
     objetos_de_la_sala = []
     for indice, tipo_objeto in enumerate(contenido.get("objetos", [])):
@@ -875,7 +881,8 @@ def _incorporar_sala_preparada(motor, sala_preparada):
             tipo_catalogo=tipo_objeto, ubicacion="suelo", sala=id_sala,
         ))
     existentes = motor.objetos_en_suelo[id_sala]
-    motor.objetos_en_suelo[id_sala] = objetos_de_la_sala + existentes
+    if not motor.contenido_cargado[id_sala]:
+        motor.objetos_en_suelo[id_sala] = objetos_de_la_sala + existentes
 
     trampas_json = contenido.get("trampas", [])
     if trampas_json:
