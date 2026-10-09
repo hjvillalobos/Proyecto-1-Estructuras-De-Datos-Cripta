@@ -17,7 +17,7 @@ def entero_positivo(texto):
     return valor
 
 
-def ejecutar_replay(args, gestor_precarga):
+def ejecutar_replay(args, cliente, gestor_precarga):
     from datos.bitacora_replay import reproducir
     from modelo.juego import crear_juego
     from vista.consola import VistaConsola
@@ -34,7 +34,7 @@ def ejecutar_replay(args, gestor_precarga):
 
     juego = reproducir(
         args.replay,
-        gestor_precarga,
+        cliente,
         fabrica,
         notificar=vista.mostrar_info,
     )
@@ -181,6 +181,7 @@ def main(argv=None):
         if args.replay:
             ejecutar_replay(
                 args,
+                cliente,
                 precarga,
             )
             return 0
@@ -215,6 +216,7 @@ def main(argv=None):
         # -------------------------------------------------
 
         from controlador.controlador import ControladorJuego
+        from datos.puntajes import TablaPuntajes
         from modelo.juego import crear_juego
 
         semilla = (
@@ -255,9 +257,12 @@ def main(argv=None):
                 semilla,
             )
 
+            tabla_puntajes = TablaPuntajes("datos_generados/puntajes.jsonl")
+
             controlador = ControladorJuego(
                 modelo=juego,
                 vista=vista,
+                tabla_puntajes=tabla_puntajes,
             )
 
             controlador.iniciar()

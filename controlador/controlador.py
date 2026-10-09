@@ -106,9 +106,9 @@ class ControladorJuego:
             self._mostrar_estado()
 
             if hasattr(self.modelo, "resumen"):
-                self.vista.mostrar_fin(
-                    self.modelo.resumen()
-                )
+                resumen = self.modelo.resumen()
+                self.vista.mostrar_fin(resumen)
+                self._registrar_puntaje(resumen)
 
         self.vista.mostrar_info(
             "Sesión finalizada."
@@ -488,6 +488,33 @@ class ControladorJuego:
             return None
 
         return item.instancia
+
+    # ---------------------------------------------------------
+    # PUNTAJE
+    # ---------------------------------------------------------
+
+    def _registrar_puntaje(self, resumen):
+        if self.tabla_puntajes is None:
+            return
+        if resumen.resultado not in ("victoria", "derrota"):
+            return
+        try:
+            nombre = self.vista.pedir_texto("Tu nombre para el ranking")
+            if not nombre:
+                nombre = "Anónimo"
+            from datos.puntajes import RegistroPuntaje
+            meta = getattr(self.modelo, "meta", None)
+            self.tabla_puntajes.registrar(RegistroPuntaje(
+                nombre=nombre,
+                cripta_id=meta.cripta_id if meta else "?",
+                cripta_version=meta.cripta_version if meta else "?",
+                acciones=resumen.acciones,
+                derrotados=resumen.derrotados,
+                tiempo_final=resumen.reloj_final,
+                resultado=resumen.resultado,
+            ))
+        except Exception:
+            pass
 
     # ---------------------------------------------------------
     # GUARDADO
