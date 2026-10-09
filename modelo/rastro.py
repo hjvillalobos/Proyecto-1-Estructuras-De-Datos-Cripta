@@ -23,7 +23,7 @@ class RegistroRastro:
             faltan = sala_id + 1 - len(self._tiempos)
             self._tiempos.extend([None] * faltan)
 
-    def marcar_visita(self, sala_id: int, tiempo: int):
+    def marcar_visita(self, sala_id: int, tiempo: int | None):
         self._asegurar_capacidad(sala_id)
         self._tiempos[sala_id] = tiempo
 
