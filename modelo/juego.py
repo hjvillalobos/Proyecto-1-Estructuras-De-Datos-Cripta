@@ -57,9 +57,10 @@ class Motor:
         self.acciones_jugador = 0
         self.enemigos_derrotados = 0
         self.terminado = False
-        self.resultado = None
-        self.sala_salida = None
-        self.llave_salida = None
+        self.resultado = None       # "victoria" | "derrota" | None
+        self.sala_salida = None     # lo llena crear_juego()
+        self.llave_salida = None    # lo llena crear_juego()
+        self.meta = None
 
     # ---------- enemigos ----------
 
@@ -112,6 +113,12 @@ class Motor:
 
     def _resolver_clase(self, tipo_catalogo):
         return self._resolver_ficha(tipo_catalogo).clase
+
+    def _buscar_enemigo_en_sala_actual(self, id_instancia):
+        for enemigo in self.enemigos_por_sala[self.jugador.posicion_actual]:
+            if enemigo.id_instancia == id_instancia:
+                return enemigo
+        return None
 
     def _tiene_llave(self, llave_id):
         inventario = self.jugador.inventario
@@ -398,10 +405,14 @@ class Motor:
         if jug.velocidad != velocidad_base:
             efectos_activos.append("velocidad")
 
-        # Objetos presentes en el suelo de la sala actual
+                # Objetos presentes en el suelo de la sala actual
+        from modelo.snapshots import ItemVista
+
         objetos_vista = []
+
         for objeto in self.objetos_en_suelo[sala.id]:
             ficha = self._resolver_ficha(objeto.tipo_catalogo)
+
             objetos_vista.append(
                 ItemVista(
                     instancia=objeto.id_instancia,
