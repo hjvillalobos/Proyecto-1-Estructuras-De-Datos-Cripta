@@ -278,11 +278,20 @@ class Inventario:
             nodo = nodo.siguiente
         return resultado
 
+    def vaciar(self):
+        self.cabeza.siguiente = self.cola
+        self.cola.anterior = self.cabeza
+        self.tamaño = 0
+        self.cursor = None
+        self.arma_equipada = None
+        self.armadura_equipada = None
+
     def restaurar_desde_guardado(self, items: list[ItemInventarioGuardado], resolver_clase) -> None:
         """Inverso de a_lista_guardado(). `resolver_clase(tipo_catalogo)`
         debe devolver la `clase` de catálogo ("arma"/"armadura"/...) para
         volver a marcar qué estaba equipado, ya que ItemInventarioGuardado
         solo guarda un booleano `equipado`, no cuál puntero es."""
+        self.vaciar()
         for item in items:
             objeto = ObjetoInstancia(
                 id_instancia=item.instancia,

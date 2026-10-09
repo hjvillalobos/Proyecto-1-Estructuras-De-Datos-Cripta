@@ -51,12 +51,9 @@ class ControladorJuego:
     # ---------------------------------------------------------
 
     def iniciar(self):
-        """
-        Loop principal de consola.
-        """
+   
 
-        # Cuando A implemente modelo.meta, esto inicia automáticamente
-        # la bitácora de replay.
+    # Iniciar bitácora de replay.
         if hasattr(self.modelo, "meta"):
             try:
                 self.bitacora_replay.iniciar(self.modelo.meta)
@@ -66,10 +63,13 @@ class ControladorJuego:
                 )
 
         self.notificar("Partida iniciada.")
-
         self.vista.mostrar_ayuda()
 
         while self.ejecutando:
+
+            # Si el modelo ya terminó, no pedir otro comando.
+            if getattr(self.modelo, "terminado", False):
+                break
 
             self._mostrar_estado()
 
@@ -95,6 +95,19 @@ class ControladorJuego:
             except Exception as error:
                 self.vista.mostrar_error(
                     f"Error: {error}"
+                )
+
+            # La acción pudo haber causado victoria o derrota.
+            if getattr(self.modelo, "terminado", False):
+                break
+
+        # Mostrar el último estado para que se vea cómo terminó.
+        if getattr(self.modelo, "terminado", False):
+            self._mostrar_estado()
+
+            if hasattr(self.modelo, "resumen"):
+                self.vista.mostrar_fin(
+                    self.modelo.resumen()
                 )
 
         self.vista.mostrar_info(

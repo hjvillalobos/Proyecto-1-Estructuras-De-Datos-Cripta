@@ -1,55 +1,285 @@
-def reproducir(ruta, fuente, fabrica_juego, notificar=print):
+import json
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Callable
+
+
+VERSION_FORMATO_REPLAY = 1
+
+
+class ErrorReplay(Exception):
+    """Error general relacionado con un replay."""
+
+
+class ReplayCorrupto(ErrorReplay):
+    """El archivo de replay no tiene un formato válido."""
+
+
+class ReplayIncompatible(ErrorReplay):
+    """El replay pertenece a versiones incompatibles."""
+
+
+@dataclass(frozen=True)
+class MetaReplay:
+    cripta_id: str
+    version_cripta: str
+    version_catalogo: str
+    semilla: int
+
+
+@dataclass(frozen=True)
+class AccionReplay:
+    accion: str
+    argumento: Any = None
+
+
+def extraer_version(valor):
     """
-    Reproduce una partida sin pedir input al usuario.
+    B puede devolver directamente la versión o un diccionario
+    que contenga la clave 'version'.
+    """
+    if isinstance(valor, dict):
+        return valor.get("version")
 
-    fuente:
-        implementación de Persona B.
+    return valor
 
-    fabrica_juego:
-        modelo.juego.crear_juego cuando Persona A la implemente.
+
+class BitacoraReplay:
+    """
+    Bitácora append-only de las acciones aceptadas del jugador.
+
+    Primera línea:
+        encabezado del replay.
+
+    Líneas siguientes:
+        acciones aceptadas.
     """
 
-    bitacora = BitacoraReplay(ruta)
+    def __init__(self, ruta):
+        self.ruta = Path(ruta)
+
+    def iniciar(self, meta):
+        self.ruta.parent.mkdir(
+            parents=True,
+            exist_ok=True,
+        )
+
+        encabezado = {
+            "tipo": "encabezado",
+            "formato": VERSION_FORMATO_REPLAY,
+            "cripta_id": meta.cripta_id,
+            "version_cripta": meta.cripta_version,
+            "version_catalogo": meta.catalogo_version,
+            "semilla": meta.semilla,
+        }
+
+        with self.ruta.open(
+            "w",
+            encoding="utf-8",
+        ) as archivo:
+            archivo.write(
+                json.dumps(
+                    encabezado,
+                    ensure_ascii=False,
+                )
+            )
+            archivo.write("\n")
+
+    def registrar_accion(
+        self,
+        accion,
+        argumento=None,
+    ):
+        registro = {
+            "tipo": "accion",
+            "accion": accion,
+            "argumento": argumento,
+        }
+
+        with self.ruta.open(
+            "a",
+            encoding="utf-8",
+        ) as archivo:
+            archivo.write(
+                json.dumps(
+                    registro,
+                    ensure_ascii=False,
+                )
+            )
+            archivo.write("\n")
+
+    def leer(self):
+        if not self.ruta.exists():
+            raise ReplayCorrupto(
+                f"No existe el replay: {self.ruta}"
+            )
+
+        try:
+            with self.ruta.open(
+                "r",
+                encoding="utf-8",
+            ) as archivo:
+                lineas = [
+                    linea.strip()
+                    for linea in archivo
+                    if linea.strip()
+                ]
+
+        except OSError as error:
+            raise ReplayCorrupto(
+                f"No se pudo leer el replay: {error}"
+            ) from error
+
+        if not lineas:
+            raise ReplayCorrupto(
+                "El replay está vacío."
+            )
+
+        try:
+            encabezado = json.loads(
+                lineas[0]
+            )
+        except json.JSONDecodeError as error:
+            raise ReplayCorrupto(
+                "El encabezado del replay no es JSON válido."
+            ) from error
+
+        if encabezado.get("tipo") != "encabezado":
+            raise ReplayCorrupto(
+                "Falta el encabezado del replay."
+            )
+
+        if (
+            encabezado.get("formato")
+            != VERSION_FORMATO_REPLAY
+        ):
+            raise ReplayIncompatible(
+                "Versión del formato de replay incompatible."
+            )
+
+        campos = (
+            "cripta_id",
+            "version_cripta",
+            "version_catalogo",
+            "semilla",
+        )
+
+        for campo in campos:
+            if campo not in encabezado:
+                raise ReplayCorrupto(
+                    f"Falta '{campo}' en el encabezado."
+                )
+
+        meta = MetaReplay(
+            cripta_id=str(
+                encabezado["cripta_id"]
+            ),
+            version_cripta=str(
+                encabezado["version_cripta"]
+            ),
+            version_catalogo=str(
+                encabezado["version_catalogo"]
+            ),
+            semilla=int(
+                encabezado["semilla"]
+            ),
+        )
+
+        acciones = []
+
+        for numero, linea in enumerate(
+            lineas[1:],
+            start=2,
+        ):
+            try:
+                registro = json.loads(
+                    linea
+                )
+            except json.JSONDecodeError as error:
+                raise ReplayCorrupto(
+                    f"Línea {numero} inválida."
+                ) from error
+
+            if registro.get("tipo") != "accion":
+                raise ReplayCorrupto(
+                    f"Línea {numero}: "
+                    "se esperaba una acción."
+                )
+
+            accion = registro.get(
+                "accion"
+            )
+
+            if not isinstance(
+                accion,
+                str,
+            ) or not accion:
+                raise ReplayCorrupto(
+                    f"Línea {numero}: "
+                    "acción inválida."
+                )
+
+            acciones.append(
+                AccionReplay(
+                    accion=accion,
+                    argumento=registro.get(
+                        "argumento"
+                    ),
+                )
+            )
+
+        return meta, acciones
+
+
+def reproducir(
+    ruta,
+    fuente,
+    fabrica_juego,
+    notificar=None,
+    al_paso=None,
+):
+    """
+    Reconstruye una partida utilizando la misma cripta,
+    versiones y semilla, y ejecuta las acciones sin pedir
+    entrada al usuario.
+    """
+
+    bitacora = BitacoraReplay(
+        ruta
+    )
 
     meta, acciones = bitacora.leer()
 
-    # -------------------------------------------------
-    # Validar versiones
-    # -------------------------------------------------
-
-    version_cripta_actual = fuente.version_cripta(
-        meta.cripta_id
+    version_cripta_actual = extraer_version(
+        fuente.obtener_version_cripta(
+            meta.cripta_id
+        )
     )
 
-    version_catalogo_actual = fuente.version_catalogo()
-
-    versiones_iguales = (
-        version_cripta_actual == meta.cripta_version
-        and
-        version_catalogo_actual == meta.catalogo_version
+    version_catalogo_actual = extraer_version(
+        fuente.obtener_version_catalogo()
     )
 
-    if not versiones_iguales:
+    if (
+        str(version_cripta_actual)
+        != meta.cripta_version
+    ):
+        raise ReplayIncompatible(
+            "La versión actual de la cripta "
+            "no coincide con la del replay."
+        )
 
-        # B puede ofrecer una copia local compatible.
-        tiene_copia = False
+    if (
+        str(version_catalogo_actual)
+        != meta.catalogo_version
+    ):
+        raise ReplayIncompatible(
+            "La versión actual del catálogo "
+            "no coincide con la del replay."
+        )
 
-        if hasattr(fuente, "tiene_copia_local"):
-            tiene_copia = fuente.tiene_copia_local(
-                meta.cripta_id,
-                meta.cripta_version,
-                meta.catalogo_version,
-            )
-
-        if not tiene_copia:
-            raise ReplayIncompatible(
-                "Las versiones actuales no coinciden con las del replay. "
-                "No se puede garantizar una reproducción fiel."
-            )
-
-    # -------------------------------------------------
-    # Crear partida con LA MISMA SEMILLA
-    # -------------------------------------------------
+    if notificar is None:
+        notificar = lambda mensaje: None
 
     juego = fabrica_juego(
         fuente,
@@ -58,22 +288,33 @@ def reproducir(ruta, fuente, fabrica_juego, notificar=print):
         notificar,
     )
 
-    # -------------------------------------------------
-    # Ejecutar exactamente las acciones registradas
-    # -------------------------------------------------
+    if al_paso is not None:
+        al_paso(
+            juego,
+            None,
+            None,
+        )
 
-    for numero, registro in enumerate(acciones, start=1):
-
+    for accion in acciones:
         resultado = juego.ejecutar(
-            registro.accion,
-            registro.argumento,
+            accion.accion,
+            accion.argumento,
         )
 
         if not resultado.ok:
             raise ReplayCorrupto(
-                f"El replay falló en la acción {numero}: "
-                f"{registro.accion} {registro.argumento}. "
+                "El replay contiene una acción "
+                f"que no pudo reproducirse: "
+                f"{accion.accion!r} "
+                f"{accion.argumento!r}. "
                 f"{resultado.mensaje}"
+            )
+
+        if al_paso is not None:
+            al_paso(
+                juego,
+                accion,
+                resultado,
             )
 
     return juego
