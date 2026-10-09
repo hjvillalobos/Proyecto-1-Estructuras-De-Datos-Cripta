@@ -47,7 +47,6 @@ class Motor:
         self.objetos_en_suelo = [[] for _ in range(salas_total + 1)]
         self.contenido_cargado = [False] * (salas_total + 1)
 
-
         self.efectos = GestorEfectos(self)
         self.registro_rastro = RegistroRastro()
         self.registro_rastro.marcar_visita(self.jugador.posicion_actual, 0)
@@ -76,6 +75,43 @@ class Motor:
                 ficha = self.gestor_precarga.catalogo.obtener_fichas([enemigo.tipo_catalogo])[0]
                 if "regeneracion" in ficha.atributos:
                     self.efectos.aplicar_regeneracion(enemigo, ficha.atributos["regeneracion"], 200)
+
+    # ---------- inventario (vistas y fichas) ----------
+
+    def inventario_cursor(self, movimiento):
+        return self.jugador.inventario.cursor_vista(
+            movimiento,
+            self._resolver_ficha,
+        )
+
+    def inventario_vista(self, orden=None, descendente=False):
+        if orden not in (None, "nombre", "peso", "valor"):
+            raise ValueError(f"Orden inválido: {orden}")
+        return self.jugador.inventario.vista(
+            self._resolver_ficha,
+            orden,
+            descendente,
+        )
+
+    def _equipar_objeto(self, id_instancia):
+        inventario = self.jugador.inventario
+        if not self._posicionar_cursor_en(id_instancia):
+            return False, "No tienes ese objeto."
+        objeto = inventario.objeto_actual()
+        ficha = self._resolver_ficha(objeto.tipo_catalogo)
+        if ficha.clase not in ("arma", "armadura"):
+            return False, "Ese objeto no se puede equipar."
+        inventario.equipar_actual(ficha.clase)
+        return True, None
+
+    def _resolver_ficha(self, tipo_catalogo):
+        fichas = self.gestor_precarga.catalogo.obtener_fichas([tipo_catalogo])
+        if not fichas:
+            raise ValueError(f"No existe la ficha {tipo_catalogo}")
+        return fichas[0]
+
+    def _resolver_clase(self, tipo_catalogo):
+        return self._resolver_ficha(tipo_catalogo).clase
 
     def _tiene_llave(self, llave_id):
         inventario = self.jugador.inventario
@@ -307,7 +343,7 @@ class Motor:
     # ---------- vista / resumen ----------
 
     def estado_vista(self):
-        from modelo.snapshots import EstadoVista, SalidaVista, EnemigoVista
+        from modelo.snapshots import EstadoVista, SalidaVista, EnemigoVista, ItemVista
 
         sala = self.salas[self.jugador.posicion_actual]
 
@@ -362,13 +398,33 @@ class Motor:
         if jug.velocidad != velocidad_base:
             efectos_activos.append("velocidad")
 
+        # Objetos presentes en el suelo de la sala actual
+        objetos_vista = []
+        for objeto in self.objetos_en_suelo[sala.id]:
+            ficha = self._resolver_ficha(objeto.tipo_catalogo)
+            objetos_vista.append(
+                ItemVista(
+                    instancia=objeto.id_instancia,
+                    nombre=ficha.nombre,
+                    clase=ficha.clase,
+                    peso=ficha.atributos.get("peso", 0),
+                    valor=ficha.atributos.get("valor", 0),
+                    equipado=False,
+                )
+            )
+
+        # Capacidad y cantidad real del inventario
+        inventario_usado = len(jug.inventario.a_lista_guardado())
+        inventario_max = jug.inventario.capacidad_max
+
         return EstadoVista(
             reloj=self.reloj, sala_id=sala.id, sala_nombre=sala.nombre,
             salidas=salidas, enemigos=enemigos_vista,
-            objetos_suelo=[],
+            objetos_suelo=objetos_vista,
             vida=self.jugador.vida, vida_max=self.jugador.vida_max,
             ataque=self.jugador.ataque, defensa=self.jugador.defensa, velocidad=self.jugador.velocidad,
-            inventario_usado=0, inventario_max=0,
+            inventario_usado=inventario_usado,
+            inventario_max=inventario_max,
             efectos=efectos_activos,
         )
 
@@ -731,6 +787,9 @@ class Motor:
         elif evento.tipo == "cierre_puerta":
             sala, direccion = evento.referencia
             self.efectos.ejecutar_cierre_puerta(sala, direccion)
+        elif evento.tipo == "restaurar_velocidad":
+            actor, velocidad_base = evento.referencia
+            self.cambiar_velocidad(actor, velocidad_base)
         elif evento.tipo == "turno_jugador":
             pass
 
