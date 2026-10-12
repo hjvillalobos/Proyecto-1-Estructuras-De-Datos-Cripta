@@ -85,6 +85,21 @@ class BitacoraReplay:
             )
             archivo.write("\n")
 
+    def registrar_carga(self):
+        """
+        Marca en la bitácora que la partida se cargó desde un guardado.
+        Desde ese punto el replay ya no es fiel (el historial anterior a la
+        carga no está en este archivo), así que reproducir() lo rechazará.
+        """
+        with self.ruta.open(
+            "a",
+            encoding="utf-8",
+        ) as archivo:
+            archivo.write(
+                json.dumps({"tipo": "cargar"})
+            )
+            archivo.write("\n")
+
     def registrar_accion(
         self,
         accion,
@@ -200,6 +215,12 @@ class BitacoraReplay:
                     f"Línea {numero} inválida."
                 ) from error
 
+            if registro.get("tipo") == "cargar":
+                raise ReplayIncompatible(
+                    "En esta partida se usó 'cargar': "
+                    "no se puede garantizar una reproducción fiel."
+                )
+
             if registro.get("tipo") != "accion":
                 raise ReplayCorrupto(
                     f"Línea {numero}: "
@@ -262,7 +283,7 @@ def reproducir(
 
     if (
         str(version_cripta_actual)
-        != meta.cripta_version
+        != meta.version_cripta
     ):
         raise ReplayIncompatible(
             "La versión actual de la cripta "
@@ -271,7 +292,7 @@ def reproducir(
 
     if (
         str(version_catalogo_actual)
-        != meta.catalogo_version
+        != meta.version_catalogo
     ):
         raise ReplayIncompatible(
             "La versión actual del catálogo "

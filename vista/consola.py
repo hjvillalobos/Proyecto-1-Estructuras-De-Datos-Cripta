@@ -1,5 +1,3 @@
-
-
 from modelo.snapshots import EstadoVista, ItemVista
 
 AYUDA = """\
@@ -16,6 +14,7 @@ Comandos:
   retroceso               usar un pergamino de retroceso
   guardar [archivo]       guardar la partida      cargar [archivo]   cargar partida
   puntajes                ver la tabla de puntajes
+  replay [archivo]        reproducir una partida guardada en bitácora (por defecto, la actual)
   ayuda                   esta ayuda              salir              terminar la sesión"""
 
 
@@ -131,6 +130,13 @@ class VistaConsola:
         self._salida(f"  acciones {resumen.acciones} | derrotados {resumen.derrotados} | "
                      f"tiempo virtual {resumen.reloj_final}")
         self._salida("*" * 64)
+
+    def mostrar_replay_paso(self, estado, mensajes, paso, total, inventario=None):
+        """Una línea por paso del replay. Devuelve True para seguir."""
+        ultimo = mensajes[-1] if mensajes else ""
+        self._salida(f"[{paso}/{total}] {ultimo}  ->  sala {estado.sala_id} | "
+                     f"vida {estado.vida}/{estado.vida_max} | t={estado.reloj}")
+        return True
 
     def mostrar_estadisticas_red(self, est):
         """§5.1: al terminar se reporta solicitudes, presupuesto y aciertos/fallos de caché."""

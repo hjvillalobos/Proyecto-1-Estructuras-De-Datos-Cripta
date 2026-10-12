@@ -1,6 +1,8 @@
 import argparse
 import json
+import os
 import random
+import subprocess
 import sys
 
 from datos.almacen import AlmacenLocal
@@ -17,29 +19,59 @@ def entero_positivo(texto):
     return valor
 
 
-def ejecutar_replay(args, gestor_precarga):
-    from datos.bitacora_replay import reproducir
+def ejecutar_replay(args, gestor_precarga, cliente):
+    """--replay ARCHIVO: reproduce la partida (con --gui, en una ventana)."""
+    from controlador.replay import ReproductorReplay
     from modelo.juego import crear_juego
-    from vista.consola import VistaConsola
 
-    vista = VistaConsola()
+    if args.gui:
+        from vista.grafica import VistaGrafica
 
-    def fabrica(fuente, cripta_id, semilla, notificar):
-        return crear_juego(
+        vista = VistaGrafica()
+    else:
+        from vista.consola import VistaConsola
+
+        vista = VistaConsola()
+
+    try:
+        ReproductorReplay(
+            cliente,
             gestor_precarga,
-            cripta_id,
-            semilla,
-            notificar,
-        )
+            vista,
+            crear_juego,
+        ).reproducir(args.replay)
+    finally:
+        if args.gui:
+            vista.cerrar()
 
-    juego = reproducir(
-        args.replay,
-        gestor_precarga,
-        fabrica,
-        notificar=vista.mostrar_info,
-    )
 
-    vista.mostrar_fin(juego.resumen())
+def crear_lanzador_replay(args):
+    """
+    Función que abre un replay en un proceso aparte, con las mismas opciones
+    de datos (--offline, --datos-dir, --cache-size). Así el replay no toca
+    la partida en curso ni gasta su presupuesto de solicitudes.
+    """
+
+    def lanzar(ruta):
+        comando = [sys.executable, os.path.abspath(__file__)]
+
+        if args.offline is not None:
+            comando += ["--offline", args.offline]
+
+        comando += [
+            "--datos-dir", args.datos_dir,
+            "--cache-size", str(args.cache_size),
+            "--replay", ruta,
+        ]
+
+        if args.gui:
+            # Ventana propia; la partida sigue jugable mientras tanto.
+            subprocess.Popen(comando + ["--gui"])
+        else:
+            # Consola: se muestra en línea y se vuelve a la partida.
+            subprocess.run(comando)
+
+    return lanzar
 
 
 def main(argv=None):
@@ -182,6 +214,7 @@ def main(argv=None):
             ejecutar_replay(
                 args,
                 precarga,
+                cliente,
             )
             return 0
 
@@ -258,6 +291,7 @@ def main(argv=None):
             controlador = ControladorJuego(
                 modelo=juego,
                 vista=vista,
+                lanzador_replay=crear_lanzador_replay(args),
             )
 
             controlador.iniciar()

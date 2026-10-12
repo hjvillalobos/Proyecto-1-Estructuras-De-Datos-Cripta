@@ -1,3 +1,5 @@
+import os
+
 from datos.bitacora_replay import BitacoraReplay
 from datos.guardado_binario import guardar_estado, cargar_estado
 from vista.bitacora_pantalla import BufferCircular
@@ -27,6 +29,7 @@ class ControladorJuego:
         vista,
         ruta_replay="datos_generados/partida.log",
         tabla_puntajes=None,
+        lanzador_replay=None,
     ):
         self.modelo = modelo
         self.vista = vista
@@ -36,6 +39,9 @@ class ControladorJuego:
         self.bitacora_replay = BitacoraReplay(ruta_replay)
 
         self.tabla_puntajes = tabla_puntajes
+
+        # función(ruta) que abre un replay; la entrega main.py
+        self.lanzador_replay = lanzador_replay
 
         self.ejecutando = True
 
@@ -330,6 +336,13 @@ class ControladorJuego:
             return
 
         # ---------------------------------------------
+        # REPLAY
+        # ---------------------------------------------
+
+        if comando == "replay":
+            return self._replay(argumentos)
+
+        # ---------------------------------------------
         # AYUDA
         # ---------------------------------------------
 
@@ -488,6 +501,46 @@ class ControladorJuego:
             return None
 
         return item.instancia
+
+    # ---------------------------------------------------------
+    # REPLAY
+    # ---------------------------------------------------------
+
+    def _replay(self, argumentos):
+
+        if self.lanzador_replay is None:
+            return self.vista.mostrar_error(
+                "El replay no está disponible en esta sesión."
+            )
+
+        if argumentos:
+            ruta = argumentos[0]
+
+        elif hasattr(self.vista, "pedir_ruta_replay"):
+            ruta = self.vista.pedir_ruta_replay()
+
+            if not ruta:
+                return
+
+        else:
+            # Sin argumento: repetir la partida en curso.
+            ruta = str(self.bitacora_replay.ruta)
+
+        if not os.path.exists(ruta):
+            return self.vista.mostrar_error(
+                f"No existe el archivo de replay: {ruta}"
+            )
+
+        try:
+            self.lanzador_replay(ruta)
+
+        except OSError as error:
+            return self.vista.mostrar_error(
+                f"No se pudo abrir el replay: {error}"
+            )
+
+        self.notificar(f"Replay abierto: {ruta}")
+        self.vista.mostrar_info(f"Replay abierto: {ruta}")
 
     # ---------------------------------------------------------
     # GUARDADO

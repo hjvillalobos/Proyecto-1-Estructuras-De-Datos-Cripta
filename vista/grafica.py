@@ -1,20 +1,7 @@
-"""
-Vista gráfica sencilla de CRIPTA con tkinter (viene incluido con Python).
-
-Implementa la MISMA interfaz que VistaConsola (pedir_comando, mostrar_estado,
-mostrar_inventario, ...), así que el controlador y el modelo no cambian.
-
-Cómo conversa con el controlador:
-  * Cada clic/tecla se convierte en un comando de texto ("mover N",
-    "atacar e-201", "recoger obj-1-0", "usar itm-3", "esperar", ...) y se
-    entrega al controlador desde pedir_comando().
-  * Después de cada comando la vista pide "inv" por su cuenta, para que la
-    lista de inventario de la derecha siempre esté al día.
-"""
 
 import time
 import tkinter as tk
-from tkinter import messagebox, simpledialog, ttk
+from tkinter import filedialog, messagebox, simpledialog, ttk
 
 FONDO   = "#0d0d14"
 PANEL   = "#16161f"
@@ -47,6 +34,10 @@ BOTONES
   Usar / Equipar / Soltar actúan sobre el objeto seleccionado
   en el inventario. El selector ordena la vista sin cambiar el
   orden real del inventario.
+
+REPLAY
+  El botón «Replay» abre un archivo de bitácora (.log) y lo reproduce
+  paso a paso en otra ventana, con Pausa, Detener y selector de velocidad.
 """
 
 
@@ -66,6 +57,9 @@ class VistaGrafica:
         self._refrescar_inv = True      # pedir "inv" antes de esperar al jugador
         self._ayuda_omitida = False     # el controlador pide ayuda al arrancar: no abrir ventana
         self._items = []                # ítems del inventario que se ven en la lista
+        self._en_replay = False         # True en la ventana que reproduce un replay
+        self._replay_pausado = False
+        self._replay_detener = False
 
         self._construir()
         self._atar_teclas()
@@ -109,18 +103,37 @@ class VistaGrafica:
 
         botones = tk.Frame(izq, bg=FONDO)
         botones.pack(fill="x")
-        acciones = [
-            ("Esperar (Espacio)", "esperar"),
-            ("Retroceso (R)", "retroceso"),
+        fila0 = [
+            ("Esperar", "esperar"),
+            ("Retroceso", "retroceso"),
             ("Guardar", "guardar"),
             ("Cargar", "cargar"),
+        ]
+        fila1 = [
+            ("🎬 Replay", "replay"),
             ("Puntajes", "puntajes"),
             ("Ayuda", "ayuda"),
             ("Salir", "salir"),
         ]
-        for i, (texto, comando) in enumerate(acciones):
+        for i, (texto, comando) in enumerate(fila0):
             ttk.Button(botones, text=texto,
-                       command=lambda c=comando: self._enviar(c)).grid(row=0, column=i, padx=2)
+                       command=lambda c=comando: self._enviar(c)).grid(row=0, column=i, padx=2, pady=(0, 2), sticky="ew")
+        for i, (texto, comando) in enumerate(fila1):
+            ttk.Button(botones, text=texto,
+                       command=lambda c=comando: self._enviar(c)).grid(row=1, column=i, padx=2, sticky="ew")
+
+        # Controles del replay: reemplazan a los botones de arriba en modo replay.
+        self.barra_botones = botones
+        self.barra_replay = tk.Frame(izq, bg=FONDO)
+        ttk.Button(self.barra_replay, text="Pausa / Continuar",
+                   command=self._replay_alternar_pausa).pack(side="left", padx=2)
+        ttk.Button(self.barra_replay, text="Detener",
+                   command=self._replay_parar).pack(side="left", padx=2)
+        tk.Label(self.barra_replay, text="Velocidad:", bg=FONDO, fg=TENUE).pack(
+            side="left", padx=(14, 4))
+        self.var_vel = tk.StringVar(value="normal")
+        ttk.Combobox(self.barra_replay, textvariable=self.var_vel, state="readonly", width=8,
+                     values=("lento", "normal", "rápido")).pack(side="left")
 
         # --- derecha: estado del jugador e inventario ---
         tk.Label(der, text="⚔  C R I P T A  ⚔", bg=FONDO, fg=AMARILLO,
@@ -561,6 +574,57 @@ class VistaGrafica:
     def mostrar_estadisticas_red(self, est):
         self.mostrar_info(f"Red: {est.solicitudes}/{est.presupuesto} solicitudes | "
                           f"caché: {est.aciertos_cache} aciertos, {est.fallos_cache} fallos")
+
+    # ------------------------------------------------------------------
+    # Replay
+    # ------------------------------------------------------------------
+    def pedir_ruta_replay(self):
+        """Abre el selector de archivos. Devuelve la ruta o None si se cancela."""
+        ruta = filedialog.askopenfilename(
+            parent=self.root, title="Elige un archivo de replay",
+            initialdir="datos_generados",
+            filetypes=[("Bitácora de partida", "*.log"), ("Todos los archivos", "*.*")])
+        return ruta or None
+
+    def modo_replay(self):
+        """Esta ventana pasa a reproducir: se ocultan los botones de juego."""
+        self._en_replay = True
+        self._replay_pausado = False
+        self._replay_detener = False
+        self.barra_botones.pack_forget()
+        self.barra_replay.pack(fill="x")
+        self.root.title("REPLAY — CRIPTA")
+
+    def _replay_alternar_pausa(self):
+        self._replay_pausado = not self._replay_pausado
+        self._aviso("REPLAY en pausa." if self._replay_pausado else "REPLAY continúa.", AZUL)
+
+    def _replay_parar(self):
+        self._replay_detener = True
+
+    def _pausa_replay(self):
+        velocidad = self.var_vel.get()
+        if velocidad == "lento":
+            return 1.4
+        if velocidad == "rápido":
+            return 0.2
+        return 0.7
+
+    def mostrar_replay_paso(self, estado, mensajes, paso, total, inventario=None):
+        """Dibuja un paso del replay y espera. Devuelve False para detenerlo."""
+        if self._cerrada or self._replay_detener:
+            return False
+        self.mostrar_estado(estado, mensajes)
+        if inventario is not None:
+            self.mostrar_inventario(inventario)
+        self._aviso(f"REPLAY — paso {paso}/{total}", AZUL)
+        fin = time.time() + self._pausa_replay()
+        while not self._cerrada and not self._replay_detener:
+            self._actualizar_ui()
+            if not self._replay_pausado and time.time() >= fin:
+                break
+            time.sleep(0.01)
+        return not self._cerrada and not self._replay_detener
 
     # ------------------------------------------------------------------
     # Cierre
