@@ -2,6 +2,7 @@ import time
 
 from datos.bitacora_replay import BitacoraReplay, ErrorReplay, ReplayIncompatible, aplicar_accion_replay
 from vista.bitacora_pantalla import BufferCircular
+from red.errores import ErrorCripta
 
 
 class ReproductorReplay:
@@ -30,13 +31,17 @@ class ReproductorReplay:
             self._vista.modo_replay()
 
         def mostrar(juego, paso):
-            estado = juego.estado_vista()
-            if usa_paso:
-                return self._vista.mostrar_replay_paso(estado, mensajes.ultimos(), paso, total,
-                                                     inventario=juego.inventario_vista())
-            self._vista.mostrar_estado(estado, mensajes.ultimos())
-            time.sleep(0.8)
-            return True
+            try:
+                estado = juego.estado_vista()
+                if usa_paso:
+                    return self._vista.mostrar_replay_paso(estado, mensajes.ultimos(), paso, total,
+                                                         inventario=juego.inventario_vista())
+                self._vista.mostrar_estado(estado, mensajes.ultimos())
+                time.sleep(0.8)
+                return True
+            except (ErrorCripta, OSError) as error:
+                self._error(f"No se pudo mostrar el paso {paso}: {error}")
+                return False
 
         # estado inicial
         try:
@@ -59,8 +64,8 @@ class ReproductorReplay:
         for i, accion in enumerate(acciones, start=1):
             try:
                 resultado = aplicar_accion_replay(juego, accion)
-            except ErrorReplay as error:
-                self._error(str(error))
+            except (ErrorReplay, ErrorCripta, OSError) as error:
+                self._error(f"Replay detenido en paso {i}: {error}")
                 return
             if not resultado.ok:
                 self._error(
@@ -68,6 +73,8 @@ class ReproductorReplay:
                 )
                 return
             arg = f" {accion.argumento}" if accion.argumento and accion.accion != "cargar" else ""
+            if callable(getattr(type(self._vista), "preparar_animacion", None)):
+                self._vista.preparar_animacion(accion.accion)
             mensajes.agregar(f"► {accion.accion}{arg}")
             if not mostrar(juego, i):
                 return

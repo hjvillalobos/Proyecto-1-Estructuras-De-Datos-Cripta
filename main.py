@@ -1,15 +1,11 @@
 import argparse
 import json
 import os
-import random
 import subprocess
 import sys
 
-from datos.almacen import AlmacenLocal
-from red.cache import CacheCatalogoOrdenado
-from red.catalogo import GestorCatalogo
+from red.sesion import SesionDatos
 from red.errores import ErrorCripta
-from red.precarga import GestorPrecarga
 
 
 def entero_positivo(texto):
@@ -74,319 +70,66 @@ def crear_lanzador_replay(args):
     return lanzar
 
 
+def leer_argumentos(argumentos):
+    parser = argparse.ArgumentParser(description="CRIPTA - Estructuras de Datos II")
+    parser.add_argument("--cripta")
+    parser.add_argument("--listar", action="store_true")
+    parser.add_argument("--offline", nargs="?", const=".cache/cripta", metavar="CARPETA")
+    parser.add_argument("--datos-dir", default=".cache/cripta")
+    parser.add_argument("--cache-size", type=entero_positivo, default=25)
+    parser.add_argument("--version-cripta")
+    parser.add_argument("--version-catalogo")
+    parser.add_argument("--descargar-todo", action="store_true")
+    parser.add_argument("--semilla", type=int, default=None)
+    parser.add_argument("--replay", metavar="ARCHIVO")
+    parser.add_argument("--gui", action="store_true",
+                        help="Jugar en una ventana gráfica (tkinter) en vez de la consola.")
+    return parser.parse_args(argumentos)
+
+
 def main(argv=None):
     argumentos = sys.argv[1:] if argv is None else list(argv)
-
-    # BENCH
     if "--bench" in argumentos:
         from bench import main as ejecutar_bench
-
         argumentos.remove("--bench")
         ejecutar_bench(argumentos)
         return 0
 
-    # ARGUMENTOS
-    parser = argparse.ArgumentParser(
-        description="CRIPTA - Estructuras de Datos II"
-    )
-
-    parser.add_argument("--cripta")
-    parser.add_argument("--listar", action="store_true")
-
-    parser.add_argument(
-        "--offline",
-        nargs="?",
-        const=".cache/cripta",
-        metavar="CARPETA",
-    )
-
-    parser.add_argument(
-        "--datos-dir",
-        default=".cache/cripta",
-    )
-
-    parser.add_argument(
-        "--cache-size",
-        type=entero_positivo,
-        default=25,
-    )
-
-    parser.add_argument("--version-cripta")
-    parser.add_argument("--version-catalogo")
-
-    parser.add_argument(
-        "--descargar-todo",
-        action="store_true",
-    )
-
-    parser.add_argument(
-        "--semilla",
-        type=int,
-        default=None,
-    )
-
-    parser.add_argument(
-        "--replay",
-        metavar="ARCHIVO",
-    )
-
-    parser.add_argument(
-        "--gui",
-        action="store_true",
-        help="Jugar en una ventana gráfica (tkinter) en vez de la consola.",
-    )
-
-    args = parser.parse_args(argumentos)
-
-    cliente = None
-    precarga = None
-    catalogo = None
-
+    args = leer_argumentos(argumentos)
+    sesion = SesionDatos(args)
     try:
-        # -------------------------------------------------
-        # ALMACENAMIENTO
-        # -------------------------------------------------
-
-        almacen = AlmacenLocal(args.datos_dir)
-
-        # -------------------------------------------------
-        # FUENTE DE DATOS
-        # -------------------------------------------------
-
-        if args.offline is not None:
-            from datos.offline import ClienteOffline
-
-            cliente = ClienteOffline(args.offline)
-
-        else:
-            from red.cliente_api import ClienteApi
-
-            cliente = ClienteApi()
-
-        # -------------------------------------------------
-        # LISTAR CRIPTAS
-        # -------------------------------------------------
-
-        if (
-            args.listar
-            or (args.cripta is None and not args.replay and not args.gui)
-            or args.descargar_todo
-        ):
-            listado = cliente.listar_criptas()
-
-            almacen.guardar_lista(listado)
-
-            print(
-                json.dumps(
-                    listado,
-                    indent=2,
-                    ensure_ascii=False,
-                )
-            )
-
-        # Si no se indicó cripta
+        sesion.abrir()
+        if args.listar or (args.cripta is None and not args.replay and not args.gui) or args.descargar_todo:
+            listado = sesion.cliente.listar_criptas()
+            sesion.almacen.guardar_lista(listado)
+            print(json.dumps(listado, indent=2, ensure_ascii=False))
         if args.cripta is None and not args.replay and not args.gui:
-            print(
-                "Selecciona una cripta con --cripta ID."
-            )
+            print("Selecciona una cripta con --cripta ID.")
             return 0
 
-        # -------------------------------------------------
-        # CATÁLOGO Y PRECARGA
-        # -------------------------------------------------
-
-        catalogo = GestorCatalogo(
-            cliente,
-            CacheCatalogoOrdenado(args.cache_size),
-            almacen,
-        )
-
-        precarga = GestorPrecarga(
-            cliente,
-            catalogo,
-        )
-
-        # -------------------------------------------------
-        # REPLAY
-        # -------------------------------------------------
-
+        sesion.preparar()
         if args.replay:
-            ejecutar_replay(
-                args,
-                precarga,
-                cliente,
-            )
+            ejecutar_replay(args, sesion.precarga, sesion.cliente)
             return 0
-
-        # -------------------------------------------------
-        # DESCARGAR TODO
-        # -------------------------------------------------
-
         if args.descargar_todo:
-            preparada = precarga.preparar_cripta(
-                args.cripta,
-                args.version_cripta,
-                args.version_catalogo,
-            )
-
-            precarga.cargar_contenido(
-                [
-                    sala.id
-                    for sala in preparada.salas
-                ]
-            )
-
-            print(
-                f"Respuestas completas guardadas en "
-                f"{args.datos_dir}"
-            )
-
+            preparada = sesion.precarga.preparar_cripta(
+                args.cripta, args.version_cripta, args.version_catalogo)
+            sesion.precarga.cargar_contenido([sala.id for sala in preparada.salas])
+            print(f"Respuestas completas guardadas en {args.datos_dir}")
             return 0
 
-        # -------------------------------------------------
-        # INICIAR JUEGO
-        # -------------------------------------------------
-
-        from controlador.controlador import ControladorJuego
-        from modelo.juego import crear_juego
-        from datos.puntajes import TablaPuntajes
-
-        semilla = (
-            args.semilla
-            if args.semilla is not None
-            else random.randint(0, 2**32 - 1)
-        )
-
-        if args.gui:
-            from vista.grafica import VistaGrafica
-
-            vista = VistaGrafica()
-        else:
-            from vista.consola import VistaConsola
-
-            vista = VistaConsola()
-
-        try:
-            estado_inicial = None
-            if args.gui:
-                from datos.guardado_binario import cargar_estado, ErrorGuardado
-
-                def abrir_replay():
-                    ruta = vista.pedir_ruta_replay()
-                    if ruta:
-                        try:
-                            crear_lanzador_replay(args)(ruta)
-                        except OSError as error:
-                            vista.mostrar_error_replay(str(error))
-
-                def ver_puntajes():
-                    try:
-                        vista.mostrar_puntajes(TablaPuntajes("datos_generados/puntajes.jsonl").ranking())
-                    except OSError as error:
-                        vista.mostrar_error_replay(str(error))
-
-                while True:
-                    accion, ruta = vista.mostrar_menu(abrir_replay, ver_puntajes)
-                    if accion == "salir":
-                        return 0
-                    if accion == "cargar":
-                        try:
-                            estado_inicial = cargar_estado(ruta)
-                        except (OSError, ErrorGuardado, ValueError) as error:
-                            vista.mostrar_error_replay(f"No se pudo cargar: {error}")
-                            continue
-                        args.cripta = estado_inicial.meta.cripta_id
-                        semilla = estado_inicial.meta.semilla
-                    break
-            # Con --gui y sin --cripta se elige la cripta en una ventana.
-            if args.cripta is None:
-                listado = cliente.listar_criptas()
-                almacen.guardar_lista(listado)
-                lista = (
-                    listado["criptas"]
-                    if isinstance(listado, dict)
-                    else listado
-                )
-                args.cripta = vista.elegir_cripta(lista)
-                if args.cripta is None:
-                    return 0
-
-            # IMPORTANTE:
-            # No llamamos preparar_cripta() aquí.
-            # crear_juego() se encarga de hacerlo.
-            while True:
-                versiones = (dict(version_cripta=estado_inicial.meta.cripta_version,
-                                  version_catalogo=estado_inicial.meta.catalogo_version)
-                             if estado_inicial is not None else {})
-                juego = crear_juego(precarga, args.cripta, semilla, **versiones)
-                controlador = ControladorJuego(
-                    modelo=juego, vista=vista,
-                    tabla_puntajes=TablaPuntajes("datos_generados/puntajes.jsonl"),
-                    lanzador_replay=crear_lanzador_replay(args),
-                )
-                if estado_inicial is not None:
-                    controlador.iniciar(estado_inicial=estado_inicial)
-                    estado_inicial = None
-                else:
-                    controlador.iniciar()
-                if not (args.gui and juego.resultado == "derrota" and vista.preguntar_reinicio()):
-                    break
-                precarga.cerrar()
-                cliente.cerrar()
-                if args.offline is not None:
-                    cliente = ClienteOffline(args.offline)
-                else:
-                    cliente = ClienteApi()
-                catalogo = GestorCatalogo(cliente, CacheCatalogoOrdenado(args.cache_size), almacen)
-                precarga = GestorPrecarga(cliente, catalogo)
-                semilla = args.semilla if args.semilla is not None else random.randint(0, 2**32 - 1)
-                vista.reiniciar_presentacion()
-        finally:
-            if args.gui:
-                vista.cerrar()
-
-        return 0
-
+        from controlador.aplicacion import ejecutar_juego
+        return ejecutar_juego(args, sesion, crear_lanzador_replay(args))
     except ErrorCripta as error:
-        print(
-            f"Error: {error}",
-            file=sys.stderr,
-        )
+        print(f"Error: {error}", file=sys.stderr)
         return 1
-
     except ModuleNotFoundError as error:
         if error.name != "requests":
             raise
-
-        print(
-            "Falta requests. "
-            "Instálalo con: python -m pip install requests",
-            file=sys.stderr,
-        )
-
+        print("Falta requests. Instálalo con: python -m pip install requests", file=sys.stderr)
         return 1
-
     finally:
-        if precarga is not None:
-            precarga.cerrar()
-
-        if catalogo is not None:
-            print(
-                json.dumps(
-                    catalogo.reporte(),
-                    indent=2,
-                    ensure_ascii=False,
-                )
-            )
-
-        elif cliente is not None:
-            print(
-                f"Solicitudes de red: "
-                f"{cliente.solicitudes_realizadas}"
-            )
-
-        if cliente is not None:
-            cliente.cerrar()
+        sesion.cerrar(reportar=True)
 
 
 if __name__ == "__main__":

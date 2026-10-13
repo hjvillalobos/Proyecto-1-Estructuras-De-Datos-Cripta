@@ -76,6 +76,7 @@ class EscenaCripta:
         if self.animacion is not None:
             self.animacion.iniciar()
         self.anterior = estado
+        v._accion_visual = None
 
     def _ambiente(self, nombre, ancho, c):
         nombre = nombre.lower()
@@ -120,12 +121,36 @@ class EscenaCripta:
             anterior = self.anterior
             self._actor(sprite, entrada=anterior is not None and anterior.sala_id != estado.sala_id,
                         golpe=anterior is not None and estado.vida < anterior.vida)
+            if self.animacion is not None:
+                accion = self._accion_jugador(estado)
+                if accion:
+                    cuadros = self.vista.recursos.fotogramas_jugador(290, min(280, alto - 175))
+                    self.imagenes.extend(cuadros)
+                    indices = {"correr": (0, 1, 2, 3), "atacar": (4, 5), "caer": (6, 7)}[accion]
+                    if len(cuadros) == 8:
+                        self.animacion.secuencia(sprite, [cuadros[i] for i in indices],
+                                                reposo=imagen, mantener=accion == "caer")
         else:
             c.create_oval(px - 22, py - 90, px + 22, py - 46, fill=AMARILLO, outline=TEXTO, tags=("jugador",))
             c.create_polygon(px - 38, py - 42, px + 38, py - 42, px + 25, py, px - 25, py,
                              fill="#537c67", outline=TEXTO, tags=("jugador",))
         c.create_text(px, py + 15, text=f"Jugador  {estado.vida}/{estado.vida_max}",
                       fill=self.vista._color_vida(estado.vida, estado.vida_max), font=("Segoe UI", 11, "bold"))
+
+    def _accion_jugador(self, estado):
+        if estado.vida <= 0:
+            return "caer"
+        anterior = self.anterior
+        accion = getattr(self.vista, "_accion_visual", None)
+        if accion in ("cargar", "retroceso"):
+            return None
+        if anterior is None or estado.reloj < anterior.reloj:
+            return None
+        if anterior.sala_id != estado.sala_id:
+            return "correr"
+        if accion == "atacar":
+            return "atacar"
+        return None
 
     def _enemigos(self, estado, ancho, alto, c):
         v = self.vista

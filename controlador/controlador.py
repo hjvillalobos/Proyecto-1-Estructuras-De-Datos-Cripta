@@ -427,6 +427,8 @@ class ControladorJuego:
             return False
 
         # Solo registramos acciones aceptadas.
+        if callable(getattr(type(self.vista), "preparar_animacion", None)):
+            self.vista.preparar_animacion(accion)
         if self._grabacion_valida:
             try:
                 self.bitacora_replay.registrar_accion(accion, argumento)
@@ -642,6 +644,8 @@ class ControladorJuego:
             self.modelo.restaurar_estado(
                 estado
             )
+            if callable(getattr(type(self.vista), "preparar_animacion", None)):
+                self.vista.preparar_animacion("cargar")
             if self._grabacion_valida:
                 try:
                     self.bitacora_replay.registrar_carga(estado)

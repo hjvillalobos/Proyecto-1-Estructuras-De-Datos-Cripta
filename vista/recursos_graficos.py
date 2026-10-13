@@ -14,6 +14,33 @@ class RecursosGraficos:
         self.root = root
         self.carpeta = Path(carpeta) if carpeta else Path(__file__).parent / "recursos"
         self._imagenes = []
+        self._secuencias = []
+
+    def fotogramas_jugador(self, ancho, alto):
+        clave = (int(ancho), int(alto))
+        for actual, imagenes in self._secuencias:
+            if actual == clave:
+                return imagenes
+        if Image is None:
+            return ()
+        try:
+            with Image.open(self.carpeta / "jugador_acciones.png") as origen:
+                hoja = origen.convert("RGBA")
+            w, h = hoja.width // 4, hoja.height // 2
+            imagenes = []
+            for indice in range(8):
+                fila, col = divmod(indice, 4)
+                cuadro = hoja.crop((col * w, fila * h + int(h * .19),
+                                   (col + 1) * w, fila * h + int(h * .88)))
+                cuadro.thumbnail(clave, Image.Resampling.LANCZOS)
+                imagenes.append(ImageTk.PhotoImage(cuadro, master=self.root))
+        except (OSError, ValueError, tk.TclError):
+            return ()
+        resultado = tuple(imagenes)
+        self._secuencias.append((clave, resultado))
+        if len(self._secuencias) > 4:
+            self._secuencias.pop(0)
+        return resultado
 
     def imagen(self, nombre, ancho, alto):
         if Path(nombre).name != nombre:

@@ -36,6 +36,11 @@ Incluye cliente HTTP, precarga por lotes, catálogo, caché ordenada con LRU, pe
 
 El punto de entrada integra el motor con consola o Tkinter, guardado y reproduccion mediante --replay.
 
+`main.py` interpreta argumentos y selecciona el modo de ejecucion.
+`controlador/aplicacion.py` coordina menu, carga inicial, reintentos y partidas.
+`red/sesion.py` administra la creacion, renovacion y cierre de cliente, catalogo
+y precarga. El motor y las reglas de tiempo virtual permanecen independientes.
+
 ### Requisitos y ejecución
 
 Python 3.11 o superior. Para acceder al servidor:
@@ -85,7 +90,15 @@ python main.py --bench --capacidades 25 --operaciones 1000 --repeticiones 3 --es
 ```
 
 Las pruebas usan respuestas simuladas y archivos temporales, sin acceder al servidor. La suite incluye regresiones de retroceso, carga, replay, efectos, cache, trampas y paginacion del GUI.
-Verificacion del 2026-10-13: 225 pruebas aprobadas, carga real de los PNG, miniaturas y acciones de recogida verificadas, presentacion sin cambios en la simulacion y comprobacion de escenas normales y pobladas en Tkinter. Incluye menu de inicio, validacion de replay, fallos de grabacion, reinicio tras derrota, carga aislada, precarga fallida y puntajes invalidos.
+Verificacion del 2026-10-13: 235 pruebas aprobadas, carga real de los PNG y fotogramas, miniaturas y acciones de recogida verificadas, presentacion sin cambios en la simulacion y comprobacion de escenas normales y pobladas en Tkinter. Incluye menu de inicio, validacion de replay, fallos de grabacion, reinicio tras derrota, carga aislada, precarga fallida, puntajes invalidos y ciclo de vida de la sesion de datos.
+
+El personaje usa fotogramas de carrera al cambiar de sala, ataque tras una accion
+aceptada y caida al perder. Son secuencias visuales desactivables; no avanzan el
+reloj ni bloquean el juego. Sin Pillow o sin la hoja de acciones se usa el PNG original.
+
+El replay mantiene visible el reloj virtual, permite Salir y muestra errores de
+datos/red sin continuar la reproduccion. Los errores al preparar una partida se
+muestran en el GUI y permiten regresar al menu para reintentar o salir.
 
 Con `--gui` aparece el menu de inicio: Jugar, Cargar partida, Replay, Puntajes y
 Salir. Se navega con raton, flechas y Enter. No inicia la simulacion ni avanza el

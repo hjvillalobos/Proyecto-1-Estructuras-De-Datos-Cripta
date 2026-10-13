@@ -43,3 +43,9 @@ Tkinter. El aspecto nunca cambia estadisticas, costos, semillas ni reglas.
   redimensionar, reiniciar o cerrar cancela el callback y libera sus referencias.
 - No hay movimiento libre ni ataques automaticos. Las flechas siguen siendo
   acciones discretas entre salas; el reloj virtual solo pertenece al motor.
+- El jugador tiene una hoja 4x2 de fotogramas: carrera (0-3), ataque (4-5),
+  caida (6-7). El controlador anuncia solo acciones aceptadas; el replay usa
+  el mismo aviso. No se infiere un ataque a partir de dano automatico.
+- Las secuencias duran cientos de milisegundos reales sin bloquear comandos;
+  un estado nuevo las reemplaza. La caida conserva la ultima pose. Sin Pillow,
+  sin la hoja o con Animaciones desactivadas se conserva el dibujo original.

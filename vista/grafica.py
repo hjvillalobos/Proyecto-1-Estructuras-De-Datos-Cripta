@@ -108,7 +108,8 @@ class VistaGrafica:
         self.boton_esperar.pack(side="left", padx=(0, 8))
         ttk.Button(self.barra_botones, text="Retroceso", command=lambda: self._enviar("retroceso")).pack(side="left")
         self.var_tiempo = tk.StringVar()
-        self._etiqueta(self.barra_botones, variable=self.var_tiempo, color=TENUE, fuente="Consolas").pack(side="right")
+        self.lbl_tiempo = self._etiqueta(izq, variable=self.var_tiempo, color=TENUE, fuente="Consolas")
+        self.lbl_tiempo.pack(anchor="e")
         self.barra_replay = tk.Frame(izq, bg=FONDO)
         self.var_movimiento = tk.BooleanVar(value=True)
         ttk.Checkbutton(izq, text="Animaciones", variable=self.var_movimiento,
@@ -220,6 +221,9 @@ class VistaGrafica:
         if self._estado is not None:
             self._dibujar_sala(self._estado)
 
+    def preparar_animacion(self, accion):
+        self._accion_visual = accion
+
     def _clic_accion(self, comando):
         anterior, instante = getattr(self, "_ultimo_clic", ("", 0))
         ahora = time.monotonic()
@@ -248,7 +252,12 @@ class VistaGrafica:
     # Entrada
     # ------------------------------------------------------------------
     def _enviar(self, comando):
-        if self._cerrada or self._en_replay or getattr(self, "_en_menu", False):
+        if self._cerrada or getattr(self, "_en_menu", False):
+            return
+        if self._en_replay:
+            if comando == "salir":
+                self._replay_detener = True
+                self.cerrar()
             return
         self._cola.append(comando)
 
@@ -504,6 +513,7 @@ class VistaGrafica:
             "Jugar de nuevo", "Has perdido. ¿Quieres iniciar una partida nueva?", parent=self.root)
 
     def reiniciar_presentacion(self):
+        self._accion_visual = None
         if hasattr(self, "escena"):
             self.escena.detener()
             self.escena.anterior = None

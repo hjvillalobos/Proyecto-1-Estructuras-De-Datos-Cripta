@@ -202,3 +202,21 @@ Uso: repartir los archivos del m√≥dulo de D en las ramas de git del equipo, seg√
 - **Uso:** Menu local con personaje e iconos existentes, Jugar, Cargar partida, Replay, Puntajes y Salir. Navegacion con flechas/Enter y raton. El menu no crea el motor ni consume tiempo virtual. Cargar conserva cripta, versiones, semilla y reloj y registra la base cargada en el replay. Mantener MVC y separar menu dentro de vista.
 - **Verificacion:** Cinco pruebas nuevas: teclado y acciones del menu real, cancelacion de selector, carga inicial registrada, salida sin crear partida y versiones/semilla de carga. Capturas Tkinter en 1280x800 y 1100x760.
 
+### 2026-10-13: errores de inicio y controles de replay
+
+- **Prompt textual:** "arreglame todos los bugs que encontraste"
+- **Uso:** Capturar errores de datos/red durante acciones y presentacion del replay, conservar visible su reloj virtual y permitir cerrar su ventana con Salir sin aceptar comandos de juego. Mostrar errores de preparacion de partida y volver al menu con cliente, catalogo y precarga nuevos para reintentar. Conservar las reglas y estructura MVC.
+- **Verificacion:** 229 pruebas aprobadas, incluidas cuatro regresiones nuevas para errores de replay, reloj y cierre real de Tkinter, regreso al menu y reintento con precarga nueva.
+
+### 2026-10-13: simplificar main
+
+- **Prompt textual:** "dale si, hazlo pero no rompas nada"
+- **Uso:** Extraer coordinacion de menu y partidas a controlador/aplicacion.py y propiedad de cliente, catalogo, precarga y cierre a red/sesion.py. Mantener argumentos, modos de consola/GUI, replay, descargas, semilla, cargas, reloj y reglas. Reducir main.py de 416 a 136 lineas sin cambiar los contratos del motor o de las vistas.
+- **Verificacion:** 232 pruebas aprobadas; las 229 existentes conservan sus expectativas. Tres pruebas nuevas cubren renovacion independiente, preservacion del almacen y cierre del cliente cuando falla una precarga.
+
+### 2026-10-13: fotogramas de acciones
+
+- **Prompt textual:** "dale haslo pero sigue el enunciado y no rompas nada"
+- **Uso:** Crear una hoja local de ocho poses basada en el personaje original mediante imagegen integrado. Carrera al cambiar de sala, ataque solo tras accion aceptada y caida al perder. Reutilizar el temporizador visual cancelable; no alterar motor, costos, reloj, azar ni formatos. Conservar jugador.png y respaldo sin Pillow.
+- **Verificacion:** 235 pruebas aprobadas; fotogramas y respaldo comprobados, seleccion de acciones y final de secuencias. Capturas de carrera, ataque y caida en 1280x800 y 1100x760; diferencias de pixeles entre fotogramas, motor intacto y cola de comandos vacia.
+
