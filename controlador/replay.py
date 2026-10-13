@@ -12,11 +12,14 @@ class ReproductorReplay:
         self._crear_juego = crear_juego
 
     def reproducir(self, ruta):
+        self._error = (self._vista.mostrar_error_replay
+                       if callable(getattr(type(self._vista), "mostrar_error_replay", None))
+                       else self._vista.mostrar_error)
         bitacora = BitacoraReplay(ruta)
         try:
             meta, acciones = bitacora.leer()
         except ErrorReplay as e:
-            self._vista.mostrar_error(str(e))
+            self._error(str(e))
             return
 
         mensajes = BufferCircular(20)
@@ -45,7 +48,7 @@ class ReproductorReplay:
                     or juego.meta.catalogo_version != meta.version_catalogo):
                 raise ReplayIncompatible("Las versiones cargadas no coinciden con el replay.")
         except Exception as e:
-            self._vista.mostrar_error(f"No se pudo cargar la cripta: {e}")
+            self._error(f"No se pudo cargar la cripta: {e}")
             return
 
         if not mostrar(juego, 0):
@@ -57,10 +60,10 @@ class ReproductorReplay:
             try:
                 resultado = aplicar_accion_replay(juego, accion)
             except ErrorReplay as error:
-                self._vista.mostrar_error(str(error))
+                self._error(str(error))
                 return
             if not resultado.ok:
-                self._vista.mostrar_error(
+                self._error(
                     f"Acción inválida en paso {i}: {accion.accion} {accion.argumento}"
                 )
                 return

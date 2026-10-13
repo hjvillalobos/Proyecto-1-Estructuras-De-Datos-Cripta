@@ -56,6 +56,7 @@ class VistaGrafica:
         self.escena = EscenaCripta(self)
         self._estado = None
         self._animaciones = []
+        self._movimiento_activo = True
         self._ultimo_clic = ("", 0)
         self._construir()
         self._atar_teclas()
@@ -109,6 +110,9 @@ class VistaGrafica:
         self.var_tiempo = tk.StringVar()
         self._etiqueta(self.barra_botones, variable=self.var_tiempo, color=TENUE, fuente="Consolas").pack(side="right")
         self.barra_replay = tk.Frame(izq, bg=FONDO)
+        self.var_movimiento = tk.BooleanVar(value=True)
+        ttk.Checkbutton(izq, text="Animaciones", variable=self.var_movimiento,
+                        command=self._alternar_movimiento).pack(anchor="e")
         ttk.Button(self.barra_replay, text="Pausa / Continuar", command=self._replay_alternar_pausa).pack(side="left")
         ttk.Button(self.barra_replay, text="Detener", command=self._replay_parar).pack(side="left", padx=8)
         self.var_vel = tk.StringVar(value="normal")
@@ -209,6 +213,13 @@ class VistaGrafica:
         if hasattr(self, "lbl_aviso"):
             self.lbl_aviso.config(wraplength=max(400, self.canvas.winfo_width() - 16))
 
+    def _alternar_movimiento(self):
+        self._movimiento_activo = self.var_movimiento.get()
+        if hasattr(self, "escena"):
+            self.escena.detener()
+        if self._estado is not None:
+            self._dibujar_sala(self._estado)
+
     def _clic_accion(self, comando):
         anterior, instante = getattr(self, "_ultimo_clic", ("", 0))
         ahora = time.monotonic()
@@ -237,9 +248,13 @@ class VistaGrafica:
     # Entrada
     # ------------------------------------------------------------------
     def _enviar(self, comando):
-        if self._cerrada or self._en_replay:
+        if self._cerrada or self._en_replay or getattr(self, "_en_menu", False):
             return
         self._cola.append(comando)
+
+    def mostrar_menu(self, replay, puntajes):
+        from vista.menu_inicio import MenuInicio
+        return MenuInicio(self, replay, puntajes).mostrar()
 
     def _actualizar_ui(self):
         try:
@@ -480,6 +495,29 @@ class VistaGrafica:
     def mostrar_error(self, texto):
         self._aviso(f"(!) {texto}", ROJO)
 
+    def mostrar_error_replay(self, texto):
+        if not self._cerrada:
+            messagebox.showerror("Error de replay", texto, parent=self.root)
+
+    def preguntar_reinicio(self):
+        return not self._cerrada and messagebox.askyesno(
+            "Jugar de nuevo", "Has perdido. ¿Quieres iniciar una partida nueva?", parent=self.root)
+
+    def reiniciar_presentacion(self):
+        if hasattr(self, "escena"):
+            self.escena.detener()
+            self.escena.anterior = None
+        for identificador in self._animaciones:
+            self.root.after_cancel(identificador)
+        self._animaciones.clear()
+        self._cola.clear()
+        self._estado = self._estado_sala = None
+        self._pagina_enemigos = self._pagina_objetos = 0
+        self._refrescar_inv = True
+        self._ultimo_clic = ("", 0)
+        self.mostrar_inventario([])
+        self._aviso("Nueva partida.", AMARILLO)
+
     def mostrar_info(self, texto):
         self._aviso(texto, AMARILLO)
 
@@ -587,6 +625,8 @@ class VistaGrafica:
         if self._cerrada:
             return
         self._cerrada = True
+        if hasattr(self, "escena"):
+            self.escena.detener()
         try:
             for identificador in getattr(self, "_animaciones", []):
                 self.root.after_cancel(identificador)

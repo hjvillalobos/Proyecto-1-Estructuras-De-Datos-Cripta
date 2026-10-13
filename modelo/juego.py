@@ -1,6 +1,8 @@
 # modelo/juego.py
 
 import random
+from copy import copy, deepcopy
+from red.errores import ErrorCripta
 from modelo.eventos import ColaEventos
 from modelo.efectos import GestorEfectos
 from modelo.tipos import Jugador, InstanciaEnemigo, ObjetoInstancia
@@ -195,7 +197,10 @@ class Motor:
         self.registro_rastro.marcar_visita(id_destino, self.reloj)
 
         self.activar_enemigos_de_sala(id_destino, self.enemigos_por_sala[id_destino])
-        self.gestor_precarga.anticipar(id_destino)
+        try:
+            self.gestor_precarga.anticipar(id_destino)
+        except ErrorCripta as error:
+            self.informar(f"Precarga anticipada no disponible: {error}")
 
         for trampa in sala_destino.trampas:
             if self.terminado:
@@ -444,7 +449,7 @@ class Motor:
         for trampa in sala.trampas:
             ficha = self._resolver_ficha(trampa.tipo_catalogo)
             trampas.append(TrampaVista(trampa.id_instancia, ficha.nombre, trampa.armada,
-                                      ficha.atributos.get("daño", 0)))
+                                      ficha.atributos.get("daño", 0), tipo=trampa.tipo_catalogo))
         agenda = []
         nombres = (("pulso_veneno", "Pulso de veneno"), ("fin_veneno", "Fin del veneno"),
                    ("apagar_antorcha", "Se apaga la antorcha"),
@@ -644,11 +649,96 @@ class Motor:
                 for i in ids):
             raise ValueError("Guardado incompatible: salas o indicadores invalidos.")
 
+        random.Random().setstate(estado.rng_estado)
+        j = estado.jugador
+        valores = (estado.reloj, estado.siguiente_secuencia, estado.acciones_jugador,
+                   estado.enemigos_derrotados, j.vida, j.ataque, j.defensa, j.tiempo_siguiente)
+        if any(type(v) is not int or v < 0 for v in valores) or any(
+                type(v) is not int or v < 1 for v in (j.vida_max, j.velocidad)):
+            raise ValueError("Guardado invalido: estadisticas o reloj.")
+        if j.vida > j.vida_max or len(j.inventario) > self.jugador.inventario.capacidad_max:
+            raise ValueError("Guardado invalido: vida o capacidad.")
+        if j.extras[0] not in (0, 1) or j.extras[1] not in (0, 1, 2):
+            raise ValueError("Guardado invalido: resultado.")
+        actores = ["jugador"] + [e.instancia for s in estado.salas for e in s.enemigos]
+        trampas = [t.instancia for s in estado.salas for t in s.trampas]
+        cantidades = (("turno_jugador", 0), ("turno_enemigo", 0), ("pulso_veneno", 0),
+                      ("fin_veneno", 2), ("pulso_regeneracion", 2), ("apagar_antorcha", 0),
+                      ("rearmar_trampa", 0), ("cierre_puerta", 0), ("restaurar_velocidad", 1))
+        secuencias = []
+        for evento in estado.eventos:
+            cantidad = next((n for tipo, n in cantidades if tipo == evento.tipo), None)
+            if cantidad is None or len(evento.parametros) != cantidad or any(
+                    type(p) is not int or p < 1 for p in evento.parametros):
+                raise ValueError("Guardado invalido: parametros de evento.")
+            if (type(evento.tiempo) is not int or evento.tiempo < estado.reloj
+                    or type(evento.secuencia) is not int or not 0 <= evento.secuencia < estado.siguiente_secuencia
+                    or evento.secuencia in secuencias):
+                raise ValueError("Guardado invalido: tiempo o secuencia de evento.")
+            secuencias.append(evento.secuencia)
+            if evento.tipo == "cierre_puerta":
+                try:
+                    sala, direccion = evento.objetivo.split(":")
+                    sala = int(sala)
+                    valido = 0 <= sala < len(self.salas) and self.salas[sala] is not None and direccion in self.salas[sala].salidas
+                except (ValueError, AttributeError):
+                    valido = False
+            elif evento.tipo == "rearmar_trampa":
+                valido = evento.objetivo in trampas
+            elif evento.tipo == "apagar_antorcha":
+                valido = isinstance(evento.objetivo, str) and bool(evento.objetivo)
+            else:
+                valido = evento.objetivo in actores
+            if not valido:
+                raise ValueError("Guardado invalido: objetivo de evento.")
+
     def restaurar_estado(self, estado):
+        self.validar_estado(estado)
+        # Construir la carga fuera de la partida viva; el historial sigue usando deltas.
+        preparado = copy(self)
+        preparado.jugador = deepcopy(self.jugador)
+        preparado.salas = deepcopy(self.salas)
+        preparado.registro_rastro = deepcopy(self.registro_rastro)
+        preparado.azar = random.Random()
+        catalogo = self.gestor_precarga.catalogo
+        if hasattr(catalogo, "cache"):
+            preparado.gestor_precarga = copy(self.gestor_precarga)
+            preparado.gestor_precarga.catalogo = copy(catalogo)
+            preparado.gestor_precarga.catalogo.cache = deepcopy(catalogo.cache)
+        preparado._restaurar_estado_validado(estado)
+        if hasattr(catalogo, "cache"):
+            catalogo.cache.__dict__.update(preparado.gestor_precarga.catalogo.cache.__dict__)
+            for campo in ("aciertos", "fallos", "recuperaciones_disco"):
+                setattr(catalogo, campo, getattr(preparado.gestor_precarga.catalogo, campo))
+        preparado.gestor_precarga = self.gestor_precarga
+        # Conservar las referencias publicas del jugador, salas y puertas.
+        for i, sala in enumerate(self.salas):
+            if sala is None:
+                continue
+            nueva = preparado.salas[i]
+            for direccion, salida in sala.salidas.items():
+                salida.clear()
+                salida.update(nueva.salidas[direccion])
+            sala.trampas = nueva.trampas
+            preparado.salas[i] = sala
+        jugador = self.jugador
+        jugador.__dict__.update(preparado.jugador.__dict__)
+        for evento in preparado.cola.pendientes():
+            if evento.referencia is preparado.jugador:
+                evento.referencia = jugador
+            elif evento.tipo == "restaurar_velocidad" and evento.referencia[0] is preparado.jugador:
+                evento.referencia = (jugador, evento.referencia[1])
+            elif evento.tipo == "cierre_puerta":
+                sala, direccion = evento.referencia
+                evento.referencia = (self.salas[sala.id], direccion)
+        preparado.jugador = jugador
+        self.__dict__.update(preparado.__dict__)
+        self.efectos.motor = self
+
+    def _restaurar_estado_validado(self, estado):
         from modelo.tipos import InstanciaEnemigo, ObjetoInstancia, Trampa
         from modelo.inventario import Inventario
 
-        self.validar_estado(estado)
         if self.gestor_precarga is not None:
             fijar = getattr(self.gestor_precarga.catalogo, "fijar_referencias", None)
             if fijar is not None:

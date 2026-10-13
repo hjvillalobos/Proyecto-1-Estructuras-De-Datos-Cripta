@@ -136,7 +136,7 @@ class BitacoraReplay:
                     if linea.strip()
                 ]
 
-        except OSError as error:
+        except (OSError, UnicodeError) as error:
             raise ReplayCorrupto(
                 f"No se pudo leer el replay: {error}"
             ) from error
@@ -155,6 +155,8 @@ class BitacoraReplay:
                 "El encabezado del replay no es JSON válido."
             ) from error
 
+        if not isinstance(encabezado, dict):
+            raise ReplayCorrupto("El encabezado debe ser un objeto JSON.")
         if encabezado.get("tipo") != "encabezado":
             raise ReplayCorrupto(
                 "Falta el encabezado del replay."
@@ -180,6 +182,12 @@ class BitacoraReplay:
                 raise ReplayCorrupto(
                     f"Falta '{campo}' en el encabezado."
                 )
+
+        for campo in campos[:-1]:
+            if not isinstance(encabezado[campo], str) or not encabezado[campo].strip():
+                raise ReplayCorrupto(f"Campo '{campo}' invalido en el encabezado.")
+        if type(encabezado["semilla"]) is not int:
+            raise ReplayCorrupto("La semilla debe ser un entero.")
 
         meta = MetaReplay(
             cripta_id=str(
@@ -211,6 +219,8 @@ class BitacoraReplay:
                     f"Línea {numero} inválida."
                 ) from error
 
+            if not isinstance(registro, dict):
+                raise ReplayCorrupto(f"Linea {numero}: se esperaba un objeto JSON.")
             if registro.get("tipo") == "cargar":
                 if not isinstance(registro.get("estado"), dict):
                     raise ReplayIncompatible("La carga no contiene el estado necesario para reproducirla.")
@@ -236,6 +246,8 @@ class BitacoraReplay:
                     "acción inválida."
                 )
 
+            if registro.get("argumento") is not None and not isinstance(registro["argumento"], str):
+                raise ReplayCorrupto(f"Linea {numero}: argumento invalido.")
             acciones.append(
                 AccionReplay(
                     accion=accion,

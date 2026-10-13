@@ -165,6 +165,7 @@ class TrampaVista:
     nombre: str
     armada: bool
     dano: int
+    tipo: str = ""
 
 
 @dataclass

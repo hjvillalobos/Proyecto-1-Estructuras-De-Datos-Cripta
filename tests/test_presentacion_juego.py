@@ -5,7 +5,7 @@ from unittest.mock import Mock, patch
 import tkinter as tk
 
 from controlador.controlador import ControladorJuego
-from modelo.snapshots import EnemigoVista, ItemVista
+from modelo.snapshots import EnemigoVista, ItemVista, TrampaVista
 from tests import test_regresiones_juego as base
 from vista.grafica import VistaGrafica
 from vista.recursos_graficos import RecursosGraficos
@@ -76,6 +76,7 @@ class TestPresentacionModelo(unittest.TestCase):
         self.motor.ejecutar("mover", "E")
         trampa = self.motor.estado_vista().trampas[0]
         self.assertFalse(trampa.armada)
+        self.assertEqual(trampa.tipo, "trampa")
         self.assertEqual(trampa.dano, 4)
         self.assertTrue(any("Trampa:" in m and "4 de dano" in m for m in mensajes))
 
@@ -155,7 +156,9 @@ class TestGraficosTk(unittest.TestCase):
     def test_png_del_jugador_y_rata_cargan_con_tamano_acotado(self):
         recursos = RecursosGraficos(self.vista.root)
         for nombre in ("jugador", "ent_rata_gigante", "ent_guardian_oseo",
-                       "itm_pocion_menor", "itm_daga_oxidada"):
+                       "itm_pocion_menor", "itm_daga_oxidada", "itm_antidoto", "itm_antorcha",
+                       "itm_coraza_cuero", "itm_llave_bronce", "itm_llave_negra",
+                       "itm_pergamino_retroceso", "trp_dardos"):
             imagen = recursos.imagen(nombre, 200, 150)
             self.assertIsNotNone(imagen)
             self.assertLessEqual(imagen.width(), 200)
@@ -165,7 +168,8 @@ class TestGraficosTk(unittest.TestCase):
 
     def test_miniatura_del_inventario_se_actualiza_y_se_limpia(self):
         v = self.vista
-        for tipo in ("itm_pocion_menor", "itm_daga_oxidada"):
+        for tipo in ("itm_pocion_menor", "itm_daga_oxidada", "itm_antidoto", "itm_antorcha",
+                     "itm_coraza_cuero", "itm_llave_bronce", "itm_llave_negra", "itm_pergamino_retroceso"):
             v.mostrar_inventario([ItemVista("obj", "Objeto", "pocion", 1, 2, tipo=tipo)])
             self.assertIsNotNone(v._imagen_detalle)
             self.assertEqual(str(v.icono_detalle.cget("image")), str(v._imagen_detalle))
@@ -195,6 +199,18 @@ class TestGraficosTk(unittest.TestCase):
             imagen = recursos.imagen("jugador", 200, 150)
             self.assertIsNotNone(imagen)
             self.assertLessEqual(imagen.height(), 150)
+
+    def test_trampa_muestra_imagen_sin_ocultar_su_estado(self):
+        datos = base.TestRegresionesJuego()
+        datos.setUp()
+        estado = datos.motor.estado_vista()
+        v = self.vista
+        for armada in (True, False):
+            estado.trampas = [TrampaVista("t1", "Dardos", armada, 4, tipo="trp_dardos")]
+            v._dibujar_sala(estado)
+            self.assertIn("image", [v.canvas.type(i) for i in v.canvas.find_withtag("trampa")])
+            textos = [v.canvas.itemcget(i, "text") for i in v.canvas.find_all() if v.canvas.type(i) == "text"]
+            self.assertTrue(any(("armada" if armada else "desarmada") in t and "Dardos" in t for t in textos))
 
     def test_acciones_incompatibles_se_deshabilitan(self):
         v = self.vista

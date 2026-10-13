@@ -172,3 +172,33 @@ Uso: repartir los archivos del módulo de D en las ramas de git del equipo, seg�
 - **Recursos:** `vista/recursos/itm_pocion_menor.png`, `itm_daga_oxidada.png`, `ent_guardian_oseo.png`.
 - **Verificacion:** 203 pruebas aprobadas y captura de la ventana real de Tkinter con los tres recursos; canales RGBA transparentes verificados.
 
+### 2026-10-13: completar iconos
+
+- **Prompt textual:** "puedes implementar esas imagenes y tambien todas las demas, pero hazlas a tu gusto."
+- **Uso:** Conservar las imagenes originales del antidoto y antorcha. Generar coraza, llaves, pergamino y trampa con imagegen integrado; prompts en vista/recursos/README.md. Resolver la imagen de trampa por tipo de catalogo sin cambiar reglas ni estructura MVC.
+- **Verificacion:** 204 pruebas aprobadas, todos los PNG con transparencia RGBA y comprobacion visual de los siete recursos nuevos en Tkinter.
+
+### 2026-10-13: replay y nueva partida
+
+- **Prompt textual:** "puedes solucionar los problemas porfa y tambien implementar que cuando el jugador pierde preguntar si quiere jugar de nuevo"
+- **Uso:** Validar tipos y codificacion de bitacoras; mostrar errores persistentes de replay; detener la sesion ante fallos de escritura indicando que la accion ya ocurrio y la grabacion esta incompleta. Preguntar tras derrota en GUI e iniciar un motor, cliente, catalogo y precarga nuevos, conservando la cripta y la semilla explicita si existe. Limpiar comandos, seleccion y animaciones de la vista.
+- **Pruebas:** Casos de bitacora corrupta, fallo de escritura e inicio, dialogos, limpieza real de Tkinter y reinicio integrado offline.
+
+### 2026-10-13: animacion visual
+
+- **Prompt textual:** "dale hazlo mas vivo pero no rompas nada del enunciado"
+- **Uso:** Respiracion de sprites, entrada de sala, reaccion al dano y movimiento sutil de objetos. Temporizador exclusivamente en la vista, cancelable y desactivable; sin tiempo virtual, azar, acciones ni reglas adicionales. Se conserva MVC y el control discreto por flechas.
+- **Verificacion:** 214 pruebas aprobadas; estado completo del motor intacto tras animar; comandos de las cuatro flechas comprobados. Capturas reales en 1280x800 y 1100x760 y diferencias de pixeles entre fotogramas.
+
+### 2026-10-13: integridad de operaciones
+
+- **Prompt textual:** "corrige esos 3 bugs porfa, siguiendo el enunciado y los principios SOLID sin cambiar la estructura del proyecto, y agrega pruebas para verificarlos"
+- **Uso:** Aislar errores de precarga anticipada sin perder el registro del movimiento. Validar reloj, estadisticas, azar, objetivos y parametros de eventos antes de cargar; preparar el estado y cache aisladamente y conservar referencias publicas al confirmar la carga. Validar registros de puntaje para descartar lineas semanticamente invalidas antes del ranking. Mantener MVC, reloj virtual, binario y retroceso por deltas; las copias temporales solo corresponden a la operacion de carga.
+- **Verificacion:** Seis pruebas nuevas de regresion, incluyendo fallos de catalogo, carga valida con efectos, referencias de puertas y cache, movimiento reversible y registro de replay, y ranking con registros invalidos.
+
+### 2026-10-13: menu de inicio
+
+- **Prompt textual:** "hazlo si basado en el diseño del juego"
+- **Uso:** Menu local con personaje e iconos existentes, Jugar, Cargar partida, Replay, Puntajes y Salir. Navegacion con flechas/Enter y raton. El menu no crea el motor ni consume tiempo virtual. Cargar conserva cripta, versiones, semilla y reloj y registra la base cargada en el replay. Mantener MVC y separar menu dentro de vista.
+- **Verificacion:** Cinco pruebas nuevas: teclado y acciones del menu real, cancelacion de selector, carga inicial registrada, salida sin crear partida y versiones/semilla de carga. Capturas Tkinter en 1280x800 y 1100x760.
+

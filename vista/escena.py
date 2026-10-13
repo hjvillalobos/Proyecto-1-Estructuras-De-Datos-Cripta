@@ -1,4 +1,5 @@
 from vista.tema import FONDO, PANEL, TEXTO, TENUE, VERDE, ROJO, AMARILLO, BORDE
+from vista.animacion import AnimacionEscena
 
 
 class EscenaCripta:
@@ -7,6 +8,16 @@ class EscenaCripta:
     def __init__(self, vista):
         self.vista = vista
         self.imagenes = []
+        self.animacion = None
+        self.anterior = None
+
+    def detener(self):
+        if self.animacion is not None:
+            self.animacion.detener()
+
+    def _actor(self, identificador, fase=0, entrada=False, golpe=False):
+        if self.animacion is not None:
+            self.animacion.agregar(identificador, fase, entrada, golpe)
 
     def _imagen(self, nombre, ancho, alto):
         recursos = getattr(self.vista, "recursos", None)
@@ -17,6 +28,11 @@ class EscenaCripta:
 
     def dibujar(self, estado):
         v, c = self.vista, self.vista.canvas
+        self.detener()
+        if hasattr(v, "root") and getattr(v, "_movimiento_activo", True):
+            self.animacion = AnimacionEscena(v.root, c)
+        else:
+            self.animacion = None
         self.imagenes.clear()
         c.delete("all")
         ancho, alto = c.winfo_width(), c.winfo_height()
@@ -51,9 +67,15 @@ class EscenaCripta:
                              fill="#303e34", outline=color, width=2, tags=("trampa",))
             for x in (37, 47, 57):
                 c.create_line(x, alto - 119, x + 5, alto - 113, fill=color, width=2, tags=("trampa",))
+            imagen = self._imagen(getattr(trampas[0], "tipo", ""), 42, 32)
+            if imagen is not None:
+                c.create_image(48, alto - 117, image=imagen, tags=("trampa",))
         self._jugador(estado, alto, c)
         self._enemigos(estado, ancho, alto, c)
         self._objetos(estado, ancho, alto, c)
+        if self.animacion is not None:
+            self.animacion.iniciar()
+        self.anterior = estado
 
     def _ambiente(self, nombre, ancho, c):
         nombre = nombre.lower()
@@ -94,7 +116,10 @@ class EscenaCripta:
         c.create_oval(px - 68, py - 16, px + 68, py + 10, fill="#0b1512", outline="")
         imagen = self._imagen("jugador", 230, min(280, alto - 175))
         if imagen is not None:
-            c.create_image(px, py, image=imagen, anchor="s", tags=("jugador",))
+            sprite = c.create_image(px, py, image=imagen, anchor="s", tags=("jugador",))
+            anterior = self.anterior
+            self._actor(sprite, entrada=anterior is not None and anterior.sala_id != estado.sala_id,
+                        golpe=anterior is not None and estado.vida < anterior.vida)
         else:
             c.create_oval(px - 22, py - 90, px + 22, py - 46, fill=AMARILLO, outline=TEXTO, tags=("jugador",))
             c.create_polygon(px - 38, py - 42, px + 38, py - 42, px + 25, py, px - 25, py,
@@ -116,7 +141,9 @@ class EscenaCripta:
             altura = min(118, (alto - 190) / 2) if len(visibles) <= 4 else min(75, 8 + (alto - 350) * .35)
             imagen = self._imagen(getattr(enemigo, "tipo", ""), min(205, celda - 16), altura)
             if imagen is not None:
-                c.create_image(x, y, image=imagen, anchor="s", tags=(etiqueta,))
+                sprite = c.create_image(x, y, image=imagen, anchor="s", tags=(etiqueta,))
+                previo = next((e for e in self.anterior.enemigos if e.instancia == enemigo.instancia), None) if self.anterior else None
+                self._actor(sprite, fase=i * .8, golpe=previo is not None and enemigo.vida < previo.vida)
             else:
                 radio = min(30, celda / 3)
                 c.create_polygon(x - radio, y - 5, x - radio * .8, y - altura * .8,
@@ -158,7 +185,8 @@ class EscenaCripta:
             imagen = self._imagen(getattr(objeto, "tipo", ""), 26, 26)
             margen = 34 if imagen is not None else 8
             if imagen is not None:
-                c.create_image(x + 18, y + 15, image=imagen, tags=(etiqueta,))
+                sprite = c.create_image(x + 18, y + 15, image=imagen, tags=(etiqueta,))
+                self._actor(sprite, fase=i * .7)
             c.create_text(x + margen + (w - margen - 8) / 2, y + 15,
                           text=objeto.nombre, fill=AMARILLO, width=w - margen - 8,
                           font=("Segoe UI", 10), tags=(etiqueta,))

@@ -9,7 +9,7 @@ python -m pip install -r requirements.txt
 python main.py --gui
 ```
 
-El jugador, las ratas, el guardian oseo, la pocion menor y la daga oxidada utilizan las imagenes locales de `vista/recursos/`. Los objetos muestran miniaturas en el suelo y al seleccionarlos en el inventario.
+El jugador, los dos enemigos, los ocho objetos y la trampa de dardos del catalogo local utilizan imagenes de `vista/recursos/`. Los objetos muestran miniaturas en el suelo y al seleccionarlos en el inventario.
 Pillow conserva la transparencia y mejora el escalado; si no esta instalado,
 Tkinter puede cargar los PNG con un escalado basico. Los enemigos sin imagen local
 se muestran con una representacion generica, sin cambiar su tipo ni estadisticas.
@@ -85,7 +85,22 @@ python main.py --bench --capacidades 25 --operaciones 1000 --repeticiones 3 --es
 ```
 
 Las pruebas usan respuestas simuladas y archivos temporales, sin acceder al servidor. La suite incluye regresiones de retroceso, carga, replay, efectos, cache, trampas y paginacion del GUI.
-Verificacion del 2026-10-13: 203 pruebas aprobadas, carga real de los PNG, miniaturas y acciones de recogida verificadas, presentacion sin cambios en la simulacion y comprobacion de escenas normales y pobladas en Tkinter.
+Verificacion del 2026-10-13: 225 pruebas aprobadas, carga real de los PNG, miniaturas y acciones de recogida verificadas, presentacion sin cambios en la simulacion y comprobacion de escenas normales y pobladas en Tkinter. Incluye menu de inicio, validacion de replay, fallos de grabacion, reinicio tras derrota, carga aislada, precarga fallida y puntajes invalidos.
+
+Con `--gui` aparece el menu de inicio: Jugar, Cargar partida, Replay, Puntajes y
+Salir. Se navega con raton, flechas y Enter. No inicia la simulacion ni avanza el
+reloj virtual. Una partida nueva empieza en t=0; cargar recupera el reloj guardado.
+
+La escena incluye respiracion suave, entrada a salas y reaccion visual al dano.
+La casilla Animaciones desactiva el movimiento. Estos efectos no consumen tiempo
+virtual ni generan acciones; las flechas mantienen el movimiento por salas.
+
+Al perder en el GUI se pregunta si se desea jugar de nuevo en la misma cripta.
+Cada intento crea una partida y presupuesto de red nuevos. Una semilla indicada
+con `--semilla` se conserva; en otro caso se genera otra. La bitacora de la nueva
+partida reemplaza `datos_generados/partida.log`, como al iniciar una sesion normal.
+Si falla la escritura de la bitacora, la sesion se detiene y se advierte que la
+ultima accion ya se realizo pero la grabacion esta incompleta.
 
 ### Compatibilidad del guardado y replay
 

@@ -267,6 +267,37 @@ def main(argv=None):
             vista = VistaConsola()
 
         try:
+            estado_inicial = None
+            if args.gui:
+                from datos.guardado_binario import cargar_estado, ErrorGuardado
+
+                def abrir_replay():
+                    ruta = vista.pedir_ruta_replay()
+                    if ruta:
+                        try:
+                            crear_lanzador_replay(args)(ruta)
+                        except OSError as error:
+                            vista.mostrar_error_replay(str(error))
+
+                def ver_puntajes():
+                    try:
+                        vista.mostrar_puntajes(TablaPuntajes("datos_generados/puntajes.jsonl").ranking())
+                    except OSError as error:
+                        vista.mostrar_error_replay(str(error))
+
+                while True:
+                    accion, ruta = vista.mostrar_menu(abrir_replay, ver_puntajes)
+                    if accion == "salir":
+                        return 0
+                    if accion == "cargar":
+                        try:
+                            estado_inicial = cargar_estado(ruta)
+                        except (OSError, ErrorGuardado, ValueError) as error:
+                            vista.mostrar_error_replay(f"No se pudo cargar: {error}")
+                            continue
+                        args.cripta = estado_inicial.meta.cripta_id
+                        semilla = estado_inicial.meta.semilla
+                    break
             # Con --gui y sin --cripta se elige la cripta en una ventana.
             if args.cripta is None:
                 listado = cliente.listar_criptas()
@@ -283,20 +314,33 @@ def main(argv=None):
             # IMPORTANTE:
             # No llamamos preparar_cripta() aquí.
             # crear_juego() se encarga de hacerlo.
-            juego = crear_juego(
-                precarga,
-                args.cripta,
-                semilla,
-            )
-
-            controlador = ControladorJuego(
-                modelo=juego,
-                vista=vista,
-                tabla_puntajes=TablaPuntajes("datos_generados/puntajes.jsonl"),
-                lanzador_replay=crear_lanzador_replay(args),
-            )
-
-            controlador.iniciar()
+            while True:
+                versiones = (dict(version_cripta=estado_inicial.meta.cripta_version,
+                                  version_catalogo=estado_inicial.meta.catalogo_version)
+                             if estado_inicial is not None else {})
+                juego = crear_juego(precarga, args.cripta, semilla, **versiones)
+                controlador = ControladorJuego(
+                    modelo=juego, vista=vista,
+                    tabla_puntajes=TablaPuntajes("datos_generados/puntajes.jsonl"),
+                    lanzador_replay=crear_lanzador_replay(args),
+                )
+                if estado_inicial is not None:
+                    controlador.iniciar(estado_inicial=estado_inicial)
+                    estado_inicial = None
+                else:
+                    controlador.iniciar()
+                if not (args.gui and juego.resultado == "derrota" and vista.preguntar_reinicio()):
+                    break
+                precarga.cerrar()
+                cliente.cerrar()
+                if args.offline is not None:
+                    cliente = ClienteOffline(args.offline)
+                else:
+                    cliente = ClienteApi()
+                catalogo = GestorCatalogo(cliente, CacheCatalogoOrdenado(args.cache_size), almacen)
+                precarga = GestorPrecarga(cliente, catalogo)
+                semilla = args.semilla if args.semilla is not None else random.randint(0, 2**32 - 1)
+                vista.reiniciar_presentacion()
         finally:
             if args.gui:
                 vista.cerrar()

@@ -27,3 +27,19 @@ Tkinter. El aspecto nunca cambia estadisticas, costos, semillas ni reglas.
 - Los mensajes del motor llegan al buffer circular existente de 20 entradas.
 - Dano flotante y escalado de imagenes pertenecen exclusivamente a la vista.
 - Se verifican 1280x800 y 1100x760, incluyendo escenas pobladas, equipo y replay.
+
+## Movimiento visual
+
+- El menu de inicio usa los mismos colores, tipografia y recursos locales. Permite
+  Jugar, Cargar partida, Replay, Puntajes y Salir con raton, flechas y Enter.
+  Es una capa de vista temporal sin motor; sus callbacks se cancelan al salir.
+  El indicador t=0 corresponde a una partida nueva, no a una simulacion activa.
+
+- AnimacionEscena usa un solo callback de Tkinter cada 40 ms, sin acceder al modelo
+  ni al azar. Respiracion de 1.5 px, entrada de sala de 18 px y reaccion breve al dano.
+- Solo se mueven sprites: nombres, salud, controles y zonas de clic permanecen
+  estables. Los objetos conservan su etiqueta de recogida.
+- La casilla Animaciones permite desactivar el movimiento. Cambiar de sala,
+  redimensionar, reiniciar o cerrar cancela el callback y libera sus referencias.
+- No hay movimiento libre ni ataques automaticos. Las flechas siguen siendo
+  acciones discretas entre salas; el reloj virtual solo pertenece al motor.
