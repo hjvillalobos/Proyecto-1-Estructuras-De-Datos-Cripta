@@ -433,6 +433,7 @@ class Motor:
                     valor=ficha.atributos.get("valor", 0),
                     equipado=False,
                     detalle=descripcion_objeto(ficha),
+                    tipo=objeto.tipo_catalogo,
                 )
             )
 

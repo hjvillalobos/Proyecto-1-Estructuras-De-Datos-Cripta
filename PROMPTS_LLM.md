@@ -164,3 +164,11 @@ Uso: repartir los archivos del m√≥dulo de D en las ramas de git del equipo, seg√
 - **Uso de la respuesta:** Integrar los PNG proporcionados, mejorar escena, contraste, tipografia, inventario, costos visibles, trampas, agenda y mensajes de combate. Separar recursos, tema y dibujo dentro de la vista. Conservar reglas, semilla, reloj, MVC, guardado y replay.
 - **Verificacion:** 201 pruebas aprobadas; comprobacion de imagenes, disposicion en ventanas normal y compacta, textos sin solapamiento en una sala poblada, clic real de recogida y victoria reproducida con semilla 1916 y 4 de vida.
 
+### 2026-10-13: recursos adicionales
+
+- **Prompt textual:** "puedes poner estas imagenes en el juego para pocion, daga, guardian oseo como lo hiciste con la rata y el jugador"
+- **Uso:** Integrar tres PNG locales por tipo de catalogo; miniaturas de suelo e inventario, conservando MVC y sin modificar reglas.
+- **Edicion de imagenes:** Herramienta integrada imagegen, una llamada por imagen proporcionada, fondo transparente. Prompt comun: "Remove only the background from the supplied image. Preserve the original subject, its exact design, colors, silhouette and details. Remove all white/gray checkerboard or white background and exterior shadow. Output a tightly framed standalone game sprite with real transparent alpha background, complete subject fully visible, no added text or objects."
+- **Recursos:** `vista/recursos/itm_pocion_menor.png`, `itm_daga_oxidada.png`, `ent_guardian_oseo.png`.
+- **Verificacion:** 203 pruebas aprobadas y captura de la ventana real de Tkinter con los tres recursos; canales RGBA transparentes verificados.
+

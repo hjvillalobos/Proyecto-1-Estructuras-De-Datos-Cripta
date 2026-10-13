@@ -287,6 +287,7 @@ class Inventario:
             valor=ficha.atributos.get("valor", 0),
             equipado=self._esta_equipado(objeto),
             detalle=descripcion_objeto(ficha),
+            tipo=objeto.tipo_catalogo,
         )
 
     def vista(self, resolver_ficha, orden: str | None = None, descendente: bool = False) -> list[ItemVista]:

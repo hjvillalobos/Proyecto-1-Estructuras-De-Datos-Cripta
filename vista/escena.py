@@ -155,7 +155,12 @@ class EscenaCripta:
             x, y = 20 + col * w, alto - 76 + fila * 35
             etiqueta = f"objeto_{i}"
             c.create_rectangle(x + 2, y, x + w - 4, y + 30, fill="#30382a", outline="#77734e", tags=(etiqueta,))
-            c.create_text(x + w / 2, y + 15, text=objeto.nombre, fill=AMARILLO, width=w - 18,
+            imagen = self._imagen(getattr(objeto, "tipo", ""), 26, 26)
+            margen = 34 if imagen is not None else 8
+            if imagen is not None:
+                c.create_image(x + 18, y + 15, image=imagen, tags=(etiqueta,))
+            c.create_text(x + margen + (w - margen - 8) / 2, y + 15,
+                          text=objeto.nombre, fill=AMARILLO, width=w - margen - 8,
                           font=("Segoe UI", 10), tags=(etiqueta,))
             v._ligar(etiqueta, f"recoger {objeto.instancia}")
             detalle = f"{objeto.nombre} | {getattr(objeto, 'detalle', '')} | Recoger {v._costo('recoger')} u.t."

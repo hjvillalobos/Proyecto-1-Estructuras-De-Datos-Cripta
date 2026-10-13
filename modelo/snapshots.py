@@ -142,6 +142,7 @@ class ItemVista:
     valor: int
     equipado: bool = False
     detalle: str = ""
+    tipo: str = ""
 
 
 @dataclass

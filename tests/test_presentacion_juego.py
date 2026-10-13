@@ -63,6 +63,8 @@ class TestPresentacionModelo(unittest.TestCase):
         self.assertIn("Velocidad x2", items[1].detalle)
         self.assertIn("300", items[1].detalle)
         self.assertIn("Cura +8", self.motor.estado_vista().objetos_suelo[0].detalle)
+        self.assertEqual(items[0].tipo, "coraza")
+        self.assertEqual(self.motor.estado_vista().objetos_suelo[0].tipo, "pocion")
 
     def test_trampa_aparece_y_su_dano_se_notifica(self):
         from modelo.tipos import Trampa
@@ -152,13 +154,40 @@ class TestGraficosTk(unittest.TestCase):
 
     def test_png_del_jugador_y_rata_cargan_con_tamano_acotado(self):
         recursos = RecursosGraficos(self.vista.root)
-        for nombre in ("jugador", "ent_rata_gigante"):
+        for nombre in ("jugador", "ent_rata_gigante", "ent_guardian_oseo",
+                       "itm_pocion_menor", "itm_daga_oxidada"):
             imagen = recursos.imagen(nombre, 200, 150)
             self.assertIsNotNone(imagen)
             self.assertLessEqual(imagen.width(), 200)
             self.assertLessEqual(imagen.height(), 150)
             self.assertIs(recursos.imagen(nombre, 200, 150), imagen)
         self.assertIsNone(recursos.imagen("entidad-no-conocida", 200, 150))
+
+    def test_miniatura_del_inventario_se_actualiza_y_se_limpia(self):
+        v = self.vista
+        for tipo in ("itm_pocion_menor", "itm_daga_oxidada"):
+            v.mostrar_inventario([ItemVista("obj", "Objeto", "pocion", 1, 2, tipo=tipo)])
+            self.assertIsNotNone(v._imagen_detalle)
+            self.assertEqual(str(v.icono_detalle.cget("image")), str(v._imagen_detalle))
+        v.mostrar_inventario([ItemVista("otro", "Otro", "llave", 1, 2)])
+        self.assertIsNone(v._imagen_detalle)
+        self.assertEqual(v.icono_detalle.cget("image"), "")
+        v.mostrar_inventario([])
+        self.assertIsNone(v._imagen_detalle)
+
+    def test_imagen_del_suelo_conserva_la_accion_de_recoger(self):
+        datos = base.TestRegresionesJuego()
+        datos.setUp()
+        estado = datos.motor.estado_vista()
+        estado.objetos_suelo = [ItemVista("p1", "Pocion", "pocion", 1, 2, tipo="itm_pocion_menor"),
+                                ItemVista("d1", "Daga", "arma", 1, 2, tipo="itm_daga_oxidada")]
+        v = self.vista
+        with patch.object(v, "_ligar") as ligar:
+            v._dibujar_sala(estado)
+        ligar.assert_any_call("objeto_0", "recoger p1")
+        ligar.assert_any_call("objeto_1", "recoger d1")
+        for etiqueta in ("objeto_0", "objeto_1"):
+            self.assertIn("image", [v.canvas.type(i) for i in v.canvas.find_withtag(etiqueta)])
 
     def test_fallback_sin_pillow_sigue_mostrando_los_png(self):
         with patch("vista.recursos_graficos.Image", None):

@@ -9,7 +9,7 @@ python -m pip install -r requirements.txt
 python main.py --gui
 ```
 
-El jugador y las ratas utilizan las imagenes locales de `vista/recursos/`.
+El jugador, las ratas, el guardian oseo, la pocion menor y la daga oxidada utilizan las imagenes locales de `vista/recursos/`. Los objetos muestran miniaturas en el suelo y al seleccionarlos en el inventario.
 Pillow conserva la transparencia y mejora el escalado; si no esta instalado,
 Tkinter puede cargar los PNG con un escalado basico. Los enemigos sin imagen local
 se muestran con una representacion generica, sin cambiar su tipo ni estadisticas.
@@ -85,7 +85,7 @@ python main.py --bench --capacidades 25 --operaciones 1000 --repeticiones 3 --es
 ```
 
 Las pruebas usan respuestas simuladas y archivos temporales, sin acceder al servidor. La suite incluye regresiones de retroceso, carga, replay, efectos, cache, trampas y paginacion del GUI.
-Verificacion del 2026-10-13: 201 pruebas aprobadas, carga real de los PNG, presentacion sin cambios en la simulacion y comprobacion de escenas normales y pobladas en Tkinter.
+Verificacion del 2026-10-13: 203 pruebas aprobadas, carga real de los PNG, miniaturas y acciones de recogida verificadas, presentacion sin cambios en la simulacion y comprobacion de escenas normales y pobladas en Tkinter.
 
 ### Compatibilidad del guardado y replay
 

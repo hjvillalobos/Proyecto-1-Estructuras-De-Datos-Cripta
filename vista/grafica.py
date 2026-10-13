@@ -150,8 +150,15 @@ class VistaGrafica:
         self.lista.bind("<Double-Button-1>", self._doble_clic_inventario)
         self.lista.bind("<<ListboxSelect>>", self._mostrar_detalle)
         self.var_detalle = tk.StringVar(value="Inventario vacio")
-        self._etiqueta(der, variable=self.var_detalle, wraplength=315, justify="left",
-                       color=TENUE, height=3).pack(fill="x")
+        detalle = tk.Frame(der, bg=FONDO)
+        detalle.pack(fill="x")
+        miniatura = tk.Frame(detalle, bg=FONDO, width=56, height=56)
+        miniatura.pack(side="left", padx=(0, 6))
+        miniatura.pack_propagate(False)
+        self.icono_detalle = tk.Label(miniatura, bg=FONDO)
+        self.icono_detalle.pack(fill="both", expand=True)
+        self._etiqueta(detalle, variable=self.var_detalle, wraplength=255, justify="left",
+                       color=TENUE, height=3).pack(side="left", fill="x", expand=True)
         acciones = tk.Frame(der, bg=FONDO)
         acciones.pack(fill="x", pady=8)
         self._botones_inventario = []
@@ -184,6 +191,9 @@ class VistaGrafica:
         if not hasattr(self, "var_detalle"):
             return
         item = self._instancia_seleccionada()
+        if hasattr(self, "icono_detalle"):
+            self._imagen_detalle = self.recursos.imagen(item.tipo, 52, 52) if item else None
+            self.icono_detalle.config(image=self._imagen_detalle or "")
         self.var_detalle.set("Inventario vacio" if item is None else
             f"{item.nombre}\n{item.detalle or item.clase.capitalize()}\nPeso {item.peso}  |  Valor {item.valor}")
         for verbo, boton in self._botones_inventario:
