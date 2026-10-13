@@ -85,18 +85,14 @@ class BitacoraReplay:
             )
             archivo.write("\n")
 
-    def registrar_carga(self):
-        """
-        Marca en la bitácora que la partida se cargó desde un guardado.
-        Desde ese punto el replay ya no es fiel (el historial anterior a la
-        carga no está en este archivo), así que reproducir() lo rechazará.
-        """
+    def registrar_carga(self, estado=None):
+        """Anexa la base cargada; el replay no depende de un archivo mutable."""
         with self.ruta.open(
             "a",
             encoding="utf-8",
         ) as archivo:
             archivo.write(
-                json.dumps({"tipo": "cargar"})
+                json.dumps({"tipo": "cargar", "estado": estado.a_dict() if estado else None})
             )
             archivo.write("\n")
 
@@ -216,10 +212,10 @@ class BitacoraReplay:
                 ) from error
 
             if registro.get("tipo") == "cargar":
-                raise ReplayIncompatible(
-                    "En esta partida se usó 'cargar': "
-                    "no se puede garantizar una reproducción fiel."
-                )
+                if not isinstance(registro.get("estado"), dict):
+                    raise ReplayIncompatible("La carga no contiene el estado necesario para reproducirla.")
+                acciones.append(AccionReplay("cargar", registro["estado"]))
+                continue
 
             if registro.get("tipo") != "accion":
                 raise ReplayCorrupto(
@@ -250,6 +246,17 @@ class BitacoraReplay:
             )
 
         return meta, acciones
+
+
+def aplicar_accion_replay(juego, accion):
+    if accion.accion == "cargar":
+        from modelo.snapshots import EstadoGuardado, ResultadoAccion
+        try:
+            juego.restaurar_estado(EstadoGuardado.desde_dict(accion.argumento))
+        except (ValueError, TypeError, KeyError, IndexError) as error:
+            raise ReplayIncompatible(f"No se puede restaurar la carga del replay: {error}") from error
+        return ResultadoAccion(ok=True)
+    return juego.ejecutar(accion.accion, accion.argumento)
 
 
 def reproducir(
@@ -317,10 +324,7 @@ def reproducir(
         )
 
     for accion in acciones:
-        resultado = juego.ejecutar(
-            accion.accion,
-            accion.argumento,
-        )
+        resultado = aplicar_accion_replay(juego, accion)
 
         if not resultado.ok:
             raise ReplayCorrupto(

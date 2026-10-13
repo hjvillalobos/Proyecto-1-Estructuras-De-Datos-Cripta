@@ -11,7 +11,7 @@ from modelo.snapshots import (
 from utilidades.ordenamiento import ordenar
 
 MAGIC = b"CRPT"
-FORMATO_VERSION = 1          # súbanla si cambian el layout; los archivos viejos se rechazan
+FORMATO_VERSION = 2          # contador de extras ampliado; los archivos viejos se rechazan
 
 _ENCABEZADO = struct.Struct("<4sHHIQIQ")     # 4+2+2+4+8+4+8 = 32 bytes
 _ENTRADA = struct.Struct("<IQI")             # sala_id, offset, longitud = 16 bytes
@@ -122,7 +122,7 @@ def _codificar_global(e: EstadoGuardado):
         w.texto(it.instancia)
         w.texto(it.tipo)
         w.booleano(it.equipado)
-    w.u8(len(j.extras))
+    w.u32(len(j.extras))
     for v in j.extras:
         w.i64(v)
 
@@ -155,7 +155,7 @@ def _decodificar_global(payload):
     vida, vida_max, ataque, defensa, velocidad, t_sig = (r.i64() for _ in range(6))
     inventario = [ItemInventarioGuardado(r.texto(), r.texto(), r.booleano())
                   for _ in range(r.u16())]
-    extras = [r.i64() for _ in range(r.u8())]
+    extras = [r.i64() for _ in range(r.u32())]
     jugador = JugadorGuardado(sala_id, vida, vida_max, ataque, defensa, velocidad,
                               t_sig, inventario, extras)
 

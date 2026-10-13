@@ -4,6 +4,25 @@ from modelo.tipos import ObjetoInstancia
 from modelo.snapshots import ItemVista, ItemInventarioGuardado
 
 
+def descripcion_objeto(ficha):
+    atributos = ficha.atributos
+    partes = []
+    for campo, etiqueta in (("ataque_bonus", "Ataque"), ("defensa_bonus", "Defensa"), ("cura", "Cura")):
+        if campo in atributos:
+            partes.append(f"{etiqueta} +{atributos[campo]}")
+    if "modificador_velocidad" in atributos:
+        partes.append(f"Velocidad x{atributos['modificador_velocidad']:g}")
+    if "duracion" in atributos:
+        partes.append(f"Duracion {atributos['duracion']} u.t.")
+    if ficha.clase == "llave":
+        partes.append("Abre su puerta sin consumirse")
+    if ficha.clase == "antidoto":
+        partes.append("Cancela el veneno")
+    if ficha.clase == "pergamino_retroceso":
+        partes.append("Deshace la ultima accion y sus consecuencias")
+    return " | ".join(partes)
+
+
 class NodoInventario:
     """Nodo de la lista doblemente enlazada del inventario."""
 
@@ -11,6 +30,7 @@ class NodoInventario:
         self.objeto = objeto
         self.anterior = None
         self.siguiente = None
+        self.en_inventario = False
 
 
 class Inventario:
@@ -51,27 +71,37 @@ class Inventario:
     def insertar_despues(self, nodo_referencia: "NodoInventario", objeto: ObjetoInstancia) -> "NodoInventario":
         """Inserta `objeto` justo después de `nodo_referencia` (o de la
         cabeza si `nodo_referencia` es None) y devuelve el nodo nuevo."""
-        if nodo_referencia is None:
-            nodo_referencia = self.cabeza
-
         nuevo = NodoInventario(objeto)
+        self.reinsertar_nodo(nuevo, nodo_referencia)
+        return nuevo
+
+    def _referencia_vigente(self, nodo):
+        # Un pergamino excluido del retroceso pudo desaparecer entre acciones.
+        while nodo is not None and nodo is not self.cabeza and not nodo.en_inventario:
+            nodo = nodo.anterior
+        return self.cabeza if nodo is None else nodo
+
+    def reinsertar_nodo(self, nuevo: "NodoInventario", nodo_referencia=None):
+        """Restaura el mismo nodo para conservar las referencias del historial."""
+        nodo_referencia = self._referencia_vigente(nodo_referencia)
         siguiente = nodo_referencia.siguiente
 
         nodo_referencia.siguiente = nuevo
         nuevo.anterior = nodo_referencia
         nuevo.siguiente = siguiente
         siguiente.anterior = nuevo
+        nuevo.en_inventario = True
 
         self.tamaño += 1
         if self.cursor is None:
             self.cursor = nuevo
-        return nuevo
 
     def quitar_nodo(self, nodo: "NodoInventario") -> None:
         """Desconecta `nodo` de la lista sin tocar el objeto en sí."""
         nodo.anterior.siguiente = nodo.siguiente
         nodo.siguiente.anterior = nodo.anterior
         self.tamaño -= 1
+        nodo.en_inventario = False
 
         if self.cursor is nodo:
             if nodo.siguiente is not self.cola:
@@ -92,8 +122,7 @@ class Inventario:
         nodo.anterior.siguiente = nodo.siguiente
         nodo.siguiente.anterior = nodo.anterior
 
-        if nodo_referencia is None:
-            nodo_referencia = self.cabeza
+        nodo_referencia = self._referencia_vigente(nodo_referencia)
         siguiente = nodo_referencia.siguiente
         nodo_referencia.siguiente = nodo
         nodo.anterior = nodo_referencia
@@ -101,6 +130,25 @@ class Inventario:
         siguiente.anterior = nodo
 
     # --- navegación ---
+
+    def __iter__(self):
+        nodo = self.cabeza.siguiente
+        while nodo is not self.cola:
+            yield nodo.objeto
+            nodo = nodo.siguiente
+
+    def seleccionar(self, id_instancia):
+        nodo = self.cabeza.siguiente
+        while nodo is not self.cola:
+            if nodo.objeto.id_instancia == id_instancia:
+                self.cursor = nodo
+                return True
+            nodo = nodo.siguiente
+        return False
+
+    def normalizar_cursor(self):
+        if self.cursor is None or not self.cursor.en_inventario:
+            self.cursor = None if self.esta_vacio() else self.cabeza.siguiente
 
     def avanzar(self) -> ObjetoInstancia | None:
         if self.cursor is not None and self.cursor.siguiente is not self.cola:
@@ -238,6 +286,7 @@ class Inventario:
             peso=ficha.atributos.get("peso", 0),
             valor=ficha.atributos.get("valor", 0),
             equipado=self._esta_equipado(objeto),
+            detalle=descripcion_objeto(ficha),
         )
 
     def vista(self, resolver_ficha, orden: str | None = None, descendente: bool = False) -> list[ItemVista]:

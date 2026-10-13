@@ -2,6 +2,7 @@ import os
 
 from datos.bitacora_replay import BitacoraReplay
 from datos.guardado_binario import guardar_estado, cargar_estado
+from datos.puntajes import RegistroPuntaje
 from vista.bitacora_pantalla import BufferCircular
 
 
@@ -35,6 +36,9 @@ class ControladorJuego:
         self.vista = vista
 
         self.mensajes = BufferCircular(20)
+        self._modelo_notifica = callable(getattr(type(modelo), "establecer_notificador", None))
+        if self._modelo_notifica:
+            modelo.establecer_notificador(self.notificar)
 
         self.bitacora_replay = BitacoraReplay(ruta_replay)
 
@@ -44,6 +48,7 @@ class ControladorJuego:
         self.lanzador_replay = lanzador_replay
 
         self.ejecutando = True
+        self._puntaje_registrado = False
 
     # ---------------------------------------------------------
     # BITÁCORA EN PANTALLA
@@ -110,6 +115,7 @@ class ControladorJuego:
         # Mostrar el último estado para que se vea cómo terminó.
         if getattr(self.modelo, "terminado", False):
             self._mostrar_estado()
+            self._registrar_puntaje()
 
             if hasattr(self.modelo, "resumen"):
                 self.vista.mostrar_fin(
@@ -131,6 +137,22 @@ class ControladorJuego:
             estado,
             self.mensajes.ultimos(),
         )
+
+    def _registrar_puntaje(self):
+        if self.tabla_puntajes is None or self._puntaje_registrado or not self.modelo.terminado:
+            return
+        resumen = self.modelo.resumen()
+        meta = self.modelo.meta
+        nombre = self.vista.pedir_texto("Nombre para la tabla de puntajes:") or "Jugador"
+        try:
+            self.tabla_puntajes.registrar(RegistroPuntaje(
+                nombre=nombre, cripta_id=meta.cripta_id, cripta_version=meta.cripta_version,
+                acciones=resumen.acciones, derrotados=resumen.derrotados,
+                tiempo_final=resumen.reloj_final, resultado=resumen.resultado))
+        except OSError as error:
+            self.vista.mostrar_error(f"No se pudo registrar el puntaje: {error}")
+            return
+        self._puntaje_registrado = True
 
     # ---------------------------------------------------------
     # PARSEAR COMANDOS
@@ -398,7 +420,7 @@ class ControladorJuego:
 
         if resultado.mensaje:
             self.notificar(resultado.mensaje)
-        else:
+        elif not self._modelo_notifica:
             if argumento is None:
                 self.notificar(
                     f"Acción: {accion}"
@@ -592,6 +614,8 @@ class ControladorJuego:
             self.modelo.restaurar_estado(
                 estado
             )
+            self.bitacora_replay.registrar_carga(estado)
+            self._puntaje_registrado = False
 
             self.notificar(
                 f"Partida cargada desde {ruta}"

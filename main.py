@@ -249,6 +249,7 @@ def main(argv=None):
 
         from controlador.controlador import ControladorJuego
         from modelo.juego import crear_juego
+        from datos.puntajes import TablaPuntajes
 
         semilla = (
             args.semilla
@@ -291,6 +292,7 @@ def main(argv=None):
             controlador = ControladorJuego(
                 modelo=juego,
                 vista=vista,
+                tabla_puntajes=TablaPuntajes("datos_generados/puntajes.jsonl"),
                 lanzador_replay=crear_lanzador_replay(args),
             )
 

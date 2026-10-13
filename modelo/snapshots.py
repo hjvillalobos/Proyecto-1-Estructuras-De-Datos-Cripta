@@ -141,6 +141,7 @@ class ItemVista:
     peso: int
     valor: int
     equipado: bool = False
+    detalle: str = ""
 
 
 @dataclass
@@ -149,6 +150,26 @@ class EnemigoVista:
     nombre: str             
     vida: int
     vida_max: int
+    tipo: str = ""
+    ataque: int = 0
+    defensa: int = 0
+    velocidad: int = 100
+    tiempo_siguiente: int = 0
+    comportamiento: str = ""
+
+
+@dataclass
+class TrampaVista:
+    instancia: str
+    nombre: str
+    armada: bool
+    dano: int
+
+
+@dataclass
+class EventoVista:
+    tiempo: int
+    nombre: str
 
 
 @dataclass
@@ -175,6 +196,9 @@ class EstadoVista:
     inventario_usado: int
     inventario_max: int
     efectos: list[str] = field(default_factory=list)   # ej. "veneno (faltan 120)"
+    trampas: list[TrampaVista] = field(default_factory=list)
+    agenda: list[EventoVista] = field(default_factory=list)
+    costos: list[tuple[str, int]] = field(default_factory=list)
 
 
 @dataclass

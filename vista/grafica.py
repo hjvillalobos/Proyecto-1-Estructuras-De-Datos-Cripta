@@ -2,20 +2,10 @@
 import time
 import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
+from vista.recursos_graficos import RecursosGraficos
+from vista.escena import EscenaCripta
 
-FONDO   = "#0d0d14"
-PANEL   = "#16161f"
-SALA    = "#1e1e2e"
-TEXTO   = "#f0f0ff"
-TENUE   = "#7070a0"
-VERDE   = "#3ddc84"
-ROJO    = "#ff4f4f"
-AMARILLO= "#ffd166"
-AZUL    = "#56b4ff"
-NARANJA = "#ff9f43"
-MORADO  = "#9b59b6"
-PIEDRA  = "#2a2a3d"
-BORDE   = "#44446a"
+from vista.tema import FONDO, PANEL, SALA, TEXTO, TENUE, VERDE, ROJO, AMARILLO, AZUL, NARANJA, MORADO, PIEDRA, BORDE
 
 NOMBRES_DIR = {"N": "Norte", "S": "Sur", "E": "Este", "O": "Oeste"}
 
@@ -42,14 +32,15 @@ REPLAY
 
 
 class VistaGrafica:
-    ANCHO = 760
-    ALTO = 440
+    ANCHO = 900
+    ALTO = 500
 
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("⚔  CRIPTA  ⚔")
         self.root.configure(bg=FONDO)
-        self.root.minsize(1100, 720)
+        self.root.geometry("1280x850")
+        self.root.minsize(1100, 760)
         self.root.protocol("WM_DELETE_WINDOW", self._al_cerrar)
 
         self._cola = []                 # comandos pendientes de entregar al controlador
@@ -61,132 +52,160 @@ class VistaGrafica:
         self._replay_pausado = False
         self._replay_detener = False
 
+        self.recursos = RecursosGraficos(self.root)
+        self.escena = EscenaCripta(self)
+        self._estado = None
+        self._animaciones = []
+        self._ultimo_clic = ("", 0)
         self._construir()
         self._atar_teclas()
 
     # ------------------------------------------------------------------
     # Construcción de la ventana
     # ------------------------------------------------------------------
+    def _etiqueta(self, padre, texto=None, variable=None, color=TEXTO, tamano=11, fuente="Segoe UI", **opciones):
+        return tk.Label(padre, text=texto, textvariable=variable, bg=FONDO, fg=color,
+                        font=(fuente, tamano), anchor="w", **opciones)
+
     def _construir(self):
         estilo = ttk.Style(self.root)
-        try:
-            estilo.theme_use("clam")
-        except tk.TclError:
-            pass
-        estilo.configure("TButton", padding=5)
-
+        estilo.theme_use("clam")
+        estilo.configure("TButton", background=PANEL, foreground=TEXTO, bordercolor=BORDE,
+                         padding=(10, 8), font=("Segoe UI", 10))
+        estilo.map("TButton", background=[("active", "#31433b"), ("disabled", "#182020")],
+                   foreground=[("disabled", "#82918a")])
+        estilo.configure("TCombobox", fieldbackground=PANEL, background=PANEL, foreground=TEXTO,
+                         arrowcolor=TEXTO, bordercolor=BORDE)
+        estilo.map("TCombobox", fieldbackground=[("readonly", PANEL)], foreground=[("readonly", TEXTO)])
+        self.root.option_add("*TCombobox*Listbox.background", PANEL)
+        self.root.option_add("*TCombobox*Listbox.foreground", TEXTO)
         self.root.columnconfigure(0, weight=1)
-        self.root.rowconfigure(0, weight=1)
-
+        self.root.rowconfigure(0, weight=0)
+        self.root.rowconfigure(1, weight=1)
+        cabecera = tk.Frame(self.root, bg=FONDO)
+        cabecera.grid(row=0, column=0, columnspan=2, sticky="ew", padx=22, pady=(14, 8))
+        self._etiqueta(cabecera, "CRIPTA", color=AMARILLO, tamano=24, fuente="Georgia").pack(side="left", padx=(0, 30))
+        for texto, comando in (("Guardar", "guardar"), ("Cargar", "cargar"), ("Replay", "replay"),
+                               ("Puntajes", "puntajes"), ("Ayuda", "ayuda"), ("Salir", "salir")):
+            ttk.Button(cabecera, text=texto, command=lambda c=comando: self._enviar(c)).pack(side="left", padx=3)
         izq = tk.Frame(self.root, bg=FONDO)
-        izq.grid(row=0, column=0, sticky="nsew", padx=(10, 5), pady=10)
-        der = tk.Frame(self.root, bg=FONDO)
-        der.grid(row=0, column=1, sticky="ns", padx=(5, 10), pady=10)
-
-        # --- izquierda: sala, aviso, bitácora, botones ---
-        self.canvas = tk.Canvas(izq, width=self.ANCHO, height=self.ALTO, bg=FONDO,
-                                highlightthickness=0)
-        self.canvas.pack()
-
-        self.var_aviso = tk.StringVar(value="")
-        self.lbl_aviso = tk.Label(izq, textvariable=self.var_aviso, bg=FONDO, fg=AMARILLO,
-                                  anchor="w", justify="left", wraplength=self.ANCHO,
-                                  font=("Courier", 9, "bold"))
-        self.lbl_aviso.pack(fill="x", pady=(4, 2))
-
-        tk.Label(izq, text="► Mensajes", bg=FONDO, fg=TENUE, anchor="w",
-                 font=("Courier", 9)).pack(fill="x")
-        self.log = tk.Text(izq, height=9, bg=PANEL, fg=TEXTO, relief="flat", wrap="word",
-                           state="disabled", font=("Courier", 9),
-                           insertbackground=TEXTO, padx=6, pady=4)
-        self.log.pack(fill="both", expand=True, pady=(0, 6))
-
-        botones = tk.Frame(izq, bg=FONDO)
-        botones.pack(fill="x")
-        fila0 = [
-            ("Esperar", "esperar"),
-            ("Retroceso", "retroceso"),
-            ("Guardar", "guardar"),
-            ("Cargar", "cargar"),
-        ]
-        fila1 = [
-            ("🎬 Replay", "replay"),
-            ("Puntajes", "puntajes"),
-            ("Ayuda", "ayuda"),
-            ("Salir", "salir"),
-        ]
-        for i, (texto, comando) in enumerate(fila0):
-            ttk.Button(botones, text=texto,
-                       command=lambda c=comando: self._enviar(c)).grid(row=0, column=i, padx=2, pady=(0, 2), sticky="ew")
-        for i, (texto, comando) in enumerate(fila1):
-            ttk.Button(botones, text=texto,
-                       command=lambda c=comando: self._enviar(c)).grid(row=1, column=i, padx=2, sticky="ew")
-
-        # Controles del replay: reemplazan a los botones de arriba en modo replay.
-        self.barra_botones = botones
-        self.barra_replay = tk.Frame(izq, bg=FONDO)
-        ttk.Button(self.barra_replay, text="Pausa / Continuar",
-                   command=self._replay_alternar_pausa).pack(side="left", padx=2)
-        ttk.Button(self.barra_replay, text="Detener",
-                   command=self._replay_parar).pack(side="left", padx=2)
-        tk.Label(self.barra_replay, text="Velocidad:", bg=FONDO, fg=TENUE).pack(
-            side="left", padx=(14, 4))
-        self.var_vel = tk.StringVar(value="normal")
-        ttk.Combobox(self.barra_replay, textvariable=self.var_vel, state="readonly", width=8,
-                     values=("lento", "normal", "rápido")).pack(side="left")
-
-        # --- derecha: estado del jugador e inventario ---
-        tk.Label(der, text="⚔  C R I P T A  ⚔", bg=FONDO, fg=AMARILLO,
-                 font=("Courier", 16, "bold")).pack(anchor="w", pady=(0, 6))
-        tk.Frame(der, bg=BORDE, height=2).pack(fill="x", pady=(0, 6))
-
+        izq.grid(row=1, column=0, sticky="nsew", padx=(22, 12), pady=(0, 16))
+        der = tk.Frame(self.root, bg=FONDO, width=320)
+        der.grid(row=1, column=1, sticky="ns", padx=(8, 22), pady=(0, 16))
         self.var_sala = tk.StringVar()
+        self._etiqueta(izq, variable=self.var_sala, tamano=18, fuente="Georgia").pack(fill="x", pady=(0, 10))
+        self.canvas = tk.Canvas(izq, width=self.ANCHO, height=350, bg=FONDO, highlightthickness=0)
+        self.canvas.pack(fill="both", expand=True)
+        self.canvas.bind("<Configure>", self._redimensionar)
+        self.var_aviso = tk.StringVar()
+        self.lbl_aviso = self._etiqueta(izq, variable=self.var_aviso, color=AMARILLO,
+                                        wraplength=700, justify="left", height=2)
+        self.lbl_aviso.pack(fill="x", pady=4)
+        self.barra_botones = tk.Frame(izq, bg=FONDO)
+        self.barra_botones.pack(fill="x", pady=(0, 10))
+        self.boton_esperar = ttk.Button(self.barra_botones, text="Esperar", command=lambda: self._enviar("esperar"))
+        self.boton_esperar.pack(side="left", padx=(0, 8))
+        ttk.Button(self.barra_botones, text="Retroceso", command=lambda: self._enviar("retroceso")).pack(side="left")
         self.var_tiempo = tk.StringVar()
-        self.var_stats = tk.StringVar()
+        self._etiqueta(self.barra_botones, variable=self.var_tiempo, color=TENUE, fuente="Consolas").pack(side="right")
+        self.barra_replay = tk.Frame(izq, bg=FONDO)
+        ttk.Button(self.barra_replay, text="Pausa / Continuar", command=self._replay_alternar_pausa).pack(side="left")
+        ttk.Button(self.barra_replay, text="Detener", command=self._replay_parar).pack(side="left", padx=8)
+        self.var_vel = tk.StringVar(value="normal")
+        ttk.Combobox(self.barra_replay, textvariable=self.var_vel, state="readonly", width=9,
+                     values=("lento", "normal", "rápido")).pack(side="left")
+        self._etiqueta(izq, "Registro de la partida", color=TENUE).pack(fill="x")
+        caja_log = tk.Frame(izq, bg=FONDO)
+        caja_log.pack(fill="x", pady=(6, 0))
+        self.log = tk.Text(caja_log, height=4, bg=PANEL, fg=TEXTO, relief="flat", wrap="word",
+                           state="disabled", font=("Segoe UI", 10), padx=12, pady=8)
+        self.log.pack(side="left", fill="both", expand=True)
+        scroll_log = ttk.Scrollbar(caja_log, command=self.log.yview)
+        scroll_log.pack(side="right", fill="y")
+        self.log.configure(yscrollcommand=scroll_log.set)
+        self._etiqueta(der, "Jugador", tamano=18, fuente="Georgia").pack(fill="x")
+        self.barra = tk.Canvas(der, width=320, height=30, bg=FONDO, highlightthickness=0)
+        self.barra.pack(pady=(10, 6))
+        self.var_stats, self.var_efectos = tk.StringVar(), tk.StringVar()
+        self._etiqueta(der, variable=self.var_stats, color=AZUL).pack(fill="x")
+        self._etiqueta(der, variable=self.var_efectos, color=MORADO, wraplength=320, height=2).pack(fill="x")
+        ttk.Separator(der).pack(fill="x", pady=12)
+        self._etiqueta(der, "Proximos sucesos", tamano=14, fuente="Georgia").pack(fill="x")
+        self.var_agenda = tk.StringVar()
+        self._etiqueta(der, variable=self.var_agenda, color=TENUE, justify="left",
+                       wraplength=320, height=4).pack(fill="x", pady=(6, 0))
+        ttk.Separator(der).pack(fill="x", pady=12)
         self.var_inv = tk.StringVar()
-        self.var_efectos = tk.StringVar()
-        tk.Label(der, textvariable=self.var_sala, bg=FONDO, fg=TEXTO, anchor="w",
-                 wraplength=320, justify="left", font=("Courier", 10, "bold")).pack(fill="x")
-        tk.Label(der, textvariable=self.var_tiempo, bg=FONDO, fg=TENUE, anchor="w",
-                 wraplength=320, justify="left", font=("Courier", 9)).pack(fill="x")
-
-        self.barra = tk.Canvas(der, width=320, height=26, bg=FONDO, highlightthickness=0)
-        self.barra.pack(pady=(8, 4))
-        tk.Label(der, textvariable=self.var_stats, bg=FONDO, fg=AZUL, anchor="w",
-                 wraplength=320, justify="left", font=("Courier", 9)).pack(fill="x")
-        tk.Label(der, textvariable=self.var_efectos, bg=FONDO, fg=MORADO, anchor="w",
-                 wraplength=320, justify="left", font=("Courier", 9)).pack(fill="x")
-
-        tk.Frame(der, bg=BORDE, height=2).pack(fill="x", pady=(10, 4))
-        tk.Label(der, textvariable=self.var_inv, bg=FONDO, fg=AMARILLO, anchor="w",
-                 font=("Courier", 10, "bold")).pack(fill="x", pady=(0, 2))
-
-        self.lista = tk.Listbox(der, width=44, height=14, bg=PANEL, fg=TEXTO,
-                                selectbackground=AZUL, selectforeground="black",
-                                activestyle="none", relief="flat", exportselection=False,
-                                font=("Courier", 9))
-        self.lista.pack(fill="x")
+        self._etiqueta(der, variable=self.var_inv, tamano=14, fuente="Georgia").pack(fill="x")
+        caja_lista = tk.Frame(der, bg=FONDO)
+        caja_lista.pack(fill="x", pady=(10, 8))
+        self.lista = tk.Listbox(caja_lista, width=34, height=5, bg=PANEL, fg=TEXTO,
+                               selectbackground="#35584e", selectforeground=TEXTO,
+                               activestyle="none", relief="flat", exportselection=False,
+                               highlightthickness=1, highlightbackground=BORDE, font=("Segoe UI", 11))
+        self.lista.pack(side="left", fill="both", expand=True)
+        scroll = ttk.Scrollbar(caja_lista, command=self.lista.yview)
+        scroll.pack(side="right", fill="y")
+        self.lista.configure(yscrollcommand=scroll.set)
         self.lista.bind("<Double-Button-1>", self._doble_clic_inventario)
-
+        self.lista.bind("<<ListboxSelect>>", self._mostrar_detalle)
+        self.var_detalle = tk.StringVar(value="Inventario vacio")
+        self._etiqueta(der, variable=self.var_detalle, wraplength=315, justify="left",
+                       color=TENUE, height=3).pack(fill="x")
+        acciones = tk.Frame(der, bg=FONDO)
+        acciones.pack(fill="x", pady=8)
+        self._botones_inventario = []
+        for verbo in ("usar", "equipar", "soltar"):
+            boton = ttk.Button(acciones, text=verbo.capitalize(),
+                               command=lambda v=verbo: self._accion_inventario(v))
+            boton.pack(side="left", fill="x", expand=True, padx=2)
+            self._botones_inventario.append((verbo, boton))
         orden = tk.Frame(der, bg=FONDO)
-        orden.pack(fill="x", pady=6)
-        tk.Label(orden, text="Ordenar por:", bg=FONDO, fg=TENUE).pack(side="left")
+        orden.pack(fill="x", pady=(5, 0))
         self.var_orden = tk.StringVar(value="orden real")
-        self.combo = ttk.Combobox(orden, textvariable=self.var_orden, state="readonly", width=11,
+        self.combo = ttk.Combobox(orden, textvariable=self.var_orden, state="readonly", width=13,
                                   values=("orden real", "peso", "valor", "nombre"))
-        self.combo.pack(side="left", padx=4)
+        self.combo.pack(side="left")
         self.combo.bind("<<ComboboxSelected>>", self._cambio_orden)
         self.var_desc = tk.IntVar(value=0)
-        tk.Checkbutton(orden, text="descendente", variable=self.var_desc, bg=FONDO, fg=TEXTO,
+        tk.Checkbutton(orden, text="Descendente", variable=self.var_desc, bg=FONDO, fg=TEXTO,
                        selectcolor=PANEL, activebackground=FONDO, activeforeground=TEXTO,
-                       command=self._cambio_orden).pack(side="left")
+                       command=self._cambio_orden).pack(side="left", padx=8)
+        self._mostrar_detalle()
 
-        acc = tk.Frame(der, bg=FONDO)
-        acc.pack(fill="x")
-        for texto, verbo in (("Usar", "usar"), ("Equipar", "equipar"), ("Soltar", "soltar")):
-            ttk.Button(acc, text=texto,
-                       command=lambda v=verbo: self._accion_inventario(v)).pack(
-                           side="left", expand=True, fill="x", padx=2)
+    def _costo(self, verbo):
+        estado = getattr(self, "_estado", None)
+        for nombre, valor in getattr(estado, "costos", []):
+            if nombre == verbo:
+                return valor
+        return 0
+
+    def _mostrar_detalle(self, _evento=None):
+        if not hasattr(self, "var_detalle"):
+            return
+        item = self._instancia_seleccionada()
+        self.var_detalle.set("Inventario vacio" if item is None else
+            f"{item.nombre}\n{item.detalle or item.clase.capitalize()}\nPeso {item.peso}  |  Valor {item.valor}")
+        for verbo, boton in self._botones_inventario:
+            permitido = item is not None and (verbo == "soltar" or
+                (verbo == "equipar" and item.clase in ("arma", "armadura")) or
+                (verbo == "usar" and item.clase not in ("arma", "armadura", "llave")))
+            costo = 0 if item and item.clase == "pergamino_retroceso" and verbo == "usar" else self._costo(verbo)
+            boton.config(text=f"{verbo.capitalize()} {costo}", state="normal" if permitido else "disabled")
+
+    def _redimensionar(self, _evento=None):
+        if getattr(self, "_estado", None) is not None and not self._cerrada:
+            self._dibujar_sala(self._estado)
+        if hasattr(self, "lbl_aviso"):
+            self.lbl_aviso.config(wraplength=max(400, self.canvas.winfo_width() - 16))
+
+    def _clic_accion(self, comando):
+        anterior, instante = getattr(self, "_ultimo_clic", ("", 0))
+        ahora = time.monotonic()
+        if comando == anterior and ahora - instante < .25:
+            return
+        self._ultimo_clic = (comando, ahora)
+        self._enviar(comando)
 
     def _atar_teclas(self):
         mapa = (("Up", "mover N"), ("w", "mover N"), ("Down", "mover S"), ("s", "mover S"),
@@ -208,6 +227,8 @@ class VistaGrafica:
     # Entrada
     # ------------------------------------------------------------------
     def _enviar(self, comando):
+        if self._cerrada or self._en_replay:
+            return
         self._cola.append(comando)
 
     def _actualizar_ui(self):
@@ -229,7 +250,6 @@ class VistaGrafica:
             self._refrescar_inv = False
             return self._cmd_inventario()
         self._actualizar_ui()
-        self._cola.clear()              # descarta clics hechos mientras el juego procesaba
         while not self._cola and not self._cerrada:
             self._actualizar_ui()
             time.sleep(0.015)
@@ -296,7 +316,7 @@ class VistaGrafica:
             return
         if item.clase in ("arma", "armadura"):
             self._enviar(f"equipar {item.instancia}")
-        elif item.clase not in ("llave", "pergamino_retroceso"):
+        elif item.clase != "llave":
             self._enviar(f"usar {item.instancia}")
 
     def _cambio_orden(self, _evento=None):
@@ -306,24 +326,21 @@ class VistaGrafica:
     def mostrar_inventario(self, items, orden=None, cursor=None):
         if self._cerrada:
             return
-        iconos_clase = {
-            "arma": "⚔", "armadura": "🛡", "pocion": "🧪",
-            "llave": "🔑", "pergamino_retroceso": "📜", "antorcha": "🕯",
-        }
         previo = self._instancia_seleccionada()
         self._items = list(items)
         self.lista.delete(0, "end")
         reseleccion = None
         for i, it in enumerate(self._items):
-            marca = "★ " if it.equipado else "  "
-            icono = iconos_clase.get(it.clase, "○")
-            self.lista.insert("end", f"{marca}{icono} {it.nombre}  [{it.clase} p:{it.peso} v:{it.valor}]")
+            self.lista.insert("end", f"{'[E] ' if it.equipado else '    '}{it.nombre}")
             if it.equipado:
                 self.lista.itemconfig(i, foreground=AMARILLO)
             if previo is not None and it.instancia == previo.instancia:
                 reseleccion = i
+        if reseleccion is None and self._items:
+            reseleccion = next((i for i, it in enumerate(self._items) if it.instancia == cursor), 0)
         if reseleccion is not None:
             self.lista.selection_set(reseleccion)
+        self._mostrar_detalle()
 
     def mostrar_item(self, item):
         if item is None:
@@ -338,14 +355,20 @@ class VistaGrafica:
     def mostrar_estado(self, e, mensajes):
         if self._cerrada:
             return
-        self._dibujar_sala(e)
+        anterior = self._estado
+        self._estado = e
+        if e != anterior:
+            self._dibujar_sala(e)
         self._actualizar_stats(e)
         self._actualizar_log(mensajes)
+        self._mostrar_detalle()
+        if anterior and e.reloj >= anterior.reloj and e.vida != anterior.vida:
+            self._animar_vida(e.vida - anterior.vida)
         self.root.update_idletasks()
 
     def _ligar(self, etiqueta, comando):
         c = self.canvas
-        c.tag_bind(etiqueta, "<Button-1>", lambda _ev, cmd=comando: self._enviar(cmd))
+        c.tag_bind(etiqueta, "<Button-1>", lambda _ev, cmd=comando: self._clic_accion(cmd))
         c.tag_bind(etiqueta, "<Enter>", lambda _ev: c.config(cursor="hand2"))
         c.tag_bind(etiqueta, "<Leave>", lambda _ev: c.config(cursor=""))
 
@@ -357,147 +380,65 @@ class VistaGrafica:
         return AMARILLO if fraccion > 0.25 else ROJO
 
     def _dibujar_sala(self, e):
-        c = self.canvas
-        c.delete("all")
-        ancho, alto = self.ANCHO, self.ALTO
-        x0, y0, x1, y1 = 90, 75, ancho - 90, alto - 65
-        cx, cy = ancho // 2, (y0 + y1) // 2
+        anterior = getattr(self, "_estado_sala", None)
+        if anterior is None or anterior.sala_id != e.sala_id:
+            self._pagina_enemigos = self._pagina_objetos = 0
+        self._estado_sala = e
+        self._pagina_enemigos = min(self._pagina_enemigos, max(0, (len(e.enemigos) - 1) // 8))
+        self._pagina_objetos = min(self._pagina_objetos, max(0, (len(e.objetos_suelo) - 1) // 8))
+        if not hasattr(self, "escena"):
+            self.escena = EscenaCripta(self)
+        self.escena.dibujar(e)
 
-        # --- fondo con patrón de piedra ---
-        for gx in range(0, ancho, 32):
-            for gy in range(0, alto, 16):
-                offset = 16 if (gy // 16) % 2 else 0
-                c.create_rectangle(gx + offset, gy, gx + offset + 30, gy + 14,
-                                   fill="#111118", outline="#1a1a26", width=1)
+    def _cambiar_pagina(self, tipo, avance):
+        atributo = f"_pagina_{tipo}"
+        setattr(self, atributo, max(0, getattr(self, atributo) + avance))
+        self._dibujar_sala(self._estado_sala)
 
-        # --- sala principal ---
-        c.create_rectangle(x0 + 4, y0 + 4, x1 + 4, y1 + 4, fill="#0a0a12", outline="")
-        c.create_rectangle(x0, y0, x1, y1, fill=SALA, outline=BORDE, width=3)
-        # esquinas decorativas
-        sz = 12
-        for (ex, ey) in ((x0, y0), (x1, y0), (x0, y1), (x1, y1)):
-            c.create_rectangle(ex - sz//2, ey - sz//2, ex + sz//2, ey + sz//2,
-                               fill=BORDE, outline=AMARILLO, width=1)
-
-        # título de sala con fondo
-        c.create_rectangle(cx - 140, y0 + 4, cx + 140, y0 + 28,
-                           fill="#0d0d1a", outline=BORDE)
-        c.create_text(cx, y0 + 16, text=f"⌂  Sala {e.sala_id}: {e.sala_nombre}  ⌂",
-                      fill=AMARILLO, font=("Courier", 11, "bold"))
-
-        # --- puertas ---
-        geometria = {
-            "N": ((cx - 40, y0 - 10, cx + 40, y0 + 10), (cx, y0 - 28, "center")),
-            "S": ((cx - 40, y1 - 10, cx + 40, y1 + 10), (cx, y1 + 28, "center")),
-            "E": ((x1 - 10, cy - 40, x1 + 10, cy + 40), (x1 + 16, cy, "w")),
-            "O": ((x0 - 10, cy - 40, x0 + 10, cy + 40), (x0 - 16, cy, "e")),
-        }
-        flechas = {"N": "↑", "S": "↓", "E": "→", "O": "←"}
-        for s in e.salidas:
-            if s.direccion not in geometria:
-                continue
-            caja, (tx, ty, ancla) = geometria[s.direccion]
-            etiqueta = f"puerta_{s.direccion}"
-            color_puerta = NARANJA if s.cerrada else VERDE
-            icono = "🔒" if s.cerrada else flechas[s.direccion]
-            llave = (s.llave or "").replace("itm_", "").replace("_", " ")
-            texto = f"{icono} {NOMBRES_DIR[s.direccion]}"
-            if s.cerrada and llave:
-                texto += f"\n({llave})"
-            # sombra
-            c.create_rectangle(caja[0]+3, caja[1]+3, caja[2]+3, caja[3]+3,
-                               fill="#000000", outline="")
-            c.create_rectangle(*caja, fill=color_puerta, outline="white", width=2,
-                               tags=(etiqueta,))
-            c.create_text(tx, ty, text=texto, fill="white", anchor=ancla,
-                          width=80 if s.direccion in ("E", "O") else 220, justify="center",
-                          font=("Courier", 8, "bold"), tags=(etiqueta,))
-            self._ligar(etiqueta, f"abrir {s.direccion}" if s.cerrada else f"mover {s.direccion}")
-
-        # --- enemigos ---
-        iconos_enemigo = ["👺", "💀", "🦴", "🐉", "🦧", "👻"]
-        por_fila, ancho_c, alto_c = 4, 116, 70
-        visibles = e.enemigos[:2 * por_fila]
-        for i, en in enumerate(visibles):
-            fila, col = divmod(i, por_fila)
-            en_fila = min(por_fila, len(visibles) - fila * por_fila)
-            total = en_fila * ancho_c + (en_fila - 1) * 10
-            ex = cx - total // 2 + col * (ancho_c + 10)
-            ey = y0 + 42 + fila * (alto_c + 8)
-            etiqueta = f"enemigo_{i}"
-            icono_e = iconos_enemigo[i % len(iconos_enemigo)]
-            # sombra
-            c.create_rectangle(ex+3, ey+3, ex+ancho_c+3, ey+alto_c+3,
-                               fill="#000000", outline="")
-            c.create_rectangle(ex, ey, ex + ancho_c, ey + alto_c,
-                               fill="#3a1520", outline=ROJO, width=2, tags=(etiqueta,))
-            c.create_text(ex + ancho_c // 2, ey + 14, text=icono_e,
-                          font=("TkDefaultFont", 14), tags=(etiqueta,))
-            c.create_text(ex + ancho_c // 2, ey + 32, text=en.nombre, fill=TEXTO,
-                          width=ancho_c - 8, justify="center",
-                          font=("Courier", 8, "bold"), tags=(etiqueta,))
-            fraccion = max(0, en.vida) / max(1, en.vida_max)
-            color_v = self._color_vida(en.vida, en.vida_max)
-            c.create_rectangle(ex + 8, ey + 44, ex + ancho_c - 8, ey + 56,
-                               fill="#1a1a1a", outline=BORDE, tags=(etiqueta,))
-            c.create_rectangle(ex + 8, ey + 44,
-                               ex + 8 + int((ancho_c - 16) * fraccion), ey + 56,
-                               fill=color_v, outline="", tags=(etiqueta,))
-            c.create_text(ex + ancho_c // 2, ey + 63,
-                          text=f"♥ {en.vida}/{en.vida_max}",
-                          fill=color_v, font=("Courier", 7), tags=(etiqueta,))
-            self._ligar(etiqueta, f"atacar {en.instancia}")
-        if len(e.enemigos) > len(visibles):
-            c.create_text(x1 - 10, y0 + 18, anchor="e", fill=ROJO,
-                          text=f"+{len(e.enemigos) - len(visibles)} más",
-                          font=("Courier", 8, "bold"))
-
-        # --- objetos del suelo ---
-        chip_ancho, chip_alto = 104, 26
-        visibles_o = e.objetos_suelo[:8]
-        for i, o in enumerate(visibles_o):
-            fila, col = divmod(i, 4)
-            ix = x0 + 100 + col * (chip_ancho + 6)
-            iy = y1 - 68 + fila * (chip_alto + 6)
-            etiqueta = f"objeto_{i}"
-            nombre = o.nombre if len(o.nombre) <= 15 else o.nombre[:14] + "…"
-            c.create_rectangle(ix+2, iy+2, ix+chip_ancho+2, iy+chip_alto+2,
-                               fill="#000000", outline="")
-            c.create_rectangle(ix, iy, ix + chip_ancho, iy + chip_alto,
-                               fill="#3a3010", outline=AMARILLO, width=1, tags=(etiqueta,))
-            c.create_text(ix + chip_ancho // 2, iy + chip_alto // 2,
-                          text=f"★ {nombre}", fill=AMARILLO,
-                          font=("Courier", 8), tags=(etiqueta,))
-            self._ligar(etiqueta, f"recoger {o.instancia}")
-        if len(e.objetos_suelo) > len(visibles_o):
-            c.create_text(x1 - 8, y1 - 8, anchor="se", fill=AMARILLO,
-                          text=f"+{len(e.objetos_suelo) - len(visibles_o)} objetos más",
-                          font=("Courier", 8))
-
-        # --- el jugador ---
-        px, py = x0 + 48, y1 - 48
-        c.create_oval(px - 24, py - 24, px + 24, py + 24,
-                      fill="#0a2a4a", outline=AZUL, width=3)
-        c.create_text(px, py - 4, text="⛔", font=("TkDefaultFont", 16))
-        c.create_text(px, py + 18, text=f"♥ {e.vida}/{e.vida_max}",
-                      fill=self._color_vida(e.vida, e.vida_max),
-                      font=("Courier", 8, "bold"))
+    def _dibujar_paginacion(self, tipo, cantidad, x, y):
+        if cantidad <= 8:
+            return
+        pagina = getattr(self, f"_pagina_{tipo}")
+        paginas = (cantidad + 7) // 8
+        self.canvas.create_text(x + 105, y, text=f"{tipo.capitalize()} {pagina + 1}/{paginas}",
+                                fill=TEXTO, font=("Segoe UI", 9))
+        for avance, dx, simbolo in ((-1, 0, "←"), (1, 210, "→")):
+            etiqueta = f"pagina_{tipo}_{avance}"
+            habilitado = 0 <= pagina + avance < paginas
+            self.canvas.create_rectangle(x + dx - 14, y - 13, x + dx + 14, y + 13,
+                                         fill=PANEL, outline=BORDE, tags=(etiqueta,))
+            self.canvas.create_text(x + dx, y, text=simbolo, fill=TEXTO if habilitado else TENUE,
+                                    font=("Segoe UI", 12), tags=(etiqueta,))
+            if habilitado:
+                self.canvas.tag_bind(etiqueta, "<Button-1>",
+                                     lambda _e, t=tipo, a=avance: self._cambiar_pagina(t, a))
 
     def _actualizar_stats(self, e):
-        self.var_sala.set(f"⌂  Sala {e.sala_id} — {e.sala_nombre}")
-        self.var_tiempo.set(f"⏱  Tiempo virtual: {e.reloj}")
-        self.var_stats.set(f"⚔ Ataque {e.ataque}   🛡 Defensa {e.defensa}   ⚡ Velocidad {e.velocidad}")
-        self.var_inv.set(f"🎒  Inventario  {e.inventario_usado}/{e.inventario_max}")
-        efectos_txt = ", ".join(e.efectos) if e.efectos else "ninguno"
-        self.var_efectos.set(f"✨ Efectos: {efectos_txt}")
+        self.var_sala.set(f"Sala {e.sala_id}  |  {e.sala_nombre}")
+        self.var_tiempo.set(f"Tu decision: t={e.reloj}")
+        self.var_stats.set(f"Ataque {e.ataque}   Defensa {e.defensa}   Velocidad {e.velocidad}")
+        self.var_inv.set(f"Inventario   {e.inventario_usado}/{e.inventario_max}")
+        self.var_efectos.set("Efectos: " + (", ".join(e.efectos) if e.efectos else "ninguno"))
+        self.var_agenda.set("\n".join(f"t={ev.tiempo}  {ev.nombre}" for ev in e.agenda) or "Sin sucesos pendientes")
+        self.boton_esperar.config(text=f"Esperar  {self._costo('esperar')} u.t.")
         b = self.barra
         b.delete("all")
-        fraccion = max(0, e.vida) / max(1, e.vida_max)
-        color_v = self._color_vida(e.vida, e.vida_max)
-        b.create_rectangle(0, 0, 320, 26, fill="#1a1a1a", outline=BORDE)
-        b.create_rectangle(2, 2, 2 + int(316 * fraccion), 24, fill=color_v, outline="")
-        b.create_text(160, 13, text=f"♥  Vida  {e.vida} / {e.vida_max}",
-                      fill="white", font=("Courier", 10, "bold"))
+        b.create_rectangle(0, 0, 320, 30, fill=PANEL, outline=BORDE)
+        b.create_rectangle(2, 2, 2 + 316 * max(0, e.vida) / max(1, e.vida_max), 28,
+                           fill=self._color_vida(e.vida, e.vida_max), outline="")
+        b.create_rectangle(99, 5, 221, 25, fill=FONDO, outline="")
+        b.create_text(160, 15, text=f"Vida {e.vida} / {e.vida_max}", fill=TEXTO, font=("Segoe UI", 11, "bold"))
+
+    def _animar_vida(self, diferencia):
+        for identificador in self._animaciones:
+            self.root.after_cancel(identificador)
+        self._animaciones.clear()
+        x, y = self._jugador_xy
+        texto = self.canvas.create_text(x, y - 145, text=f"{diferencia:+d}",
+            fill=ROJO if diferencia < 0 else VERDE, font=("Segoe UI", 25, "bold"), tags=("dano_flotante",))
+        for paso in range(1, 7):
+            self._animaciones.append(self.root.after(paso * 70, lambda t=texto: self.canvas.move(t, 0, -4)))
+        self._animaciones.append(self.root.after(650, lambda: self.canvas.delete(texto)))
 
     def _actualizar_log(self, mensajes):
         self.log.config(state="normal")
@@ -505,9 +446,9 @@ class VistaGrafica:
         self.log.tag_configure("dano", foreground=ROJO)
         self.log.tag_configure("bien", foreground=VERDE)
         self.log.tag_configure("normal", foreground=TEXTO)
-        for m in mensajes:
+        for m in mensajes[-20:]:
             ml = m.lower()
-            if any(p in ml for p in ("muere", "derrota", "daño", "veneno", "trampa", "herido")):
+            if any(p in ml for p in ("muere", "derrota", "daño", "dano", "veneno", "trampa", "herido")):
                 tag = "dano"
             elif any(p in ml for p in ("recoge", "cura", "victoria", "abre", "equipa")):
                 tag = "bien"
@@ -637,6 +578,8 @@ class VistaGrafica:
             return
         self._cerrada = True
         try:
+            for identificador in getattr(self, "_animaciones", []):
+                self.root.after_cancel(identificador)
             self.root.destroy()
         except tk.TclError:
             pass

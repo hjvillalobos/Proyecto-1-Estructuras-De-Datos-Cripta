@@ -71,6 +71,7 @@ class ColaEventos:
             tipo=tipo,
             referencia=referencia,
             cancelado=False,
+            en_cola=True,
         )
         self._contador += 1
         self._datos.append(evento)
@@ -87,6 +88,7 @@ class ColaEventos:
         while not self.esta_vacia():
             raiz = self._datos[0]
             ultimo = self._datos.pop()
+            raiz.en_cola = False
 
             if self._datos:
                 self._datos[0] = ultimo
@@ -116,10 +118,17 @@ class ColaEventos:
     def insertar_con_secuencia(self, tiempo, secuencia, tipo, referencia):
         """Para restaurar una partida: reinserta un evento con SU número de secuencia original."""
         evento = Evento(tiempo=tiempo, secuencia=secuencia, tipo=tipo,
-                        referencia=referencia, cancelado=False)
+                        referencia=referencia, cancelado=False, en_cola=True)
         self._datos.append(evento)
         self._sube(len(self._datos) - 1)
         return evento
+
+    def reinsertar(self, evento):
+        """Recupera un evento extraido conservando su identidad y secuencia."""
+        if not evento.en_cola:
+            evento.en_cola = True
+            self._datos.append(evento)
+            self._sube(len(self._datos) - 1)
 
     def pendientes(self):
         """Eventos vigentes (no cancelados), para guardar la partida."""

@@ -143,3 +143,24 @@ Uso: repartir los archivos del módulo de D en las ramas de git del equipo, seg�
 - **Prompt textual:** "Ahora Agrega pruebas de presupuesto, reintentos, validación, paginación, lotes, reutilización, versiones, referencias activas, LRU, persistencia y modo offline. Compara búsqueda binaria y lineal usando el mismo arreglo ordenado y LRU, con cargas reproducibles de consultas e inserciones. Mide por separado la recuperación desde disco y comprueba que no use red. Reporta promedios y variación. Considera AVL solo si los resultados justifican su complejidad; no afirmes que estas mediciones prueban el límite de 20 ms del juego completo."
 - **Uso de la respuesta:** Crear pruebas automatizadas y mediciones reproducibles para validar la parte B, comparar las estrategias de búsqueda y evaluar la recuperación desde disco.
 
+### 2026-10-12
+
+- **Herramienta/modelo:** Codex (modelo cambiado durante la sesion).
+- **Prompt textual:** "en la rama vista-controlador corrijamos los bugs de el GUI todos los que encontraste y tambien sigue los principios SOLID, es decir, solamente corrige los bugs pero el codigo debe mantener la estructura que ya llevas"
+- **Aclaracion del alcance:** "GUI y todos los bugs del motor".
+- **Uso de la respuesta:** Corregir llaves y victoria, recogida y entrega de comandos del GUI, retroceso mediante deltas, agenda de eventos, equipo, efectos, guardado y rastro, conservando MVC y las estructuras propias. Agregar pruebas de regresion y comprobar la ventana real de Tkinter. Resultado: 167 pruebas automatizadas aprobadas.
+
+### 2026-10-12
+
+- **Herramienta/modelo:** Codex.
+- **Prompt textual:** "Corrige estos 10 bugs en la rama vista-controlador, siguiendo el enunciado y los principios SOLID, sin cambiar la estructura actual del proyecto. Agrega pruebas para verificar las correcciones."
+- **Uso de la respuesta:** Corregir botin de pergaminos al retroceder, versiones y cargas en replay, validacion previa de guardados, limite de salas, referencias de cache, pociones superpuestas, multiples trampas, puntajes y paginacion del GUI. Mantener los modulos MVC y agregar pruebas reproducibles sin red real.
+- **Verificacion:** 188 pruebas aprobadas, incluidas 21 nuevas; paginacion comprobada con clics reales de Tkinter. Al medir ciclos se detectaron referencias circulares de turnos descartados y se corrigieron sin cambiar el historial por deltas. Una medicion puntual de 100 ciclos con 300 enemigos activos, cache caliente y sin red ni renderizado obtuvo mediana de 5,683 ms y maximo de 15,214 ms; no certifica el rendimiento de todas las criptas.
+
+### 2026-10-13
+
+- **Herramienta/modelo:** Codex (GPT-6).
+- **Prompt textual:** "Si, esta bien haz esas mejoras. Tambien te doy estas imagenes, el personaje que esta vestido de tigre podria ser el jugador y la rata, de los enemigos, me gustaria implementarlos"
+- **Uso de la respuesta:** Integrar los PNG proporcionados, mejorar escena, contraste, tipografia, inventario, costos visibles, trampas, agenda y mensajes de combate. Separar recursos, tema y dibujo dentro de la vista. Conservar reglas, semilla, reloj, MVC, guardado y replay.
+- **Verificacion:** 201 pruebas aprobadas; comprobacion de imagenes, disposicion en ventanas normal y compacta, textos sin solapamiento en una sala poblada, clic real de recogida y victoria reproducida con semilla 1916 y 4 de vida.
+

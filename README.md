@@ -2,11 +2,39 @@
 
 Diseño, implementación y evaluación de estructuras de datos en un juego de mazmorra dirigido por eventos.
 
+## Jugar con la interfaz grafica
+
+```powershell
+python -m pip install -r requirements.txt
+python main.py --gui
+```
+
+El jugador y las ratas utilizan las imagenes locales de `vista/recursos/`.
+Pillow conserva la transparencia y mejora el escalado; si no esta instalado,
+Tkinter puede cargar los PNG con un escalado basico. Los enemigos sin imagen local
+se muestran con una representacion generica, sin cambiar su tipo ni estadisticas.
+
+El inventario muestra los efectos del objeto seleccionado; las acciones muestran
+su costo temporal. La agenda contiene proximos sucesos observables y el registro
+conserva los ultimos 20 mensajes de ataques, trampas y acciones. El dano flotante
+es visual y no modifica el reloj virtual.
+
+Con la cripta local descargada puede reproducirse esta partida de verificacion:
+
+```powershell
+python main.py --offline .cache/cripta --cripta cripta-01 --gui --semilla 1916
+```
+
+Ruta verificada para esa version y semilla: norte, norte, recoger y equipar la
+coraza, norte, recoger y usar la pocion, recoger la llave negra, abrir este y
+atravesar la puerta. Termina con 4 de vida. No garantiza resultados para otras
+semillas o versiones de la cripta.
+
 ## Parte B
 
 Incluye cliente HTTP, precarga por lotes, catálogo, caché ordenada con LRU, persistencia por versiones y un adaptador offline.
 
-El punto de entrada prepara los datos para el motor; todavía no ejecuta una partida completa ni implementa --replay.
+El punto de entrada integra el motor con consola o Tkinter, guardado y reproduccion mediante --replay.
 
 ### Requisitos y ejecución
 
@@ -56,7 +84,16 @@ python main.py --bench
 python main.py --bench --capacidades 25 --operaciones 1000 --repeticiones 3 --escenarios mixta_90_10
 ```
 
-Las pruebas usan respuestas simuladas y archivos temporales, sin acceder al servidor. La última ejecución registrada completó 67 pruebas.
+Las pruebas usan respuestas simuladas y archivos temporales, sin acceder al servidor. La suite incluye regresiones de retroceso, carga, replay, efectos, cache, trampas y paginacion del GUI.
+Verificacion del 2026-10-13: 201 pruebas aprobadas, carga real de los PNG, presentacion sin cambios en la simulacion y comprobacion de escenas normales y pobladas en Tkinter.
+
+### Compatibilidad del guardado y replay
+
+El formato binario actual es la version 2: permite guardar mas de 253 salas cargadas. Los archivos de formato 1 se rechazan con un mensaje de incompatibilidad; no se sobrescriben ni se convierten automaticamente.
+
+Cargar requiere la misma cripta y las mismas versiones de cripta y catalogo de la sesion actual. El replay solicita las versiones de su encabezado y puede usar copias historicas locales. Cada carga exitosa anexa su estado al log, por lo que la reproduccion no depende de conservar el archivo binario original. Esta base de carga no forma parte del historial de retroceso, que sigue utilizando deltas.
+
+Una segunda pocion de velocidad sustituye y renueva el efecto temporal desde la velocidad base. Al terminar el efecto se recupera esa base. El GUI permite recorrer paginas de enemigos y objetos del suelo sin consumir tiempo virtual.
 
 El benchmark compara búsqueda binaria y lineal sobre el mismo arreglo ordenado y LRU. Incluye aciertos, fallos y cargas con inserciones. La recuperación desde disco se mide por separado y verifica cero solicitudes de red. --sin-disco permite medir solo memoria.
 
