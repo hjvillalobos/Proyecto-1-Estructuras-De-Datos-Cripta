@@ -1,5 +1,59 @@
 # Decisiones de diseño
 
+## Revision integrada: 2026-10-14
+
+Estas correcciones actualizan las rutas del motor; las mediciones antiguas y los
+pendientes de las secciones originales no certifican por si solos el juego actual.
+
+### Cursor del inventario (§4.5)
+
+El GUI comunica la seleccion al controlador sin ejecutar una accion temporal ni
+grabarla en replay. Seleccionar el ID que ya esta en el cursor retorna de inmediato;
+soltar usa el nodo conocido y lo desconecta en O(1). Buscar un ID diferente puede
+ser O(n), pero es una operacion de seleccion, no una nueva busqueda necesaria
+para eliminar el objeto que ya se esta viendo. El ciclo completo tambien incluye
+agenda y sincronizacion de fichas: no se afirma que todo el ciclo cueste O(1).
+
+### Traslado de enemigos (§4.7)
+
+Se descartaron buscar/eliminar en una lista convencional (O(n) por actor) y
+mantener un indice hash (no permitido). EnemigosSala conserva un arreglo contiguo
+y cada actor conoce su posicion. Extraer intercambia con el ultimo elemento y
+agregar al destino actualiza la posicion, sin recorrer ni desplazar los restantes.
+El delta guarda el indice extraido y restaura la posicion original al deshacer.
+La activacion sigue ordenando IDs y la agenda sigue usando tiempo y secuencia.
+
+Con Python 3.14.6, nueve repeticiones locales, excluyendo construccion y agenda:
+
+| Actores trasladados | Mediana por traslado |
+|---:|---:|
+| 32 | 0.959 us |
+| 512 | 0.954 us |
+| 4096 | 0.977 us |
+
+Estos resultados miden extraer/agregar, no el ciclo completo. Las pruebas tambien
+prohiben recorridos y remove durante los traslados y verifican el orden restaurado.
+El limite del diseño es que toda alteracion de la coleccion debe mantener los
+indices; las primitivas del motor centralizan esas operaciones.
+
+### Victoria y persistencia (§2.12, §4.10)
+
+Llevar la llave o encontrar una puerta inicialmente abierta no demuestra que se
+haya abierto correctamente. El motor conserva una lista de aperturas por sala y
+direccion; abrir con la llave registra esa evidencia y su delta. La victoria exige
+atravesar hacia la salida la puerta con la llave declarada y evidencia de apertura.
+La llave no se consume, y el cierre automatico sigue impidiendo atravesarla.
+El marcador se guarda en cada PuertaGuardada del formato binario v3. Los formatos
+anteriores no permiten reconstruirlo con certeza, por lo que se rechazan.
+
+### Frontera del adaptador (§6)
+
+El motor solicita una transaccion de catalogo a la fuente de datos y prepara el
+estado del juego por separado. El adaptador decide como aislar y confirmar su
+cache bajo su propio candado; el motor ya no clona caches ni modifica sus nodos
+o contadores. Los fallos descartan la transaccion y preservan la partida viva.
+Las copias temporales corresponden a cargar, no al historial, que usa solo deltas.
+
 ## Parte B: red, catálogo, precarga y caché
 
 Actualización: 2026-10-03.

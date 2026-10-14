@@ -220,3 +220,35 @@ Uso: repartir los archivos del módulo de D en las ramas de git del equipo, seg�
 - **Uso:** Crear una hoja local de ocho poses basada en el personaje original mediante imagegen integrado. Carrera al cambiar de sala, ataque solo tras accion aceptada y caida al perder. Reutilizar el temporizador visual cancelable; no alterar motor, costos, reloj, azar ni formatos. Conservar jugador.png y respaldo sin Pillow.
 - **Verificacion:** 235 pruebas aprobadas; fotogramas y respaldo comprobados, seleccion de acciones y final de secuencias. Capturas de carrera, ataque y caida en 1280x800 y 1100x760; diferencias de pixeles entre fotogramas, motor intacto y cola de comandos vacia.
 
+### 2026-10-13: acciones fallidas y preferencias visuales
+
+- **Prompt textual:** "podrias arreglarlos, respetando correctamente el enunciado"
+- **Uso:** Revertir por deltas el intervalo de una accion que lanza una excepcion, restaurando reloj, azar, agenda, inventario y rastro. Diferenciar deltas exclusivos de fallo para no alterar la excepcion de pergaminos en el retroceso valido. Publicar mensajes de simulacion solo al aceptar la accion. Comunicar inicio rechazado al coordinador para regresar al menu con sesion nueva. Cancelar y omitir dano flotante al desactivar Animaciones.
+- **Verificacion:** 239 pruebas aprobadas. Cuatro regresiones nuevas con variantes cubren fallos de cache antes y despues de eventos enemigos, pergaminos al recoger/soltar, carga rechazada y cancelacion de efectos Tkinter.
+
+### 2026-10-14: cumplimiento integrado
+
+- **Herramienta/modelo:** Codex.
+- **Prompt textual (solicitud):** "puedes por favor resolver esos bugs para que el proyecto cumpla con el enunciado exitosamente"
+- **Contexto del prompt:** Soltar el objeto seleccionado (§4.5), escalabilidad de rastreadores (§4.7), victoria (§2.12) y separacion MVC (§6).
+- **Uso:** Reutilizar el cursor y sincronizar la seleccion gratuita del GUI. Implementar traslados por posicion conocida en un arreglo propio sin indices hash ni busquedas lineales por actor; revertir el orden por deltas. Exigir evidencia de apertura con llave de la puerta atravesada, conservarla en guardado v3 y rechazar estados antiguos ambiguos. Trasladar la transaccion de cache al adaptador, sin acceso a sus detalles internos desde el motor.
+- **Verificacion:** 250 pruebas aprobadas, incluidas once regresiones nuevas. Partida offline con semilla 1916 termina en victoria, vida 4 y reloj 525; replay identico al estado original. Medicion local de nueve repeticiones para traslados de 32, 512 y 4096 actores: medianas 0.959, 0.954 y 0.977 us/traslado, excluyendo preparacion, agenda, red e interfaz. No certifica el limite de 20 ms del ciclo completo.
+
+# 2026-10-14: cuatro criptas oficiales
+
+Herramienta: Codex. Solicitud textual del usuario:
+
+> dale implementa las 4 que estan en la API dejalas 100% funcionales, usa el mismo personaje vestido de tigre y si vienen enemigos diferentes creales el icono
+
+Continuacion textual:
+
+> sigue trabajando ya cambie el modelo
+
+Uso: verificar las cuatro criptas reales con el cargador existente, mejorar
+seleccion por teclado y cancelacion, bloquear comandos durante la seleccion,
+descargar el listado completo con sesiones independientes y agregar pruebas.
+Los contenidos oficiales solo referencian rata gigante y guardian oseo; ambas
+imagenes ya existen. No se generaron enemigos, estadisticas ni salas adicionales.
+Las partidas de prueba usan equipo, curacion y la apertura real de la salida;
+el replay debe reproducir el mismo estado final. No se altero el balance.
+

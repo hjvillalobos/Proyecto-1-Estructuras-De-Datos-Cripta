@@ -1,4 +1,5 @@
-from copy import deepcopy
+from copy import copy, deepcopy
+from contextlib import contextmanager
 from dataclasses import dataclass
 from threading import Thread
 
@@ -40,6 +41,13 @@ class GestorPrecarga:
         self.contenidos = []
         self.pendiente = None
         self.red_compatible = True
+
+    @contextmanager
+    def transaccion_catalogo(self):
+        with self.catalogo.transaccion() as catalogo:
+            preparado = copy(self)
+            preparado.catalogo = catalogo
+            yield preparado
 
     def _validar_generales(self, datos, cripta_id):
         if not isinstance(datos, dict) or datos.get("id") != cripta_id:

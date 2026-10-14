@@ -1,5 +1,6 @@
 
-from copy import deepcopy
+from copy import copy, deepcopy
+from contextlib import contextmanager
 from threading import RLock
 
 from datos.almacen import AlmacenLocal
@@ -20,6 +21,17 @@ class GestorCatalogo:
         self.fallos = 0
         self.recuperaciones_disco = 0
         self._candado = RLock()
+
+    @contextmanager
+    def transaccion(self):
+        """Aisla cambios de cache y confirma solo una carga completada."""
+        with self._candado:
+            preparado = copy(self)
+            preparado.cache = deepcopy(self.cache)
+            yield preparado
+            self.cache.__dict__.update(preparado.cache.__dict__)
+            for campo in ("aciertos", "fallos", "recuperaciones_disco", "version", "red_compatible"):
+                setattr(self, campo, getattr(preparado, campo))
 
     def iniciar(self, version_esperada=None):
         with self._candado:

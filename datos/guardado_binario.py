@@ -11,7 +11,7 @@ from modelo.snapshots import (
 from utilidades.ordenamiento import ordenar
 
 MAGIC = b"CRPT"
-FORMATO_VERSION = 2          # contador de extras ampliado; los archivos viejos se rechazan
+FORMATO_VERSION = 3          # incluye evidencia de apertura con llave; rechaza formatos anteriores
 
 _ENCABEZADO = struct.Struct("<4sHHIQIQ")     # 4+2+2+4+8+4+8 = 32 bytes
 _ENTRADA = struct.Struct("<IQI")             # sala_id, offset, longitud = 16 bytes
@@ -178,6 +178,7 @@ def _codificar_sala(s: SalaGuardada):
     for p in s.puertas:
         w.texto(p.direccion)
         w.booleano(p.cerrada)
+        w.booleano(p.abierta_con_llave)
     w.u16(len(s.enemigos))
     for en in s.enemigos:
         w.texto(en.instancia)
@@ -200,7 +201,7 @@ def _codificar_sala(s: SalaGuardada):
 def _decodificar_sala(payload):
     r = _Lector(payload)
     sala_id, rastro = r.u32(), r.i64()
-    puertas = [PuertaGuardada(r.texto(), r.booleano()) for _ in range(r.u8())]
+    puertas = [PuertaGuardada(r.texto(), r.booleano(), r.booleano()) for _ in range(r.u8())]
     enemigos = [EnemigoGuardado(r.texto(), r.texto(), r.i64(), r.booleano(), r.i64())
                 for _ in range(r.u16())]
     objetos = [ObjetoGuardado(r.texto(), r.texto()) for _ in range(r.u16())]

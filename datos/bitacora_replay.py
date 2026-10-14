@@ -224,6 +224,12 @@ class BitacoraReplay:
             if registro.get("tipo") == "cargar":
                 if not isinstance(registro.get("estado"), dict):
                     raise ReplayIncompatible("La carga no contiene el estado necesario para reproducirla.")
+                salas = registro["estado"].get("salas", [])
+                if isinstance(salas, list):
+                    for sala in salas:
+                        if isinstance(sala, dict) and isinstance(sala.get("puertas"), list):
+                            if any(isinstance(p, dict) and "abierta_con_llave" not in p for p in sala["puertas"]):
+                                raise ReplayIncompatible("La carga antigua no registra aperturas con llave; no se garantiza un replay fiel.")
                 acciones.append(AccionReplay("cargar", registro["estado"]))
                 continue
 

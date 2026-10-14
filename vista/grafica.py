@@ -153,7 +153,7 @@ class VistaGrafica:
         scroll.pack(side="right", fill="y")
         self.lista.configure(yscrollcommand=scroll.set)
         self.lista.bind("<Double-Button-1>", self._doble_clic_inventario)
-        self.lista.bind("<<ListboxSelect>>", self._mostrar_detalle)
+        self.lista.bind("<<ListboxSelect>>", self._seleccionar_inventario)
         self.var_detalle = tk.StringVar(value="Inventario vacio")
         detalle = tk.Frame(der, bg=FONDO)
         detalle.pack(fill="x")
@@ -216,6 +216,8 @@ class VistaGrafica:
 
     def _alternar_movimiento(self):
         self._movimiento_activo = self.var_movimiento.get()
+        if not self._movimiento_activo:
+            self._cancelar_dano()
         if hasattr(self, "escena"):
             self.escena.detener()
         if self._estado is not None:
@@ -301,13 +303,13 @@ class VistaGrafica:
         dlg.title("Elige una cripta")
         dlg.configure(bg=FONDO)
         dlg.transient(self.root)
-        tk.Label(dlg, text="Elige una cripta:", bg=FONDO, fg=TEXTO,
+        tk.Label(dlg, text="Elige una cripta", bg=FONDO, fg=TEXTO,
                  font=("TkDefaultFont", 12, "bold")).pack(padx=14, pady=(14, 6))
         lb = tk.Listbox(dlg, width=58, height=max(3, min(12, len(criptas))), bg=PANEL, fg=TEXTO,
                         selectbackground=AZUL, selectforeground="black", relief="flat",
                         exportselection=False)
         for c in criptas:
-            lb.insert("end", f"{c['id']} — {c['nombre']}  "
+            lb.insert("end", f"{c['nombre']}  "
                              f"({c['salas']} salas, dificultad {c['dificultad']})")
         lb.pack(padx=14)
         if criptas:
@@ -321,10 +323,25 @@ class VistaGrafica:
                 dlg.destroy()
 
         lb.bind("<Double-Button-1>", aceptar)
-        ttk.Button(dlg, text="Jugar", command=aceptar).pack(pady=12)
+        lb.bind("<Return>", aceptar)
+        dlg.bind("<Escape>", lambda _evento: dlg.destroy())
+        controles = tk.Frame(dlg, bg=FONDO)
+        controles.pack(pady=12)
+        ttk.Button(controles, text="Volver", command=dlg.destroy).pack(side="left", padx=4)
+        ttk.Button(controles, text="Jugar", command=aceptar,
+                   state="normal" if criptas else "disabled").pack(side="left", padx=4)
+        if not criptas:
+            tk.Label(dlg, text="No hay criptas disponibles.", bg=FONDO, fg=TEXTO).pack(pady=8)
         dlg.protocol("WM_DELETE_WINDOW", dlg.destroy)
         dlg.grab_set()
-        self.root.wait_window(dlg)
+        lb.focus_set()
+        en_menu = getattr(self, "_en_menu", False)
+        self._en_menu = True
+        try:
+            self.root.wait_window(dlg)
+        finally:
+            self._en_menu = en_menu
+            self._cola.clear()
         return elegido[0] if elegido else None
 
     # ------------------------------------------------------------------
@@ -335,6 +352,12 @@ class VistaGrafica:
         if not seleccion or seleccion[0] >= len(self._items):
             return None
         return self._items[seleccion[0]]
+
+    def _seleccionar_inventario(self, _evento=None):
+        self._mostrar_detalle()
+        item = self._instancia_seleccionada()
+        if item is not None:
+            self._enviar(f"seleccionar {item.instancia}")
 
     def _accion_inventario(self, verbo):
         item = self._instancia_seleccionada()
@@ -464,15 +487,21 @@ class VistaGrafica:
         b.create_text(160, 15, text=f"Vida {e.vida} / {e.vida_max}", fill=TEXTO, font=("Segoe UI", 11, "bold"))
 
     def _animar_vida(self, diferencia):
-        for identificador in self._animaciones:
-            self.root.after_cancel(identificador)
-        self._animaciones.clear()
+        self._cancelar_dano()
+        if not getattr(self, "_movimiento_activo", True):
+            return
         x, y = self._jugador_xy
         texto = self.canvas.create_text(x, y - 145, text=f"{diferencia:+d}",
             fill=ROJO if diferencia < 0 else VERDE, font=("Segoe UI", 25, "bold"), tags=("dano_flotante",))
         for paso in range(1, 7):
             self._animaciones.append(self.root.after(paso * 70, lambda t=texto: self.canvas.move(t, 0, -4)))
         self._animaciones.append(self.root.after(650, lambda: self.canvas.delete(texto)))
+
+    def _cancelar_dano(self):
+        for identificador in self._animaciones:
+            self.root.after_cancel(identificador)
+        self._animaciones.clear()
+        self.canvas.delete("dano_flotante")
 
     def _actualizar_log(self, mensajes):
         self.log.config(state="normal")

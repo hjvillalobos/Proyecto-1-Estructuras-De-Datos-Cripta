@@ -71,7 +71,7 @@ class ControladorJuego:
                 self.bitacora_replay.iniciar(self.modelo.meta)
             except OSError as error:
                 self._fallo_grabacion(error)
-                return
+                return False
 
         self.notificar("Partida iniciada.")
         if estado_inicial is not None:
@@ -80,14 +80,14 @@ class ControladorJuego:
                 self.bitacora_replay.registrar_carga(estado_inicial)
             except OSError as error:
                 self._fallo_grabacion(error)
-                return
+                return False
             except Exception as error:
                 self.ejecutando = False
                 if callable(getattr(type(self.vista), "mostrar_error_replay", None)):
                     self.vista.mostrar_error_replay(f"No se pudo cargar: {error}")
                 else:
                     self.vista.mostrar_error(f"No se pudo cargar: {error}")
-                return
+                return False
         self.vista.mostrar_ayuda()
 
         while self.ejecutando:
@@ -139,6 +139,7 @@ class ControladorJuego:
         self.vista.mostrar_info(
             "Sesión finalizada."
         )
+        return True
 
     # ---------------------------------------------------------
     # ESTADO
@@ -288,6 +289,11 @@ class ControladorJuego:
 
         if comando == "inv":
             return self._comando_inventario(argumentos)
+
+        if comando == "seleccionar":
+            if argumentos and self.modelo.inventario_seleccionar(argumentos[0]):
+                return
+            return self.vista.mostrar_error("No tienes ese objeto en el inventario.")
 
         if comando == "sig":
             return self._mover_cursor("siguiente")

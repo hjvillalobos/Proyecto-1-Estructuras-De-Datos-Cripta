@@ -259,7 +259,7 @@ class TestCicloCompleto(unittest.TestCase):
         if motor.terminado:
             self.assertEqual(motor.resultado, "derrota")
 
-    def test_victoria_al_llegar_a_sala_salida_con_llave(self):
+    def test_victoria_al_llegar_a_sala_salida_tras_abrir_con_llave(self):
         servidor = ServidorFalso(salas=2)
         generales_original = servidor.obtener_datos_generales
 
@@ -283,6 +283,14 @@ class TestCicloCompleto(unittest.TestCase):
             return resp
 
         servidor.obtener_catalogo = catalogo_con_llave
+        esqueleto_original = servidor.obtener_esqueleto
+
+        def esqueleto_con_puerta(cripta_id, pagina=1):
+            datos = esqueleto_original(cripta_id, pagina)
+            datos["salas"][0]["salidas"]["E"].update(cerrada=True, llave="llave_maestra")
+            return datos
+
+        servidor.obtener_esqueleto = esqueleto_con_puerta
 
         tmp = tempfile.mkdtemp()
         almacen = AlmacenLocal(tmp)
@@ -294,6 +302,7 @@ class TestCicloCompleto(unittest.TestCase):
         llave = ObjetoInstancia("llave-test", "llave_maestra", "suelo", sala_id)
         motor.objetos_en_suelo[sala_id].append(llave)
         motor.ejecutar("recoger", llave.id_instancia)
+        self.assertTrue(motor.ejecutar("abrir", "E").ok)
         motor.ejecutar("mover", "E")
         self.assertTrue(motor.terminado)
         self.assertEqual(motor.resultado, "victoria")

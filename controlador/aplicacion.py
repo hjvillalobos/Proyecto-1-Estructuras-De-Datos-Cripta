@@ -97,8 +97,16 @@ def ejecutar_juego(args, sesion, lanzador_replay):
                 lanzador_replay=lanzador_replay,
             )
             if estado_inicial is not None:
-                controlador.iniciar(estado_inicial=estado_inicial)
+                iniciado = controlador.iniciar(estado_inicial=estado_inicial)
                 estado_inicial = None
+                if iniciado is False:
+                    if not args.gui:
+                        return 1
+                    sesion.renovar(tolerar_error=True)
+                    vista.reiniciar_presentacion()
+                    if not elegir_inicio():
+                        return 0
+                    continue
             else:
                 controlador.iniciar()
             if not (args.gui and juego.resultado == "derrota" and vista.preguntar_reinicio()):

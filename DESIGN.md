@@ -34,6 +34,10 @@ Tkinter. El aspecto nunca cambia estadisticas, costos, semillas ni reglas.
   Jugar, Cargar partida, Replay, Puntajes y Salir con raton, flechas y Enter.
   Es una capa de vista temporal sin motor; sus callbacks se cancelan al salir.
   El indicador t=0 corresponde a una partida nueva, no a una simulacion activa.
+- Jugar abre un selector de criptas con nombre, salas y dificultad recibidos de
+  la API o del paquete offline. Enter confirma y Escape/Volver cancelan. Ninguna
+  tecla de seleccion entra en la cola de acciones. Las cuatro criptas conservan
+  al jugador y los recursos compartidos; no se clonan vistas ni motores por nivel.
 
 - AnimacionEscena usa un solo callback de Tkinter cada 40 ms, sin acceder al modelo
   ni al azar. Respiracion de 1.5 px, entrada de sala de 18 px y reaccion breve al dano.

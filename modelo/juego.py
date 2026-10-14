@@ -2,12 +2,14 @@
 
 import random
 from copy import copy, deepcopy
+from contextlib import nullcontext
 from red.errores import ErrorCripta
 from modelo.eventos import ColaEventos
 from modelo.efectos import GestorEfectos
 from modelo.tipos import Jugador, InstanciaEnemigo, ObjetoInstancia
 from modelo.rastro import RegistroRastro
 from modelo.historial import HistorialRetroceso
+from modelo.coleccion_enemigos import EnemigosSala
 
 
 _COSTO_MOVER = 100
@@ -49,7 +51,7 @@ class Motor:
         self.azar = random.Random(semilla)
         self.reloj = 0
 
-        self.enemigos_por_sala = [[] for _ in range(salas_total + 1)]
+        self.enemigos_por_sala = [EnemigosSala() for _ in range(salas_total + 1)]
         self.objetos_en_suelo = [[] for _ in range(salas_total + 1)]
         self.contenido_cargado = [False] * (salas_total + 1)
 
@@ -66,6 +68,7 @@ class Motor:
         self.resultado = None       # "victoria" | "derrota" | None
         self.sala_salida = None     # lo llena crear_juego()
         self.llave_salida = None    # lo llena crear_juego()
+        self.puertas_abiertas_con_llave = []
         self.meta = None
         self._notificador = None
 
@@ -103,6 +106,9 @@ class Motor:
             movimiento,
             self._resolver_ficha,
         )
+
+    def inventario_seleccionar(self, instancia):
+        return self.jugador.inventario.seleccionar(instancia)
 
     def inventario_vista(self, orden=None, descendente=False):
         if orden not in (None, "nombre", "peso", "valor"):
@@ -167,6 +173,10 @@ class Motor:
 
         self.historial.registrar_puerta(salida, "cerrada", salida.get("cerrada", False))
         salida["cerrada"] = False
+        apertura = (sala_actual.id, direccion)
+        if llave_necesaria and apertura not in self.puertas_abiertas_con_llave:
+            self.puertas_abiertas_con_llave.append(apertura)
+            self.historial.registrar_cambio(lambda: self.puertas_abiertas_con_llave.remove(apertura))
         self._avanzar_actor(self.jugador, _COSTO_ABRIR_PUERTA)
 
         if "cierre_automatico" in salida:
@@ -185,6 +195,18 @@ class Motor:
 
         if not self.contenido_cargado[id_destino]:
             sala_preparada = self.gestor_precarga.preparar_entrada(id_destino, self._ids_en_uso(id_destino))
+            enemigos_antes = self.enemigos_por_sala[id_destino]
+            objetos_antes = self.objetos_en_suelo[id_destino]
+            trampas = self.salas[id_destino].trampas
+            cantidad_trampas = len(trampas)
+            def descartar_contenido():
+                self.enemigos_por_sala[id_destino] = enemigos_antes
+                self.objetos_en_suelo[id_destino] = objetos_antes
+                del trampas[cantidad_trampas:]
+                self.contenido_cargado[id_destino] = False
+                for i, enemigo in enumerate(enemigos_antes):
+                    enemigo.indice_sala = i
+            self.historial.registrar_fallo(descartar_contenido)
             _incorporar_sala_preparada(self, sala_preparada)
 
         sala_destino = self.salas[id_destino]
@@ -208,7 +230,8 @@ class Motor:
             self.efectos.activar_trampa(trampa)
 
         if (not self.terminado and id_destino == self.sala_salida
-                and (salida.get("llave") == self.llave_salida or self._tiene_llave(self.llave_salida))):
+                and salida.get("llave") == self.llave_salida
+                and (pos_anterior, direccion) in self.puertas_abiertas_con_llave):
             self.historial.registrar_atributo(self, "terminado")
             self.historial.registrar_atributo(self, "resultado")
             self.terminado = True
@@ -326,13 +349,12 @@ class Motor:
             nuevo_id = sala_actual.salidas[direccion]["sala"]
             lista_origen = self.enemigos_por_sala[id_sala]
             lista_destino = self.enemigos_por_sala[nuevo_id]
-            if enemigo in lista_origen:
-                lista_origen.remove(enemigo)
+            indice = lista_origen.extraer(enemigo)
             lista_destino.append(enemigo)
             enemigo.sala_actual = nuevo_id
             self.historial.registrar_inventario(
-                lambda e=enemigo, lo=lista_origen, ld=lista_destino, s=id_sala: (
-                    ld.remove(e), lo.append(e), setattr(e, "sala_actual", s)
+                lambda e=enemigo, lo=lista_origen, ld=lista_destino, s=id_sala, i=indice: (
+                    ld.extraer(e), lo.restaurar(e, i), setattr(e, "sala_actual", s)
                 )
             )
             self._avanzar_actor(enemigo, _COSTO_MOVER)
@@ -386,7 +408,10 @@ class Motor:
 
         salidas = [
             SalidaVista(direccion=d, destino=info["sala"],
-                        cerrada=info.get("cerrada", False), llave=info.get("llave"))
+                        cerrada=info.get("cerrada", False), llave=info.get("llave"),
+                        apertura_pendiente=info["sala"] == self.sala_salida
+                        and info.get("llave") == self.llave_salida
+                        and (sala.id, d) not in self.puertas_abiertas_con_llave)
             for d, info in sala.salidas.items()
         ]
 
@@ -563,7 +588,8 @@ class Motor:
                 continue
             salas.append(SalaGuardada(
                 sala_id=id_sala, rastro=rastro,
-                puertas=[PuertaGuardada(direccion=d, cerrada=bool(info.get("cerrada", False)))
+                puertas=[PuertaGuardada(direccion=d, cerrada=bool(info.get("cerrada", False)),
+                                       abierta_con_llave=(id_sala, d) in self.puertas_abiertas_con_llave)
                          for d, info in sala.salidas.items() if "cerrada" in info],
                 enemigos=[EnemigoGuardado(instancia=en.id_instancia, tipo=en.tipo_catalogo, vida=en.vida,
                                           activo=en.sala_actual is not None,
@@ -700,16 +726,11 @@ class Motor:
         preparado.salas = deepcopy(self.salas)
         preparado.registro_rastro = deepcopy(self.registro_rastro)
         preparado.azar = random.Random()
-        catalogo = self.gestor_precarga.catalogo
-        if hasattr(catalogo, "cache"):
-            preparado.gestor_precarga = copy(self.gestor_precarga)
-            preparado.gestor_precarga.catalogo = copy(catalogo)
-            preparado.gestor_precarga.catalogo.cache = deepcopy(catalogo.cache)
-        preparado._restaurar_estado_validado(estado)
-        if hasattr(catalogo, "cache"):
-            catalogo.cache.__dict__.update(preparado.gestor_precarga.catalogo.cache.__dict__)
-            for campo in ("aciertos", "fallos", "recuperaciones_disco"):
-                setattr(catalogo, campo, getattr(preparado.gestor_precarga.catalogo, campo))
+        transaccion = getattr(self.gestor_precarga, "transaccion_catalogo", None)
+        contexto = transaccion() if callable(transaccion) else nullcontext(self.gestor_precarga)
+        with contexto as fuente:
+            preparado.gestor_precarga = fuente
+            preparado._restaurar_estado_validado(estado)
         preparado.gestor_precarga = self.gestor_precarga
         # Conservar las referencias publicas del jugador, salas y puertas.
         for i, sala in enumerate(self.salas):
@@ -751,9 +772,10 @@ class Motor:
         self.azar.setstate(estado.rng_estado)
         self.acciones_jugador = estado.acciones_jugador
         self.enemigos_derrotados = estado.enemigos_derrotados
-        self.enemigos_por_sala = [[] for _ in range(n)]
+        self.enemigos_por_sala = [EnemigosSala() for _ in range(n)]
         self.objetos_en_suelo = [[] for _ in range(n)]
         self.contenido_cargado = [False] * n
+        self.puertas_abiertas_con_llave = []
         for id_sala, direccion, tenia_campo, cerrada in self._puertas_iniciales:
             salida = self.salas[id_sala].salidas[direccion]
             if tenia_campo:
@@ -794,6 +816,10 @@ class Motor:
             for p in sg.puertas:
                 if p.direccion in sala.salidas:
                     sala.salidas[p.direccion]["cerrada"] = p.cerrada
+                    if p.abierta_con_llave:
+                        if not sala.salidas[p.direccion].get("llave"):
+                            raise ValueError("Guardado invalido: apertura sin llave declarada.")
+                        self.puertas_abiertas_con_llave.append((sg.sala_id, p.direccion))
             for eg in sg.enemigos:
                 ficha = self.gestor_precarga.catalogo.obtener_fichas([eg.tipo])[0]
                 a = ficha.atributos
@@ -821,6 +847,28 @@ class Motor:
         self._sincronizar_referencias()
 
     def ejecutar(self, accion, argumento=None):
+        reloj = self.reloj
+        notificador = self._notificador
+        mensajes = []
+        self._notificador = mensajes.append if notificador is not None else None
+        try:
+            resultado = self._ejecutar_accion(accion, argumento)
+        except Exception:
+            self.historial.descartar_turno()
+            self.reloj = reloj
+            try:
+                self._sincronizar_referencias()
+            except (ErrorCripta, OSError):
+                pass  # Conservar el error original; la partida ya fue revertida por deltas.
+            raise
+        finally:
+            self._notificador = notificador
+        if resultado.ok and notificador is not None:
+            for mensaje in mensajes:
+                notificador(mensaje)
+        return resultado
+
+    def _ejecutar_accion(self, accion, argumento=None):
         from modelo.snapshots import ResultadoAccion
         from modelo.enemigos import decidir_accion
 
@@ -882,6 +930,11 @@ class Motor:
                 self.historial.registrar_inventario(lambda n=nodo: inventario.quitar_nodo(n))
                 self.historial.registrar_inventario(
                     lambda lista=objetos_sala, i=indice, o=objeto: lista.insert(i, o))
+            else:
+                self.historial.registrar_fallo(lambda n=nodo: inventario.quitar_nodo(n))
+                self.historial.registrar_fallo(lambda: setattr(objeto, "ubicacion", "suelo"))
+                self.historial.registrar_fallo(lambda: setattr(objeto, "sala", sala_origen))
+                self.historial.registrar_fallo(lambda: objetos_sala.insert(indice, objeto))
             self._avanzar_actor(self.jugador, _COSTO_RECOGER)
             ok, error = True, None
         elif accion == "soltar":
@@ -909,6 +962,11 @@ class Motor:
                 self.historial.registrar_inventario(
                     lambda a=anterior, n=nodo_actual: inventario.reinsertar_nodo(n, a))
                 self.historial.registrar_inventario(lambda lista=objetos_sala, o=objeto: lista.remove(o))
+            else:
+                self.historial.registrar_fallo(lambda: inventario.reinsertar_nodo(nodo_actual, anterior))
+                self.historial.registrar_fallo(lambda: setattr(objeto, "ubicacion", "inventario"))
+                self.historial.registrar_fallo(lambda: setattr(objeto, "sala", None))
+                self.historial.registrar_fallo(lambda: objetos_sala.remove(objeto))
             self._avanzar_actor(self.jugador, _COSTO_SOLTAR)
             ok, error = True, None
         elif accion == "equipar":
@@ -1126,9 +1184,9 @@ def _incorporar_sala_preparada(motor, sala_preparada):
                 return ficha
         return None
 
-    ids_enemigos_existentes = {
+    ids_enemigos_existentes = [
         e.id_instancia for e in motor.enemigos_por_sala[id_sala]
-    }
+    ]
     enemigos_nuevos = []
     for enemigo_json in contenido.get("enemigos", []):
         if enemigo_json["instancia"] in ids_enemigos_existentes:
@@ -1146,11 +1204,11 @@ def _incorporar_sala_preparada(motor, sala_preparada):
             comportamiento=ficha.atributos["comportamiento"],
         ))
     visitantes = motor.enemigos_por_sala[id_sala]
-    motor.enemigos_por_sala[id_sala] = enemigos_nuevos + visitantes
+    motor.enemigos_por_sala[id_sala] = EnemigosSala(enemigos_nuevos + visitantes)
 
-    ids_objetos_existentes = {
+    ids_objetos_existentes = [
         o.id_instancia for o in motor.objetos_en_suelo[id_sala]
-    }
+    ]
     objetos_nuevos = []
     for indice, tipo_objeto in enumerate(contenido.get("objetos", [])):
         id_instancia = f"obj-{id_sala}-{indice}"

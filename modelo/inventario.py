@@ -138,6 +138,9 @@ class Inventario:
             nodo = nodo.siguiente
 
     def seleccionar(self, id_instancia):
+        if (self.cursor is not None and self.cursor.en_inventario
+                and self.cursor.objeto.id_instancia == id_instancia):
+            return True
         nodo = self.cabeza.siguiente
         while nodo is not self.cola:
             if nodo.objeto.id_instancia == id_instancia:

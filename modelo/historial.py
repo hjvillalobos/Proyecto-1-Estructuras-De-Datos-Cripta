@@ -15,9 +15,14 @@ class RegistroTurno:
         self._registro_rastro = registro_rastro
         self._cola = cola
         self.cambios = []
+        self.cambios_fallo = []
 
     def registrar_cambio(self, deshacer):
         self.cambios.append(deshacer)
+        self.cambios_fallo.append(deshacer)
+
+    def registrar_fallo(self, deshacer):
+        self.cambios_fallo.append(deshacer)
 
     def registrar_atributo(self, objeto, atributo):
         anterior = getattr(objeto, atributo)
@@ -100,9 +105,13 @@ class HistorialRetroceso:
     def descartar_turno(self):
         """Una accion rechazada no deja cambios ni ocupa historial."""
         if self._turno_actual is not None:
-            for deshacer in reversed(self._turno_actual.cambios):
+            for deshacer in reversed(self._turno_actual.cambios_fallo):
                 deshacer()
             self._turno_actual = None
+
+    def registrar_fallo(self, deshacer):
+        if self._turno_actual is not None:
+            self._turno_actual.registrar_fallo(deshacer)
 
     def cerrar_turno(self):
         """Se llama cuando el jugador vuelve a tener una decisión, es

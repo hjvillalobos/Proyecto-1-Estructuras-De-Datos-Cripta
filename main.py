@@ -103,7 +103,7 @@ def main(argv=None):
             listado = sesion.cliente.listar_criptas()
             sesion.almacen.guardar_lista(listado)
             print(json.dumps(listado, indent=2, ensure_ascii=False))
-        if args.cripta is None and not args.replay and not args.gui:
+        if args.cripta is None and not args.replay and not args.gui and not args.descargar_todo:
             print("Selecciona una cripta con --cripta ID.")
             return 0
 
@@ -112,9 +112,15 @@ def main(argv=None):
             ejecutar_replay(args, sesion.precarga, sesion.cliente)
             return 0
         if args.descargar_todo:
-            preparada = sesion.precarga.preparar_cripta(
-                args.cripta, args.version_cripta, args.version_catalogo)
-            sesion.precarga.cargar_contenido([sala.id for sala in preparada.salas])
+            ids = ([args.cripta] if args.cripta is not None
+                   else [cripta["id"] for cripta in listado["criptas"]])
+            for indice, cripta_id in enumerate(ids):
+                if indice:
+                    sesion.renovar()
+                preparada = sesion.precarga.preparar_cripta(
+                    cripta_id, args.version_cripta, args.version_catalogo)
+                sesion.precarga.cargar_contenido([sala.id for sala in preparada.salas])
+                print(f"{cripta_id}: {len(preparada.salas)} salas descargadas")
             print(f"Respuestas completas guardadas en {args.datos_dir}")
             return 0
 

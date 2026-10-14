@@ -20,6 +20,7 @@ class MetaPartida:
 class PuertaGuardada:
     direccion: str          # "N", "S", "E", "O"
     cerrada: bool
+    abierta_con_llave: bool = False
 
 
 @dataclass
@@ -180,6 +181,7 @@ class SalidaVista:
     destino: int
     cerrada: bool = False
     llave: str | None = None
+    apertura_pendiente: bool = False
 
 
 @dataclass

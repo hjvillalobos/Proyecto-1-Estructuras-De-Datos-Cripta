@@ -1,6 +1,6 @@
 # modelo/tipos.py
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Dict, Any, List
 
 @dataclass(init=False)
@@ -45,6 +45,7 @@ class InstanciaEnemigo(Actor):
     tipo_catalogo: str
     comportamiento: str
     sala_actual: int = None        # reemplaza el dict sala_de_enemigo
+    indice_sala: int = field(default=-1, compare=False, repr=False)
 
 @dataclass
 class FichaCatalogo:

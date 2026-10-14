@@ -9,6 +9,14 @@ python -m pip install -r requirements.txt
 python main.py --gui
 ```
 
+Jugar abre el selector con las criptas publicadas por la API. La consulta del
+2026-10-14 devuelve Osario menor (6 salas, dificultad 1), Catacumbas menores
+(20, dificultad 2), Catacumbas medias (40, dificultad 3) y Catacumbas profundas
+(50, dificultad 4). Todas conservan el jugador con traje de tigre. El selector
+usa los datos recibidos, no genera salas ni modifica la dificultad del motor.
+Enter confirma, Escape o Volver regresan al menu. `--cripta ID` sigue permitiendo
+iniciar directamente la cripta indicada.
+
 El jugador, los dos enemigos, los ocho objetos y la trampa de dardos del catalogo local utilizan imagenes de `vista/recursos/`. Los objetos muestran miniaturas en el suelo y al seleccionarlos en el inventario.
 Pillow conserva la transparencia y mejora el escalado; si no esta instalado,
 Tkinter puede cargar los PNG con un escalado basico. Los enemigos sin imagen local
@@ -59,6 +67,28 @@ Para guardar el contenido completo disponible de una cripta:
 python main.py --cripta ID --descargar-todo --datos-dir .cache/cripta
 ```
 
+Para descargar todas las criptas del listado y elegir cualquiera sin conexion:
+
+```powershell
+python main.py --descargar-todo --datos-dir .cache/cripta
+python main.py --offline .cache/cripta --gui
+```
+
+Cada cripta usa una sesion y un presupuesto independientes. El UUID HTTP se
+mantiene durante la ejecucion. Las respuestas quedan en la cache local ignorada
+por Git; en otro equipo hay que descargarlas antes de jugar sin conexion.
+
+Verificacion opcional del paquete completo descargado, sin solicitudes HTTP:
+
+```powershell
+$env:CRIPTA_PAQUETE_API = ".cache/cripta"
+python -m unittest tests.test_criptas_api -v
+```
+
+Incluye las cuatro selecciones, incorporacion de las 116 salas, cobertura de
+imagenes, guardado/carga, una victoria por cripta y replay con estado final igual.
+Las rutas de prueba no garantizan ganar con cualquier semilla o version.
+
 La descarga respeta el presupuesto y puede detenerse si este se agota. Para usar después esos datos sin conexión:
 
 ```powershell
@@ -90,7 +120,7 @@ python main.py --bench --capacidades 25 --operaciones 1000 --repeticiones 3 --es
 ```
 
 Las pruebas usan respuestas simuladas y archivos temporales, sin acceder al servidor. La suite incluye regresiones de retroceso, carga, replay, efectos, cache, trampas y paginacion del GUI.
-Verificacion del 2026-10-13: 235 pruebas aprobadas, carga real de los PNG y fotogramas, miniaturas y acciones de recogida verificadas, presentacion sin cambios en la simulacion y comprobacion de escenas normales y pobladas en Tkinter. Incluye menu de inicio, validacion de replay, fallos de grabacion, reinicio tras derrota, carga aislada, precarga fallida, puntajes invalidos y ciclo de vida de la sesion de datos.
+Verificacion del 2026-10-14: 250 pruebas aprobadas. Incluye seleccion de inventario sin tiempo virtual, traslados de enemigos sin busqueda ni desplazamiento lineal, victoria condicionada a la apertura correcta y transacciones de cache encapsuladas en el adaptador. Se conservan las regresiones de reloj, retroceso por deltas, guardado, replay, errores de datos, menu y animaciones.
 
 El personaje usa fotogramas de carrera al cambiar de sala, ataque tras una accion
 aceptada y caida al perder. Son secuencias visuales desactivables; no avanzan el
@@ -117,7 +147,15 @@ ultima accion ya se realizo pero la grabacion esta incompleta.
 
 ### Compatibilidad del guardado y replay
 
-El formato binario actual es la version 2: permite guardar mas de 253 salas cargadas. Los archivos de formato 1 se rechazan con un mensaje de incompatibilidad; no se sobrescriben ni se convierten automaticamente.
+El formato binario actual es la version 3: conserva la evidencia de apertura con llave de cada puerta, ademas del soporte para mas de 253 salas cargadas. Los formatos 1 y 2 se rechazan con un mensaje de incompatibilidad; los archivos existentes no se borran ni se convierten automaticamente. Los logs antiguos que incluyen cargas sin esa evidencia tambien se rechazan, en vez de reproducir silenciosamente un estado ambiguo.
+
+El GUI sincroniza el cursor al seleccionar un objeto. Soltar el objeto actual
+reutiliza ese nodo, sin volver a buscarlo desde la cabeza. Seleccionar otro ID
+puede requerir una busqueda, pero esa seleccion no consume tiempo virtual.
+
+Los enemigos usan un arreglo por sala con posicion conocida por actor. Extraer
+intercambia con el ultimo elemento y agrega al destino: O(1) por traslado.
+Los deltas conservan el indice original para restaurar el orden al deshacer.
 
 Cargar requiere la misma cripta y las mismas versiones de cripta y catalogo de la sesion actual. El replay solicita las versiones de su encabezado y puede usar copias historicas locales. Cada carga exitosa anexa su estado al log, por lo que la reproduccion no depende de conservar el archivo binario original. Esta base de carga no forma parte del historial de retroceso, que sigue utilizando deltas.
 

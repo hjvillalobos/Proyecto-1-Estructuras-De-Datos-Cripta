@@ -102,7 +102,7 @@ class EscenaCripta:
             _, x, y = posicion
             etiqueta = "puerta_" + salida.direccion
             w, h = (98, 34) if salida.direccion in ("N", "S") else (72, 56)
-            verbo = "abrir" if salida.cerrada else "mover"
+            verbo = "abrir" if salida.cerrada or getattr(salida, "apertura_pendiente", False) else "mover"
             c.create_rectangle(x - w / 2, y - h / 2, x + w / 2, y + h / 2,
                                fill="#403925" if salida.cerrada else "#20392f",
                                outline=AMARILLO if salida.cerrada else VERDE, width=2, tags=(etiqueta,))
