@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog, ttk
 
-from vista.tema import FONDO, TEXTO, TENUE, AMARILLO, VERDE
+from vista.tema import FONDO, TEXTO, AMARILLO, VERDE, configurar_botones_menu
 from vista.animacion import AnimacionEscena
 
 
@@ -10,6 +10,7 @@ class MenuInicio:
 
     def __init__(self, vista, replay, puntajes):
         self.vista = vista
+        configurar_botones_menu(vista.root)
         self.resultado = None
         self.fin = tk.BooleanVar(master=vista.root, value=False)
         self.panel = tk.Frame(vista.root, bg=FONDO)
@@ -22,9 +23,10 @@ class MenuInicio:
         acciones = (("Jugar", lambda: self.elegir("jugar")), ("Cargar partida", self.cargar),
                     ("Replay", replay), ("Puntajes", puntajes), ("Salir", lambda: self.elegir("salir")))
         self.controles = tk.Frame(self.panel, bg=FONDO)
-        self.controles.place(relx=.61, rely=.48, anchor="n", width=250)
+        self.controles.place(relx=.63, rely=.43, anchor="n", width=280)
         for nombre, comando in acciones:
-            boton = ttk.Button(self.controles, text=nombre, command=comando, takefocus=True)
+            boton = ttk.Button(self.controles, text=nombre, command=comando, takefocus=True,
+                               style="Principal.Menu.TButton" if nombre == "Jugar" else "Menu.TButton")
             boton.pack(fill="x", pady=5, ipady=5)
             boton.bind("<Up>", lambda e: self.mover(-1))
             boton.bind("<Down>", lambda e: self.mover(1))
@@ -57,12 +59,16 @@ class MenuInicio:
         self.canvas.delete("all")
         self.imagenes.clear()
         w, h = self.canvas.winfo_width(), self.canvas.winfo_height()
-        self.canvas.create_rectangle(0, h * .83, w, h, fill="#1c2825", outline="")
-        self.canvas.create_line(40, h * .83, w - 40, h * .83, fill=VERDE)
-        self.canvas.create_text(w * .61, h * .23, text="CRIPTA", fill=AMARILLO, font=("Georgia", 64, "bold"))
-        self.canvas.create_text(w * .61, h * .34, text="La salida te espera.", fill=TEXTO, font=("Georgia", 18))
-        self.canvas.create_text(w * .61, h * .89, text="Reloj virtual", fill=TENUE, font=("Segoe UI", 11))
-        self.canvas.create_text(w * .61, h * .94, text="t = 0", fill=VERDE, font=("Consolas", 22))
+        fondo = self.vista.recursos.fondo(w, h)
+        if fondo is not None:
+            self.imagenes.append(fondo)
+            self.canvas.create_image(0, 0, image=fondo, anchor="nw")
+        self.canvas.create_text(w * .63 + 2, h * .23 + 3, text="CRIPTA", fill=FONDO,
+                                font=("Georgia", 64, "bold"))
+        self.canvas.create_text(w * .63, h * .23, text="CRIPTA", fill=AMARILLO, font=("Georgia", 64, "bold"))
+        self.canvas.create_text(w * .63, h * .34, text="La salida te espera.", fill=TEXTO, font=("Georgia", 18))
+        self.canvas.create_text(w * .63, h * .87, text="Reloj virtual", fill=TEXTO, font=("Segoe UI", 11))
+        self.canvas.create_text(w * .63, h * .92, text="t = 0", fill=VERDE, font=("Consolas", 22, "bold"))
         for nombre, x, ancho, alto, fase in (("jugador", w * .23, 320, int(h * .68), 0),
                                              ("itm_antorcha", w * .88, 48, 94, 1.2)):
             imagen = self.vista.recursos.imagen(nombre, ancho, alto)

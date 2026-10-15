@@ -390,11 +390,15 @@ class Motor:
                 ids.append(objeto.tipo_catalogo)
         return ids
 
-    def _sincronizar_referencias(self):
+    def _sincronizar_referencias(self, adicionales=()):
         if self.gestor_precarga is not None:
             fijar = getattr(self.gestor_precarga.catalogo, "fijar_referencias", None)
             if fijar is not None:
-                fijar(self._ids_en_uso())
+                ids = self._ids_en_uso()
+                for identificador in adicionales:
+                    if identificador not in ids:
+                        ids.append(identificador)
+                fijar(ids)
 
     # ---------- vista / resumen ----------
 
@@ -877,19 +881,22 @@ class Motor:
                               if self._resolver_clase(objeto.tipo_catalogo) == "pergamino_retroceso"), None)
             if pergamino is None:
                 return ResultadoAccion(ok=False, mensaje="No tenés pergaminos de retroceso")
+            if not self.historial.hay_turno_para_revertir():
+                return ResultadoAccion(ok=False, mensaje="No hay nada que deshacer")
+            # Toda operacion de datos potencialmente fallida precede a los deltas.
+            self._sincronizar_referencias(self.historial.referencias_retroceso())
             reloj_anterior = self.historial.usar_pergamino(
                 self.jugador.inventario, pergamino.tipo_catalogo)
             if reloj_anterior is None:
                 return ResultadoAccion(ok=False, mensaje="No hay nada que deshacer")
             self.reloj = reloj_anterior
-            self._sincronizar_referencias()
             self.informar("Retroceso: se restaura la accion anterior.")
             return ResultadoAccion(ok=True)
 
         if self.terminado:
             return ResultadoAccion(ok=False, mensaje="La partida ya terminó")
 
-        self.historial.iniciar_turno(self.reloj)
+        self.historial.iniciar_turno(self.reloj, self._ids_en_uso())
         azar_anterior = self.azar.getstate()
         secuencia_anterior = self.cola.proxima_secuencia()
         self.historial.registrar_cambio(lambda: self.azar.setstate(azar_anterior))

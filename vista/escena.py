@@ -10,14 +10,16 @@ class EscenaCripta:
         self.imagenes = []
         self.animacion = None
         self.anterior = None
+        self._accion_en_curso = None
+        self._entrada_en_curso = (0, 0)
 
     def detener(self):
         if self.animacion is not None:
             self.animacion.detener()
 
-    def _actor(self, identificador, fase=0, entrada=False, golpe=False):
+    def _actor(self, identificador, fase=0, entrada=False, golpe=False, **movimiento):
         if self.animacion is not None:
-            self.animacion.agregar(identificador, fase, entrada, golpe)
+            self.animacion.agregar(identificador, fase, entrada, golpe, **movimiento)
 
     def _imagen(self, nombre, ancho, alto):
         recursos = getattr(self.vista, "recursos", None)
@@ -28,11 +30,19 @@ class EscenaCripta:
 
     def dibujar(self, estado):
         v, c = self.vista, self.vista.canvas
+        continuar = (estado == self.anterior and self.animacion is not None
+                     and getattr(v, "_accion_visual", None) is None)
+        paso_anterior = self.animacion.paso if continuar else 0
+        accion_anterior = self._accion_en_curso if continuar else None
         self.detener()
         if hasattr(v, "root") and getattr(v, "_movimiento_activo", True):
             self.animacion = AnimacionEscena(v.root, c)
         else:
             self.animacion = None
+        self._accion_en_curso = accion_anterior
+        self._continuar_movimiento = continuar
+        if self.animacion is not None:
+            self.animacion.paso = paso_anterior
         self.imagenes.clear()
         c.delete("all")
         ancho, alto = c.winfo_width(), c.winfo_height()
@@ -119,17 +129,42 @@ class EscenaCripta:
         if imagen is not None:
             sprite = c.create_image(px, py, image=imagen, anchor="s", tags=("jugador",))
             anterior = self.anterior
-            self._actor(sprite, entrada=anterior is not None and anterior.sala_id != estado.sala_id,
-                        golpe=anterior is not None and estado.vida < anterior.vida)
+            accion = self._accion_jugador(estado)
+            if accion is None and self._continuar_movimiento:
+                accion = self._accion_en_curso
+            self._accion_en_curso = accion
+            direccion = next((s.direccion for s in getattr(anterior, "salidas", [])
+                              if s.destino == estado.sala_id), "E")
+            entrada = {"N": (-28, -18), "S": (28, -18), "E": (-65, 0), "O": (65, 0)}[direccion]
+            if self._continuar_movimiento:
+                entrada = self._entrada_en_curso
+            self._entrada_en_curso = entrada
+            self._actor(sprite, entrada=accion == "correr",
+                        golpe=anterior is not None and estado.vida < anterior.vida,
+                        desplazamiento=entrada, carrera=accion == "correr", ataque=accion == "atacar")
             if self.animacion is not None:
-                accion = self._accion_jugador(estado)
                 if accion:
                     cuadros = self.vista.recursos.fotogramas_jugador(290, min(280, alto - 175))
                     self.imagenes.extend(cuadros)
                     indices = {"correr": (0, 1, 2, 3), "atacar": (4, 5), "caer": (6, 7)}[accion]
                     if len(cuadros) == 8:
                         self.animacion.secuencia(sprite, [cuadros[i] for i in indices],
-                                                reposo=imagen, mantener=accion == "caer")
+                                                reposo=imagen, mantener=accion == "caer",
+                                                pasos_por_cuadro=4 if accion == "correr" else 6,
+                                                duracion=32 if accion == "correr" else 18,
+                                                repetir=accion == "correr")
+                    if accion == "correr":
+                        for i in range(4):
+                            polvo = c.create_line(px - 35 + i * 10, py + 3,
+                                                  px - 29 + i * 10, py + 3,
+                                                  fill=TENUE, width=2, tags=("efecto_visual",))
+                            self.animacion.particula(polvo, duracion=18 + i * 3,
+                                                     desplazamiento=(-16 - i * 4, -5 - i))
+                    elif accion == "atacar":
+                        golpe = c.create_line(px + 45, py - 100, px + 75, py - 125,
+                                              px + 95, py - 105, smooth=True,
+                                              fill=AMARILLO, width=3, tags=("efecto_visual",))
+                        self.animacion.particula(golpe, duracion=14, desplazamiento=(16, 0))
         else:
             c.create_oval(px - 22, py - 90, px + 22, py - 46, fill=AMARILLO, outline=TEXTO, tags=("jugador",))
             c.create_polygon(px - 38, py - 42, px + 38, py - 42, px + 25, py, px - 25, py,

@@ -2,6 +2,43 @@
 
 ## Revision integrada: 2026-10-14
 
+### Fallos de juego y verificacion para defensa
+
+El retroceso conserva deltas, no snapshots. Cada registro guarda tambien los
+IDs de fichas en uso antes de la accion. Antes de aplicar sus deltas se preparan
+las fichas del estado actual y del estado a restaurar; una falla de datos rechaza
+el retroceso antes de consumir el pergamino o sacar el intervalo del historial.
+No se hace una operacion de datos fallible despues de aplicar el retroceso.
+La cache no se deshace. Estos IDs son metadatos de referencias, no copias de
+actores, objetos, agenda ni estado del juego. Si la union de referencias no cabe
+en una cache muy pequena, el retroceso falla sin alterar la partida.
+
+El reinicio descarta errores pendientes de la sesion finalizada y muestra un
+aviso persistente si falla la nueva sesion; permite volver al menu y reintentar
+o salir. Las rutas de guardar/cargar/replay se interpretan como un argumento
+completo, con espacios y barras Windows, opcionalmente entre comillas.
+
+Verificacion local: 265 pruebas, con respuestas oficiales copiadas a directorios
+temporales. Victoria y replay con estado final identico en las cuatro criptas:
+
+| Cripta | Salas | Semilla | Vida final | Reloj final |
+|---|---:|---:|---:|---:|
+| cripta-01 | 6 | 1916 | 4 | 525 |
+| cripta-02 | 20 | 20 | 25 | 3725 |
+| cripta-03 | 40 | 20 | 20 | 8225 |
+| cripta-04 | 50 | 20 | 17 | 10300 |
+
+Una medicion exploratoria con contenido precargado, sin red ni renderizado,
+cronometrando Motor.ejecutar con perf_counter_ns, dio maximos de 10.416, 7.776,
+7.397 y 10.485 ms respectivamente. Incluye las acciones de la ruta y su replay
+(20, 104, 224 y 278 ciclos). No es evidencia obtenida mediante --bench, no
+certifica otras cargas ni sustituye la evaluacion de una cripta desconocida.
+
+Pendientes de cumplimiento: ampliar --bench a todos los subsistemas de §5.3,
+completar las secciones y mediciones de §8, comprobar el paquete offline del
+curso y revisar que la bitacora LLM incluya todos los prompts del equipo.
+El juego verificado no equivale a certificacion de la entrega completa.
+
 Estas correcciones actualizan las rutas del motor; las mediciones antiguas y los
 pendientes de las secciones originales no certifican por si solos el juego actual.
 

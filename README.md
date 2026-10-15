@@ -17,6 +17,10 @@ usa los datos recibidos, no genera salas ni modifica la dificultad del motor.
 Enter confirma, Escape o Volver regresan al menu. `--cripta ID` sigue permitiendo
 iniciar directamente la cripta indicada.
 
+Inicio y selector comparten un fondo de ladrillos de piedra con el personaje
+original. El selector resalta la cripta elegida y actualiza sus salas y dificultad.
+Este cambio es exclusivamente visual; no modifica los turnos ni el reloj virtual.
+
 El jugador, los dos enemigos, los ocho objetos y la trampa de dardos del catalogo local utilizan imagenes de `vista/recursos/`. Los objetos muestran miniaturas en el suelo y al seleccionarlos en el inventario.
 Pillow conserva la transparencia y mejora el escalado; si no esta instalado,
 Tkinter puede cargar los PNG con un escalado basico. Los enemigos sin imagen local

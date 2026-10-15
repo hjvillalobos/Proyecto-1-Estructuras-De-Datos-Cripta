@@ -252,3 +252,45 @@ imagenes ya existen. No se generaron enemigos, estadisticas ni salas adicionales
 Las partidas de prueba usan equipo, curacion y la apertura real de la salida;
 el replay debe reproducir el mismo estado final. No se altero el balance.
 
+# 2026-10-14: fondo y selector visual
+
+Herramienta: Codex e image_gen integrado. Solicitud textual:
+
+> puedes mejorar visualmente el proyecto la pantalla de inicio ponle como un fondo de ladrillos y tambien a la hora de escoger una de las 4 criptas, mejoralo
+
+Uso: fondo raster compartido, estilos de botones de menu, selector separado
+en la capa vista, pruebas de imagen a sangre, falta de recurso, seleccion y
+estado vacio. Se mantienen personaje, reloj, identificadores y reglas.
+
+Prompt de imagen (image_gen integrado, fondo no transparente):
+
+> Create a polished 2D fantasy game menu background, landscape 1536x1024. An old crypt wall of clearly visible rectangular weathered charcoal-gray masonry bricks with muted green patina and fine mortar joints. Straight-on elevation, subtle carved stone doorway arch on the far left behind where a character will stand, stone flagstone floor in bottom 18 percent. Readable mid-dark stone, varied gray and desaturated green, restrained warm torch illumination at far edges, no torches themselves. Center and right are a quiet uniform brick wall for cream/gold UI text overlay, no dramatic darkness, no gradients or abstract blobs. Hand-painted illustrated game environment matching a detailed fantasy character, crisp masonry texture. Full bleed background only, no text, no letters, no UI, no characters, no items, no borders.
+
+Archivo integrado: `vista/recursos/fondo_ladrillos.png`. No reemplaza los sprites.
+
+# 2026-10-14: auditoria y correcciones para defensa
+
+Herramienta: Codex. Prompts textuales:
+
+> puedes revisar si hay bugs a la hora de jugar? en las 4 criptas diferentes, fijate que el juego sea completamente funcional
+
+> por favor corrige los fallos, ya que debo defender el proyecto a mi profesor, tambien despues de corregirlos dime si se puede ganar en las 4 criptas y fijate que tambien todo cumpla acorde al enunciado
+
+Uso: reproducir fallos de retroceso, reinicio y rutas con espacios, corregirlos
+sin snapshots para deshacer, agregar cinco pruebas de regresion, ejecutar la
+suite y rutas de victoria/replay con respuestas oficiales locales y revisar
+reglas, mediciones y documentacion contra el PDF del proyecto. La auditoria no
+certifica los subsistemas de --bench que siguen pendientes ni una cripta futura.
+
+# 2026-10-14: carrera y feedback visual con recursos existentes
+
+Herramienta: Codex. Solicitud textual:
+
+> me mejoras la animacion del proyecto para que se vea como un juego real, respetando el enunciado y usando lo que ya tenemos, no migres a pygame
+
+Uso: reutilizar jugador_acciones.png, repetir los cuadros de carrera durante una
+entrada suavizada, agregar embestida y efectos visuales temporales, conservar el
+progreso al redibujar y verificar cancelacion y estado del motor sin cambios.
+Todo permanece en la vista Tkinter; no se migra biblioteca ni se agrega movimiento
+libre, colisiones, azar o tiempo real a la simulacion del juego.
+

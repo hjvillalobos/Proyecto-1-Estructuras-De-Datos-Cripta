@@ -175,11 +175,19 @@ class ControladorJuego:
 
     def procesar_comando(self, texto):
 
-        partes = texto.split()
+        partes = texto.split(maxsplit=1)
+        if not partes:
+            return
 
         comando = partes[0].lower()
 
-        argumentos = partes[1:]
+        if comando in ("guardar", "cargar", "replay"):
+            ruta = partes[1].strip() if len(partes) > 1 else ""
+            if len(ruta) >= 2 and ruta[0] == ruta[-1] and ruta[0] in ("\"", "'"):
+                ruta = ruta[1:-1]
+            argumentos = [ruta] if ruta else []
+        else:
+            argumentos = partes[1].split() if len(partes) > 1 else []
 
         # ---------------------------------------------
         # MOVIMIENTO RÁPIDO

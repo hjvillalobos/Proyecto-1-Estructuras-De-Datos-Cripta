@@ -2,7 +2,7 @@ from pathlib import Path
 import tkinter as tk
 
 try:
-    from PIL import Image, ImageTk
+    from PIL import Image, ImageTk, ImageOps
 except ImportError:
     Image = ImageTk = None
 
@@ -15,6 +15,24 @@ class RecursosGraficos:
         self.carpeta = Path(carpeta) if carpeta else Path(__file__).parent / "recursos"
         self._imagenes = []
         self._secuencias = []
+        self._fondo = None
+
+    def fondo(self, ancho, alto):
+        """Fondo a sangre, con una sola variante de tamano retenida."""
+        clave = (max(1, int(ancho)), max(1, int(alto)))
+        if self._fondo is not None and self._fondo[0] == clave:
+            return self._fondo[1]
+        if Image is None:
+            return self.imagen("fondo_ladrillos", *clave)
+        try:
+            with Image.open(self.carpeta / "fondo_ladrillos.png") as origen:
+                fondo = ImageOps.fit(origen.convert("RGB"), clave,
+                                     method=Image.Resampling.LANCZOS)
+            imagen = ImageTk.PhotoImage(fondo, master=self.root)
+        except (OSError, ValueError, tk.TclError):
+            return None
+        self._fondo = (clave, imagen)
+        return imagen
 
     def fotogramas_jugador(self, ancho, alto):
         clave = (int(ancho), int(alto))
@@ -45,6 +63,7 @@ class RecursosGraficos:
     def imagen(self, nombre, ancho, alto):
         if Path(nombre).name != nombre:
             return None
+        ancho, alto = max(1, int(ancho)), max(1, int(alto))
         clave = (nombre, int(ancho), int(alto))
         for actual, imagen in self._imagenes:
             if actual == clave:

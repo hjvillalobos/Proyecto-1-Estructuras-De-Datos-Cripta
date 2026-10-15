@@ -11,3 +11,13 @@ NARANJA = "#e6ac73"
 MORADO = "#d9b4ee"
 PIEDRA = "#304039"
 BORDE = "#42544d"
+
+
+def configurar_botones_menu(root):
+    from tkinter import ttk
+    estilo = ttk.Style(root)
+    estilo.configure("Menu.TButton", font=("Segoe UI", 12), padding=(12, 9))
+    estilo.configure("Principal.Menu.TButton", background=AMARILLO, foreground=FONDO,
+                     bordercolor=AMARILLO)
+    estilo.map("Principal.Menu.TButton", background=[("active", VERDE), ("disabled", PANEL)],
+               foreground=[("disabled", TENUE)])

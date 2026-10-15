@@ -111,7 +111,14 @@ def ejecutar_juego(args, sesion, lanzador_replay):
                 controlador.iniciar()
             if not (args.gui and juego.resultado == "derrota" and vista.preguntar_reinicio()):
                 break
-            sesion.renovar()
+            while True:
+                try:
+                    sesion.renovar(tolerar_error=True)
+                    break
+                except (ErrorCripta, OSError) as error:
+                    vista.mostrar_error_replay(f"No se pudo reiniciar la partida: {error}")
+                    if not elegir_inicio():
+                        return 0
             semilla = args.semilla if args.semilla is not None else random.randint(0, 2**32 - 1)
             vista.reiniciar_presentacion()
     finally:

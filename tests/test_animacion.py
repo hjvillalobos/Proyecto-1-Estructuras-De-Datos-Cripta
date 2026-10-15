@@ -13,6 +13,75 @@ from tests import test_regresiones_juego as base
 
 
 class TestAnimacion(unittest.TestCase):
+    def test_carrera_repite_cuadros_y_se_asienta_sin_salto(self):
+        root, canvas = Mock(), Mock()
+        canvas.coords.return_value = [145, 200]
+        animacion = AnimacionEscena(root, canvas)
+        animacion.agregar(1, entrada=True, desplazamiento=(-65, 0), carrera=True)
+        animacion.secuencia(1, ["a", "b", "c", "d"], reposo="quieto",
+                            pasos_por_cuadro=4, duracion=32, repetir=True)
+        for _ in range(16):
+            animacion._avanzar()
+        canvas.itemconfig.assert_called_with(1, image="a")
+        x_mitad = canvas.coords.call_args.args[1]
+        self.assertGreater(x_mitad, 80)
+        self.assertLess(x_mitad, 145)
+        for _ in range(16):
+            animacion._avanzar()
+        canvas.itemconfig.assert_called_with(1, image="quieto")
+        self.assertEqual(canvas.coords.call_args.args[1], 145)
+        animacion.detener()
+
+    def test_efectos_temporales_se_eliminan_al_terminar_o_cancelar(self):
+        root, canvas = Mock(), Mock()
+        canvas.coords.return_value = [20, 30, 28, 30]
+        animacion = AnimacionEscena(root, canvas)
+        animacion.particula(7, duracion=2)
+        animacion.iniciar()
+        root.after.assert_called_once_with(20, animacion._avanzar)
+        animacion._avanzar()
+        self.assertNotEqual(canvas.coords.call_args.args, (7, 20, 30, 28, 30))
+        animacion._avanzar()
+        canvas.delete.assert_called_with(7)
+        animacion.detener()
+        self.assertEqual(animacion.particulas, [])
+        self.assertIsNone(animacion.pendiente)
+
+    def test_redibujar_preserva_progreso_y_no_modifica_el_motor(self):
+        datos = base.TestRegresionesJuego()
+        datos.setUp()
+        try:
+            vista = VistaGrafica()
+        except tk.TclError as error:
+            self.skipTest(str(error))
+        try:
+            vista.root.withdraw()
+            inicial = datos.motor.estado_vista()
+            vista.mostrar_estado(inicial, [])
+            estado = deepcopy(inicial)
+            estado.sala_id = 2
+            estado.reloj = 100
+            vista.preparar_animacion("mover")
+            vista.mostrar_estado(estado, [])
+            antes = datos.motor.exportar_estado()
+            for _ in range(10):
+                # Pasos manuales: cancelar el callback anterior evita duplicarlo.
+                a = vista.escena.animacion
+                vista.root.after_cancel(a.pendiente)
+                a.pendiente = None
+                a._avanzar()
+            vista._redimensionar()
+            self.assertEqual(vista.escena.animacion.paso, 10)
+            self.assertEqual(vista.escena._accion_en_curso, "correr")
+            self.assertEqual(datos.motor.exportar_estado(), antes)
+            self.assertEqual(vista._cola, [])
+            vista.var_movimiento.set(False)
+            vista._alternar_movimiento()
+            self.assertIsNone(vista.escena.animacion)
+            self.assertEqual(vista.canvas.find_withtag("efecto_visual"), ())
+        finally:
+            vista.cerrar()
+
     def test_secuencia_avanza_y_vuelve_a_reposo(self):
         root, canvas = Mock(), Mock()
         animacion = AnimacionEscena(root, canvas)

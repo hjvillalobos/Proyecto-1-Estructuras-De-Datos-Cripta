@@ -10,12 +10,13 @@ class RegistroTurno:
     completa del estado del juego.
     """
 
-    def __init__(self, reloj_anterior: int, registro_rastro, cola=None):
+    def __init__(self, reloj_anterior: int, registro_rastro, cola=None, referencias=()):
         self.reloj_anterior = reloj_anterior
         self._registro_rastro = registro_rastro
         self._cola = cola
         self.cambios = []
         self.cambios_fallo = []
+        self.referencias = list(referencias)
 
     def registrar_cambio(self, deshacer):
         self.cambios.append(deshacer)
@@ -98,9 +99,9 @@ class HistorialRetroceso:
 
     # --- ciclo de vida de un turno ---
 
-    def iniciar_turno(self, reloj_actual: int):
+    def iniciar_turno(self, reloj_actual: int, referencias=()):
         """Se llama justo antes de ejecutar una acción del jugador."""
-        self._turno_actual = RegistroTurno(reloj_actual, self._registro_rastro, self._cola)
+        self._turno_actual = RegistroTurno(reloj_actual, self._registro_rastro, self._cola, referencias)
 
     def descartar_turno(self):
         """Una accion rechazada no deja cambios ni ocupa historial."""
@@ -170,6 +171,9 @@ class HistorialRetroceso:
 
     def cantidad_turnos(self) -> int:
         return len(self._turnos)
+
+    def referencias_retroceso(self):
+        return list(self._turnos[-1].referencias) if self._turnos else []
 
     def usar_pergamino(self, inventario, tipo_pergamino: str = "itm_pergamino_retroceso"):
         """

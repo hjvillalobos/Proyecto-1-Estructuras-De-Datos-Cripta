@@ -298,51 +298,8 @@ class VistaGrafica:
         return (simpledialog.askstring("CRIPTA", pregunta, parent=self.root) or "").strip()
 
     def elegir_cripta(self, criptas):
-        """Diálogo de selección de cripta. Devuelve el id o None si se cierra."""
-        dlg = tk.Toplevel(self.root)
-        dlg.title("Elige una cripta")
-        dlg.configure(bg=FONDO)
-        dlg.transient(self.root)
-        tk.Label(dlg, text="Elige una cripta", bg=FONDO, fg=TEXTO,
-                 font=("TkDefaultFont", 12, "bold")).pack(padx=14, pady=(14, 6))
-        lb = tk.Listbox(dlg, width=58, height=max(3, min(12, len(criptas))), bg=PANEL, fg=TEXTO,
-                        selectbackground=AZUL, selectforeground="black", relief="flat",
-                        exportselection=False)
-        for c in criptas:
-            lb.insert("end", f"{c['nombre']}  "
-                             f"({c['salas']} salas, dificultad {c['dificultad']})")
-        lb.pack(padx=14)
-        if criptas:
-            lb.selection_set(0)
-        elegido = []
-
-        def aceptar(_evento=None):
-            seleccion = lb.curselection()
-            if seleccion:
-                elegido.append(criptas[seleccion[0]]["id"])
-                dlg.destroy()
-
-        lb.bind("<Double-Button-1>", aceptar)
-        lb.bind("<Return>", aceptar)
-        dlg.bind("<Escape>", lambda _evento: dlg.destroy())
-        controles = tk.Frame(dlg, bg=FONDO)
-        controles.pack(pady=12)
-        ttk.Button(controles, text="Volver", command=dlg.destroy).pack(side="left", padx=4)
-        ttk.Button(controles, text="Jugar", command=aceptar,
-                   state="normal" if criptas else "disabled").pack(side="left", padx=4)
-        if not criptas:
-            tk.Label(dlg, text="No hay criptas disponibles.", bg=FONDO, fg=TEXTO).pack(pady=8)
-        dlg.protocol("WM_DELETE_WINDOW", dlg.destroy)
-        dlg.grab_set()
-        lb.focus_set()
-        en_menu = getattr(self, "_en_menu", False)
-        self._en_menu = True
-        try:
-            self.root.wait_window(dlg)
-        finally:
-            self._en_menu = en_menu
-            self._cola.clear()
-        return elegido[0] if elegido else None
+        from vista.selector_cripta import SelectorCripta
+        return SelectorCripta(self, criptas).mostrar()
 
     # ------------------------------------------------------------------
     # Inventario (lado derecho)

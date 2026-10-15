@@ -1,6 +1,7 @@
 """Seleccion de criptas y comprobacion opcional del paquete oficial descargado."""
 import io
 import os
+import shutil
 import tempfile
 import tkinter as tk
 import unittest
@@ -89,8 +90,14 @@ class TestSeleccionCriptas(unittest.TestCase):
 
 @unittest.skipUnless(os.environ.get("CRIPTA_PAQUETE_API"), "Paquete oficial opcional no indicado")
 class TestPaqueteOficial(unittest.TestCase):
+    def setUp(self):
+        temporal = tempfile.TemporaryDirectory()
+        self.addCleanup(temporal.cleanup)
+        self.carpeta = str(Path(temporal.name) / "paquete")
+        shutil.copytree(os.environ["CRIPTA_PAQUETE_API"], self.carpeta)
+
     def test_partidas_hasta_victoria_y_replay_en_las_cuatro_criptas(self):
-        carpeta = os.environ["CRIPTA_PAQUETE_API"]
+        carpeta = self.carpeta
         for cripta in CRIPTAS:
             with self.subTest(cripta=cripta["id"]), tempfile.TemporaryDirectory() as salida:
                 cliente = ClienteOffline(carpeta)
@@ -178,7 +185,7 @@ class TestPaqueteOficial(unittest.TestCase):
                     precarga.cerrar()
 
     def test_todas_las_salas_iconos_guardado_y_carga(self):
-        carpeta = os.environ["CRIPTA_PAQUETE_API"]
+        carpeta = self.carpeta
         cliente = ClienteOffline(carpeta)
         criptas = cliente.listar_criptas()["criptas"]
         self.assertEqual(len(criptas), 4)

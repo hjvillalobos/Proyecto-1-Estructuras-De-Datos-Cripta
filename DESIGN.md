@@ -13,6 +13,12 @@ Tkinter. El aspecto nunca cambia estadisticas, costos, semillas ni reglas.
 - Georgia para titulos; Segoe UI para lectura; Consolas para tiempo virtual.
 - Los personajes son el foco. La escena ocupa el espacio disponible y el inventario
   mantiene un ancho estable, con desplazamiento propio.
+- Inicio y selector comparten `fondo_ladrillos.png`, muro ilustrado gris verdoso
+  con puerta de piedra y suelo. Se ajusta a sangre con Pillow; sin el archivo
+  sigue disponible la interfaz sobre el fondo solido. El boton Jugar usa oro.
+- El selector vive en `vista/selector_cripta.py`, usa una lista nativa accesible
+  por teclado y muestra por separado salas y dificultad de la seleccion.
+  No altera el reloj, la API, el modelo ni los identificadores de las criptas.
 
 ## Comportamiento
 
@@ -39,8 +45,12 @@ Tkinter. El aspecto nunca cambia estadisticas, costos, semillas ni reglas.
   tecla de seleccion entra en la cola de acciones. Las cuatro criptas conservan
   al jugador y los recursos compartidos; no se clonan vistas ni motores por nivel.
 
-- AnimacionEscena usa un solo callback de Tkinter cada 40 ms, sin acceder al modelo
-  ni al azar. Respiracion de 1.5 px, entrada de sala de 18 px y reaccion breve al dano.
+- AnimacionEscena usa un solo callback de Tkinter cada 20 ms, sin acceder al modelo
+  ni al azar. Respiracion de 1.5 px, carrera de 640 ms con dos ciclos de cuatro
+  poses (80 ms por cuadro), entrada direccional de hasta 65 px y reaccion al dano.
+  El ataque combina poses y una embestida de 24 px; polvo y trazo de ataque son
+  temporales y se eliminan al terminar o cancelar. No son objetos ni colisiones.
+  Redimensionar conserva el progreso visual; ninguna animacion bloquea comandos.
 - Solo se mueven sprites: nombres, salud, controles y zonas de clic permanecen
   estables. Los objetos conservan su etiqueta de recogida.
 - La casilla Animaciones permite desactivar el movimiento. Cambiar de sala,
