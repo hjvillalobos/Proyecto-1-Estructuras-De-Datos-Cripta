@@ -16,6 +16,7 @@ class RecursosGraficos:
         self._imagenes = []
         self._secuencias = []
         self._fondo = None
+        self._hoja_jugador = None
 
     def fondo(self, ancho, alto):
         """Fondo a sangre, con una sola variante de tamano retenida."""
@@ -34,23 +35,33 @@ class RecursosGraficos:
         self._fondo = (clave, imagen)
         return imagen
 
-    def fotogramas_jugador(self, ancho, alto):
-        clave = (int(ancho), int(alto))
+    def fotogramas_jugador(self, ancho, alto, invertir=False):
+        tamano = (int(ancho), int(alto))
+        clave = (*tamano, bool(invertir))
         for actual, imagenes in self._secuencias:
             if actual == clave:
                 return imagenes
         if Image is None:
             return ()
         try:
-            with Image.open(self.carpeta / "jugador_acciones.png") as origen:
-                hoja = origen.convert("RGBA")
+            if self._hoja_jugador is None:
+                with Image.open(self.carpeta / "jugador_acciones.png") as origen:
+                    self._hoja_jugador = origen.convert("RGBA")
+            hoja = self._hoja_jugador
             w, h = hoja.width // 4, hoja.height // 2
             imagenes = []
             for indice in range(8):
                 fila, col = divmod(indice, 4)
                 cuadro = hoja.crop((col * w, fila * h + int(h * .19),
                                    (col + 1) * w, fila * h + int(h * .88)))
-                cuadro.thumbnail(clave, Image.Resampling.LANCZOS)
+                if invertir:
+                    cuadro = cuadro.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
+                cuadro.thumbnail(tamano, Image.Resampling.LANCZOS)
+                limite = cuadro.getchannel("A").point(lambda a: 255 if a >= 32 else 0).getbbox()
+                if limite is not None and limite[3] < cuadro.height:
+                    alineado = Image.new("RGBA", cuadro.size)
+                    alineado.paste(cuadro, (0, cuadro.height - limite[3]))
+                    cuadro = alineado
                 imagenes.append(ImageTk.PhotoImage(cuadro, master=self.root))
         except (OSError, ValueError, tk.TclError):
             return ()

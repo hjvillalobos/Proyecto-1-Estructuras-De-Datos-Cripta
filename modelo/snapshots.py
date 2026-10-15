@@ -203,6 +203,8 @@ class EstadoVista:
     trampas: list[TrampaVista] = field(default_factory=list)
     agenda: list[EventoVista] = field(default_factory=list)
     costos: list[tuple[str, int]] = field(default_factory=list)
+    arma_tipo: str | None = None
+    armadura_tipo: str | None = None
 
 
 @dataclass

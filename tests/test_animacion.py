@@ -19,14 +19,14 @@ class TestAnimacion(unittest.TestCase):
         animacion = AnimacionEscena(root, canvas)
         animacion.agregar(1, entrada=True, desplazamiento=(-65, 0), carrera=True)
         animacion.secuencia(1, ["a", "b", "c", "d"], reposo="quieto",
-                            pasos_por_cuadro=4, duracion=32, repetir=True)
-        for _ in range(16):
+                            pasos_por_cuadro=2, duracion=16, repetir=True)
+        for _ in range(8):
             animacion._avanzar()
         canvas.itemconfig.assert_called_with(1, image="a")
         x_mitad = canvas.coords.call_args.args[1]
         self.assertGreater(x_mitad, 80)
         self.assertLess(x_mitad, 145)
-        for _ in range(16):
+        for _ in range(8):
             animacion._avanzar()
         canvas.itemconfig.assert_called_with(1, image="quieto")
         self.assertEqual(canvas.coords.call_args.args[1], 145)
@@ -64,14 +64,14 @@ class TestAnimacion(unittest.TestCase):
             vista.preparar_animacion("mover")
             vista.mostrar_estado(estado, [])
             antes = datos.motor.exportar_estado()
-            for _ in range(10):
+            for _ in range(5):
                 # Pasos manuales: cancelar el callback anterior evita duplicarlo.
                 a = vista.escena.animacion
                 vista.root.after_cancel(a.pendiente)
                 a.pendiente = None
                 a._avanzar()
             vista._redimensionar()
-            self.assertEqual(vista.escena.animacion.paso, 10)
+            self.assertEqual(vista.escena.animacion.paso, 5)
             self.assertEqual(vista.escena._accion_en_curso, "correr")
             self.assertEqual(datos.motor.exportar_estado(), antes)
             self.assertEqual(vista._cola, [])

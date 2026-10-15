@@ -81,7 +81,11 @@ def ejecutar_juego(args, sesion, lanzador_replay):
                         return 0
                 versiones = (dict(version_cripta=estado_inicial.meta.cripta_version,
                                   version_catalogo=estado_inicial.meta.catalogo_version)
-                             if estado_inicial is not None else {})
+                             if estado_inicial is not None else {
+                                 campo: valor for campo, valor in (
+                                     ("version_cripta", getattr(args, "version_cripta", None)),
+                                     ("version_catalogo", getattr(args, "version_catalogo", None)))
+                                 if valor is not None})
                 juego = crear_juego(sesion.precarga, args.cripta, semilla, **versiones)
             except (ErrorCripta, OSError) as error:
                 if not args.gui:

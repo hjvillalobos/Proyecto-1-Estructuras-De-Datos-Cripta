@@ -47,16 +47,45 @@ Tkinter. El aspecto nunca cambia estadisticas, costos, semillas ni reglas.
 
 - AnimacionEscena usa un solo callback de Tkinter cada 20 ms, sin acceder al modelo
   ni al azar. Respiracion de 1.5 px, carrera de 640 ms con dos ciclos de cuatro
-  poses (80 ms por cuadro), entrada direccional de hasta 65 px y reaccion al dano.
+  poses (40 ms por cuadro de carrera), entrada direccional y reaccion al dano.
   El ataque combina poses y una embestida de 24 px; polvo y trazo de ataque son
   temporales y se eliminan al terminar o cancelar. No son objetos ni colisiones.
   Redimensionar conserva el progreso visual; ninguna animacion bloquea comandos.
 - Solo se mueven sprites: nombres, salud, controles y zonas de clic permanecen
   estables. Los objetos conservan su etiqueta de recogida.
+- El snapshot presenta los tipos de arma y armadura realmente equipadas.
+  `equipo_visual.py` ancla sus imagenes al torso y a la mano del jugador, usando
+  coordenadas artisticas de las poses existentes. Siguen carrera, ataque y dano.
+  Al recoger un objeto se sostiene unos 45 pasos visuales; mientras tanto se
+  oculta el arma dibujada, no su efecto real. Soltar, cargar, retroceder y reiniciar
+  actualizan la apariencia desde el modelo. No se cambia el guardado ni la API.
+  Con Animaciones desactivadas se conserva el equipo estatico y se omite el gesto.
 - La casilla Animaciones permite desactivar el movimiento. Cambiar de sala,
   redimensionar, reiniciar o cerrar cancela el callback y libera sus referencias.
 - No hay movimiento libre ni ataques automaticos. Las flechas siguen siendo
   acciones discretas entre salas; el reloj virtual solo pertenece al motor.
+- Cada movimiento aceptado puede mostrar salida y entrada: 10 pasos visuales
+  hasta la puerta de origen, cambio de escena y carrera desde el lado opuesto
+  hasta un punto de llegada dependiente de la direccion. Se mantiene la escala
+  durante el recorrido; hacia la izquierda se invierte la carrera.
+  Sombra, equipo y etiqueta acompanian al jugador. No hay posiciones de combate,
+  distancias, colisiones ni tiempo adicional en el modelo.
+  La entrada dura 16 pasos: salida y entrada suman unos 520 ms con callbacks
+  de 20 ms. La puerta cierra en 4 pasos (80 ms) y se retira al paso 12 de entrada.
+- Los fotogramas alinean los pies y el desplazamiento mantiene velocidad uniforme,
+  con oscilacion leve. La entrada comienza en la puerta, sin destello en el destino.
+  `PuertaVisual` aparece al acercarse, abre sus hojas y cierra tras la entrada;
+  luego se retira. Es decorativa: no abre cerraduras ni modifica el cierre logico.
+- `TransicionSalas` solo usa snapshots y el callback existente de AnimacionEscena.
+  Restaurar un paso actualiza de inmediato posicion, fotograma, equipo y puerta,
+  sin avanzar el reloj visual ni duplicar callbacks. La paginacion se ignora
+  durante la salida para no dejar visible un snapshot de la sala anterior.
+  La sala inicial prepara ambas orientaciones de carrera; la hoja RGBA se
+  decodifica una vez por vista y se reutiliza al cambiar el tamano.
+  Cargar, retroceder, una nueva accion o desactivar movimiento cancelan el recorrido
+  anterior; redimensionar conserva su avance. Durante la salida no se aceptan clics
+  sobre actores de la escena vieja; el teclado y los controles generales siguen
+  disponibles. Con movimiento desactivado se muestra directamente la sala destino.
 - El jugador tiene una hoja 4x2 de fotogramas: carrera (0-3), ataque (4-5),
   caida (6-7). El controlador anuncia solo acciones aceptadas; el replay usa
   el mismo aviso. No se infiere un ataque a partir de dano automatico.

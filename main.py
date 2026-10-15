@@ -135,7 +135,10 @@ def main(argv=None):
         print("Falta requests. Instálalo con: python -m pip install requests", file=sys.stderr)
         return 1
     finally:
-        sesion.cerrar(reportar=True)
+        try:
+            sesion.cerrar(reportar=True)
+        except (ErrorCripta, OSError) as error:
+            print(f"Aviso al cerrar la sesion: {error}", file=sys.stderr)
 
 
 if __name__ == "__main__":

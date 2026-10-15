@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
 from vista.recursos_graficos import RecursosGraficos
 from vista.escena import EscenaCripta
+from vista.transicion_salas import TransicionSalas
 
 from vista.tema import FONDO, PANEL, SALA, TEXTO, TENUE, VERDE, ROJO, AMARILLO, AZUL, NARANJA, MORADO, PIEDRA, BORDE
 
@@ -54,6 +55,7 @@ class VistaGrafica:
 
         self.recursos = RecursosGraficos(self.root)
         self.escena = EscenaCripta(self)
+        self.transicion_salas = TransicionSalas(self)
         self._estado = None
         self._animaciones = []
         self._movimiento_activo = True
@@ -210,7 +212,11 @@ class VistaGrafica:
 
     def _redimensionar(self, _evento=None):
         if getattr(self, "_estado", None) is not None and not self._cerrada:
-            self._dibujar_sala(self._estado)
+            transicion = getattr(self, "transicion_salas", None)
+            if transicion is not None and transicion.activa:
+                transicion.redibujar()
+            else:
+                self._dibujar_sala(self._estado)
         if hasattr(self, "lbl_aviso"):
             self.lbl_aviso.config(wraplength=max(400, self.canvas.winfo_width() - 16))
 
@@ -227,6 +233,8 @@ class VistaGrafica:
         self._accion_visual = accion
 
     def _clic_accion(self, comando):
+        if getattr(self, "transicion_salas", None) is not None and self.transicion_salas.activa:
+            return
         anterior, instante = getattr(self, "_ultimo_clic", ("", 0))
         ahora = time.monotonic()
         if comando == anterior and ahora - instante < .25:
@@ -371,8 +379,12 @@ class VistaGrafica:
             return
         anterior = self._estado
         self._estado = e
-        if e != anterior:
-            self._dibujar_sala(e)
+        if e != anterior or getattr(self, "_accion_visual", None) in ("cargar", "retroceso"):
+            recorrido = (anterior is not None and anterior.sala_id != e.sala_id
+                         and getattr(self, "_accion_visual", None) == "mover"
+                         and self.transicion_salas.mostrar(anterior, e))
+            if not recorrido:
+                self._dibujar_sala(e)
         self._actualizar_stats(e)
         self._actualizar_log(mensajes)
         self._mostrar_detalle()
@@ -393,7 +405,10 @@ class VistaGrafica:
             return VERDE
         return AMARILLO if fraccion > 0.25 else ROJO
 
-    def _dibujar_sala(self, e):
+    def _dibujar_sala(self, e, salir_hacia=None):
+        transicion = getattr(self, "transicion_salas", None)
+        if transicion is not None and salir_hacia is None:
+            transicion.cancelar()
         anterior = getattr(self, "_estado_sala", None)
         if anterior is None or anterior.sala_id != e.sala_id:
             self._pagina_enemigos = self._pagina_objetos = 0
@@ -402,9 +417,11 @@ class VistaGrafica:
         self._pagina_objetos = min(self._pagina_objetos, max(0, (len(e.objetos_suelo) - 1) // 8))
         if not hasattr(self, "escena"):
             self.escena = EscenaCripta(self)
-        self.escena.dibujar(e)
+        self.escena.dibujar(e, salir_hacia=salir_hacia)
 
     def _cambiar_pagina(self, tipo, avance):
+        if getattr(self, "transicion_salas", None) is not None and self.transicion_salas.activa:
+            return
         atributo = f"_pagina_{tipo}"
         setattr(self, atributo, max(0, getattr(self, atributo) + avance))
         self._dibujar_sala(self._estado_sala)

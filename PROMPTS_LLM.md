@@ -294,3 +294,80 @@ progreso al redibujar y verificar cancelacion y estado del motor sin cambios.
 Todo permanece en la vista Tkinter; no se migra biblioteca ni se agrega movimiento
 libre, colisiones, azar o tiempo real a la simulacion del juego.
 
+# 2026-10-14: equipo visible y objetos recogidos
+
+Herramienta: Codex. Solicitudes textuales:
+
+> okay, necesito que hagas lo siguiente, que cuando el jugador recoja algun objeto o se ponga un chaleco que visualmente se vean sujetando el objeto, me entiendes?
+
+> que me recomiendas?
+
+> hazlo si, sigue el enunciado no rompas nada
+
+Uso: mantener arma y coraza visibles mientras estan equipadas, sostener brevemente
+el objeto recogido y volver al arma equipada. Se reutilizan PNG existentes y se
+agregan anclajes visuales por pose; el modelo solo comunica tipos equipados en su
+snapshot de presentacion. No se agrega tiempo, efecto, estado persistido ni HTTP.
+Pruebas de soltar, retroceso, carga, seguimiento de poses, cancelacion y simulacion
+intacta; capturas reales de reposo, carrera y recogida para revisar los anclajes.
+
+# 2026-10-14: recorrido visual hasta las puertas
+
+Herramienta: Codex. Prompt textual:
+
+> Necesito que implementes algo. como bien ya el jugador se mueve pero permanece en el mismo lugar siempre. Puedes hacer que se mueva para meterse a las salas no que se quede ahi en el mismo lugar, osea que corra por todo lado, como un juego normal no que se quede ahi parado haciendo movimientos, para que se vea que entro a las salas y asi, no se si me entiendes?
+
+Uso: salida hacia la puerta elegida y entrada visual en la siguiente sala,
+trayectos con coordenadas cambiantes, orientacion de la carrera, sombra y equipo
+vinculados, cancelacion de callbacks y pruebas de cuatro direcciones. Sin migrar
+Tkinter, agregar libre movimiento, colisiones, acciones o modificar tiempo virtual.
+
+# 2026-10-15: carrera y puerta de paso
+
+Herramienta: Codex. Prompt textual:
+
+> Okay me gusta la idea que estas haciendo pero visualmente siento que corre raro no se si lo puedes mejorar y no crees que esa puerta siempre ahi se ve fea? no es mejor que el jugador apenas se acerque a la sala se abra la puerta y cuando se pase a otra sala se cierre
+
+Uso: alinear pies de fotogramas, mantener escala y velocidad, evitar destello al
+entrar y mostrar hojas decorativas solo durante el paso. Pruebas de apertura,
+cierre, limpieza, posicion inicial y simulacion intacta. Las cerraduras siguen
+dependiendo del motor, sin apertura gratuita ni cambios al reloj virtual.
+
+# 2026-10-15: acelerar recorrido y cierre
+
+Herramienta: Codex. Prompt textual:
+
+> dale hazlo y que la puerta se cierre mas rapido
+
+Uso: reducir a la mitad salida, entrada y cadencia de carrera, sincronizar la
+apertura y cerrar las hojas en 80 ms. Mantener el callback visual de 20 ms y
+las reglas del motor. Actualizar pruebas de recorrido, cierre y estado intacto.
+
+# 2026-10-15: corregir transiciones y primer recorrido
+
+Herramienta: Codex. Prompt textual:
+
+> arregla esos bugs y tambien visualmente vi que al principio es lento, la primera vez entrando a la primera sala, revisa que el jugador pase de sala en sala bien, sin ningun problema o bug, que el juego quede 100% funcional
+
+Uso: bloquear paginacion durante salida, restaurar posicion y pose inmediatamente
+al redimensionar, precargar las orientaciones de carrera en la sala inicial y
+reutilizar la hoja decodificada. Pruebas de resize, paginacion, movimientos
+consecutivos, precarga, cuatro direcciones y suite con las cuatro criptas.
+La verificacion no constituye una garantia de ausencia total de defectos.
+
+# 2026-10-15: revision integral y cuatro correcciones
+
+Herramienta: Codex. Prompts textuales:
+
+> puedes revisar paso a paso todo el proyecto para ver si tiene algun bug
+
+Uso: revision por subsistemas, contraste con el enunciado, pruebas existentes y
+reproducciones de fallos en puertas, cargas inconsistentes, versiones y cierre.
+
+> corrige esos 4 bugs porfa, siguiendo el enunciado y los principios SOLID sin cambiar la estructura del proyecto, y agrega pruebas para verificarlos
+
+Uso: rechazar aperturas redundantes sin costo, conservar la acreditacion con
+llave de la salida, validar unicidad y tipo de turnos y cierres al cargar,
+propagar versiones solicitadas y reportar errores finales sin ocultar el error
+original. Nueve pruebas focalizadas y suite completa, sin cambiar la estructura MVC.
+

@@ -167,13 +167,18 @@ class Motor:
         salida = sala_actual.salidas.get(direccion)
         if salida is None:
             return False, "No hay puerta en esa dirección"
+        apertura = (sala_actual.id, direccion)
+        acreditar_salida = (salida["sala"] == self.sala_salida
+                            and salida.get("llave") == self.llave_salida
+                            and apertura not in self.puertas_abiertas_con_llave)
+        if not salida.get("cerrada", False) and not acreditar_salida:
+            return False, "La puerta ya esta abierta"
         llave_necesaria = salida.get("llave")
         if llave_necesaria and not self._tiene_llave(llave_necesaria):
             return False, "No tenés la llave correcta"
 
         self.historial.registrar_puerta(salida, "cerrada", salida.get("cerrada", False))
         salida["cerrada"] = False
-        apertura = (sala_actual.id, direccion)
         if llave_necesaria and apertura not in self.puertas_abiertas_con_llave:
             self.puertas_abiertas_con_llave.append(apertura)
             self.historial.registrar_cambio(lambda: self.puertas_abiertas_con_llave.remove(apertura))
@@ -516,6 +521,10 @@ class Motor:
             inventario_max=inventario_max,
             efectos=efectos_activos,
             trampas=trampas, agenda=agenda, costos=costos,
+            arma_tipo=(jug.inventario.arma_equipada_objeto.tipo_catalogo
+                       if jug.inventario.arma_equipada_objeto is not None else None),
+            armadura_tipo=(jug.inventario.armadura_equipada_objeto.tipo_catalogo
+                           if jug.inventario.armadura_equipada_objeto is not None else None),
         )
 
     def resumen(self):
@@ -696,7 +705,18 @@ class Motor:
                       ("fin_veneno", 2), ("pulso_regeneracion", 2), ("apagar_antorcha", 0),
                       ("rearmar_trampa", 0), ("cierre_puerta", 0), ("restaurar_velocidad", 1))
         secuencias = []
+        turnos_actores = []
+        cierres_puertas = []
         for evento in estado.eventos:
+            if evento.tipo in ("turno_jugador", "turno_enemigo"):
+                if (evento.objetivo in turnos_actores
+                        or (evento.tipo == "turno_jugador") != (evento.objetivo == "jugador")):
+                    raise ValueError("Guardado invalido: turno de actor duplicado o incompatible.")
+                turnos_actores.append(evento.objetivo)
+            elif evento.tipo == "cierre_puerta":
+                if evento.objetivo in cierres_puertas:
+                    raise ValueError("Guardado invalido: cierre de puerta duplicado.")
+                cierres_puertas.append(evento.objetivo)
             cantidad = next((n for tipo, n in cantidades if tipo == evento.tipo), None)
             if cantidad is None or len(evento.parametros) != cantidad or any(
                     type(p) is not int or p < 1 for p in evento.parametros):

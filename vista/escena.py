@@ -1,5 +1,8 @@
 from vista.tema import FONDO, PANEL, TEXTO, TENUE, VERDE, ROJO, AMARILLO, BORDE
-from vista.animacion import AnimacionEscena
+from vista.animacion import AnimacionEscena, PASOS_CARRERA
+from vista.equipo_visual import dibujar_equipo
+from vista.transicion_salas import punto_puerta
+from vista.puerta_visual import PuertaVisual
 
 
 class EscenaCripta:
@@ -12,6 +15,10 @@ class EscenaCripta:
         self.anterior = None
         self._accion_en_curso = None
         self._entrada_en_curso = (0, 0)
+        self._objeto_recogido = None
+        self._salir_hacia = None
+        self._posicion_relativa = .20
+        self._direccion_entrada = None
 
     def detener(self):
         if self.animacion is not None:
@@ -28,12 +35,19 @@ class EscenaCripta:
             self.imagenes.append(imagen)
         return imagen
 
-    def dibujar(self, estado):
+    def dibujar(self, estado, salir_hacia=None):
         v, c = self.vista, self.vista.canvas
+        self._salir_hacia = salir_hacia
         continuar = (estado == self.anterior and self.animacion is not None
                      and getattr(v, "_accion_visual", None) is None)
         paso_anterior = self.animacion.paso if continuar else 0
         accion_anterior = self._accion_en_curso if continuar else None
+        if not continuar:
+            self._direccion_entrada = None
+            self._objeto_recogido = None
+            if getattr(v, "_accion_visual", None) == "recoger" and self.anterior is not None:
+                self._objeto_recogido = next((objeto for objeto in self.anterior.objetos_suelo
+                    if not any(actual.instancia == objeto.instancia for actual in estado.objetos_suelo)), None)
         self.detener()
         if hasattr(v, "root") and getattr(v, "_movimiento_activo", True):
             self.animacion = AnimacionEscena(v.root, c)
@@ -84,6 +98,13 @@ class EscenaCripta:
         self._enemigos(estado, ancho, alto, c)
         self._objetos(estado, ancho, alto, c)
         if self.animacion is not None:
+            if self.anterior is None:
+                recursos = getattr(v, "recursos", None)
+                if recursos is not None:
+                    for invertir in (False, True):
+                        recursos.fotogramas_jugador(290, int(min(280, alto - 175)), invertir=invertir)
+            if salir_hacia is None:
+                self.animacion.situar(paso_anterior)
             self.animacion.iniciar()
         self.anterior = estado
         v._accion_visual = None
@@ -101,6 +122,20 @@ class EscenaCripta:
                 c.create_rectangle(x - 13, 92, x + 13, 148, fill="#3a4b41", outline=BORDE)
 
     def _puertas(self, estado, ancho, alto, c):
+        direccion = None
+        entrando = self._salir_hacia is None
+        if not entrando:
+            direccion = next((s.direccion for s in estado.salidas
+                              if s.destino == self._salir_hacia), None)
+        elif self._accion_jugador(estado) == "correr" and self.anterior is not None:
+            previa = next((s.direccion for s in self.anterior.salidas
+                           if s.destino == estado.sala_id), None)
+            direccion = {"N": "S", "S": "N", "E": "O", "O": "E"}.get(previa)
+            self._direccion_entrada = direccion
+        elif self._continuar_movimiento:
+            direccion = self._direccion_entrada
+        if direccion is not None and self.animacion is not None:
+            self.animacion.decorar(PuertaVisual(c, punto_puerta(direccion, ancho, alto), entrando))
         sur_x = 145 if len(estado.enemigos) > 4 else ancho / 2
         posiciones = (("N", ancho / 2, 40), ("S", sur_x, alto - 108),
                       ("O", 44, alto / 2), ("E", ancho - 44, alto / 2))
@@ -122,36 +157,55 @@ class EscenaCripta:
             self.vista._ligar(etiqueta, f"{verbo} {salida.direccion}")
 
     def _jugador(self, estado, alto, c):
-        px, py = 145, alto - 150
+        ancho = c.winfo_width()
+        ancho = max(700, ancho) if isinstance(ancho, int) else self.vista.ANCHO
+        anterior = self.anterior
+        direccion = next((s.direccion for s in getattr(anterior, "salidas", [])
+                          if s.destino == estado.sala_id), "E")
+        accion_nueva = self._accion_jugador(estado)
+        if accion_nueva == "correr" and anterior is not None and anterior.sala_id != estado.sala_id:
+            self._posicion_relativa = {"N": .31, "S": .20, "E": .27, "O": .18}[direccion]
+        elif anterior is None or getattr(self.vista, "_accion_visual", None) in ("cargar", "retroceso"):
+            self._posicion_relativa = .20
+        px = min(ancho * self._posicion_relativa, 210 if len(estado.enemigos) > 4 else 240)
+        py = alto - 150
         self.vista._jugador_xy = (px, py)
-        c.create_oval(px - 68, py - 16, px + 68, py + 10, fill="#0b1512", outline="")
-        imagen = self._imagen("jugador", 230, min(280, alto - 175))
+        sombra = c.create_oval(px - 68, py - 16, px + 68, py + 10, fill="#0b1512", outline="")
+        altura_jugador = int(min(280, alto - 175))
+        imagen = self._imagen("jugador", 230, altura_jugador)
         if imagen is not None:
             sprite = c.create_image(px, py, image=imagen, anchor="s", tags=("jugador",))
+            cuadros = ()
+            indices = ()
             anterior = self.anterior
             accion = self._accion_jugador(estado)
             if accion is None and self._continuar_movimiento:
                 accion = self._accion_en_curso
             self._accion_en_curso = accion
-            direccion = next((s.direccion for s in getattr(anterior, "salidas", [])
-                              if s.destino == estado.sala_id), "E")
-            entrada = {"N": (-28, -18), "S": (28, -18), "E": (-65, 0), "O": (65, 0)}[direccion]
+            opuesta = {"N": "S", "S": "N", "E": "O", "O": "E"}[direccion]
+            inicio = punto_puerta(opuesta, ancho, alto)
+            entrada = (inicio[0] - px, inicio[1] - py)
             if self._continuar_movimiento:
                 entrada = self._entrada_en_curso
             self._entrada_en_curso = entrada
-            self._actor(sprite, entrada=accion == "correr",
+            invertir = accion == "correr" and entrada[0] > 0
+            if self._salir_hacia is not None:
+                salida = next((s for s in estado.salidas if s.destino == self._salir_hacia), None)
+                if salida is not None:
+                    invertir = punto_puerta(salida.direccion, ancho, alto)[0] < px
+            self._actor(sprite, entrada=accion == "correr" and self._salir_hacia is None,
                         golpe=anterior is not None and estado.vida < anterior.vida,
                         desplazamiento=entrada, carrera=accion == "correr", ataque=accion == "atacar")
             if self.animacion is not None:
                 if accion:
-                    cuadros = self.vista.recursos.fotogramas_jugador(290, min(280, alto - 175))
+                    cuadros = self.vista.recursos.fotogramas_jugador(290, altura_jugador, invertir=invertir)
                     self.imagenes.extend(cuadros)
                     indices = {"correr": (0, 1, 2, 3), "atacar": (4, 5), "caer": (6, 7)}[accion]
                     if len(cuadros) == 8:
                         self.animacion.secuencia(sprite, [cuadros[i] for i in indices],
                                                 reposo=imagen, mantener=accion == "caer",
-                                                pasos_por_cuadro=4 if accion == "correr" else 6,
-                                                duracion=32 if accion == "correr" else 18,
+                                                pasos_por_cuadro=2 if accion == "correr" else 6,
+                                                duracion=PASOS_CARRERA if accion == "correr" else 18,
                                                 repetir=accion == "correr")
                     if accion == "correr":
                         for i in range(4):
@@ -165,12 +219,18 @@ class EscenaCripta:
                                               px + 95, py - 105, smooth=True,
                                               fill=AMARILLO, width=3, tags=("efecto_visual",))
                         self.animacion.particula(golpe, duracion=14, desplazamiento=(16, 0))
+            elegidos = [cuadros[i] for i in indices] if len(cuadros) == 8 else ()
+            dibujar_equipo(self, estado, sprite, imagen, elegidos, accion, self._objeto_recogido,
+                            invertir=invertir)
         else:
             c.create_oval(px - 22, py - 90, px + 22, py - 46, fill=AMARILLO, outline=TEXTO, tags=("jugador",))
             c.create_polygon(px - 38, py - 42, px + 38, py - 42, px + 25, py, px - 25, py,
                              fill="#537c67", outline=TEXTO, tags=("jugador",))
-        c.create_text(px, py + 15, text=f"Jugador  {estado.vida}/{estado.vida_max}",
+        etiqueta = c.create_text(px, py + 15, text=f"Jugador  {estado.vida}/{estado.vida_max}",
                       fill=self.vista._color_vida(estado.vida, estado.vida_max), font=("Segoe UI", 11, "bold"))
+        if imagen is not None and self.animacion is not None and self._accion_en_curso == "correr":
+            self.animacion.anclar(sombra, sprite, (-68, -16, 68, 10))
+            self.animacion.anclar(etiqueta, sprite, (0, 15))
 
     def _accion_jugador(self, estado):
         if estado.vida <= 0:
@@ -179,7 +239,9 @@ class EscenaCripta:
         accion = getattr(self.vista, "_accion_visual", None)
         if accion in ("cargar", "retroceso"):
             return None
-        if anterior is None or estado.reloj < anterior.reloj:
+        if self._salir_hacia is not None:
+            return "correr"
+        if anterior is None or getattr(estado, "reloj", 0) < getattr(anterior, "reloj", 0):
             return None
         if anterior.sala_id != estado.sala_id:
             return "correr"
