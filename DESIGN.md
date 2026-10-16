@@ -13,11 +13,22 @@ Tkinter. El aspecto nunca cambia estadisticas, costos, semillas ni reglas.
 - Georgia para titulos; Segoe UI para lectura; Consolas para tiempo virtual.
 - Los personajes son el foco. La escena ocupa el espacio disponible y el inventario
   mantiene un ancho estable, con desplazamiento propio.
-- Inicio y selector comparten `fondo_ladrillos.png`, muro ilustrado gris verdoso
-  con puerta de piedra y suelo. Se ajusta a sangre con Pillow; sin el archivo
-  sigue disponible la interfaz sobre el fondo solido. El boton Jugar usa oro.
+- El jugador se muestra al 70% de la altura anterior, tanto en reposo como en
+  carrera, ataque y caida; el equipo y la sombra conservan sus anclajes.
+- Sala, inicio y selector comparten `fondo_cripta_ilustrado.png`: piedra pintada,
+  contornos de tinta, luz ambar izquierda y sombras carbon; no contiene puertas.
+  La fuente separa pared y suelo al 58%; la sala reparte ambos planos al 50%
+  para mantener mas suelo visible.
+  El fondo anterior y la mamposteria quedan como respaldos locales.
+- El tigre y su hoja de animacion originales permanecen intactos. La rata conserva
+  su ilustracion, orientada hacia el jugador. `guardian_ilustrado.png` sustituye
+  la presentacion realista del guardian. Objetos y trampa proceden de recortes
+  verificados de `objetos_ilustrados.png`; sus PNG previos quedan como respaldo.
+  El boton Jugar usa oro; las estadisticas conservan sus colores funcionales.
 - El selector vive en `vista/selector_cripta.py`, usa una lista nativa accesible
   por teclado y muestra por separado salas y dificultad de la seleccion.
+  Ocupa la ventana principal completa, sin ventana modal ni tablero visible
+  detras. Enter o doble clic confirma; Volver y Escape regresan al inicio.
   No altera el reloj, la API, el modelo ni los identificadores de las criptas.
 
 ## Comportamiento
@@ -32,7 +43,28 @@ Tkinter. El aspecto nunca cambia estadisticas, costos, semillas ni reglas.
   incompatibles. Seleccionar, ordenar y cambiar de pagina no consume tiempo.
 - Los mensajes del motor llegan al buffer circular existente de 20 entradas.
 - Dano flotante y escalado de imagenes pertenecen exclusivamente a la vista.
+- Sonidos breves de acciones aceptadas y fin de partida pertenecen a la vista.
+  `Sonidos` encapsula winsound asincrono, WAV locales sintetizados y limpieza;
+  no usa eventos del motor ni azar. La casilla Sonido permite silenciar y se
+  conserva entre partidas. Sin backend o dispositivo, la partida sigue sin audio.
+  Motivo de inicio original en modo menor, campanas inarmonicas, graves y eco
+  finito. Pasos y puertas usan ruido filtrado y golpes amortiguados, no tonos
+  puros. La sintesis no utiliza random ni grabaciones o melodias de otros juegos.
 - Se verifican 1280x800 y 1100x760, incluyendo escenas pobladas, equipo y replay.
+- `FinPartida` reemplaza el aviso nativo de resultado por una pantalla completa
+  con piedra, tigre, resultado y resumen real. No contiene un segundo motor.
+  Derrota ofrece Jugar de nuevo y Terminar; Escape equivale a Terminar. La vista
+  conserva esa respuesta para la consulta existente del controlador, sin repetir
+  la pregunta. En replay solo permite cerrar la reproduccion. La capa bloquea
+  comandos, limpia la cola y restaura foco/enlaces al cerrarse.
+  Las estadisticas estan ocultas inicialmente; Ver/Ocultar estadisticas despliega
+  el resumen en la misma pantalla y desplaza los botones principales sin taparlos.
+  El despliegue conserva su estado al redimensionar y no crea acciones del motor.
+- `NombrePuntaje` sustituye la entrada nativa del nombre por un dialogo centrado
+  con piedra, titulo Georgia, campo de alto contraste y botones del menu.
+  Enter confirma; Escape, Cancelar y la X devuelven texto vacio como antes
+  (el controlador conserva Jugador como nombre predeterminado). El grab es local,
+  se libera al cerrar y ninguna tecla pasa a la cola de acciones del juego.
 
 ## Movimiento visual
 
@@ -60,6 +92,14 @@ Tkinter. El aspecto nunca cambia estadisticas, costos, semillas ni reglas.
   oculta el arma dibujada, no su efecto real. Soltar, cargar, retroceder y reiniciar
   actualizan la apariencia desde el modelo. No se cambia el guardado ni la API.
   Con Animaciones desactivadas se conserva el equipo estatico y se omite el gesto.
+- La coraza de cuero equipada usa su PNG como ropa, no el icono de inventario:
+  se ajusta al torso en reposo y en los ocho fotogramas antes de reducir/reflejar
+  la imagen. Conserva el alfa del tigre, su cabeza, brazos y piernas. El antebrazo
+  adelantado queda delante de la ropa en el segundo ataque. Las variantes tienen
+  caches acotadas; los PNG originales no se sobrescriben. Sin Pillow o sin el
+  recurso se conserva la presentacion anterior como respaldo.
+  La ropa en reposo cubre un 25% del ancho del recurso del tigre, hasta la cintura;
+  las poses amplian un 20% el ancho y un 8% el largo de sus anclajes de torso.
 - La casilla Animaciones permite desactivar el movimiento. Cambiar de sala,
   redimensionar, reiniciar o cerrar cancela el callback y libera sus referencias.
 - No hay movimiento libre ni ataques automaticos. Las flechas siguen siendo
@@ -92,3 +132,8 @@ Tkinter. El aspecto nunca cambia estadisticas, costos, semillas ni reglas.
 - Las secuencias duran cientos de milisegundos reales sin bloquear comandos;
   un estado nuevo las reemplaza. La caida conserva la ultima pose. Sin Pillow,
   sin la hoja o con Animaciones desactivadas se conserva el dibujo original.
+- Proporcion de sala: el tigre conserva sus recursos y equipo, con escala .70
+  y altura maxima de 196 px. Los controles visuales comparten la fila de acciones;
+  el registro muestra tres lineas con desplazamiento para liberar altura de escena.
+  El fondo dedica la mitad de su altura al suelo, sin cambiar reglas ni geometria
+  logica. Verificado en ventanas de 1100x760 y 1280x850.

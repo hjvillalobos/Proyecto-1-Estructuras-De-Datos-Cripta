@@ -4,6 +4,8 @@ from vista.equipo_visual import dibujar_equipo
 from vista.transicion_salas import punto_puerta
 from vista.puerta_visual import PuertaVisual
 
+ESCALA_JUGADOR = .70
+
 
 class EscenaCripta:
     """Dibuja la sala a partir de datos de presentacion, sin ejecutar reglas."""
@@ -63,23 +65,20 @@ class EscenaCripta:
         ancho = max(700, ancho) if isinstance(ancho, int) else v.ANCHO
         alto = max(350, alto) if isinstance(alto, int) else v.ALTO
         c.create_rectangle(0, 0, ancho, alto, fill=FONDO, outline="")
-        pared = ("#28372f", "#303431", "#293638")[estado.sala_id % 3]
-        c.create_polygon(24, 58, ancho - 24, 58, ancho - 56, alto - 92, 56, alto - 92,
-                         fill=pared, outline=BORDE, width=2)
-        for fila in range(3):
-            y = 62 + fila * 23
-            c.create_line(25, y, ancho - 25, y, fill="#3e4c42")
-            for x in range(40 + (fila % 2) * 35, ancho - 30, 70):
-                c.create_line(x, y, x, y + 23, fill="#3e4c42")
-        c.create_polygon(70, 130, ancho - 70, 130, ancho - 30, alto - 92, 30, alto - 92,
-                         fill="#1c2825", outline="#3a4e40")
-        for i in range(1, 6):
-            x = 70 + (ancho - 140) * i / 6
-            c.create_line(x, 130, ancho / 2 + (x - ancho / 2) * 1.5, alto - 92, fill="#304039")
-        for fraccion in (.2, .45, .75):
-            y = 130 + (alto - 222) * fraccion
-            c.create_line(65, y, ancho - 65, y, fill="#304039")
-        self._ambiente(estado.sala_nombre, ancho, c)
+        dibujar_fondo = getattr(getattr(v, "recursos", None), "fondo_sala", None)
+        fondo = dibujar_fondo(ancho, alto - 82) if callable(dibujar_fondo) else None
+        if fondo is not None:
+            self.imagenes.append(fondo)
+            c.create_image(0, 0, image=fondo, anchor="nw", tags=("fondo_sala",))
+        else:
+            c.create_rectangle(0, 58, ancho, alto - 82, fill="#594636", outline="")
+            for fila, y in enumerate(range(58, alto - 82, 38)):
+                for x in range(-45 if fila % 2 else 0, ancho, 90):
+                    c.create_rectangle(x + 2, y + 2, x + 88, min(y + 36, alto - 82),
+                                       fill="#756047", outline="#a08866")
+        c.create_rectangle(0, 0, ancho, 62, fill=FONDO, outline="")
+        if fondo is None:
+            self._ambiente(estado.sala_nombre, ancho, c)
         self._puertas(estado, ancho, alto, c)
         trampas = getattr(estado, "trampas", [])
         if trampas:
@@ -102,7 +101,8 @@ class EscenaCripta:
                 recursos = getattr(v, "recursos", None)
                 if recursos is not None:
                     for invertir in (False, True):
-                        recursos.fotogramas_jugador(290, int(min(280, alto - 175)), invertir=invertir)
+                        recursos.fotogramas_jugador(290, int(min(280, alto - 175) * ESCALA_JUGADOR),
+                                                    invertir=invertir, armadura=getattr(estado, "armadura_tipo", None))
             if salir_hacia is None:
                 self.animacion.situar(paso_anterior)
             self.animacion.iniciar()
@@ -113,13 +113,13 @@ class EscenaCripta:
         nombre = nombre.lower()
         for x in (80, ancho - 80):
             if "urna" in nombre or "nicho" in nombre:
-                c.create_oval(x - 17, 102, x + 17, 145, fill="#59665b", outline="#94a18d")
-                c.create_rectangle(x - 13, 97, x + 13, 105, fill="#7b8879", outline="")
+                c.create_oval(x - 17, 102, x + 17, 145, fill="#78644c", outline="#b7a280")
+                c.create_rectangle(x - 13, 97, x + 13, 105, fill="#a08a68", outline="")
             elif "osario" in nombre or "cripta" in nombre:
-                c.create_rectangle(x - 18, 98, x + 18, 145, fill="#435449", outline="#6a806d")
+                c.create_rectangle(x - 18, 98, x + 18, 145, fill="#66533e", outline="#a58a67")
                 c.create_oval(x - 9, 109, x + 9, 128, fill="#bcc4a5", outline="")
             else:
-                c.create_rectangle(x - 13, 92, x + 13, 148, fill="#3a4b41", outline=BORDE)
+                c.create_rectangle(x - 13, 92, x + 13, 148, fill="#66533e", outline="#a58a67")
 
     def _puertas(self, estado, ancho, alto, c):
         direccion = None
@@ -170,11 +170,19 @@ class EscenaCripta:
         px = min(ancho * self._posicion_relativa, 210 if len(estado.enemigos) > 4 else 240)
         py = alto - 150
         self.vista._jugador_xy = (px, py)
-        sombra = c.create_oval(px - 68, py - 16, px + 68, py + 10, fill="#0b1512", outline="")
-        altura_jugador = int(min(280, alto - 175))
+        sombra = c.create_oval(px - 54, py - 12, px + 54, py + 8, fill="#211a13", outline="")
+        altura_jugador = int(min(280, alto - 175) * ESCALA_JUGADOR)
         imagen = self._imagen("jugador", 230, altura_jugador)
+        recursos = getattr(self.vista, "recursos", None)
+        armadura = getattr(estado, "armadura_tipo", None)
+        vestido = recursos.jugador_vestido(230, altura_jugador, armadura) if recursos and armadura else None
+        if vestido is not None:
+            imagen = vestido
+            self.imagenes.append(imagen)
         if imagen is not None:
             sprite = c.create_image(px, py, image=imagen, anchor="s", tags=("jugador",))
+            if vestido is not None:
+                c.addtag_withtag("armadura_visible", sprite)
             cuadros = ()
             indices = ()
             anterior = self.anterior
@@ -198,7 +206,8 @@ class EscenaCripta:
                         desplazamiento=entrada, carrera=accion == "correr", ataque=accion == "atacar")
             if self.animacion is not None:
                 if accion:
-                    cuadros = self.vista.recursos.fotogramas_jugador(290, altura_jugador, invertir=invertir)
+                    cuadros = self.vista.recursos.fotogramas_jugador(290, altura_jugador,
+                                                                   invertir=invertir, armadura=armadura)
                     self.imagenes.extend(cuadros)
                     indices = {"correr": (0, 1, 2, 3), "atacar": (4, 5), "caer": (6, 7)}[accion]
                     if len(cuadros) == 8:
@@ -221,7 +230,7 @@ class EscenaCripta:
                         self.animacion.particula(golpe, duracion=14, desplazamiento=(16, 0))
             elegidos = [cuadros[i] for i in indices] if len(cuadros) == 8 else ()
             dibujar_equipo(self, estado, sprite, imagen, elegidos, accion, self._objeto_recogido,
-                            invertir=invertir)
+                            invertir=invertir, armadura_integrada=vestido is not None)
         else:
             c.create_oval(px - 22, py - 90, px + 22, py - 46, fill=AMARILLO, outline=TEXTO, tags=("jugador",))
             c.create_polygon(px - 38, py - 42, px + 38, py - 42, px + 25, py, px - 25, py,
@@ -229,7 +238,7 @@ class EscenaCripta:
         etiqueta = c.create_text(px, py + 15, text=f"Jugador  {estado.vida}/{estado.vida_max}",
                       fill=self.vista._color_vida(estado.vida, estado.vida_max), font=("Segoe UI", 11, "bold"))
         if imagen is not None and self.animacion is not None and self._accion_en_curso == "correr":
-            self.animacion.anclar(sombra, sprite, (-68, -16, 68, 10))
+            self.animacion.anclar(sombra, sprite, (-54, -12, 54, 8))
             self.animacion.anclar(etiqueta, sprite, (0, 15))
 
     def _accion_jugador(self, estado):
@@ -260,7 +269,7 @@ class EscenaCripta:
             y = 132 + (alto - 350) * .39 + fila * (78 + (alto - 350) * .35) if len(visibles) > 4 else alto / 2 + 10
             etiqueta = f"enemigo_{i}"
             c.create_oval(x - celda * .35, y - 8, x + celda * .35, y + 8, fill="#101a15", outline="", tags=(etiqueta,))
-            altura = min(118, (alto - 190) / 2) if len(visibles) <= 4 else min(75, 8 + (alto - 350) * .35)
+            altura = min(144, (alto - 140) / 1.6) if len(visibles) <= 4 else min(75, 8 + (alto - 350) * .35)
             imagen = self._imagen(getattr(enemigo, "tipo", ""), min(205, celda - 16), altura)
             if imagen is not None:
                 sprite = c.create_image(x, y, image=imagen, anchor="s", tags=(etiqueta,))

@@ -1,10 +1,11 @@
 
 import time
 import tkinter as tk
-from tkinter import filedialog, messagebox, simpledialog, ttk
+from tkinter import filedialog, messagebox, ttk
 from vista.recursos_graficos import RecursosGraficos
 from vista.escena import EscenaCripta
 from vista.transicion_salas import TransicionSalas
+from vista.sonidos import Sonidos
 
 from vista.tema import FONDO, PANEL, SALA, TEXTO, TENUE, VERDE, ROJO, AMARILLO, AZUL, NARANJA, MORADO, PIEDRA, BORDE
 
@@ -54,6 +55,7 @@ class VistaGrafica:
         self._replay_detener = False
 
         self.recursos = RecursosGraficos(self.root)
+        self.sonidos = Sonidos()
         self.escena = EscenaCripta(self)
         self.transicion_salas = TransicionSalas(self)
         self._estado = None
@@ -105,7 +107,7 @@ class VistaGrafica:
                                         wraplength=700, justify="left", height=2)
         self.lbl_aviso.pack(fill="x", pady=4)
         self.barra_botones = tk.Frame(izq, bg=FONDO)
-        self.barra_botones.pack(fill="x", pady=(0, 10))
+        self.barra_botones.pack(fill="x", pady=(0, 4))
         self.boton_esperar = ttk.Button(self.barra_botones, text="Esperar", command=lambda: self._enviar("esperar"))
         self.boton_esperar.pack(side="left", padx=(0, 8))
         ttk.Button(self.barra_botones, text="Retroceso", command=lambda: self._enviar("retroceso")).pack(side="left")
@@ -114,8 +116,14 @@ class VistaGrafica:
         self.lbl_tiempo.pack(anchor="e")
         self.barra_replay = tk.Frame(izq, bg=FONDO)
         self.var_movimiento = tk.BooleanVar(value=True)
-        ttk.Checkbutton(izq, text="Animaciones", variable=self.var_movimiento,
-                        command=self._alternar_movimiento).pack(anchor="e")
+        opciones_visuales = tk.Frame(self.barra_botones, bg=FONDO)
+        opciones_visuales.pack(side="right")
+        self.var_sonido = tk.BooleanVar(value=self.sonidos.activo)
+        ttk.Checkbutton(opciones_visuales, text="Sonido", variable=self.var_sonido,
+                        command=self._alternar_sonido,
+                        state="normal" if self.sonidos.disponible else "disabled").pack(side="right")
+        ttk.Checkbutton(opciones_visuales, text="Animaciones", variable=self.var_movimiento,
+                        command=self._alternar_movimiento).pack(side="right", padx=(0, 12))
         ttk.Button(self.barra_replay, text="Pausa / Continuar", command=self._replay_alternar_pausa).pack(side="left")
         ttk.Button(self.barra_replay, text="Detener", command=self._replay_parar).pack(side="left", padx=8)
         self.var_vel = tk.StringVar(value="normal")
@@ -124,7 +132,7 @@ class VistaGrafica:
         self._etiqueta(izq, "Registro de la partida", color=TENUE).pack(fill="x")
         caja_log = tk.Frame(izq, bg=FONDO)
         caja_log.pack(fill="x", pady=(6, 0))
-        self.log = tk.Text(caja_log, height=4, bg=PANEL, fg=TEXTO, relief="flat", wrap="word",
+        self.log = tk.Text(caja_log, height=3, bg=PANEL, fg=TEXTO, relief="flat", wrap="word",
                            state="disabled", font=("Segoe UI", 10), padx=12, pady=8)
         self.log.pack(side="left", fill="both", expand=True)
         scroll_log = ttk.Scrollbar(caja_log, command=self.log.yview)
@@ -231,6 +239,11 @@ class VistaGrafica:
 
     def preparar_animacion(self, accion):
         self._accion_visual = accion
+        if getattr(self, "sonidos", None) is not None:
+            self.sonidos.reproducir(accion)
+
+    def _alternar_sonido(self):
+        self.sonidos.habilitar(self.var_sonido.get())
 
     def _clic_accion(self, comando):
         if getattr(self, "transicion_salas", None) is not None and self.transicion_salas.activa:
@@ -303,7 +316,10 @@ class VistaGrafica:
         return self._cola.pop(0)
 
     def pedir_texto(self, pregunta):
-        return (simpledialog.askstring("CRIPTA", pregunta, parent=self.root) or "").strip()
+        if self._cerrada:
+            return ""
+        from vista.nombre_puntaje import NombrePuntaje
+        return NombrePuntaje(self, pregunta).mostrar()
 
     def elegir_cripta(self, criptas):
         from vista.selector_cripta import SelectorCripta
@@ -512,11 +528,20 @@ class VistaGrafica:
             messagebox.showerror("Error de replay", texto, parent=self.root)
 
     def preguntar_reinicio(self):
+        if hasattr(self, "_reinicio_fin"):
+            respuesta = self._reinicio_fin
+            del self._reinicio_fin
+            return not self._cerrada and respuesta
         return not self._cerrada and messagebox.askyesno(
             "Jugar de nuevo", "Has perdido. ¿Quieres iniciar una partida nueva?", parent=self.root)
 
     def reiniciar_presentacion(self):
+        if hasattr(self, "_reinicio_fin"):
+            del self._reinicio_fin
         self._accion_visual = None
+        self._ayuda_omitida = False
+        if getattr(self, "sonidos", None) is not None:
+            self.sonidos.habilitar(self.var_sonido.get())
         if hasattr(self, "escena"):
             self.escena.detener()
             self.escena.anterior = None
@@ -560,18 +585,12 @@ class VistaGrafica:
     def mostrar_fin(self, resumen):
         if self._cerrada:
             return
-        if resumen.resultado == "victoria":
-            titulo, cabecera = "¡Victoria!", "Has escapado de la cripta."
-        elif resumen.resultado == "derrota":
-            titulo, cabecera = "Derrota", "Has muerto en la cripta."
-        else:
-            titulo, cabecera = "Fin", "Sesión terminada."
-        messagebox.showinfo(
-            titulo,
-            f"{cabecera}\n\nAcciones: {resumen.acciones}\n"
-            f"Enemigos derrotados: {resumen.derrotados}\n"
-            f"Tiempo virtual: {resumen.reloj_final}",
-            parent=self.root)
+        if getattr(self, "sonidos", None) is not None:
+            self.sonidos.reproducir(resumen.resultado)
+        from vista.fin_partida import FinPartida
+        self.transicion_salas.cancelar()
+        self.escena.detener()
+        self._reinicio_fin = FinPartida(self, resumen).mostrar()
 
     def mostrar_estadisticas_red(self, est):
         self.mostrar_info(f"Red: {est.solicitudes}/{est.presupuesto} solicitudes | "
@@ -638,6 +657,8 @@ class VistaGrafica:
         if self._cerrada:
             return
         self._cerrada = True
+        if getattr(self, "sonidos", None) is not None:
+            self.sonidos.cerrar()
         if hasattr(self, "escena"):
             self.escena.detener()
         try:

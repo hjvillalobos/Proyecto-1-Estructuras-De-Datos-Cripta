@@ -21,7 +21,20 @@ Inicio y selector comparten un fondo de ladrillos de piedra con el personaje
 original. El selector resalta la cripta elegida y actualiza sus salas y dificultad.
 Este cambio es exclusivamente visual; no modifica los turnos ni el reloj virtual.
 
-El jugador, los dos enemigos, los ocho objetos y la trampa de dardos del catalogo local utilizan imagenes de `vista/recursos/`. Los objetos muestran miniaturas en el suelo y al seleccionarlos en el inventario.
+La casilla Sonido activa o silencia efectos cortos de pasos, puertas, ataques,
+objetos, retroceso, victoria y derrota. En Windows usa winsound de la biblioteca
+estandar, sin Pygame ni dependencias adicionales. Los WAV se sintetizan y guardan
+en una carpeta temporal que se limpia al cerrar. Una melodia corta suena al abrir
+el menu de inicio, sin repetirse al redimensionar: un motivo original tenebroso
+con campanas, graves y eco. Pasos y puertas usan golpes y ruido amortiguado.
+No se usan sonidos ni melodias de otros juegos. No hay musica continua. Si el
+audio no esta disponible, el juego sigue sin sonido. Para pruebas silenciosas,
+definir CRIPTA_SIN_AUDIO=1 antes de ejecutar la suite.
+
+El tigre original y sus animaciones se conservan. El fondo pintado, el guardian
+ilustrado y los objetos de `objetos_ilustrados.png` unifican el arte con contornos
+de tinta y luz ambar. La rata conserva su ilustracion; los PNG anteriores quedan
+como respaldo. Los objetos muestran miniaturas en el suelo y en el inventario.
 Pillow conserva la transparencia y mejora el escalado; si no esta instalado,
 Tkinter puede cargar los PNG con un escalado basico. Los enemigos sin imagen local
 se muestran con una representacion generica, sin cambiar su tipo ni estadisticas.

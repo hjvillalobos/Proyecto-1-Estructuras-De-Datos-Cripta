@@ -174,7 +174,7 @@ class TestTransicionSalas(unittest.TestCase):
     def test_primera_sala_precarga_ambas_orientaciones(self):
         v = self.vista
         v.mostrar_estado(self.datos.motor.estado_vista(), [])
-        alto = min(280, max(350, v.canvas.winfo_height()) - 175)
+        alto = int(min(280, max(350, v.canvas.winfo_height()) - 175) * .70)
         self.assertTrue(v.recursos.fotogramas_jugador(290, alto))
         self.assertTrue(v.recursos.fotogramas_jugador(290, alto, invertir=True))
         from vista import recursos_graficos

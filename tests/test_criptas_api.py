@@ -69,7 +69,9 @@ class TestSeleccionCriptas(unittest.TestCase):
                 def elegir(indice=indice):
                     vista._enviar("mover E")
                     self.assertEqual(vista._cola, [])
-                    dialogo = next(h for h in vista.root.winfo_children() if isinstance(h, tk.Toplevel))
+                    self.assertFalse(any(isinstance(h, tk.Toplevel) for h in vista.root.winfo_children()))
+                    dialogo = next(h for h in vista.root.winfo_children()
+                                   if isinstance(h, tk.Frame) and h.place_info())
                     lista = next(h for h in dialogo.winfo_children() if isinstance(h, tk.Listbox))
                     lista.selection_clear(0, "end")
                     lista.selection_set(indice)
@@ -82,7 +84,7 @@ class TestSeleccionCriptas(unittest.TestCase):
                 self.assertEqual(vista.elegir_cripta(CRIPTAS), cripta["id"])
                 self.assertEqual(vista._cola, [])
             vista.root.after(100, lambda: next(h for h in vista.root.winfo_children()
-                                             if isinstance(h, tk.Toplevel)).destroy())
+                                             if isinstance(h, tk.Frame) and h.place_info()).destroy())
             self.assertIsNone(vista.elegir_cripta(CRIPTAS))
         finally:
             vista.cerrar()

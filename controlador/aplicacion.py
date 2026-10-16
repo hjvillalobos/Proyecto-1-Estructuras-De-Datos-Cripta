@@ -76,6 +76,8 @@ def ejecutar_juego(args, sesion, lanzador_replay):
                     lista = listado["criptas"] if isinstance(listado, dict) else listado
                     args.cripta = vista.elegir_cripta(lista)
                     if args.cripta is None:
+                        if args.gui and getattr(vista, "_cerrada", False):
+                            return 0
                         if args.gui and elegir_inicio():
                             continue
                         return 0

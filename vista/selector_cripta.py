@@ -13,12 +13,9 @@ class SelectorCripta:
         self.criptas = criptas
         self.resultado = None
         self.imagenes = []
-        self.dialogo = tk.Toplevel(vista.root)
-        self.dialogo.title("CRIPTA - Elige tu cripta")
-        self.dialogo.configure(bg=FONDO)
-        self.dialogo.transient(vista.root)
-        self.dialogo.geometry("960x640")
-        self.dialogo.minsize(820, 560)
+        self.panel = tk.Frame(vista.root, bg=FONDO)
+        self.panel.place(relwidth=1, relheight=1)
+        self.dialogo = self.panel
         self.canvas = tk.Canvas(self.dialogo, bg=FONDO, highlightthickness=0)
         self.canvas.pack(fill="both", expand=True)
         self.lista = tk.Listbox(self.dialogo, bg=PANEL, fg=TEXTO,
@@ -35,7 +32,6 @@ class SelectorCripta:
         self.lista.bind("<<ListboxSelect>>", self.dibujar)
         self.lista.bind("<Double-Button-1>", self.aceptar)
         self.lista.bind("<Return>", self.aceptar)
-        self.dialogo.bind("<Escape>", lambda _evento: self.dialogo.destroy())
         self.controles = tk.Frame(self.dialogo, bg=FONDO)
         self.controles.place(relx=.68, rely=.85, anchor="center", width=380, height=48)
         ttk.Button(self.controles, text="Volver", command=self.dialogo.destroy, style="Menu.TButton").pack(
@@ -44,7 +40,6 @@ class SelectorCripta:
                    style="Principal.Menu.TButton",
                    state="normal" if criptas else "disabled").pack(
             side="left", fill="both", expand=True)
-        self.dialogo.protocol("WM_DELETE_WINDOW", self.dialogo.destroy)
         self.canvas.bind("<Configure>", self.dibujar)
 
     def aceptar(self, _evento=None):
@@ -89,8 +84,9 @@ class SelectorCripta:
     def mostrar(self):
         en_menu = getattr(self.vista, "_en_menu", False)
         self.vista._en_menu = True
+        escape = self.vista.root.bind("<Escape>", lambda _evento: self.panel.destroy(), add="+")
         try:
-            self.dialogo.grab_set()
+            self.vista.root.update_idletasks()
             self.lista.focus_set()
             self.vista.root.wait_window(self.dialogo)
             return self.resultado
@@ -98,3 +94,6 @@ class SelectorCripta:
             self.vista._en_menu = en_menu
             self.vista._cola.clear()
             self.imagenes.clear()
+            if not self.vista._cerrada:
+                self.vista.root.unbind("<Escape>", escape)
+                self.vista.root.focus_set()

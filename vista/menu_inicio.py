@@ -69,8 +69,7 @@ class MenuInicio:
         self.canvas.create_text(w * .63, h * .34, text="La salida te espera.", fill=TEXTO, font=("Georgia", 18))
         self.canvas.create_text(w * .63, h * .87, text="Reloj virtual", fill=TEXTO, font=("Segoe UI", 11))
         self.canvas.create_text(w * .63, h * .92, text="t = 0", fill=VERDE, font=("Consolas", 22, "bold"))
-        for nombre, x, ancho, alto, fase in (("jugador", w * .23, 320, int(h * .68), 0),
-                                             ("itm_antorcha", w * .88, 48, 94, 1.2)):
+        for nombre, x, ancho, alto, fase in (("jugador", w * .23, 320, int(h * .68), 0),):
             imagen = self.vista.recursos.imagen(nombre, ancho, alto)
             if imagen is not None:
                 self.imagenes.append(imagen)
@@ -84,6 +83,8 @@ class MenuInicio:
         self.vista.root.protocol("WM_DELETE_WINDOW", lambda: self.elegir("salir"))
         try:
             self.vista.root.update_idletasks()
+            if getattr(self.vista, "sonidos", None) is not None:
+                self.vista.sonidos.reproducir("inicio")
             self.botones[0].focus_set()
             self.vista.root.wait_variable(self.fin)
             return self.resultado

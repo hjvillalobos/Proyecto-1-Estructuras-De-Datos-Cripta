@@ -6,6 +6,7 @@ from vista.grafica import VistaGrafica
 from vista.recursos_graficos import RecursosGraficos, Image
 from vista.selector_cripta import SelectorCripta
 from tests.test_criptas_api import CRIPTAS
+from tests import test_regresiones_juego as base
 
 
 class TestMenuVisual(unittest.TestCase):
@@ -57,3 +58,72 @@ class TestMenuVisual(unittest.TestCase):
         selector.aceptar()
         self.assertIsNone(selector.resultado)
         selector.dialogo.destroy()
+
+    @unittest.skipIf(Image is None, "Pillow no disponible")
+    def test_fondo_sala_calido_tiene_cache_independiente_del_menu(self):
+        recursos = self.vista.recursos
+        menu = recursos.fondo(1100, 760)
+        sala = recursos.fondo_sala(700, 268)
+        self.assertIsNotNone(sala)
+        self.assertEqual((sala.width(), sala.height()), (700, 268))
+        self.assertIs(recursos.fondo_sala(700, 268), sala)
+        self.assertIs(recursos.fondo(1100, 760), menu)
+        with tempfile.TemporaryDirectory() as carpeta:
+            self.assertIsNone(RecursosGraficos(self.vista.root, carpeta).fondo_sala(700, 268))
+
+    def test_jugador_mas_pequeno_y_fondo_no_alteran_motor(self):
+        datos = base.TestRegresionesJuego()
+        datos.setUp()
+        antes = datos.motor.exportar_estado()
+        self.vista.mostrar_estado(datos.motor.estado_vista(), [])
+        sprite = next(i for i in self.vista.canvas.find_withtag("jugador")
+                      if self.vista.canvas.type(i) == "image")
+        nombre = self.vista.canvas.itemcget(sprite, "image")
+        alto = max(350, self.vista.canvas.winfo_height())
+        self.assertLessEqual(int(self.vista.root.tk.call("image", "height", nombre)),
+                             int(min(280, alto - 175) * .70))
+        if Image is not None:
+            self.assertTrue(self.vista.canvas.find_withtag("fondo_sala"))
+        self.assertEqual(datos.motor.exportar_estado(), antes)
+        self.assertEqual(self.vista._cola, [])
+
+    def test_sala_amplia_y_controles_visibles_en_dos_tamanos(self):
+        vista = self.vista
+        datos = base.TestRegresionesJuego()
+        datos.setUp()
+        for geometria in ("1100x760", "1280x850"):
+            with self.subTest(geometria=geometria):
+                vista.root.geometry(geometria)
+                vista.root.deiconify()
+                vista.root.update()
+                vista.mostrar_estado(datos.motor.estado_vista(), [])
+                vista.root.update()
+                self.assertGreaterEqual(vista.canvas.winfo_height(), 390)
+                sprite = vista.canvas.find_withtag("jugador")[0]
+                caja = vista.canvas.bbox(sprite)
+                self.assertLessEqual(caja[3] - caja[1], 196)
+                self.assertGreater(caja[1], 62)
+                for control in (vista.boton_esperar, vista.lbl_tiempo, vista.log):
+                    self.assertTrue(control.winfo_viewable())
+                    self.assertLess(control.winfo_rooty() + control.winfo_height(),
+                                    vista.root.winfo_rooty() + vista.root.winfo_height() + 1)
+
+    def test_selector_ocupa_la_misma_ventana_y_escape_regresa(self):
+        vista = self.vista
+        vista.root.geometry("1100x760")
+        vista.root.deiconify()
+        selector = SelectorCripta(vista, CRIPTAS)
+        vista.root.update()
+        self.assertIs(selector.panel.master, vista.root)
+        self.assertFalse(any(isinstance(h, tk.Toplevel) for h in vista.root.winfo_children()))
+        self.assertEqual(selector.panel.winfo_width(), vista.root.winfo_width())
+        self.assertEqual(selector.panel.winfo_height(), vista.root.winfo_height())
+        self.assertIsNone(vista._estado)
+        def volver():
+            vista.root.focus_force()
+            vista.root.event_generate("<Escape>")
+        vista.root.after(100, volver)
+        self.assertIsNone(selector.mostrar())
+        self.assertFalse(selector.panel.winfo_exists())
+        self.assertFalse(vista._en_menu)
+        self.assertEqual(vista._cola, [])

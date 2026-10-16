@@ -371,3 +371,102 @@ llave de la salida, validar unicidad y tipo de turnos y cierres al cargar,
 propagar versiones solicitadas y reportar errores finales sin ocultar el error
 original. Nueve pruebas focalizadas y suite completa, sin cambiar la estructura MVC.
 
+# 2026-10-15: cierre del selector y ayuda al reiniciar
+
+Herramienta: Codex. Instruccion recibida mediante delegacion autorizada, textual:
+
+> La usuaria ahora autoriza explícitamente arreglar los dos fallos gráficos que acabas de reproducir. La restricción anterior de no modificar archivos queda levantada para estas correcciones: (1) cerrar la ventana principal con el selector de cripta abierto provoca que se reconstruya el menú sobre la ventana destruida; (2) reiniciar después de perder hace que la ayuda aparezca automáticamente porque no se restablece el estado de omisión. Implementa ambas correcciones en el proyecto real que ya inspeccionaste, respeta las instrucciones aplicables y verifica los dos escenarios con pruebas apropiadas. Mantén el alcance en estos dos fallos; no corrijas los hallazgos de consola o guardado corrupto. Devuelve un resumen breve en español de lo cambiado y de la validación, con cualquier limitación real.
+
+Uso: salida controlada al cerrar durante la seleccion de cripta y restauracion de
+la omision de ayuda automatica en cada reinicio. Dos regresiones con Tkinter real;
+el boton de ayuda permanece operativo. Sin cambios de reglas ni de formato binario.
+
+# 2026-10-15: selector integrado en la ventana principal
+
+Herramienta: Codex. Solicitud de voz textual:
+
+> Primero, que cuando la ventana que muestra las cuatro criptas, al fondo muestra como el juego vacío, preferiría mejor que cuando uno le de jugar, en la misma ventana salgan las cuatro criptas sin nada de fondo y ya cuando selecciona el usuario la cripta que se meta de una vez en el juego
+
+Uso: sustituir la ventana separada del selector por una pantalla que cubre la
+ventana principal; mantener las cuatro opciones, datos, Enter, doble clic, Volver
+y Escape. Actualizar pruebas del selector sin cambiar la creacion del motor.
+
+# 2026-10-15: escala del jugador y piedra calida
+
+Herramienta: Codex. Solicitud de voz textual:
+
+> Quisiera que el jugador, primero que no sea tan grande, siento que el jugador es muy grande, que sea un poquito más pequeño. También, el fondo de la sala se está feo. Quiero como algo más rocoso como, como café, como está en el inicio, algo así más encendido, no sé si podrías hacerlo por favor
+
+Uso: reducir la escala del jugador al 82%, reutilizar la textura local de piedra
+con luz calida y ajustar pared/suelo. Mantener anclajes, controles y reglas;
+agregar pruebas de recursos, escala y simulacion intacta y revisar dos ventanas.
+
+# 2026-10-15: efectos de sonido basicos
+
+Herramienta: Codex. Solicitudes de voz textuales:
+
+> Ay sí, podrías implementarlo
+
+> , porfa. Así básico
+
+Uso: efectos breves sintetizados para acciones aceptadas y victoria/derrota,
+reproduccion asincrona con winsound, control de silencio y limpieza al cerrar.
+Sin musica continua, dependencias nuevas ni cambios al reloj. Seis pruebas de
+audio simulado, errores, silencio, recursos temporales e independencia del motor.
+
+# 2026-10-15: melodia de inicio
+
+Herramienta: Codex. Prompt textual:
+
+> podrias ponerle como sonido de juego al inicio tambien, no solo en los movimientos
+
+Uso: melodia corta sintetizada al mostrar el menu, asincrona y sujeta al control
+de silencio. No se dispara desde el redibujado ni modifica el reloj virtual.
+Pruebas del WAV, omision al silenciar y llamada unica al mostrar el menu.
+
+# 2026-10-15: coherencia ilustrada y sonido tenebroso
+
+Herramienta: Codex e imagegen. Prompts textuales del usuario:
+
+> el sonido no puede ser mas de juego, como tenebroso, tomando de ejemplo plantas vs zombies o algo asi? obviamente no hagas el mismo sonido de ese juego pero me parece raro y visualmente el fondo y los enemigos y el jugador no encajan se ve raro
+
+> dale hazlo respetando el enunciado
+
+> deja el personaje de tigre cuidado lo desapareces
+
+Uso: conservar tigre y animaciones originales; generar fondo pintado, guardian
+ilustrado y hoja de objetos con luz y contornos comunes, dejando los anteriores
+como respaldo. Se descarto una variante de hoja con halos; solo se integran
+recortes verificados. Componer un motivo original en modo menor con campanas,
+graves, eco y golpes de textura, sin copiar musica ni utilizar azar del modelo.
+Pruebas de transparencia, seleccion de recursos, respaldo, audio y cuatro criptas.
+
+# 2026-10-16: resultados y chaleco ajustado
+
+Herramienta: Codex. Prompt textual del usuario:
+
+> esta ventana de victoria o la de perdida visualmente esta muy basica hazla mejor y tambien note que cuando se equipa el chaleco no se lo pone bien si no como por encima
+
+Uso: pantalla de resultado dentro de la ventana, con recursos locales existentes,
+resumen sin cambios y reinicio de derrota integrado en el flujo actual. Ajuste
+del chaleco al torso por pose mediante composicion visual en memoria, sin cambiar
+los PNG del tigre, las reglas, las estadisticas ni las estructuras del modelo.
+Pruebas de teclado, cierre, replay, reinicio, alfa, reflejo, caches y simulacion.
+
+Solicitud posterior:
+
+> y las estadisticas que sean un boton opcional que se pueda desplegar si el usuario quiere
+
+Uso: ocultar el resumen inicialmente y agregar Ver/Ocultar estadisticas en la
+misma pantalla. Conservar teclado, reinicio y resultado al desplegar, ocultar o
+redimensionar; comprobar que no se encolan comandos de juego.
+
+Solicitud posterior:
+
+> el chaleco se le pone pequeño y tambien quiero que mejores la tabla que pregunta el nombre para puntajes se ve basica
+
+Uso: ampliar la ropa sobre el torso en reposo y animacion, sin cambiar los PNG
+originales ni las estadisticas. Entrada de nombre estilizada y centrada que
+conserva el contrato anterior de confirmacion, cancelacion y nombre vacio.
+Pruebas de cobertura, teclado, foco modal, cierre y ausencia de acciones del motor.
+

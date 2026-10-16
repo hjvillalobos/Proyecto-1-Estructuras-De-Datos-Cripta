@@ -5,6 +5,7 @@ import tkinter as tk
 import unittest
 from pathlib import Path
 from unittest.mock import Mock, patch
+from types import SimpleNamespace
 
 from controlador.controlador import ControladorJuego
 from vista.grafica import VistaGrafica
@@ -13,6 +14,44 @@ from tests import test_regresiones_juego as base
 
 
 class TestMenuInicio(unittest.TestCase):
+    def test_cerrar_principal_con_selector_abierto_no_recrea_menu(self):
+        from controlador.aplicacion import ejecutar_juego
+        try:
+            vista = VistaGrafica()
+        except tk.TclError as error:
+            self.skipTest(str(error))
+        self.addCleanup(vista.cerrar)
+        vista.root.withdraw()
+        args = SimpleNamespace(semilla=42, gui=True, cripta=None)
+        sesion = Mock()
+        sesion.cliente.listar_criptas.return_value = {"criptas": [
+            {"id": "prueba", "nombre": "Prueba", "salas": 2, "dificultad": 1}]}
+        vista.root.after(100, vista._al_cerrar)
+        with patch("vista.grafica.VistaGrafica", return_value=vista), \
+                patch.object(vista, "mostrar_menu", return_value=("jugar", None)) as menu, \
+                patch("modelo.juego.crear_juego") as crear:
+            self.assertEqual(ejecutar_juego(args, sesion, Mock()), 0)
+        self.assertTrue(vista._cerrada)
+        menu.assert_called_once()
+        crear.assert_not_called()
+
+    def test_reinicio_omite_ayuda_automatica_pero_conserva_boton(self):
+        try:
+            vista = VistaGrafica()
+        except tk.TclError as error:
+            self.skipTest(str(error))
+        self.addCleanup(vista.cerrar)
+        vista.root.withdraw()
+        with patch("vista.grafica.messagebox.showinfo") as dialogo:
+            vista.mostrar_ayuda()
+            dialogo.assert_not_called()
+            for _ in range(2):
+                vista.reiniciar_presentacion()
+                vista.mostrar_ayuda()
+                dialogo.assert_not_called()
+            vista.mostrar_ayuda()
+            dialogo.assert_called_once()
+
     def test_salir_del_menu_no_crea_partida(self):
         import main
         vista = Mock(spec=VistaGrafica)
