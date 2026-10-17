@@ -74,7 +74,13 @@ class ReproductorReplay:
                 return
             arg = f" {accion.argumento}" if accion.argumento and accion.accion != "cargar" else ""
             if callable(getattr(type(self._vista), "preparar_animacion", None)):
-                self._vista.preparar_animacion(accion.accion)
+                if accion.accion == "usar":
+                    self._vista.preparar_animacion(accion.accion, accion.argumento)
+                else:
+                    self._vista.preparar_animacion(accion.accion)
+            if (getattr(resultado, "trampas_activadas", None)
+                    and callable(getattr(type(self._vista), "preparar_trampas", None))):
+                self._vista.preparar_trampas(resultado.trampas_activadas)
             mensajes.agregar(f"► {accion.accion}{arg}")
             if not mostrar(juego, i):
                 return

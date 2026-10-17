@@ -2,6 +2,7 @@
 
 import tkinter as tk
 from tkinter import ttk
+from vista.sonidos import sonorizar_botones
 
 from vista.tema import FONDO, PANEL, TEXTO, AMARILLO, BORDE, configurar_botones_menu
 
@@ -47,6 +48,7 @@ class NombrePuntaje:
         self.boton_guardar.pack(side="left", fill="x", expand=True)
         self.dialogo.bind("<Return>", self.aceptar)
         self.dialogo.bind("<Escape>", self.cancelar)
+        sonorizar_botones(self.dialogo, vista.sonidos)
 
     def aceptar(self, _evento=None):
         self.resultado = self.nombre.get().strip()

@@ -190,7 +190,7 @@ class Motor:
 
         return True, None
 
-    def mover(self, direccion):
+    def mover(self, direccion, trampas_activadas=None):
         puede, error = self.puede_moverse(direccion)
         if not puede:
             return False, error
@@ -232,6 +232,8 @@ class Motor:
         for trampa in sala_destino.trampas:
             if self.terminado:
                 break
+            if trampa.armada and trampas_activadas is not None:
+                trampas_activadas.append(trampa.id_instancia)
             self.efectos.activar_trampa(trampa)
 
         if (not self.terminado and id_destino == self.sala_salida
@@ -926,8 +928,9 @@ class Motor:
             self.historial.registrar_atributo(inventario, atributo)
         sala_origen = self.jugador.posicion_actual
 
+        trampas_activadas = []
         if accion == "mover":
-            ok, error = self.mover(argumento)
+            ok, error = self.mover(argumento, trampas_activadas)
         elif accion == "abrir":
             ok, error = self.abrir_puerta(argumento)
         elif accion == "atacar":
@@ -1102,7 +1105,7 @@ class Motor:
         self.historial.registrar_atributo(self, "acciones_jugador")
         self.acciones_jugador += 1
         self.historial.cerrar_turno()
-        return ResultadoAccion(ok=True)
+        return ResultadoAccion(ok=True, trampas_activadas=trampas_activadas)
 
     def _rechazar_accion(self, mensaje):
         from modelo.snapshots import ResultadoAccion

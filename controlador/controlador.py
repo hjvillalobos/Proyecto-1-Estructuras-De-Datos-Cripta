@@ -98,7 +98,11 @@ class ControladorJuego:
 
             self._mostrar_estado()
 
-            comando = self.vista.pedir_comando()
+            try:
+                comando = self.vista.pedir_comando()
+            except (EOFError, KeyboardInterrupt):
+                self.vista.mostrar_info("\nPartida interrumpida.")
+                break
 
             if comando is None:
                 break
@@ -158,7 +162,10 @@ class ControladorJuego:
             return
         resumen = self.modelo.resumen()
         meta = self.modelo.meta
-        nombre = self.vista.pedir_texto("Nombre para la tabla de puntajes:") or "Jugador"
+        try:
+            nombre = self.vista.pedir_texto("Nombre para la tabla de puntajes:") or "Jugador"
+        except (EOFError, KeyboardInterrupt):
+            nombre = "Jugador"
         try:
             self.tabla_puntajes.registrar(RegistroPuntaje(
                 nombre=nombre, cripta_id=meta.cripta_id, cripta_version=meta.cripta_version,
@@ -442,7 +449,13 @@ class ControladorJuego:
 
         # Solo registramos acciones aceptadas.
         if callable(getattr(type(self.vista), "preparar_animacion", None)):
-            self.vista.preparar_animacion(accion)
+            if accion == "usar":
+                self.vista.preparar_animacion(accion, argumento)
+            else:
+                self.vista.preparar_animacion(accion)
+        if (getattr(resultado, "trampas_activadas", None)
+                and callable(getattr(type(self.vista), "preparar_trampas", None))):
+            self.vista.preparar_trampas(resultado.trampas_activadas)
         if self._grabacion_valida:
             try:
                 self.bitacora_replay.registrar_accion(accion, argumento)

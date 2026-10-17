@@ -180,6 +180,18 @@ Una segunda pocion de velocidad sustituye y renueva el efecto temporal desde la 
 
 El benchmark compara búsqueda binaria y lineal sobre el mismo arreglo ordenado y LRU. Incluye aciertos, fallos y cargas con inserciones. La recuperación desde disco se mide por separado y verifica cero solicitudes de red. --sin-disco permite medir solo memoria.
 
-La salida muestra promedios, mínimos, máximos y conteos. Las mediciones de disco utilizan archivos temporales; los resultados se muestran en consola. Todavía falta medir el ciclo completo del juego.
+La salida muestra promedios, mínimos, máximos y conteos. Las mediciones de disco utilizan archivos temporales; los resultados se muestran en consola. Por defecto se miden cache, recuperacion de fichas, agenda, inventario, historial, ordenamientos, guardado/carga y ciclo completo sintetico. No se instancia la vista ni se usa HTTP.
+
+```powershell
+python main.py --bench --capacidades 25 --operaciones 1000 --repeticiones 3
+python main.py --bench --subsistemas ordenamiento --tamanos 8 16 32 256
+python main.py --bench --subsistemas ciclo --operaciones 100 --repeticiones 3 --paquete .cache/cripta --cripta cripta-01 --semilla 1916
+```
+
+`--subsistemas` permite elegir cache, agenda, inventario, historial, ordenamiento, guardado y ciclo. `--eventos` configura los eventos pendientes de agenda y por ciclo sintetico; `--salas` configura el estado sintetico de guardado. `--sin-disco` omite recuperacion persistente y guardado; un `--paquete` explicito sigue leyendo datos locales. Paquete e ID de cripta deben indicarse juntos.
+
+El ordenamiento compara insercion, fusion y seleccion automatica con entradas aleatorias, casi ordenadas y comparaciones costosas. Guardado compara el mismo estado en binario y JSON, con bytes y tiempos, mas lectura directa de una sala binaria. Cada carga valida su resultado y descarta una repeticion de calentamiento.
+
+El ciclo mide cada llamada completa a `Motor.ejecutar("esperar")` y reporta el maximo y cuantos ciclos alcanzaron 20 ms. La preparacion queda fuera del cronometro; con paquete, el contenido se precarga antes. La carga sintetica procesa eventos de rearme; la carga local espera en la sala inicial y termina si acaba la partida. Estas cargas no certifican todas las rutas ni una cripta desconocida; repetir sin otras pruebas o aplicaciones intensivas durante la defensa.
 
 Las decisiones y la evidencia están en [DECISIONES.md](DECISIONES.md). La bitácora y los prompts de referencia están en [PROMPTS_LLM.md](PROMPTS_LLM.md).

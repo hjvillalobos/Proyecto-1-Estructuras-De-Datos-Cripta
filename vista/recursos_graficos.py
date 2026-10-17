@@ -1,5 +1,6 @@
 from pathlib import Path
 import tkinter as tk
+from vista.cache_visual import CacheVisual
 
 try:
     from PIL import Image, ImageTk, ImageOps, ImageEnhance
@@ -33,6 +34,162 @@ class RecursosGraficos:
         self._objetos_ilustrados = None
         self._chaleco = None
         self._jugadores_vestidos = []
+        self._daga = None
+        self._bebidas = []
+        self._pose_beber = None
+        self._puno = None
+        self._antorcha = None
+        self._jugador_original = None
+        self._fondo_original = None
+        self._cuadros_preparados = None
+        self._cache_visual = CacheVisual(self.carpeta)
+
+    def _original_jugador(self):
+        if self._jugador_original is None:
+            with Image.open(self.carpeta / "jugador.png") as origen:
+                self._jugador_original = origen.convert("RGBA")
+        return self._jugador_original.copy()
+
+    def _original_fondo(self):
+        if self._fondo_original is None:
+            ruta = self.carpeta / "fondo_cripta_ilustrado.png"
+            ilustrado = ruta.is_file()
+            with Image.open(ruta if ilustrado else self.carpeta / "fondo_ladrillos.png") as origen:
+                self._fondo_original = (origen.convert("RGB"), ilustrado)
+        return self._fondo_original
+
+    def _antorcha_jugador(self):
+        if Image is None:
+            return None
+        if self._antorcha is None:
+            try:
+                self._antorcha = self._objeto_ilustrado("itm_antorcha")
+                if self._antorcha is None:
+                    with Image.open(self.carpeta / "itm_antorcha.png") as origen:
+                        self._antorcha = origen.convert("RGBA")
+                from PIL import ImageDraw, ImageChops
+                mascara = self._antorcha.getchannel("A").point(lambda a: 255 if a >= 16 else 0)
+                y = int(mascara.height * .70)
+                fila = [x for x in range(mascara.width) if mascara.getpixel((x, y))]
+                if fila:
+                    ImageDraw.floodfill(mascara, (fila[len(fila) // 2], y), 128)
+                    componente = mascara.point(lambda a: 255 if a == 128 else 0)
+                    self._antorcha.putalpha(ImageChops.multiply(self._antorcha.getchannel("A"), componente))
+            except (OSError, ValueError):
+                return None
+        return self._antorcha
+
+    def _puno_jugador(self):
+        if Image is None:
+            return None
+        if self._puno is None:
+            try:
+                if self._hoja_jugador is None:
+                    with Image.open(self.carpeta / "jugador_acciones.png") as origen:
+                        self._hoja_jugador = origen.convert("RGBA")
+                hoja = self._hoja_jugador
+                self._puno = hoja.crop((int(hoja.width * 299 / 1536), int(hoja.height * 224 / 1024),
+                                       int(hoja.width * 339 / 1536), int(hoja.height * 267 / 1024)))
+            except (OSError, ValueError):
+                return None
+        return self._puno
+
+    def _arma_jugador(self, tipo):
+        if Image is None or tipo != "itm_daga_oxidada":
+            return None
+        if self._daga is None:
+            try:
+                self._daga = self._objeto_ilustrado(tipo)
+                if self._daga is None:
+                    with Image.open(self.carpeta / (tipo + ".png")) as origen:
+                        self._daga = origen.convert("RGBA")
+            except (OSError, ValueError):
+                return None
+        return self._daga
+
+    def jugador_armado(self, ancho, alto, arma, armadura=None, antorcha=False):
+        if Image is None or (arma != "itm_daga_oxidada" and not antorcha):
+            return None
+        clave = (int(ancho), int(alto), armadura, arma, bool(antorcha))
+        for actual, imagen in self._jugadores_vestidos:
+            if actual == clave:
+                return imagen
+        try:
+            from vista.equipo_visual import armar_jugador, vestir_jugador, iluminar_jugador
+            cuadro = self._cache_visual.leer(("armado", *clave))
+            if cuadro is None:
+                daga = self._arma_jugador(arma)
+                luz = self._antorcha_jugador() if antorcha else None
+                puno = self._puno_jugador() if daga is not None or luz is not None else None
+                if (daga is None and luz is None) or puno is None:
+                    return None
+                cuadro = self._original_jugador()
+                ropa = self._ropa_jugador(armadura)
+                if ropa is not None:
+                    cuadro = vestir_jugador(cuadro, ropa)
+                if daga is not None:
+                    cuadro = armar_jugador(cuadro, daga, puno)
+                if luz is not None:
+                    cuadro = iluminar_jugador(cuadro, luz, puno)
+                cuadro.thumbnail(clave[:2], Image.Resampling.LANCZOS)
+                self._cache_visual.guardar(("armado", *clave), cuadro)
+            imagen = ImageTk.PhotoImage(cuadro, master=self.root)
+        except (OSError, ValueError, tk.TclError):
+            return None
+        self._jugadores_vestidos.append((clave, imagen))
+        if len(self._jugadores_vestidos) > 4:
+            self._jugadores_vestidos.pop(0)
+        return imagen
+
+    def pose_beber(self, alto, armadura=None, antidoto=False, antorcha=False):
+        if Image is None:
+            return None
+        clave = (int(alto), armadura, bool(antidoto), bool(antorcha))
+        for actual, imagen in self._bebidas:
+            if actual == clave:
+                return imagen
+        try:
+            if self._pose_beber is None:
+                with Image.open(self.carpeta / "jugador_beber.png") as origen:
+                    hoja = origen.convert("RGBA")
+                # Solo la celda central conserva el mismo brazo de reposo.
+                celda = hoja.width // 3
+                margen = int(celda * .035)
+                cuadro = hoja.crop((celda + margen, 0, celda * 2 - margen, hoja.height))
+                limite = cuadro.getchannel("A").point(lambda a: 255 if a >= 32 else 0).getbbox()
+                if limite is None:
+                    return None
+                self._pose_beber = cuadro.crop(limite)
+            cuadro = self._pose_beber.copy()
+            if antidoto:
+                from PIL import ImageChops
+                zona = (int(cuadro.width * .635), int(cuadro.height * .10),
+                        int(cuadro.width * .72), int(cuadro.height * .145))
+                botella = cuadro.crop(zona)
+                h, s, _ = botella.convert("HSV").split()
+                mascara = ImageChops.multiply(h.point(lambda v: 255 if v < 20 or v > 240 else 0),
+                                             s.point(lambda v: 255 if v > 100 else 0))
+                tinte = ImageOps.colorize(botella.convert("L"), "#103c3b", "#7be0cf").convert("RGBA")
+                tinte.putalpha(botella.getchannel("A"))
+                botella.paste(tinte, (0, 0), mascara)
+                cuadro.paste(botella, zona)
+            ropa = self._ropa_jugador(armadura)
+            if ropa is not None:
+                from vista.equipo_visual import vestir_jugador
+                cuadro = vestir_jugador(cuadro, ropa)
+            if antorcha:
+                luz, puno = self._antorcha_jugador(), self._puno_jugador()
+                if luz is not None and puno is not None:
+                    from vista.equipo_visual import iluminar_jugador
+                    cuadro = iluminar_jugador(cuadro, luz, puno, "beber")
+            cuadro.thumbnail((290, int(alto)), Image.Resampling.LANCZOS)
+            imagen = ImageTk.PhotoImage(cuadro, master=self.root)
+        except (OSError, ValueError, tk.TclError):
+            return None
+        self._bebidas.append((clave, imagen))
+        if len(self._bebidas) > 4:
+            self._bebidas.pop(0)
+        return imagen
 
     def fondo_sala(self, ancho, alto):
         """Escenario pintado; conserva el fondo previo como respaldo local."""
@@ -42,12 +199,10 @@ class RecursosGraficos:
         if Image is None:
             return None
         try:
-            ilustrado = self.carpeta / "fondo_cripta_ilustrado.png"
-            with Image.open(ilustrado if ilustrado.is_file() else self.carpeta / "fondo_ladrillos.png") as origen:
-                fondo = origen.convert("RGB")
-            if not ilustrado.is_file():
+            fondo, ilustrado = self._original_fondo()
+            if not ilustrado:
                 fondo = fondo.crop((int(fondo.width * .34), 0, fondo.width, fondo.height))
-            corte = int(fondo.height * (.58 if ilustrado.is_file() else .78))
+            corte = int(fondo.height * (.58 if ilustrado else .78))
             pared = int(clave[1] * .50)
             composicion = Image.new("RGB", clave)
             composicion.paste(fondo.crop((0, 0, fondo.width, corte)).resize(
@@ -55,7 +210,7 @@ class RecursosGraficos:
             composicion.paste(fondo.crop((0, corte, fondo.width, fondo.height)).resize(
                 (clave[0], max(1, clave[1] - pared)), Image.Resampling.LANCZOS), (0, pared))
             fondo = composicion
-            if not ilustrado.is_file():
+            if not ilustrado:
                 fondo = ImageEnhance.Brightness(fondo).enhance(1.18)
                 fondo = Image.blend(fondo, Image.new("RGB", clave, "#c58b50"), .16)
             imagen = ImageTk.PhotoImage(fondo, master=self.root)
@@ -72,10 +227,8 @@ class RecursosGraficos:
         if Image is None:
             return self.imagen("fondo_ladrillos", *clave)
         try:
-            ruta = self.carpeta / "fondo_cripta_ilustrado.png"
-            with Image.open(ruta if ruta.is_file() else self.carpeta / "fondo_ladrillos.png") as origen:
-                fondo = ImageOps.fit(origen.convert("RGB"), clave,
-                                     method=Image.Resampling.LANCZOS)
+            original, _ = self._original_fondo()
+            fondo = ImageOps.fit(original, clave, method=Image.Resampling.LANCZOS)
             imagen = ImageTk.PhotoImage(fondo, master=self.root)
         except (OSError, ValueError, tk.TclError):
             return None
@@ -114,8 +267,7 @@ class RecursosGraficos:
 
     def jugador_vestido(self, ancho, alto, armadura):
         """Variante visual acotada: el PNG del tigre permanece sin modificar."""
-        ropa = self._ropa_jugador(armadura)
-        if ropa is None:
+        if Image is None or armadura != "itm_coraza_cuero":
             return None
         clave = (int(ancho), int(alto), armadura)
         for actual, imagen in self._jugadores_vestidos:
@@ -123,9 +275,14 @@ class RecursosGraficos:
                 return imagen
         try:
             from vista.equipo_visual import vestir_jugador
-            with Image.open(self.carpeta / "jugador.png") as origen:
-                cuadro = vestir_jugador(origen.convert("RGBA"), ropa)
-            cuadro.thumbnail(clave[:2], Image.Resampling.LANCZOS)
+            cuadro = self._cache_visual.leer(("vestido", *clave))
+            if cuadro is None:
+                ropa = self._ropa_jugador(armadura)
+                if ropa is None:
+                    return None
+                cuadro = vestir_jugador(self._original_jugador(), ropa)
+                cuadro.thumbnail(clave[:2], Image.Resampling.LANCZOS)
+                self._cache_visual.guardar(("vestido", *clave), cuadro)
             imagen = ImageTk.PhotoImage(cuadro, master=self.root)
         except (OSError, ValueError, tk.TclError):
             return None
@@ -134,31 +291,36 @@ class RecursosGraficos:
             self._jugadores_vestidos.pop(0)
         return imagen
 
-    def fotogramas_jugador(self, ancho, alto, invertir=False, armadura=None):
+    def fotogramas_jugador(self, ancho, alto, invertir=False, armadura=None, arma=None, antorcha=False):
         tamano = (int(ancho), int(alto))
-        clave = (*tamano, bool(invertir), armadura)
+        clave = (*tamano, bool(invertir), armadura, arma, bool(antorcha))
         for actual, imagenes in self._secuencias:
             if actual == clave:
                 return imagenes
         if Image is None:
             return ()
         try:
-            if self._hoja_jugador is None:
-                with Image.open(self.carpeta / "jugador_acciones.png") as origen:
-                    self._hoja_jugador = origen.convert("RGBA")
-            hoja = self._hoja_jugador
-            w, h = hoja.width // 4, hoja.height // 2
+            hoja_guardada = self._cache_visual.leer(("secuencia", *clave))
+            if hoja_guardada is not None and hoja_guardada.width % 8 == 0:
+                w, h = hoja_guardada.width // 8, hoja_guardada.height
+                resultado = tuple(ImageTk.PhotoImage(hoja_guardada.crop((i*w, 0, (i+1)*w, h)),
+                                                     master=self.root) for i in range(8))
+                self._secuencias.append((clave, resultado))
+                if len(self._secuencias) > 4:
+                    self._secuencias.pop(0)
+                return resultado
+            # Ambas orientaciones comparten las mismas composiciones, no los objetos Tk.
+            composicion = (armadura, arma, bool(antorcha))
+            preparados = self._cuadros_preparados
+            if preparados is None or preparados[0] != composicion:
+                cuadros = self._componer_fotogramas(armadura, arma, antorcha)
+                self._cuadros_preparados = (composicion, cuadros)
+            else:
+                cuadros = preparados[1]
             imagenes = []
-            for indice in range(8):
-                fila, col = divmod(indice, 4)
-                cuadro = hoja.crop((col * w, fila * h + int(h * .19),
-                                   (col + 1) * w, fila * h + int(h * .88)))
-                ropa = self._ropa_jugador(armadura)
-                if ropa is not None:
-                    from vista.equipo_visual import vestir_jugador
-                    cuadro = vestir_jugador(cuadro, ropa, indice)
-                if invertir:
-                    cuadro = cuadro.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
+            hoja_guardada = None
+            for indice, original in enumerate(cuadros):
+                cuadro = original.transpose(Image.Transpose.FLIP_LEFT_RIGHT) if invertir else original.copy()
                 cuadro.thumbnail(tamano, Image.Resampling.LANCZOS)
                 limite = cuadro.getchannel("A").point(lambda a: 255 if a >= 32 else 0).getbbox()
                 if limite is not None and limite[3] < cuadro.height:
@@ -166,6 +328,10 @@ class RecursosGraficos:
                     alineado.paste(cuadro, (0, cuadro.height - limite[3]))
                     cuadro = alineado
                 imagenes.append(ImageTk.PhotoImage(cuadro, master=self.root))
+                if hoja_guardada is None:
+                    hoja_guardada = Image.new("RGBA", (cuadro.width * 8, cuadro.height))
+                hoja_guardada.paste(cuadro, (indice * cuadro.width, 0))
+            self._cache_visual.guardar(("secuencia", *clave), hoja_guardada)
         except (OSError, ValueError, tk.TclError):
             return ()
         resultado = tuple(imagenes)
@@ -173,6 +339,33 @@ class RecursosGraficos:
         if len(self._secuencias) > 4:
             self._secuencias.pop(0)
         return resultado
+
+    def _componer_fotogramas(self, armadura, arma, antorcha):
+        if self._hoja_jugador is None:
+            with Image.open(self.carpeta / "jugador_acciones.png") as origen:
+                self._hoja_jugador = origen.convert("RGBA")
+        hoja = self._hoja_jugador
+        w, h = hoja.width // 4, hoja.height // 2
+        cuadros = []
+        ropa = self._ropa_jugador(armadura)
+        daga = self._arma_jugador(arma)
+        luz = self._antorcha_jugador() if antorcha else None
+        puno = self._puno_jugador() if daga is not None or luz is not None else None
+        for indice in range(8):
+            fila, col = divmod(indice, 4)
+            cuadro = hoja.crop((col * w, fila * h + int(h * .19),
+                               (col + 1) * w, fila * h + int(h * .88)))
+            if ropa is not None:
+                from vista.equipo_visual import vestir_jugador
+                cuadro = vestir_jugador(cuadro, ropa, indice)
+            if daga is not None and puno is not None:
+                from vista.equipo_visual import armar_jugador
+                cuadro = armar_jugador(cuadro, daga, puno, indice)
+            if luz is not None and puno is not None:
+                from vista.equipo_visual import iluminar_jugador
+                cuadro = iluminar_jugador(cuadro, luz, puno, indice)
+            cuadros.append(cuadro)
+        return tuple(cuadros)
 
     def imagen(self, nombre, ancho, alto):
         if Path(nombre).name != nombre:
@@ -190,6 +383,8 @@ class RecursosGraficos:
         try:
             if Image is not None:
                 original = self._objeto_ilustrado(nombre)
+                if original is None and nombre == "jugador":
+                    original = self._original_jugador()
                 if original is None:
                     with Image.open(ruta) as origen:
                         original = origen.convert("RGBA")

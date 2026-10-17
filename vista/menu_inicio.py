@@ -3,6 +3,7 @@ from tkinter import filedialog, ttk
 
 from vista.tema import FONDO, TEXTO, AMARILLO, VERDE, configurar_botones_menu
 from vista.animacion import AnimacionEscena
+from vista.sonidos import sonorizar_botones
 
 
 class MenuInicio:
@@ -33,6 +34,7 @@ class MenuInicio:
             boton.bind("<Return>", lambda e, b=boton: self.activar(b))
             self.botones.append(boton)
         self.canvas.bind("<Configure>", self.dibujar)
+        sonorizar_botones(self.panel, vista.sonidos)
 
     def activar(self, boton):
         boton.invoke()

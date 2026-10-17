@@ -1,5 +1,101 @@
 # Decisiones de diseño
 
+## Actualizacion tecnica: 2026-10-16
+
+Esta seccion sustituye el pendiente de implementar --bench indicado en las
+revisiones anteriores. No sustituye la redaccion final del equipo ni certifica
+que todas las secciones de este documento cumplan por si solas el apartado 8.
+
+### Integridad del acceso directo a salas (4.10)
+
+- Problema: un indice danado podia apuntar a otra sala con CRC correcto y
+  devolverla silenciosamente. El CRC del bloque no verifica la relacion con el indice.
+- Alternativas: cargar todo para buscar la sala, o validar rango e identidad
+  unicamente en el bloque localizado mediante busqueda binaria.
+- Decision: conservar la segunda opcion. El bloque debe estar dentro de la zona
+  de salas y su sala_id debe coincidir con el solicitado. La carga completa tambien
+  verifica orden estricto del indice, duplicados, rangos e identidad de cada bloque.
+- Complejidad: acceso directo O(log s) entradas mas O(b) bytes del bloque pedido;
+  no lee global ni las otras salas. La carga completa sigue siendo O(s + bytes).
+- Evidencia: pruebas con indice apuntando a otro bloque valido, offsets fuera de
+  zona, longitud cero y duplicados; lectura directa sin invocar leer_todo.
+- Limites: estas comprobaciones y CRC detectan corrupcion accidental; no son una
+  firma criptografica ni garantizan autenticidad ante modificaciones coordinadas.
+  No cambia el formato v3 ni invalida partidas v3 correctas.
+
+### Finalizacion de entrada de consola (10.2)
+
+Se conserva la vista de consola y se captura EOFError/KeyboardInterrupt alrededor
+de pedir_comando, donde realmente se producen. Propagarlas daba un traceback;
+capturarlas en toda la aplicacion podria ocultar fallos internos. La salida normal
+del bucle conserva el cierre de sesion existente, sin acciones, tiempo ni puntajes
+de abandono adicionales. Las pruebas inyectan ambos errores y comparan el estado
+antes y despues. No se cambia la interfaz grafica.
+
+### Mediciones por subsistema (5.3)
+
+- Problema: medir solo busquedas no permite defender el costo de las otras
+  estructuras ni la comparacion binario/JSON exigida por 4.10.
+- Alternativas: cronometros dentro del juego normal o un arnes separado que
+  invoque sus mismas primitivas. Se descartan los primeros para no introducir
+  instrumentacion o dependencias en el modelo durante una partida.
+- Decision: bench.py orquesta; utilidades/bench_juego.py prepara y valida cargas
+  de ColaEventos, Inventario, HistorialRetroceso, ordenar, persistencia y Motor.
+  Se conservan los benchmarks de cache binaria/lineal y recuperacion sin red.
+- Agenda: extraer/reinsertar, con reprogramacion periodica y comprobacion del
+  orden (tiempo, secuencia). Inventario: quitar/reinsertar un nodo conocido y
+  recorrer en ambos sentidos. Historial: delta de rastro, reversion y consumo.
+- Ordenamiento: tres estrategias sobre los mismos datos, sin modificar entrada;
+  escenarios aleatorio, casi ordenado y comparacion costosa. Los umbrales siguen
+  siendo heuristicos contrastables, no se afirman optimos en cualquier equipo.
+- Persistencia: mismo EstadoGuardado, archivos temporales, bytes, escritura,
+  carga completa y acceso directo binario; las lecturas se comparan con el estado.
+- Complejidades del arnes: agenda O(k log e), inventario O(k) con nodo conocido,
+  historial O(k) para la carga de un delta; ordenar conserva las cotas de sus
+  algoritmos. Las preparaciones y validaciones finales quedan fuera del tiempo,
+  salvo comprobaciones de orden y reversion propias de las cargas descritas.
+- Limites: memoria y disco son cargas diferentes. No se afirma que el binario
+  siempre sea mas rapido ni que un promedio bajo garantice todos los ciclos.
+  Se informa la unidad por carga; ordenar mide microsegundos por lista.
+
+### Evidencia local reproducible (Python 3.14.6, Windows)
+
+Comando ejecutado, semilla predeterminada 20261001:
+
+```powershell
+python main.py --bench --capacidades 25 --operaciones 1000 --repeticiones 3 --tamanos 8 16 32 256 --eventos 256 --salas 100
+```
+
+| Carga | Promedio observado |
+|---|---:|
+| Agenda, 256 pendientes | 17.158 us/operacion |
+| Inventario, 8 / 256 nodos | 1.612 / 1.636 us/operacion compuesta |
+| Historial, registrar/revertir/consumir | 7.853 us/operacion compuesta |
+| Orden aleatorio 256, insercion / fusion | 5980.211 / 970.211 us/lista |
+| Casi ordenado 256, insercion / fusion | 119.989 / 671.378 us/lista |
+| Comparacion costosa 256, insercion / fusion | 39594.267 / 4858.033 us/lista |
+| Carga completa binaria / JSON, 100 salas | 1678.543 / 1328.623 us |
+| Acceso directo a una sala binaria | 491.557 us |
+| Tamano binario / JSON, mismo estado | 7385 / 17921 bytes |
+
+El binario ocupa menos en esta muestra, pero JSON carga mas rapido: se conserva
+el binario por el formato propio y acceso directo exigidos, no por una ventaja
+universal de velocidad. Hubo otra suite en ejecucion durante esta medicion;
+son datos orientativos y deben repetirse de forma aislada en la defensa.
+
+El ciclo sintetico de esperar proceso 256 eventos de rearme por decision:
+3000 ciclos medidos, promedio 4.121 ms, maximo 18.698 ms, ninguno >=20 ms.
+Tambien se ejecuto:
+
+```powershell
+python main.py --bench --subsistemas ciclo --operaciones 100 --repeticiones 3 --paquete .cache/cripta --cripta cripta-01 --semilla 1916
+```
+
+En la sala inicial de ese paquete local: 300 ciclos de esperar, maximo 0.148 ms,
+sin HTTP/renderizado ni precarga dentro del cronometro. Es una carga limitada:
+no incluye una ruta completa de combate ni certifica una cripta desconocida.
+Para ampliar evidencia, usar el mismo arnes y contrastar cargas/escala del curso.
+
 ## Revision integrada: 2026-10-14
 
 ### Fallos de juego y verificacion para defensa

@@ -10,7 +10,7 @@ Los dos algoritmos
 """
 from dataclasses import dataclass
 
-# Umbrales (calibrados con --bench, ver docstring) 
+# Umbrales heuristicos; contrastar en el equipo de defensa con --bench --subsistemas ordenamiento.
 UMBRAL_PEQUENO = 16            # n <= esto -> inserción (comparaciones baratas)
 UMBRAL_PEQUENO_COSTOSO = 8     # n <= esto -> inserción (comparaciones costosas)
 DESORDEN_BAJO = 0.15           # <= esto se considera "casi ordenado"

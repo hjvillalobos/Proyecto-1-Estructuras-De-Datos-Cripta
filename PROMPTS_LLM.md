@@ -470,3 +470,131 @@ originales ni las estadisticas. Entrada de nombre estilizada y centrada que
 conserva el contrato anterior de confirmacion, cancelacion y nombre vacio.
 Pruebas de cobertura, teclado, foco modal, cierre y ausencia de acciones del motor.
 
+# 2026-10-16: sonido de botones y consulta de replay
+
+Herramienta: Codex. Solicitudes de voz del usuario:
+
+> ¿Podrías, por favor, ponerle sonido a los botones del juego cuando uno le da iniciar partida y cosas así
+
+> No cambies código del replay, solo cambia el sonido
+
+Uso: efecto corto asincrono al activar botones, conservando silencio y comandos.
+Consulta de la seccion 4.11 del enunciado: exige reproducir el archivo indicado,
+sin exigir que sea exclusivamente el ultimo ni un historial de cinco partidas.
+No se modifica el flujo ni la persistencia del replay.
+
+# 2026-10-16: agarre, bebidas y proporciones de enemigos
+
+Herramientas: Codex e imagegen integrado. Solicitudes de voz del usuario:
+
+> ¿Podrías mejorar el juego visualmente? Lo que quiero es como que cuando el jugador tenga una daga, la agarre bien con la mano, con las manos, o cosas así, que se vea bien o cuando se tome la poción se vea que se la está tomando. También, ¿no crees que las enemigos están muy grandes, como la rata? Quiero como que se vea más integrado, más bonito, es que aún siento que está un poco falso. No sé qué opinas
+
+> Okay, perfecto, deja el juego visualmente muy bonito para que el usuario quede contento con el resultado
+
+> Lo mismo con los antídotos también y así
+
+Uso: componer la daga desde la palma y delante de la silueta, con dedos por
+delante del mango; gesto local de beber para pocion y antidoto aceptados; rata
+mas pequena, plano de apoyo y sombras consistentes. Conservar motor, estadisticas,
+reloj y formato de replay. Las nuevas pruebas comparan simulacion tras la animacion.
+
+Prompt inicial de imagegen, referencia jugador.png, transparencia real:
+
+Create a production game sprite sheet DERIVED FROM the reference tiger-costumed human player. Keep exactly his recognizable orange tiger hood with ears, face, tiger-striped suit, cream belly, brown belt, tail, claw slippers, and dark ink/painterly illustration style. This is an ADDITIONAL potion drinking animation, not replacement character design. Output a wide transparent RGBA canvas with THREE equal-sized vertical cells in ONE horizontal row, no grid lines, no labels, no scenery, no shadow, no background pixels. In each cell show the full same character head to feet, same upright standing pose facing three-quarter right, identical scale, feet aligned on same baseline, same position centered within each third, generous 8% transparent padding on every edge, no overlap between cells. Left cell: right hand firmly grasps small rounded glass potion bottle with RED liquid at chest level, elbow bent. Middle cell: right hand lifts the SAME bottle to his lips, head slightly back, bottle tipped and he is visibly drinking; fingers wrap around bottle, elbow raised naturally. Right cell: lowers the same nearly-empty bottle back to chest level after drinking. LEFT hand stays down by his side in ALL cells, NO daggers, NO vest, no weapons, no extra props. Keep head, torso, feet and tail practically identical across the three cells, only change right forearm and bottle/head tilt. Bottle must be small relative to his head. Detailed hand-drawn fantasy game art coherent with original reference, NOT pixel art, no cartoon redesign. Clean TRUE transparency, crisp silhouette, no dark halos or glows.
+
+Prompt de correccion con referencia a la primera hoja:
+
+Fix this THREE-cell potion-drinking sprite sheet. KEEP the middle cell character exactly unchanged. It defines the pose and anatomy for all three frames. The problem: first and third cells currently hold the bottle in the OPPOSITE hand to the middle cell. Change ONLY the arm positions in FIRST and THIRD cells to match the middle cell's anatomical hands: the arm on the RIGHT SIDE OF THE IMAGE holds the bottle at upper chest height, elbow bent. The arm on the LEFT SIDE OF THE IMAGE hangs down relaxed just like the middle frame. In all three cells the potion must stay in the SAME right-side-of-image paw. Keep the character's scale, head, feet, torso, tail, clothing and face identical to the existing middle cell in each of the three cells. Same three-quarter-right tiger-costumed HUMAN, unchanged original identity. ONE row, THREE equal-width cells, transparent RGBA, no scenery, no text, no grid. Separate cells with clear transparent gutters and ensure every cell's tail and feet stay strictly inside its own third with 5% margin. Frame1 bottle full red at chest, Frame2 unchanged drinking at lips, Frame3 bottle nearly empty at chest. Crucial: left-side arm hangs down in ALL THREE frames, right-side arm holds potion in ALL THREE frames. No vest, no dagger. Keep painterly ink fantasy art, no halo.
+
+Seleccion: la correccion no resolvio completamente el cambio de brazo lateral.
+Solo se utiliza la celda central verificada; las otras dos no se animan.
+Recurso final conservado en vista/recursos/jugador_beber.png, sin alterar los
+PNG originales del personaje ni sus ocho poses anteriores.
+
+# 2026-10-16: puno cerrado y verificacion de muerte
+
+Herramienta: Codex. Prompt textual del usuario:
+
+> necesito que integres bien la daga en la mano se la pone por encima, no cierrra el puño, tambien fijate si los enemigos se mueren correctamente o hay algun bug
+
+Uso: sustituir las manos abiertas por el puno ya dibujado en la carrera original,
+en lugar de conservar sus garras por encima del mango. Ajustar reposo, ataque y
+caida sin editar los PNG; mantener el agarre al recoger otro objeto. Revisar la
+muerte sin modificar reglas del motor: cancelacion de turno, ausencia de ataques
+y regeneracion, botin unico utilizable, guardado/carga, retroceso y retirada visual.
+Agregar regresiones para esos casos y conservar el motor al no reproducir un
+fallo funcional de muerte en los escenarios comprobados.
+
+# 2026-10-16: trampa letal y salida Sur
+
+Herramienta: Codex. Prompt textual del usuario:
+
+> arregla lo de las trampas y este bug mira que la rata esta como encima donde dice sur
+
+Uso: no aplicar veneno despues de que el dano inicial de una trampa mate al
+jugador; conservar su desarmado y rearme. Reservar un carril para el control Sur
+cuando hay enemigos, sin tapar salud u objetos. Pruebas de veneno previo,
+antidoto, muerte con varias trampas y salida visible/pulsable con distintas
+cantidades de enemigos en tres tamanos de ventana. No se modifica el catalogo.
+
+# 2026-10-16: animaciones de trampas y antorcha en mano
+
+Herramienta: Codex. Prompt textual del usuario:
+
+> puedes hacerle animaciones a todas las trampas y tambien que cuando el jugador use la antorcha la agarre con la mano como la daga
+
+Uso: representar cada trampa con paginacion y animar sus activaciones reales,
+incluido el caso de rearme antes del siguiente turno. Comunicar los identificadores
+en ResultadoAccion al controlador y al replay, sin modificar tiempos ni dano.
+Integrar la antorcha del catalogo en el puno izquierdo usando los recursos
+existentes; conservar la daga derecha y todas las poses. La duracion visual
+depende del efecto del modelo. Agregar pruebas de activacion, limpieza,
+paginacion, silencio de animaciones, apagado, carga, retroceso y reflejo de poses.
+
+# 2026-10-16: correcciones y benchmark para defensa
+
+Herramienta: Codex. Prompt textual del usuario:
+
+> corrige todos los bugs incluido el bench y yo hare la documentacion, deja esos bugs arreglados respetando el enunciado y pon mas decisiones, deja el proyecto funcional
+
+Uso: corregir cierre de entrada de consola y verificacion de identidad/rango
+del indice binario; completar mediciones de agenda, inventario, historial,
+ordenamientos, guardado binario/JSON y ciclos de eventos sin vista ni red.
+Agregar regresiones y notas tecnicas reproducibles para que el equipo prepare
+la documentacion final; conservar MVC, reglas, recursos y partidas v3 validas.
+
+# 2026-10-16: verificaciones de entrega
+
+Herramienta: Codex. Prompt textual del usuario:
+
+> puedes hacer esas verificaciones que faltan y corregir cualquier fallo que encuentres respetando el enunciado, sin cambiar la estructura del proyecto? yo me encargo de la documentacion
+
+Uso: instalar dependencias en un entorno virtual limpio, consultar API real con
+cache fria y caliente en las cuatro criptas, verificar paquete recien descargado,
+probar contenido sintetico de mayor escala y repetir mediciones de forma aislada.
+Agregar regresiones y corregir la interrupcion al pedir el nombre del puntaje.
+La prueba de API requiere habilitacion explicita para no hacer HTTP en la suite
+normal. No se sustituye la documentacion final que preparara el equipo.
+
+# 2026-10-16: separacion de llama y antebrazo
+
+Herramienta: Codex. Solicitud recibida por delegacion autorizada de la usuaria:
+
+> La llama se superpone con el antebrazo, y el mango no se distingue entre los dedos, pareciendo mano y antorcha fusionadas. Quiere que la mano agarre claramente el mango y la llama quede alejada del brazo.
+
+Uso: ajustar el giro de la capa alrededor del mango en reposo, carrera, ataque,
+caida y bebida; conservar palma, puno y PNG originales. Revisar capturas y agregar
+una regresion geometrica de anclaje y orientacion, sin cambios del motor.
+
+# 2026-10-17: fluidez sin cambios visuales
+
+Herramienta: Codex. Prompt textual del usuario:
+
+> puedes optimizarlo pero no cambies nada, me encanta como esta el proyecto ahorita, esta perfecto, solo quiero que no sea lento nada ams
+
+Uso: reutilizar composiciones entre orientaciones, evitar preparaciones de ropa
+reemplazadas inmediatamente y decodificaciones repetidas. Agregar cache temporal
+PNG sin perdida, acotada, con invalidacion y recuperacion ante fallos. Procesar
+entrada con eventos nativos sin cambiar pasos ni tiempos configurados de las
+animaciones. Verificar pixeles, controles, visualizacion y regresiones del juego.
+

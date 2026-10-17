@@ -5,7 +5,7 @@ from tkinter import filedialog, messagebox, ttk
 from vista.recursos_graficos import RecursosGraficos
 from vista.escena import EscenaCripta
 from vista.transicion_salas import TransicionSalas
-from vista.sonidos import Sonidos
+from vista.sonidos import Sonidos, sonorizar_botones
 
 from vista.tema import FONDO, PANEL, SALA, TEXTO, TENUE, VERDE, ROJO, AMARILLO, AZUL, NARANJA, MORADO, PIEDRA, BORDE
 
@@ -63,6 +63,7 @@ class VistaGrafica:
         self._movimiento_activo = True
         self._ultimo_clic = ("", 0)
         self._construir()
+        sonorizar_botones(self.root, self.sonidos)
         self._atar_teclas()
 
     # ------------------------------------------------------------------
@@ -237,10 +238,16 @@ class VistaGrafica:
         if self._estado is not None:
             self._dibujar_sala(self._estado)
 
-    def preparar_animacion(self, accion):
+    def preparar_animacion(self, accion, argumento=None):
         self._accion_visual = accion
+        self._trampas_activadas = []
+        self._objeto_usado = next((item for item in getattr(self, "_items", ())
+                                  if item.instancia == argumento), None) if accion == "usar" else None
         if getattr(self, "sonidos", None) is not None:
             self.sonidos.reproducir(accion)
+
+    def preparar_trampas(self, instancias):
+        self._trampas_activadas = list(instancias)
 
     def _alternar_sonido(self):
         self.sonidos.habilitar(self.var_sonido.get())
@@ -308,8 +315,10 @@ class VistaGrafica:
             return self._cmd_inventario()
         self._actualizar_ui()
         while not self._cola and not self._cerrada:
-            self._actualizar_ui()
-            time.sleep(0.015)
+            try:
+                self.root.tk.dooneevent()
+            except tk.TclError:
+                self._cerrada = True
         if self._cerrada:
             return None
         self._refrescar_inv = True
@@ -427,10 +436,11 @@ class VistaGrafica:
             transicion.cancelar()
         anterior = getattr(self, "_estado_sala", None)
         if anterior is None or anterior.sala_id != e.sala_id:
-            self._pagina_enemigos = self._pagina_objetos = 0
+            self._pagina_enemigos = self._pagina_objetos = self._pagina_trampas = 0
         self._estado_sala = e
         self._pagina_enemigos = min(self._pagina_enemigos, max(0, (len(e.enemigos) - 1) // 8))
         self._pagina_objetos = min(self._pagina_objetos, max(0, (len(e.objetos_suelo) - 1) // 8))
+        self._pagina_trampas = min(getattr(self, "_pagina_trampas", 0), max(0, (len(getattr(e, "trampas", ())) - 1) // 8))
         if not hasattr(self, "escena"):
             self.escena = EscenaCripta(self)
         self.escena.dibujar(e, salir_hacia=salir_hacia)
@@ -550,7 +560,8 @@ class VistaGrafica:
         self._animaciones.clear()
         self._cola.clear()
         self._estado = self._estado_sala = None
-        self._pagina_enemigos = self._pagina_objetos = 0
+        self._pagina_enemigos = self._pagina_objetos = self._pagina_trampas = 0
+        self._trampas_activadas = []
         self._refrescar_inv = True
         self._ultimo_clic = ("", 0)
         self.mostrar_inventario([])

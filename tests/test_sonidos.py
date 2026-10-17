@@ -23,7 +23,7 @@ class TestSonidos(unittest.TestCase):
     def test_efectos_validos_asincronos_y_cacheados(self):
         sonidos, reproductor = self.crear()
         with patch.object(sonidos, "_crear_efecto", wraps=sonidos._crear_efecto) as crear:
-            for efecto in ("inicio", "mover", "abrir", "atacar", "recoger", "equipar", "usar",
+            for efecto in ("boton", "inicio", "mover", "abrir", "atacar", "recoger", "equipar", "usar",
                            "soltar", "retroceso", "victoria", "derrota"):
                 sonidos.reproducir(efecto)
                 ruta, flags = reproductor.PlaySound.call_args.args
@@ -34,7 +34,39 @@ class TestSonidos(unittest.TestCase):
                     self.assertEqual(archivo.getframerate(), 22050)
                     self.assertGreater(archivo.getnframes(), 0)
                 sonidos.reproducir(efecto)
-            self.assertEqual(crear.call_count, 11)
+            self.assertEqual(crear.call_count, 12)
+
+    def test_boton_corto_respeta_silencio(self):
+        sonidos, reproductor = self.crear()
+        sonidos.reproducir("boton")
+        with wave.open(reproductor.PlaySound.call_args.args[0], "rb") as archivo:
+            self.assertLess(archivo.getnframes() / archivo.getframerate(), .2)
+        sonidos.habilitar(False)
+        llamadas = reproductor.PlaySound.call_count
+        sonidos.reproducir("boton")
+        self.assertEqual(reproductor.PlaySound.call_count, llamadas)
+
+    def test_boton_envuelve_comando_una_vez_y_respeta_deshabilitado(self):
+        import tkinter as tk
+        from tkinter import ttk
+        from vista.sonidos import sonorizar_botones
+        try:
+            root = tk.Tk()
+        except tk.TclError as error:
+            self.skipTest(str(error))
+        self.addCleanup(root.destroy)
+        root.withdraw()
+        sonido, accion = Mock(), Mock()
+        boton = ttk.Button(root, text="Jugar", command=accion)
+        sonorizar_botones(root, sonido)
+        sonorizar_botones(root, sonido)
+        boton.invoke()
+        sonido.reproducir.assert_called_once_with("boton")
+        accion.assert_called_once_with()
+        boton.configure(state="disabled")
+        boton.invoke()
+        self.assertEqual(accion.call_count, 1)
+        self.assertEqual(sonido.reproducir.call_count, 1)
 
     def test_silenciar_detiene_y_no_reproduce_nuevos_efectos(self):
         sonidos, reproductor = self.crear()

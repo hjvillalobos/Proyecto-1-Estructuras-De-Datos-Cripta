@@ -2,6 +2,7 @@
 
 import tkinter as tk
 from tkinter import ttk
+from vista.sonidos import sonorizar_botones
 
 from vista.tema import FONDO, PANEL, TEXTO, TENUE, AMARILLO, ROJO, configurar_botones_menu
 
@@ -30,6 +31,7 @@ class FinPartida:
         self.boton_estadisticas.place(relx=.64, rely=.40, anchor="n", width=308)
         self.boton_estadisticas.bind("<Return>", lambda e: self.alternar_estadisticas())
         self.canvas.bind("<Configure>", self.dibujar)
+        sonorizar_botones(self.panel, vista.sonidos)
 
     def alternar_estadisticas(self):
         self.estadisticas_visibles = not self.estadisticas_visibles

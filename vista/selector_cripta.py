@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from vista.sonidos import sonorizar_botones
 
 from vista.tema import FONDO, PANEL, TEXTO, AMARILLO, VERDE, BORDE, configurar_botones_menu
 
@@ -41,6 +42,7 @@ class SelectorCripta:
                    state="normal" if criptas else "disabled").pack(
             side="left", fill="both", expand=True)
         self.canvas.bind("<Configure>", self.dibujar)
+        sonorizar_botones(self.panel, vista.sonidos)
 
     def aceptar(self, _evento=None):
         seleccion = self.lista.curselection()

@@ -115,7 +115,7 @@ class TestEscena(unittest.TestCase):
     def test_mismo_tipo_utiliza_la_misma_imagen_y_distinta_accion(self):
         v = VistaGrafica.__new__(VistaGrafica)
         v.canvas, v.recursos, v._ligar = Mock(), Mock(), Mock()
-        v.recursos.imagen.return_value = object()
+        v.recursos.imagen.return_value = SimpleNamespace(width=lambda: 80, height=lambda: 80)
         estado = SimpleNamespace(sala_id=1, sala_nombre="Sala", salidas=[], objetos_suelo=[], vida=30, vida_max=30,
             enemigos=[EnemigoVista("r1", "Rata #1", 12, 12, tipo="tipo-r") ,
                       EnemigoVista("r2", "Rata #2", 12, 12, tipo="tipo-r")])

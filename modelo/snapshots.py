@@ -211,6 +211,7 @@ class EstadoVista:
 class ResultadoAccion:
     ok: bool                # False = acción rechazada (no consume tiempo, Apéndice B)
     mensaje: str = ""
+    trampas_activadas: list[str] = field(default_factory=list)
 
 
 @dataclass

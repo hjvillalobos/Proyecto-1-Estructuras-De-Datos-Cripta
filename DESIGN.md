@@ -4,6 +4,19 @@ Aplicacion de escritorio Tkinter, en espanol. La escena permite decidir una acci
 por vez; la simulacion usa tiempo virtual y los efectos visuales usan callbacks de
 Tkinter. El aspecto nunca cambia estadisticas, costos, semillas ni reglas.
 
+## Rendimiento visual
+
+Las dos orientaciones reutilizan una composicion de las ocho poses. El jugador
+y el fondo originales se decodifican una sola vez por vista. Con equipo completo
+no se genera primero otra variante intermedia del chaleco.
+CacheVisual conserva hasta 128 PNG regenerables en la carpeta temporal
+`cripta-visuales`, con secuencias agrupadas y alfa sin perdida. La firma incluye
+ruta, tamano y fecha de los recursos y el codigo de composicion; al cambiar esos
+datos se regeneran. Si falta permiso o hay corrupcion se compone normalmente.
+Esta cache es de presentacion, no sustituye ni altera la cache de catalogo.
+La espera de comandos procesa eventos nativos de Tk sin sondeo con sleep;
+se conservan los 20 ms y todos los pasos de animacion existentes.
+
 ## Identidad
 
 - Imagen del jugador con traje de tigre y rata proporcionadas por el usuario.
@@ -50,6 +63,10 @@ Tkinter. El aspecto nunca cambia estadisticas, costos, semillas ni reglas.
   Motivo de inicio original en modo menor, campanas inarmonicas, graves y eco
   finito. Pasos y puertas usan ruido filtrado y golpes amortiguados, no tonos
   puros. La sintesis no utiliza random ni grabaciones o melodias de otros juegos.
+  Los botones de menus, selector, partida y dialogos emiten una campana breve
+  al activar su comando, tambien mediante teclado. No suenan al pasar el raton
+  ni estando deshabilitados. Se conserva el comando original y el control Sonido;
+  enlazar dos veces un boton no duplica su efecto ni su accion.
 - Se verifican 1280x800 y 1100x760, incluyendo escenas pobladas, equipo y replay.
 - `FinPartida` reemplaza el aviso nativo de resultado por una pantalla completa
   con piedra, tigre, resultado y resumen real. No contiene un segundo motor.
@@ -100,6 +117,31 @@ Tkinter. El aspecto nunca cambia estadisticas, costos, semillas ni reglas.
   recurso se conserva la presentacion anterior como respaldo.
   La ropa en reposo cubre un 25% del ancho del recurso del tigre, hasta la cintura;
   las poses amplian un 20% el ancho y un 8% el largo de sus anclajes de torso.
+- La daga conocida se compone con el sprite antes de reflejarlo: mango en la
+  palma y orientacion propia por pose. La mano abierta se retira, incluidas sus
+  garras, y se sustituye por el puno cerrado recortado de la carrera original;
+  no se simula el cierre con una mascara circular sobre la mano abierta.
+  El puno se gira hacia la muneca y queda delante del mango. En carrera se
+  conservan los dedos cerrados de los propios cuadros. Las armas desconocidas
+  conservan su imagen/anclaje de respaldo. El equipo prepara ambas orientaciones
+  al cambiar para evitar trabajo extra al comenzar la siguiente carrera.
+  Al recoger, la daga integrada permanece en el puno derecho y el objeto se
+  sostiene brevemente en la izquierda, sin regresar al anclaje antiguo al acabar.
+- Usar una pocion o antidoto aceptado transmite solo su instancia a la vista.
+  La vista resuelve el ItemVista anterior, sin consultar o mutar el inventario.
+  Una pose adicional de beber usa la animacion existente durante 32 pasos visuales;
+  el antidoto colorea unicamente el liquido turquesa. Se mantiene la coraza y se
+  oculta la daga durante el sorbo. No agrega acciones, consumos ni tiempo virtual;
+  acciones rechazadas, otras clases de objetos y movimiento desactivado no beben.
+  Replay recibe el mismo contexto visual sin cambiar archivos, reglas o selector.
+- Rata: limite visual al 54% de la altura base del enemigo. En salas de hasta
+  cuatro enemigos comparten el plano de apoyo del jugador; la sombra depende
+  de la anchura real del recurso, no de la celda entera. Los paneles poblados
+  conservan dos filas y paginacion. Tipos desconocidos mantienen el respaldo.
+- Sur usa el carril izquierdo mientras haya enemigos, fuera de sus celdas y
+  barras de vida; sin enemigos permanece centrado. Deja separacion respecto
+  a la salud del jugador y a la franja de objetos. La posicion del control
+  no cambia la direccion, el costo ni la animacion de atravesar una puerta.
 - La casilla Animaciones permite desactivar el movimiento. Cambiar de sala,
   redimensionar, reiniciar o cerrar cancela el callback y libera sus referencias.
 - No hay movimiento libre ni ataques automaticos. Las flechas siguen siendo
@@ -137,3 +179,15 @@ Tkinter. El aspecto nunca cambia estadisticas, costos, semillas ni reglas.
   el registro muestra tres lineas con desplazamiento para liberar altura de escena.
   El fondo dedica la mitad de su altura al suelo, sin cambiar reglas ni geometria
   logica. Verificado en ventanas de 1100x760 y 1280x850.
+- Las trampas tienen indicadores individuales y paginacion de ocho elementos.
+  ResultadoAccion comunica sus activaciones reales a la vista y al replay;
+  nunca se deducen del estado armado, que puede haber cambiado por el rearme.
+  Dardos muestra proyectiles y las fichas desconocidas un pulso generico.
+  Los efectos usan el callback de AnimacionEscena y se limpian al terminar,
+  cargar o desactivar animaciones, sin ejecutar efectos del modelo.
+- La antorcha activa se integra en el puno izquierdo del tigre, dejando la daga
+  en el derecho. Reposo, carrera, ataque, caida y bebida conservan el agarre;
+  el indicador de efecto del modelo determina cuando aparece y se apaga.
+  Se componen los recursos existentes sin modificar los PNG originales.
+  El mango es el pivote de giro; la llama se inclina hacia fuera del antebrazo,
+  con direccion inversa al cruzar el brazo en ataque o durante la caida.

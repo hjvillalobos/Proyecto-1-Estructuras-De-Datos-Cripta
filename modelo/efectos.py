@@ -112,7 +112,7 @@ class GestorEfectos:
         if self.motor.jugador.vida == 0:
             self.motor._matar(self.motor.jugador)
 
-        if "veneno" in ficha.atributos:
+        if self.motor.jugador.vida > 0 and "veneno" in ficha.atributos:
             info_veneno = ficha.atributos["veneno"]
             self.aplicar_veneno(self.motor.jugador, info_veneno.get("dano_por_pulso", 1))
 

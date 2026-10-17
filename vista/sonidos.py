@@ -13,6 +13,7 @@ except ImportError:
 
 
 _NOTAS = {
+    "boton": ((391.995, .045), (523.251, .045)),
     "inicio": ((174.614, .55), (261.626, .45), (207.652, .6), (329.628, .5),
                (0, .3), (311.127, .5), (246.942, .5), (195.998, .55),
                (174.614, .65), (130.813, .8)),
@@ -27,6 +28,22 @@ _NOTAS = {
     "victoria": ((261.626, .18), (311.127, .18), (391.995, .32)),
     "derrota": ((195.998, .25), (155.563, .3), (130.813, .45)),
 }
+
+
+def sonorizar_botones(contenedor, sonidos):
+    """Envuelve comandos reales: tambien funciona al activar con el teclado."""
+    from tkinter import ttk
+
+    for widget in contenedor.winfo_children():
+        if isinstance(widget, ttk.Button) and not getattr(widget, "_sonorizado", False):
+            comando = widget.cget("command")
+            if comando:
+                def activar(boton=widget, original=comando):
+                    sonidos.reproducir("boton")
+                    return boton.tk.call(*boton.tk.splitlist(original))
+                widget.configure(command=activar)
+                widget._sonorizado = True
+        sonorizar_botones(widget, sonidos)
 
 
 class Sonidos:
@@ -63,7 +80,7 @@ class Sonidos:
     def _crear_efecto(ruta, notas, efecto=""):
         frecuencia = 22050
         ambiente = efecto in ("inicio", "derrota")
-        campana = efecto in ("inicio", "recoger", "usar", "retroceso", "victoria", "derrota")
+        campana = efecto in ("boton", "inicio", "recoger", "usar", "retroceso", "victoria", "derrota")
         senal = []
         ruido, filtrado = 12345, 0.0
         for tono, duracion in notas:
@@ -90,7 +107,7 @@ class Sonidos:
                     valor += .12 * math.sin(2 * math.pi * 55 * tiempo)
                     valor += .07 * math.sin(2 * math.pi * 82.407 * tiempo + .2 * math.sin(tiempo * 2))
                 senal.append(valor * envolvente)
-        cola = .7 if campana else .12
+        cola = .08 if efecto == "boton" else .7 if campana else .12
         senal.extend([0.0] * int(frecuencia * cola))
         mezcla = senal.copy()
         if campana:

@@ -16,6 +16,10 @@ en tinta, hierro gastado y cuero, orientado a la izquierda) y
 `objetos_ilustrados.png` (hoja RGBA de recursos con recortes en RecursosGraficos).
 Solo se usan los nueve objetos/trampa comprobados de la hoja, no sus enemigos.
 La rata original se conserva; el tigre y `jugador_acciones.png` no se modifican.
+`jugador_beber.png` agrega un gesto derivado del tigre original, generado con
+imagegen el 2026-10-16. Solo se usa su celda central: las laterales cambiaban de
+brazo al sostener la botella y no se integran en la animacion. El PNG original
+del tigre no se sobrescribe. Prompts completos en PROMPTS_LLM.md.
 Direccion artistica: fantasia oscura ilustrada, siluetas legibles, trazos de tinta,
 luz ambar desde la izquierda y sin halos. Las versiones anteriores son respaldo.
 
