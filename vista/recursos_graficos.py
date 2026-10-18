@@ -43,6 +43,7 @@ class RecursosGraficos:
         self._puno = None
         self._antorcha = None
         self._jugador_original = None
+        self._jugador_antorcha = None
         self._fondo_original = None
         self._cuadros_preparados = None
         self._cache_visual = CacheVisual(self.carpeta)
@@ -89,6 +90,13 @@ class RecursosGraficos:
             with Image.open(self.carpeta / "jugador.png") as origen:
                 self._jugador_original = origen.convert("RGBA")
         return self._jugador_original.copy()
+
+    def _original_jugador_antorcha(self):
+        """Pose de reposo con brazo doblado y agarre pintado alrededor del mango."""
+        if self._jugador_antorcha is None:
+            with Image.open(self.carpeta / "jugador_antorcha.png") as origen:
+                self._jugador_antorcha = origen.convert("RGBA")
+        return self._jugador_antorcha.copy()
 
     def _original_fondo(self):
         if self._fondo_original is None:
@@ -175,15 +183,26 @@ class RecursosGraficos:
         if cuadro is not None:
             return cuadro
         from vista.equipo_visual import armar_jugador, vestir_jugador, iluminar_jugador
-        cuadro = self._original_jugador()
+        pose_antorcha = False
+        if antorcha:
+            try:
+                cuadro = self._original_jugador_antorcha()
+                pose_antorcha = True
+            except (OSError, ValueError):
+                cuadro = self._original_jugador()
+        else:
+            cuadro = self._original_jugador()
         ropa, daga = self._ropa_jugador(armadura), self._arma_jugador(arma)
         luz = self._antorcha_jugador() if antorcha else None
         puno = self._puno_jugador() if daga is not None or luz is not None else None
         if ropa is not None:
-            cuadro = vestir_jugador(cuadro, ropa)
+            cuadro = vestir_jugador(cuadro, ropa, torso=(
+                (.48, .25), (.70, .265), (.48, .435)) if pose_antorcha else None)
         if daga is not None and puno is not None:
-            cuadro = armar_jugador(cuadro, daga, puno)
-        if luz is not None and puno is not None:
+            cuadro = armar_jugador(cuadro, daga, puno,
+                                  mano=(.785, .582) if pose_antorcha else None,
+                                  puno_cerrado=pose_antorcha)
+        if not pose_antorcha and luz is not None and puno is not None:
             cuadro = iluminar_jugador(cuadro, luz, puno)
         return cuadro
 

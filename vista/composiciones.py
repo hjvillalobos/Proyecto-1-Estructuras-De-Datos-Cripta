@@ -17,6 +17,8 @@ class ComposicionesPreparadas:
                            "itm_coraza_cuero", "itm_daga_oxidada", "itm_antorcha"):
                 huella.update(nombre.encode())
                 huella.update((self.recursos / (nombre + ".png")).read_bytes())
+            pose = self.recursos / "jugador_antorcha.png"
+            huella.update(pose.read_bytes() if pose.is_file() else b"sin-pose-antorcha")
             for nombre in ("equipo_visual.py", "recursos_graficos.py", "composiciones.py"):
                 huella.update((Path(__file__).parent / nombre).read_bytes().replace(b"\r\n", b"\n"))
             generador = Path(__file__).parent.parent / "utilidades" / "preparar_visuales.py"

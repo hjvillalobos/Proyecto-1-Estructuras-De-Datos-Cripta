@@ -1,10 +1,12 @@
 import tkinter as tk
 import unittest
+from dataclasses import replace
 from unittest.mock import Mock, patch
 
 from tests import test_regresiones_juego as base
 from vista.animacion import AnimacionEscena
 from vista.grafica import VistaGrafica
+from vista.recursos_graficos import Image
 
 
 def avanzar(vista, pasos):
@@ -35,6 +37,46 @@ class TestTransicionSalas(unittest.TestCase):
         self.assertTrue(motor.ejecutar("mover", direccion).ok)
         vista.preparar_animacion("mover")
         vista.mostrar_estado(motor.estado_vista(), [])
+
+    @unittest.skipIf(Image is None, "Pillow no disponible")
+    def test_antorcha_apagada_no_reaparece_en_la_animacion_de_salida(self):
+        for equipado in (False, True):
+            with self.subTest(equipado=equipado):
+                self.datos.setUp()
+                v, m = self.vista, self.datos.motor
+                v.reiniciar_presentacion()
+                m.sala_salida = None
+                m.salas[1].salidas = {"N": {"sala": 2}}
+                next(f for f in self.datos.fichas if f.id == "antorcha").atributos["duracion"] = 100
+                self.datos._inventario("antorcha")
+                self.datos._accion("usar", "antorcha")
+
+                def estado():
+                    return replace(m.estado_vista(),
+                        arma_tipo="itm_daga_oxidada" if equipado else None,
+                        armadura_tipo="itm_coraza_cuero" if equipado else None)
+
+                v.mostrar_estado(estado(), [])
+                self.assertTrue(v.canvas.find_withtag("antorcha_visible"))
+                self.datos._accion("mover", "N")
+                self.assertNotIn("antorcha", m.estado_vista().efectos)
+                v.preparar_animacion("mover")
+                v.mostrar_estado(estado(), [])
+                guardado = m.exportar_estado()
+                self.assertTrue(v.transicion_salas.activa)
+                self.assertFalse(v.canvas.find_withtag("antorcha_visible"))
+                secuencia = v.escena.animacion.secuencias[0]
+                altura = int(min(280, max(350, v.canvas.winfo_height()) - 175) * .70)
+                esperados = v.recursos.fotogramas_accion("correr", 290, altura,
+                    arma="itm_daga_oxidada" if equipado else None,
+                    armadura="itm_coraza_cuero" if equipado else None, antorcha=False)
+                self.assertEqual(secuencia[1], esperados)
+                avanzar(v, 4)
+                v.transicion_salas.redibujar()
+                self.assertFalse(v.canvas.find_withtag("antorcha_visible"))
+                avanzar(v, 26)
+                self.assertFalse(v.canvas.find_withtag("antorcha_visible"))
+                self.assertEqual(m.exportar_estado(), guardado)
 
     def test_corre_hasta_puerta_y_entra_sin_cambiar_simulacion(self):
         self.mover("N")

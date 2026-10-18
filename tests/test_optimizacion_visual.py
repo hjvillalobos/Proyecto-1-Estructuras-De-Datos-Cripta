@@ -126,20 +126,21 @@ class TestReutilizacionSprites(unittest.TestCase):
             self.assertEqual(a.tobytes(), c.tobytes())
             self.assertEqual(a.transpose(Image.Transpose.FLIP_LEFT_RIGHT).tobytes(), b.tobytes())
 
-    def test_reposo_preparado_es_identico_al_compuesto_original(self):
-        from vista.equipo_visual import armar_jugador, vestir_jugador, iluminar_jugador
+    def test_reposo_preparado_conserva_pose_de_agarre_y_daga_contraria(self):
+        from vista.equipo_visual import armar_jugador, vestir_jugador
         r = self.r
-        with Image.open(r.carpeta / "jugador.png") as archivo:
+        with Image.open(r.carpeta / "jugador_antorcha.png") as archivo:
             referencia = archivo.convert("RGBA")
-        referencia = vestir_jugador(referencia, r._ropa_jugador("itm_coraza_cuero"))
-        referencia = armar_jugador(referencia, r._arma_jugador("itm_daga_oxidada"), r._puno_jugador())
-        referencia = iluminar_jugador(referencia, r._antorcha_jugador(), r._puno_jugador())
+        referencia = vestir_jugador(referencia, r._ropa_jugador("itm_coraza_cuero"),
+                                    torso=((.48, .25), (.70, .265), (.48, .435)))
+        referencia = armar_jugador(referencia, r._arma_jugador("itm_daga_oxidada"),
+                                  r._puno_jugador(), mano=(.785, .582), puno_cerrado=True)
         referencia.thumbnail((230, 196), Image.Resampling.LANCZOS)
         actual = r.jugador_armado(230, 196, "itm_daga_oxidada", "itm_coraza_cuero", antorcha=True)
         self.assertEqual(ImageTk.getimage(actual).tobytes(), referencia.tobytes())
         otra = RecursosGraficos(self.root)
         otra._cache_visual = CacheVisual(otra.carpeta, self.temporal.name)
-        with patch.object(otra, "_original_jugador", side_effect=AssertionError("Recompuso")):
+        with patch.object(otra, "_original_jugador_antorcha", side_effect=AssertionError("Recompuso")):
             guardada = otra.jugador_armado(230, 196, "itm_daga_oxidada", "itm_coraza_cuero", antorcha=True)
         self.assertEqual(ImageTk.getimage(guardada).tobytes(), referencia.tobytes())
 

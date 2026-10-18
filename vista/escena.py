@@ -172,7 +172,9 @@ class EscenaCripta:
         recursos = getattr(self.vista, "recursos", None)
         armadura = getattr(estado, "armadura_tipo", None)
         arma = getattr(estado, "arma_tipo", None)
-        antorcha = "antorcha" in getattr(estado, "efectos", ())
+        # La caida no conserva fuego en sus fotogramas aunque el reloj del
+        # modelo se detenga antes del evento de apagado.
+        antorcha = estado.vida > 0 and "antorcha" in getattr(estado, "efectos", ())
         armado = (recursos.jugador_armado(230, altura_jugador, arma, armadura, antorcha=antorcha)
                   if recursos and (arma or antorcha) else None)
         vestido = (armado if armado is not None and armadura == "itm_coraza_cuero" else

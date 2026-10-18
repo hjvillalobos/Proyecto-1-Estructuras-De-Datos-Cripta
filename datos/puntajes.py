@@ -65,7 +65,7 @@ class TablaPuntajes:
                     continue                    # una línea dañada no debe tumbar el ranking
         return registros
 
-    def ranking(self, cripta_id=None, limite=10):
+    def ranking(self, cripta_id=None, limite=None):
         registros = self.cargar()
         if cripta_id is not None:
             registros = [r for r in registros if r.cripta_id == cripta_id]

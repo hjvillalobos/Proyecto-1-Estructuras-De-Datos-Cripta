@@ -1,5 +1,26 @@
 # Recursos visuales
 
+## Agarre de antorcha
+
+`jugador_antorcha.png` es una variante RGBA creada con ImageGen integrado el
+2026-10-18, a partir del jugador original y la referencia de agarre del usuario.
+Solo se utiliza en reposo con antorcha activa. El brazo del lado izquierdo de
+la pantalla sostiene el mango vertical; la mano contraria queda cerrada para
+componer la daga. La vista coloca coraza y daga con los anclajes de esta pose.
+Al apagarse o caer derrotado se utilizan las imagenes originales sin llama.
+El original y la hoja de animaciones no se sobrescriben.
+
+Prompt principal: "Edit only the arm on the LEFT SIDE OF THE IMAGE, beside the
+tail. Bend its elbow and raise its fist to lower chest height, gripping a slender
+wooden burning torch vertically upright, like the grip reference but on the
+opposite screen side. Keep the right arm hanging for the existing dagger. Preserve
+the tiger-costume character, face, hood, torso, belt, tail, legs, feet and stance.
+Full body cutout, actual transparent alpha, no background, no text, no dagger."
+
+Refinamiento: "Change only the hanging right hand into a naturally closed
+costumed paw fist, with curled fingers around an imaginary handle. Do not add
+a dagger. Keep the raised torch arm, other artwork, canvas and transparency."
+
 ## Personaje animado
 
 `jugador_acciones.png` es una hoja de 4 columnas y 2 filas, generada con imagegen

@@ -60,3 +60,7 @@
 {"nombre": "be", "cripta_id": "cripta-03", "cripta_version": "24d301ed6e9f", "acciones": 29, "derrotados": 2, "tiempo_final": 1998, "resultado": "derrota"}
 {"nombre": "Jugador", "cripta_id": "cripta-01", "cripta_version": "fd58f7743b9e", "acciones": 7, "derrotados": 0, "tiempo_final": 405, "resultado": "derrota"}
 {"nombre": "Diana", "cripta_id": "cripta-04", "cripta_version": "d6727c7f4950", "acciones": 63, "derrotados": 7, "tiempo_final": 4312, "resultado": "derrota"}
+{"nombre": "Jugador", "cripta_id": "cripta-02", "cripta_version": "8091a5cd8b7c", "acciones": 12, "derrotados": 0, "tiempo_final": 1041, "resultado": "derrota"}
+{"nombre": "Belennn", "cripta_id": "cripta-04", "cripta_version": "d6727c7f4950", "acciones": 164, "derrotados": 21, "tiempo_final": 12450, "resultado": "victoria"}
+{"nombre": "diana", "cripta_id": "cripta-01", "cripta_version": "fd58f7743b9e", "acciones": 5, "derrotados": 0, "tiempo_final": 273, "resultado": "derrota"}
+{"nombre": "Jugador", "cripta_id": "cripta-04", "cripta_version": "d6727c7f4950", "acciones": 29, "derrotados": 2, "tiempo_final": 2166, "resultado": "derrota"}
