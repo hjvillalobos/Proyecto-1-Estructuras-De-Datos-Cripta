@@ -598,3 +598,57 @@ PNG sin perdida, acotada, con invalidacion y recuperacion ante fallos. Procesar
 entrada con eventos nativos sin cambiar pasos ni tiempos configurados de las
 animaciones. Verificar pixeles, controles, visualizacion y regresiones del juego.
 
+# 2026-10-17: contenido de criptas nuevas e icono neutro
+
+Herramienta: Codex. Prompt textual del usuario:
+
+> y podrias modificar el juego para que acepte una cripta nueva? es que mi profesor va a hacer eso, colocar una nueva cripta con diferentes enemigos, salas.. para ver si el proyecto aguanta.. No se pero puedes ponerle un signo de pregunta o una imagen neutra al juego por si mi profesor coloca alguna cosa desconocida o no se que opinas
+
+Uso: verificar que selector, motor y catalogo acepten identificadores nuevos.
+Unificar respaldo visual con signo de pregunta en escena, inventario, equipo y
+trampas sin cambiar los datos ni las reglas. Agregar pruebas con siete criptas,
+tipos nuevos, PNG ausente/danado, ausencia de Pillow y reutilizacion acotada.
+
+# 2026-10-17: puno de antorcha y equipo desconocido
+
+Herramienta: Codex. Solicitud del usuario por voz: revisar el respaldo con signo
+de pregunta en los escenarios de contenido nuevo y corregir el puno de la
+antorcha como el de la daga, manteniendo ambos objetos en manos distintas.
+
+Uso: ampliar las pruebas de equipo nuevo con antorcha y poses, reemplazar el
+borrado rectangular de la mano por una mascara localizada, alinear el mango
+con la palma y comprobar las composiciones reflejadas sin cambiar el modelo.
+
+# 2026-10-17: presentacion de puntajes
+
+Herramienta: Codex. Solicitud del usuario por voz: mejorar la ventana blanca
+que aparece al pulsar Puntajes, para que combine con el juego.
+
+Uso: sustituir el aviso estandar por una tabla modal oscura con el fondo de
+piedra existente, datos reales, scroll, estado vacio y cierre por teclado.
+No cambiar el ranking ni los archivos de resultados. Agregar pruebas de
+presentacion y del consumo de pociones y combate con identificadores nuevos.
+
+# 2026-10-17: replay directo
+
+Herramienta: Codex. Solicitud por voz: pulsar Replay sin buscar el archivo y
+mostrar arriba que se reproduce la ultima partida.
+
+Uso: abrir la bitacora automatica desde inicio y partida, preservar rutas
+explicitas por consola y la validacion existente. Identificar la grabacion
+predeterminada en el encabezado del reproductor. Probar ausencia de archivo,
+grabacion incompleta, ruta explicita y ausencia de cambios en el modelo.
+
+# 2026-10-17: optimizacion medida del inicio
+
+Herramienta: Codex. Prompts textuales del usuario por voz:
+
+> ¿Y cómo puedo mejorar el inicio? ¿O no se puede? Es que mi profesor también valora mucho el rendimiento
+
+> Ok, te doy permiso a todo
+
+Uso: perfilar menu y primera sala, comparar cargas de Tkinter y ampliar la
+cache visual sin perdida a fondos e imagenes estaticas. Probar igualdad de
+pixeles, invalidacion por cambios de PNG y respaldo para IDs nuevos. Cronometrar
+apertura fria y preparada sin modificar reglas, imagenes originales ni el PDF.
+

@@ -498,3 +498,164 @@ dispersos (por ejemplo, un id de 10 millones en una cripta de 20 salas)
 reservaría memoria proporcional al id más alto, no a la cantidad real de
 salas. No es un problema con las criptas del enunciado (ids consecutivos desde
 1), pero sería un límite real si el API llegara a usar ids no consecutivos.
+
+## Revision de arranque y cripta desconocida (2026-10-17)
+
+Se conserva el trabajo anterior del repositorio. Esta revision modifica:
+
+- El listado, la creacion de partidas y las acciones de la ventana ejecutan
+  trabajo de datos en un trabajador. Tk procesa eventos y descarta comandos
+  durante esa operacion; el controlador actualiza los widgets al terminar.
+  Las acciones siguen siendo secuenciales y se graban despues de confirmarse.
+  El cierre espera al trabajador antes de liberar la sesion. Durante la tarea
+  se suspende la recoleccion ciclica automatica para que el trabajador no
+  destruya objetos Tk; se restaura su estado anterior al finalizar.
+- Los doce WAV originales se distribuyen preparados (625 KB en total). La
+  copia conserva exactamente la senal sintetizada y mantiene la limpieza de
+  temporales. Si falta un WAV, se usa la sintesis anterior. Con Python 3.14.6,
+  la intro requirio aproximadamente 468 ms sintetizando y 4 ms copiando.
+- El esqueleto usa un arreglo auxiliar ordenado con el algoritmo propio y
+  busqueda binaria propia: validacion de duplicados O(n log n), consultas de
+  salas O(log n), sin indice hash. Las paginas descargadas se guardan despues
+  de validar el grafo; las paginas locales no se reescriben en cada arranque.
+- La precarga termina inmediatamente si todas las salas tienen contenido.
+  Consultar fichas residentes actualiza el LRU sin reconstruir las referencias
+  de todos los actores. Se conservan capacidad, proteccion y carga de faltantes.
+- El heap propio desplaza nodos hacia un hueco en vez de intercambiar dos
+  posiciones en cada nivel. Conserva (tiempo, secuencia), cancelaciones y replay.
+
+Validacion final: 399 pruebas, cero fallos y cero errores; una prueba de API
+real omitida por requerir habilitacion explicita. Se activo el paquete local de
+las cuatro criptas para probar las 116 salas, victoria, guardado y replay.
+Tambien se completo una cripta sintetica de 137 salas con tipos nuevos,
+enemigos de tres comportamientos, trampas, regeneracion y salida con llave.
+El estado final del replay coincide con el de la partida.
+
+Medicion final con Python 3.14.6, una ejecucion de rutas y replay, sin HTTP:
+
+| Cripta | Acciones | Media ms | p95 ms | Maximo ms | Acciones >=20 ms |
+|---|---:|---:|---:|---:|---:|
+| 01 (6 salas) | 21 | 2.14 | 5.82 | 9.49 | 0 |
+| 02 (20 salas) | 105 | 0.83 | 3.05 | 6.28 | 0 |
+| 03 (40 salas) | 225 | 0.75 | 2.22 | 34.20 | 1 |
+| 04 (50 salas) | 279 | 0.65 | 2.25 | 23.78 | 1 |
+| Sintetica (137 salas) | 280 | 9.94 | 38.82 | 53.70 | 29 |
+
+La accion completa incluye lectura local y esperas de lotes pendientes. La
+ruta automatica ejecuta movimientos sin tiempo de reflexion del jugador y
+puede alcanzar al trabajador. El GUI ahora procesa eventos durante esas
+esperas; esto mejora la respuesta de la ventana sin ocultar el costo de carga.
+Separadamente, los maximos del ciclo de un evento fueron 0.094, 0.067, 0.155 y
+0.185 ms en las cuatro criptas. La sintetica proceso 74 552 eventos, con media
+0.021 ms y maximo 28.90 ms; dos eventos superaron 20 ms. Esta muestra no permite
+certificar un limite estricto de 20 ms para toda cripta desconocida. Los tiempos
+de pared incluyen interrupciones del sistema y recoleccion de memoria; no se
+descartaron los picos. El script registra ambas escalas para evitar confundirlas.
+
+Reproducir desde la raiz:
+
+```powershell
+$env:CRIPTA_SIN_AUDIO = "1"
+$env:CRIPTA_PAQUETE_API = ".cache/cripta"
+python -m unittest discover -v
+python -m tests.medir_rendimiento --paquete .cache/cripta
+```
+
+Los datos completos estan en `.cache/rendimiento.json` y la salida de la suite
+en `.cache/pruebas-rendimiento.txt` (archivos locales ignorados por Git).
+El benchmark excluye Tk y audio. Un perfil previo con cache visual vacia
+dedico aproximadamente 0.82 s al primer dibujo, incluyendo la preparacion de
+ambas orientaciones del personaje; ese costo grafico inicial sigue existiendo.
+El resultado tampoco mide latencia, reintentos o disponibilidad del servidor.
+
+Para la prueba del profesor siguen siendo relevantes dos limites del contrato:
+la cache no admite mas tipos simultaneamente protegidos que su capacidad
+(25 por defecto), y los arreglos del motor reservan memoria segun el mayor ID
+de sala. Los IDs muy grandes y dispersos requieren otra representacion del
+motor; esta revision no cambia ese contrato. La prueba sintetica demuestra
+generalizacion de contenido, no compatibilidad con datos arbitrarios fuera de
+los limites y esquemas soportados.
+
+## Objetos y acciones: eliminar composicion durante la partida
+
+El perfil de un cambio a equipo completo con cache visual vacia dedico 1.578 s
+al dibujo: 0.849 s al reposo y 0.720 s a preparar ambas orientaciones de ocho
+poses. La mayor parte correspondia a transformaciones, mascaras y transferencias
+de imagenes a Tk, no a modificar estadisticas del motor.
+
+Se distribuyen 152 composiciones PNG sin perdida (51.25 MB de disco), generadas
+con `python -m utilidades.preparar_visuales`. Incluyen los ocho estados visuales
+de coraza/daga/antorcha, las ocho variantes de bebida y tamanos comunes. Los
+originales permiten adaptar otras dimensiones sin repetir la composicion.
+La firma comprueba arte y codigo; no depende de rutas, fechas o LF/CRLF. El
+paquete no contiene mapas, fichas, dificultades ni datos de ninguna cripta.
+Si falta o es incompatible, se mantiene el respaldo anterior. Incluir
+`vista/recursos/composiciones` al distribuir el proyecto evita perder esta mejora.
+
+La vista ya no prepara dieciseis poses al iniciar o cambiar equipo. Cada accion
+obtiene solo las poses que utiliza: dos para ataque/caida y cuatro para carrera.
+Mantiene indices, alfa, duraciones y anclajes. Las secuencias de acciones tienen
+un limite de ocho entradas; las demas caches conservan sus limites anteriores.
+Las bebidas tambien tienen persistencia visual, sin afectar el catalogo.
+
+Validacion: 409 pruebas, cero fallos y errores, una prueba de API real omitida.
+Se compararon pixeles de todas las combinaciones contra el compositor original,
+incluyendo bebidas, antidotos, alfa y reflejos. Se comprobaron paquetes ausentes,
+corruptos, firmas distintas, LF/CRLF, tipos desconocidos, guardado, retroceso y
+replay. La auditoria estatica de interfaz no reporta hallazgos.
+
+`python -m tests.medir_presentacion` mide 32 escenarios en 1100x760 y 1280x850,
+primero con caches de aplicacion vacias y despues reutilizando recursos. Incluye
+las combinaciones de equipo y bebidas, nueve objetos, recoger, soltar, atacar,
+esperar, retroceso, cargar, desplazamiento, derrota y una sala poblada.
+
+| Presentacion | Media ms | p95 ms | Maximo ms |
+|---|---:|---:|---:|
+| Primer uso (64 muestras) | 75.78 | 135.96 | 207.53 |
+| Repeticion (64 muestras) | 24.35 | 29.50 | 46.90 |
+
+Equipo completo: 63.90/77.30 ms en primer uso y 22.37/20.68 ms al repetir en
+las dos ventanas. Atacar: 64.66/97.51 ms en primer uso y 19.61/20.12 ms al repetir.
+Los picos restantes corresponden sobre todo al primer desplazamiento y a salas
+pobladas. Las fotos Tk todavia tienen un costo de creacion; no se garantiza un
+limite estricto de 20 ms para la presentacion.
+
+Son mediciones de snapshots sinteticos con Python 3.14.6, no una medicion de HTTP
+ni del motor. No incluyen la pausa intencional de las animaciones; en movimiento
+se dibujan salida y llegada sin esa pausa. La cache del sistema operativo puede
+estar caliente. El detalle esta en `.cache/presentacion.json` y la suite en
+`.cache/pruebas-objetos.txt`. El script no genera partidas ni consume solicitudes.
+
+## Medicion especifica de puerta a puerta
+
+`python -m tests.medir_puertas` ejecuta 32 recorridos con callbacks reales de Tk:
+cuatro direcciones, 1100x760 y 1280x850, sin equipo y con equipo completo,
+primer uso y repeticion. Usa movimientos del motor en dos salas sinteticas y
+verifica que sus 26 pasos visuales no alteran el estado posterior al movimiento.
+No mide HTTP ni representa todas las salas posibles del servidor.
+
+Se corrigio una deriva del temporizador: antes esperaba otros 20 ms despues de
+cada callback, sumando el costo de dibujo y los retrasos de despacho de Windows.
+Ahora agenda respecto al siguiente instante previsto. Ante una pausa larga
+reinicia la cadencia sin rafagas ni saltos de pasos. Los diez pasos de salida y
+dieciseis de entrada conservan su intervalo objetivo de 20 ms y su tiempo virtual.
+
+Maximos observados por grupo, en milisegundos:
+
+| Medicion | Primera vez, antes | Repetido, antes | Primera vez, despues | Repetido, despues |
+|---|---:|---:|---:|---:|
+| Dibujo de salida | 231.73 | 33.61 | 242.11 | 30.54 |
+| Redibujo de llegada | 194.78 | 6.43 | 219.75 | 8.17 |
+| Callback normal (sin redibujo de llegada) | 5.06 | 2.95 | 3.28 | 3.08 |
+| Tiempo total, incluida la animacion | 1159.80 | 812.27 | 949.84 | 549.80 |
+
+La mejora es de cadencia, no de creacion de bitmaps: el primer cruce conserva
+pausas al cargar poses y dibujar una orientacion aun no utilizada. No se ocultan
+esos picos. Al repetir, el peor recorrido queda cerca de los 520 ms previstos
+para 26 pasos; los callbacks normales tardan aproximadamente 3 ms o menos.
+La medicion de antes/despues son ejecuciones independientes, sujetas a variacion
+del sistema operativo. Los maximos de distintas columnas pueden ser casos distintos.
+
+Validacion de este ajuste: 31 pruebas aprobadas de animacion, cadencia, puertas,
+trampas y transicion de inicio; auditoria estatica sin hallazgos. El detalle de
+los recorridos posteriores esta en `.cache/puertas.json`.

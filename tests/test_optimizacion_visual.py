@@ -61,7 +61,57 @@ class TestReutilizacionSprites(unittest.TestCase):
         self.r = RecursosGraficos(self.root)
         self.r._cache_visual = CacheVisual(self.r.carpeta, self.temporal.name)
 
+    def test_fondos_preparados_conservan_pixeles_y_evitan_reescalado(self):
+        from PIL import ImageOps
+        r = self.r
+        original, _ = r._original_fondo()
+        menu = r.fondo(720, 480)
+        self.assertEqual(ImageTk.getimage(menu).tobytes(),
+                         ImageOps.fit(original, (720, 480), method=Image.Resampling.LANCZOS).convert("RGBA").tobytes())
+        sala = r.fondo_sala(700, 268)
+        corte = int(original.height * .58)
+        referencia = Image.new("RGB", (700, 268))
+        referencia.paste(original.crop((0, 0, original.width, corte)).resize(
+            (700, 134), Image.Resampling.LANCZOS), (0, 0))
+        referencia.paste(original.crop((0, corte, original.width, original.height)).resize(
+            (700, 134), Image.Resampling.LANCZOS), (0, 134))
+        self.assertEqual(ImageTk.getimage(sala).tobytes(), referencia.convert("RGBA").tobytes())
+        otra = RecursosGraficos(self.root)
+        otra._cache_visual = CacheVisual(otra.carpeta, self.temporal.name)
+        with patch.object(otra, "_original_fondo", side_effect=AssertionError("Decodifico fondo")):
+            self.assertEqual(ImageTk.getimage(otra.fondo(720, 480)).tobytes(), ImageTk.getimage(menu).tobytes())
+            self.assertEqual(ImageTk.getimage(otra.fondo_sala(700, 268)).tobytes(), ImageTk.getimage(sala).tobytes())
+
+    def test_imagen_preparada_admite_id_nuevo_e_invalida_al_cambiar_png(self):
+        carpeta = Path(self.temporal.name) / "recursos_nuevos"
+        carpeta.mkdir()
+        ruta = carpeta / "entidad_nueva.png"
+        Image.new("RGBA", (40, 60), (10, 20, 30, 180)).save(ruta)
+        r = RecursosGraficos(self.root, carpeta)
+        r._cache_visual = CacheVisual(carpeta, Path(self.temporal.name) / "imagenes")
+        primera = ImageTk.getimage(r.imagen("entidad_nueva", 20, 30))
+        otra = RecursosGraficos(self.root, carpeta)
+        otra._cache_visual = CacheVisual(carpeta, r._cache_visual.carpeta)
+        with patch.object(otra, "_objeto_ilustrado", side_effect=AssertionError("Proceso PNG")):
+            self.assertEqual(ImageTk.getimage(otra.imagen("entidad_nueva", 20, 30)).tobytes(), primera.tobytes())
+        Image.new("RGBA", (50, 60), (100, 120, 130, 180)).save(ruta)
+        tercera = RecursosGraficos(self.root, carpeta)
+        tercera._cache_visual = CacheVisual(carpeta, r._cache_visual.carpeta)
+        self.assertNotEqual(ImageTk.getimage(tercera.imagen("entidad_nueva", 20, 30)).tobytes(), primera.tobytes())
+
+    def test_fondo_modificado_invalida_la_cache_visual(self):
+        carpeta = Path(self.temporal.name)
+        self.r._cache_visual.guardar("fondo", Image.new("RGB", (10, 10)))
+        recursos = carpeta / "recursos"
+        recursos.mkdir()
+        Image.new("RGB", (10, 10), "red").save(recursos / "fondo_cripta_ilustrado.png")
+        cache = CacheVisual(recursos, carpeta / "fondos")
+        cache.guardar("fondo", Image.new("RGB", (10, 10), "red"))
+        Image.new("RGB", (11, 10), "blue").save(recursos / "fondo_cripta_ilustrado.png")
+        self.assertIsNone(CacheVisual(recursos, cache.carpeta).leer("fondo"))
+
     def test_orientaciones_comparten_composicion_y_nueva_vista_no_recompone(self):
+        self.r._preparadas.habilitada = False  # Verificar tambien el respaldo sin paquete distribuido.
         opciones = dict(armadura="itm_coraza_cuero", arma="itm_daga_oxidada", antorcha=True)
         with patch.object(self.r, "_componer_fotogramas", wraps=self.r._componer_fotogramas) as componer:
             normales = self.r.fotogramas_jugador(290, 196, **opciones)

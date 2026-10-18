@@ -1,4 +1,5 @@
 import math
+from time import perf_counter
 
 PASOS_CARRERA = 16
 
@@ -17,6 +18,7 @@ class AnimacionEscena:
         self.trayecto = None
         self._al_llegar = None
         self.decoraciones = []
+        self._siguiente_tic = None
 
     def decorar(self, decoracion):
         self.decoraciones.append(decoracion)
@@ -84,7 +86,11 @@ class AnimacionEscena:
 
     def iniciar(self):
         if self.pendiente is None and (self.actores or self.particulas):
-            self.pendiente = self.root.after(20, self._avanzar)
+            ahora = perf_counter()
+            if self._siguiente_tic is None or self._siguiente_tic <= ahora:
+                self._siguiente_tic = ahora + .020
+            demora = max(1, round((self._siguiente_tic - ahora) * 1000))
+            self.pendiente = self.root.after(demora, self._avanzar)
 
     def situar(self, paso):
         """Restaura el dibujo sin avanzar tiempo ni programar otro callback."""
@@ -131,6 +137,8 @@ class AnimacionEscena:
 
     def _avanzar(self):
         self.pendiente = None
+        if self._siguiente_tic is not None:
+            self._siguiente_tic += .020
         self.paso += 1
         self._actualizar_pose()
         for identificador, origen, duracion, desplazamiento in self.particulas:
@@ -151,6 +159,7 @@ class AnimacionEscena:
         if self.pendiente is not None:
             self.root.after_cancel(self.pendiente)
             self.pendiente = None
+        self._siguiente_tic = None
         for identificador, origen, *_ in self.actores:
             if self.canvas.type(identificador):
                 self.canvas.coords(identificador, *origen)

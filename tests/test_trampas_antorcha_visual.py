@@ -148,6 +148,19 @@ class TestTrampasAntorchaVisual(unittest.TestCase):
             self.assertEqual(cuadro.transpose(Image.Transpose.FLIP_LEFT_RIGHT).tobytes(), inverso.tobytes())
 
     @unittest.skipIf(Image is None, "Pillow no disponible")
+    def test_puno_antorcha_no_recorta_la_cola_con_un_rectangulo(self):
+        from vista.equipo_visual import iluminar_jugador
+
+        personaje = Image.new("RGBA", (1000, 1000), (140, 80, 30, 255))
+        transparente = Image.new("RGBA", (20, 20))
+        antes = personaje.tobytes()
+        resultado = iluminar_jugador(personaje, transparente, transparente)
+        self.assertEqual(resultado.getpixel((425, 640)), personaje.getpixel((425, 640)))
+        self.assertEqual(resultado.getpixel((335, 645)), personaje.getpixel((335, 645)))
+        self.assertEqual(resultado.getpixel((365, 628))[3], 0)
+        self.assertEqual(personaje.tobytes(), antes)
+
+    @unittest.skipIf(Image is None, "Pillow no disponible")
     def test_llama_apunta_fuera_del_antebrazo_sin_desanclar_el_mango(self):
         from PIL import ImageDraw
         from vista.equipo_visual import iluminar_jugador, _MANOS_IZQUIERDAS
@@ -155,7 +168,7 @@ class TestTrampasAntorchaVisual(unittest.TestCase):
         personaje = Image.new("RGBA", (400, 400))
         antorcha = Image.new("RGBA", (100, 200))
         dibujo = ImageDraw.Draw(antorcha)
-        dibujo.ellipse((20, 140, 28, 148), fill=(0, 255, 0, 255))
+        dibujo.ellipse((28, 152, 36, 160), fill=(0, 255, 0, 255))
         dibujo.ellipse((65, 10, 85, 30), fill=(255, 0, 0, 255))
         puno = Image.new("RGBA", (20, 20))
         originales = (personaje.tobytes(), antorcha.tobytes(), puno.tobytes())

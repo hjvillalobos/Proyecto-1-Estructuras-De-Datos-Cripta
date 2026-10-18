@@ -172,9 +172,17 @@ class GestorCatalogo:
 
     def obtener_fichas(self, ids_solicitados):
         with self._candado:
+            ids = list(ids_solicitados)
+            for clave in ids:
+                identificador(clave)
+            # Consultar fichas residentes no cambia sus referencias. Evita
+            # reconstruir y validar todo el conjunto activo por cada enemigo.
+            if self.version is not None and all(self.cache.contiene(clave) for clave in ids):
+                self.aciertos += len(unicos(ids))
+                return [self.cache.buscar(clave) for clave in ids]
             actuales = self._referencias_actuales()
             try:
-                return self.retener(ids_solicitados)
+                return self.retener(ids)
             finally:
                 self.cache.ajustar_referencias(actuales)
 

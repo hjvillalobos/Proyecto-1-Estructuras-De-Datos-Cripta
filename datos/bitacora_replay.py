@@ -5,6 +5,7 @@ from typing import Any, Callable
 
 
 VERSION_FORMATO_REPLAY = 1
+RUTA_REPLAY_PREDETERMINADA = "datos_generados/partida.log"
 
 
 class ErrorReplay(Exception):

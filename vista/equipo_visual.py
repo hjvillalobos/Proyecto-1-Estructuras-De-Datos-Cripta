@@ -23,7 +23,7 @@ _TORSOS = (
 
 _MANOS = ((.828, .439), (.784, .462), (.774, .377), (.831, .473),
           (.839, .286), (.815, .363), (.508, .368), (.362, .850))
-_MANOS_IZQUIERDAS = ((.365, .456), (.365, .484), (.30, .43), (.48, .507),
+_MANOS_IZQUIERDAS = ((.365, .505), (.365, .53), (.30, .475), (.48, .55),
                      (.275, .405), (.693, .484), (.273, .686), (.23, .88))
 
 
@@ -37,7 +37,7 @@ def iluminar_jugador(imagen, antorcha, puno, pose=None):
     objeto = antorcha.copy()
     objeto.thumbnail((tamano, tamano), Image.Resampling.LANCZOS)
     capa = Image.new("RGBA", (tamano * 2, tamano * 2))
-    capa.alpha_composite(objeto, (tamano - int(objeto.width * .24), tamano - int(objeto.height * .72)))
+    capa.alpha_composite(objeto, (tamano - int(objeto.width * .32), tamano - int(objeto.height * .78)))
     # La llama apunta fuera del antebrazo; el giro conserva el mango en la palma.
     giro = -25 if pose in (5, 6) else -50 if pose == 7 else 80
     capa = capa.rotate(giro, resample=Image.Resampling.BICUBIC)
@@ -47,13 +47,21 @@ def iluminar_jugador(imagen, antorcha, puno, pose=None):
     mascara = Image.new("L", imagen.size)
     dibujo = ImageDraw.Draw(mascara)
     if abierta:
-        dibujo.rectangle((x - imagen.width * .045, y - imagen.height * .025,
-                           x + imagen.width * .05, y + imagen.height * .08), fill=255)
+        # El puno cubre la palma; solo se retiran las puntas que sobresalen.
+        # Una caja aqui tambien recortaba la cola y el borde de la muneca.
+        if pose is None:
+            dibujo.polygon([(int(px * imagen.width), int(py * imagen.height)) for px, py in
+                ((.31, .57), (.34, .555), (.43, .555), (.45, .58),
+                 (.42, .615), (.405, .645), (.335, .638), (.30, .61))], fill=255)
+        else:
+            dibujo.ellipse((x - imagen.width * .055, y - imagen.height * .025,
+                             x + imagen.width * .055, y + imagen.height * .085), fill=255)
         resultado.paste((0, 0, 0, 0), (0, 0, imagen.width, imagen.height), mascara)
     resultado.alpha_composite(capa, (x - tamano, y - tamano))
     if abierta:
         cerrado = ImageOps.mirror(puno)
-        altura = max(1, int(imagen.height * .085))
+        cerrado.putalpha(cerrado.getchannel("A").point(lambda a: 0 if a < 16 else a))
+        altura = max(1, int(imagen.height * .105))
         cerrado = cerrado.resize((max(1, int(cerrado.width * altura / cerrado.height)), altura),
                                  Image.Resampling.LANCZOS)
         cerrado = cerrado.rotate(120 if pose in (None, "beber") else 15,
@@ -170,7 +178,7 @@ def dibujar_equipo(escena, estado, sprite, reposo, cuadros, accion, recogido, in
     def accesorio(tipo, tamano, posicion, anclajes, etiqueta, duracion=None, ocultar_hasta=0):
         if not tipo:
             return
-        imagen = escena._imagen(tipo, *tamano)
+        imagen = escena._imagen(tipo, *tamano, generica=True)
         if imagen is None:
             return
         identificador = canvas.create_image(x + posicion[0], y + posicion[1], image=imagen,

@@ -8,6 +8,7 @@ from unittest.mock import Mock, patch
 from types import SimpleNamespace
 
 from controlador.controlador import ControladorJuego
+from datos.guardado_binario import RUTA_GUARDADO_PREDETERMINADA
 from vista.grafica import VistaGrafica
 from vista.menu_inicio import MenuInicio
 from tests import test_regresiones_juego as base
@@ -135,13 +136,23 @@ class TestMenuInicio(unittest.TestCase):
         finally:
             vista.cerrar()
 
-    def test_cancelar_selector_no_cierra_menu(self):
+    def test_cargar_abre_guardado_directamente(self):
         menu = MenuInicio.__new__(MenuInicio)
         menu.vista = Mock()
         menu.elegir = Mock()
-        with patch("vista.menu_inicio.filedialog.askopenfilename", return_value=""):
+        with patch("vista.menu_inicio.Path.is_file", return_value=True), \
+                patch("tkinter.filedialog.askopenfilename") as selector:
+            menu.cargar()
+        menu.elegir.assert_called_once_with("cargar", RUTA_GUARDADO_PREDETERMINADA)
+        selector.assert_not_called()
+        menu.vista.mostrar_error_replay.assert_not_called()
+
+    def test_sin_guardado_avisa_y_conserva_menu(self):
+        menu = MenuInicio.__new__(MenuInicio)
+        menu.vista = Mock()
+        menu.elegir = Mock()
+        with patch("vista.menu_inicio.Path.is_file", return_value=False):
             menu.cargar()
         menu.elegir.assert_not_called()
-        with patch("vista.menu_inicio.filedialog.askopenfilename", return_value="partida.bin"):
-            menu.cargar()
-        menu.elegir.assert_called_once_with("cargar", "partida.bin")
+        menu.vista.mostrar_error_replay.assert_called_once_with(
+            "Aun no hay una partida guardada para cargar.")

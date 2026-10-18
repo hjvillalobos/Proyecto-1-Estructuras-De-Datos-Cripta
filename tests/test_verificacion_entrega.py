@@ -100,6 +100,33 @@ class CriptaDesconocida(ServidorFalso):
 
 
 class TestCriptaDesconocida(unittest.TestCase):
+    def test_arma_enemigos_botin_y_pocion_con_ids_nuevos(self):
+        with tempfile.TemporaryDirectory() as carpeta:
+            servidor = CriptaDesconocida(17)
+            precarga = GestorPrecarga(servidor, GestorCatalogo(
+                servidor, CacheCatalogoOrdenado(25), AlmacenLocal(carpeta)))
+            self.addCleanup(precarga.cerrar)
+            motor = crear_juego(precarga, "cripta-inedita", 12345)
+            arma = next(o for o in motor.objetos_en_suelo[100] if o.tipo_catalogo == "arma_nueva")
+            self.assertTrue(motor.ejecutar("recoger", arma.id_instancia).ok)
+            self.assertTrue(motor.ejecutar("equipar", arma.id_instancia).ok)
+            self.assertEqual(motor.jugador.ataque, 26)
+            self.assertTrue(motor.ejecutar("mover", "E").ok)
+            for enemigo in list(motor.estado_vista().enemigos):
+                self.assertTrue(motor.ejecutar("atacar", enemigo.instancia).ok)
+            self.assertFalse(motor.estado_vista().enemigos)
+            self.assertEqual(motor.enemigos_derrotados, 2)
+            pociones = [o for o in motor.objetos_en_suelo[101] if o.tipo_catalogo == "cura_nueva"]
+            self.assertEqual(len(pociones), 3)
+            pocion = pociones[0]
+            self.assertTrue(motor.ejecutar("recoger", pocion.id_instancia).ok)
+            motor.jugador.vida = 100
+            self.assertTrue(motor.ejecutar("usar", pocion.id_instancia).ok)
+            self.assertEqual(motor.jugador.vida, 120)
+            self.assertFalse(any(i.instancia == pocion.id_instancia for i in motor.inventario_vista()))
+            self.assertFalse(motor.ejecutar("usar", pocion.id_instancia).ok)
+            precarga.cerrar()
+
     def test_137_salas_tipos_nuevos_eventos_victoria_guardado_replay(self):
         with tempfile.TemporaryDirectory() as carpeta:
             servidor = CriptaDesconocida()

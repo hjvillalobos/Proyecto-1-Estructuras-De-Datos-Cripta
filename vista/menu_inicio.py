@@ -1,5 +1,8 @@
 import tkinter as tk
-from tkinter import filedialog, ttk
+from pathlib import Path
+from tkinter import ttk
+
+from datos.guardado_binario import RUTA_GUARDADO_PREDETERMINADA
 
 from vista.tema import FONDO, TEXTO, AMARILLO, VERDE, configurar_botones_menu
 from vista.animacion import AnimacionEscena
@@ -13,6 +16,7 @@ class MenuInicio:
         self.vista = vista
         configurar_botones_menu(vista.root)
         self.resultado = None
+        self._cargando = False
         self.fin = tk.BooleanVar(master=vista.root, value=False)
         self.panel = tk.Frame(vista.root, bg=FONDO)
         self.panel.place(relwidth=1, relheight=1)
@@ -51,10 +55,10 @@ class MenuInicio:
         self.fin.set(True)
 
     def cargar(self):
-        ruta = filedialog.askopenfilename(parent=self.vista.root, title="Cargar partida",
-            initialdir="datos_generados", filetypes=[("Partida", "*.bin"), ("Todos los archivos", "*.*")])
-        if ruta:
-            self.elegir("cargar", ruta)
+        if not Path(RUTA_GUARDADO_PREDETERMINADA).is_file():
+            self.vista.mostrar_error_replay("Aun no hay una partida guardada para cargar.")
+            return
+        self.elegir("cargar", RUTA_GUARDADO_PREDETERMINADA)
 
     def dibujar(self, _evento=None):
         self.animacion.detener()
@@ -68,7 +72,9 @@ class MenuInicio:
         self.canvas.create_text(w * .63 + 2, h * .23 + 3, text="CRIPTA", fill=FONDO,
                                 font=("Georgia", 64, "bold"))
         self.canvas.create_text(w * .63, h * .23, text="CRIPTA", fill=AMARILLO, font=("Georgia", 64, "bold"))
-        self.canvas.create_text(w * .63, h * .34, text="La salida te espera.", fill=TEXTO, font=("Georgia", 18))
+        self.canvas.create_text(w * .63, h * .34,
+                                text="Cargando…" if self._cargando else "La salida te espera.", fill=TEXTO,
+                                font=("Georgia", 18), tags=("subtitulo",))
         self.canvas.create_text(w * .63, h * .87, text="Reloj virtual", fill=TEXTO, font=("Segoe UI", 11))
         self.canvas.create_text(w * .63, h * .92, text="t = 0", fill=VERDE, font=("Consolas", 22, "bold"))
         for nombre, x, ancho, alto, fase in (("jugador", w * .23, 320, int(h * .68), 0),):
@@ -92,7 +98,14 @@ class MenuInicio:
             return self.resultado
         finally:
             self.animacion.detener()
-            self.panel.destroy()
+            if (self.resultado is not None and self.resultado[0] in ("jugar", "cargar")
+                    and callable(getattr(type(self.vista), "_conservar_inicio", None))):
+                self.controles.place_forget()
+                self._cargando = True
+                self.canvas.itemconfigure("subtitulo", text="Cargando…")
+                self.vista._conservar_inicio(self)
+            else:
+                self.panel.destroy()
             self.vista._en_menu = False
             self.vista._cola.clear()
             self.vista.root.protocol("WM_DELETE_WINDOW", self.vista._al_cerrar)

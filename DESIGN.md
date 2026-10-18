@@ -16,6 +16,26 @@ datos se regeneran. Si falta permiso o hay corrupcion se compone normalmente.
 Esta cache es de presentacion, no sustituye ni altera la cache de catalogo.
 La espera de comandos procesa eventos nativos de Tk sin sondeo con sleep;
 se conservan los 20 ms y todos los pasos de animacion existentes.
+El temporizador programa el siguiente paso respecto a su instante previsto,
+compensando el retraso de despacho y el costo del dibujo. Una pausa mayor que
+un periodo reinicia la cadencia sin rafagas de callbacks ni saltos de pasos.
+
+Las combinaciones de coraza, daga y antorcha, y las poses de pocion y antidoto,
+se distribuyen como PNG sin perdida en `vista/recursos/composiciones`. Se generan
+con `python -m utilidades.preparar_visuales`, conservando exactamente los pixeles
+del compositor. La firma usa contenido y codigo, independiente de carpeta,
+fechas y finales LF/CRLF. Un paquete ausente, corrupto o incompatible usa el
+compositor original. Hay versiones nativas para cualquier tamano y copias a las
+alturas habituales de 122, 165, 193 y 196 px. El paquete suma aproximadamente
+51 MB de disco y no se carga entero en memoria.
+
+Equipar o usar una antorcha prepara solo el reposo. No se anticipan ambas
+orientaciones de las ocho poses al iniciar o cambiar equipo. Atacar y caer
+cargan dos poses; correr carga cuatro, conservando sus duraciones y anclajes.
+Las poses de beber se conservan tambien en la cache visual de disco.
+Las caches retienen como maximo cuatro secuencias completas, ocho secuencias
+de acciones, cuatro reposos con equipo y cuatro bebidas. Los tipos desconocidos
+siguen usando los mismos respaldos; nada de esto modifica fichas ni estadisticas.
 
 ## Identidad
 
@@ -38,6 +58,11 @@ se conservan los 20 ms y todos los pasos de animacion existentes.
   la presentacion realista del guardian. Objetos y trampa proceden de recortes
   verificados de `objetos_ilustrados.png`; sus PNG previos quedan como respaldo.
   El boton Jugar usa oro; las estadisticas conservan sus colores funcionales.
+- Una entidad sin arte local usa un signo de pregunta neutro compartido por
+  tamano, dibujado con Tk sin depender de Pillow. Escena, trampas, equipo e
+  inventario mantienen nombre, instancia y datos del catalogo. La falta de PNG
+  no define reglas ni cambia el tipo. Las imagenes conocidas siguen iguales;
+  se recuerdan hasta 64 nombres ausentes para no repetir acceso a disco.
 - El selector vive en `vista/selector_cripta.py`, usa una lista nativa accesible
   por teclado y muestra por separado salas y dificultad de la seleccion.
   Ocupa la ventana principal completa, sin ventana modal ni tablero visible
@@ -45,6 +70,12 @@ se conservan los 20 ms y todos los pasos de animacion existentes.
   No altera el reloj, la API, el modelo ni los identificadores de las criptas.
 
 ## Comportamiento
+
+- Al confirmar Jugar o Cargar, el inicio conserva su fondo, tigre y titulo con
+  el texto Cargando y oculta sus botones. Permanece debajo del selector y durante
+  las consultas; se retira despues de dibujar el primer estado completo. Nunca
+  se expone el tablero vacio entre inicio, selector y partida. Volver o un error
+  permiten mostrar otro menu; la capa anterior se libera sin acumular paneles.
 
 - Cada instancia conserva su identificador aunque comparta imagen con otra.
 - Enemigos sin imagen local tienen una representacion generica consistente.
@@ -191,3 +222,26 @@ se conservan los 20 ms y todos los pasos de animacion existentes.
   Se componen los recursos existentes sin modificar los PNG originales.
   El mango es el pivote de giro; la llama se inclina hacia fuera del antebrazo,
   con direccion inversa al cruzar el brazo en ataque o durante la caida.
+  El puno cerrado ocluye el mango y la limpieza de las garras respeta la cola:
+  no borrar rectangulos alrededor de la mano. La antorcha sigue a la izquierda
+  y la daga a la derecha, incluso al equiparlas simultaneamente.
+- Puntajes usa una ventana modal propia de solo lectura, encabezado de piedra,
+  tabla oscura con scroll en ambos ejes y estados de victoria/derrota en color.
+  Conserva el ranking recibido y los IDs/versiones reales de cualquier cripta.
+  Cerrar o Escape devuelve el foco sin encolar acciones ni alterar la partida.
+- Replay en inicio y partida abre la grabacion automatica directamente, sin
+  selector de archivos. El reproductor identifica "Ultima partida" sobre sus
+  controles; un archivo explicito conserva el titulo "Partida guardada".
+  Se mantienen aislamiento del motor, pausas y validaciones de integridad.
+- Cargar partida abre directamente datos_generados/partida.bin, el mismo archivo
+  que escribe Guardar, sin selector. Si falta, muestra un aviso y conserva el menu.
+  La carga conserva las versiones, la semilla y el estado del guardado.
+- La cache visual reutiliza tambien fondos e imagenes estaticas ya reducidas
+  entre ventanas. Conserva LANCZOS, proporciones y pixeles; las marcas de los
+  PNG y del codigo invalidan copias antiguas. El limite de 128 archivos sigue
+  siendo independiente de las 25 fichas del catalogo. La primera preparacion
+  puede costar mas que las aperturas con copias validas; no ocultar ese costo.
+
+- Al finalizar una partida, victoria y derrota ofrecen Volver al menú principal
+  y Terminar. Derrota conserva Jugar de nuevo. Volver limpia la presentacion
+  y reutiliza el menu inicial para jugar o cargar; el replay conserva Cerrar replay.

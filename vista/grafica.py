@@ -28,7 +28,7 @@ BOTONES
   orden real del inventario.
 
 REPLAY
-  El botón «Replay» abre un archivo de bitácora (.log) y lo reproduce
+  El botón «Replay» abre la última grabación y la reproduce
   paso a paso en otra ventana, con Pausa, Detener y selector de velocidad.
 """
 
@@ -59,6 +59,7 @@ class VistaGrafica:
         self.escena = EscenaCripta(self)
         self.transicion_salas = TransicionSalas(self)
         self._estado = None
+        self._inicio_en_carga = None
         self._animaciones = []
         self._movimiento_activo = True
         self._ultimo_clic = ("", 0)
@@ -125,6 +126,9 @@ class VistaGrafica:
                         state="normal" if self.sonidos.disponible else "disabled").pack(side="right")
         ttk.Checkbutton(opciones_visuales, text="Animaciones", variable=self.var_movimiento,
                         command=self._alternar_movimiento).pack(side="right", padx=(0, 12))
+        self.var_titulo_replay = tk.StringVar(master=self.root, value="Replay")
+        self._etiqueta(self.barra_replay, variable=self.var_titulo_replay,
+                       color=AMARILLO, tamano=14, fuente="Georgia").pack(side="left", padx=(0, 18))
         ttk.Button(self.barra_replay, text="Pausa / Continuar", command=self._replay_alternar_pausa).pack(side="left")
         ttk.Button(self.barra_replay, text="Detener", command=self._replay_parar).pack(side="left", padx=8)
         self.var_vel = tk.StringVar(value="normal")
@@ -208,7 +212,7 @@ class VistaGrafica:
             return
         item = self._instancia_seleccionada()
         if hasattr(self, "icono_detalle"):
-            self._imagen_detalle = self.recursos.imagen(item.tipo, 52, 52) if item else None
+            self._imagen_detalle = self.recursos.imagen_entidad(item.tipo, 52, 52) if item else None
             self.icono_detalle.config(image=self._imagen_detalle or "")
         self.var_detalle.set("Inventario vacio" if item is None else
             f"{item.nombre}\n{item.detalle or item.clase.capitalize()}\nPeso {item.peso}  |  Valor {item.valor}")
@@ -282,7 +286,8 @@ class VistaGrafica:
     # Entrada
     # ------------------------------------------------------------------
     def _enviar(self, comando):
-        if self._cerrada or getattr(self, "_en_menu", False):
+        if (self._cerrada or getattr(self, "_en_menu", False) or getattr(self, "_ocupada", False)
+                or getattr(self, "_inicio_en_carga", None) is not None):
             return
         if self._en_replay:
             if comando == "salir":
@@ -291,9 +296,25 @@ class VistaGrafica:
             return
         self._cola.append(comando)
 
+    def ejecutar_tarea(self, funcion, *args, **kwargs):
+        from vista.tarea import ejecutar_tarea
+        return ejecutar_tarea(self, funcion, *args, **kwargs)
+
     def mostrar_menu(self, replay, puntajes):
         from vista.menu_inicio import MenuInicio
-        return MenuInicio(self, replay, puntajes).mostrar()
+        menu = MenuInicio(self, replay, puntajes)
+        self._liberar_inicio()
+        return menu.mostrar()
+
+    def _conservar_inicio(self, menu):
+        self._liberar_inicio()
+        self._inicio_en_carga = menu
+
+    def _liberar_inicio(self):
+        menu = getattr(self, "_inicio_en_carga", None)
+        self._inicio_en_carga = None
+        if menu is not None:
+            menu.panel.destroy()
 
     def _actualizar_ui(self):
         try:
@@ -416,6 +437,7 @@ class VistaGrafica:
         if anterior and e.reloj >= anterior.reloj and e.vida != anterior.vida:
             self._animar_vida(e.vida - anterior.vida)
         self.root.update_idletasks()
+        self._liberar_inicio()
 
     def _ligar(self, etiqueta, comando):
         c = self.canvas
@@ -545,7 +567,13 @@ class VistaGrafica:
         return not self._cerrada and messagebox.askyesno(
             "Jugar de nuevo", "Has perdido. ¿Quieres iniciar una partida nueva?", parent=self.root)
 
+    def preguntar_menu_principal(self):
+        respuesta = getattr(self, "_volver_menu_fin", False)
+        self._volver_menu_fin = False
+        return bool(respuesta and not self._cerrada)
+
     def reiniciar_presentacion(self):
+        self._volver_menu_fin = False
         if hasattr(self, "_reinicio_fin"):
             del self._reinicio_fin
         self._accion_visual = None
@@ -584,14 +612,8 @@ class VistaGrafica:
     def mostrar_puntajes(self, registros):
         if self._cerrada:
             return
-        if not registros:
-            texto = "(aún no hay partidas registradas)"
-        else:
-            texto = "\n".join(
-                f"{n:>2}. {r.nombre:<14} {r.resultado:<9} tiempo {r.tiempo_final:<6} "
-                f"acciones {r.acciones:<4} derrotados {r.derrotados}"
-                for n, r in enumerate(registros, start=1))
-        messagebox.showinfo("Tabla de puntajes", texto, parent=self.root)
+        from vista.tabla_puntajes import TablaPuntajesVisual
+        TablaPuntajesVisual(self, registros).mostrar()
 
     def mostrar_fin(self, resumen):
         if self._cerrada:
@@ -601,7 +623,9 @@ class VistaGrafica:
         from vista.fin_partida import FinPartida
         self.transicion_salas.cancelar()
         self.escena.detener()
-        self._reinicio_fin = FinPartida(self, resumen).mostrar()
+        pantalla = FinPartida(self, resumen)
+        self._reinicio_fin = pantalla.mostrar()
+        self._volver_menu_fin = pantalla.volver_menu
 
     def mostrar_estadisticas_red(self, est):
         self.mostrar_info(f"Red: {est.solicitudes}/{est.presupuesto} solicitudes | "
@@ -626,6 +650,10 @@ class VistaGrafica:
         self.barra_botones.pack_forget()
         self.barra_replay.pack(fill="x")
         self.root.title("REPLAY — CRIPTA")
+
+    def establecer_titulo_replay(self, titulo):
+        self.var_titulo_replay.set(titulo)
+        self.root.title(f"CRIPTA - Replay - {titulo}")
 
     def _replay_alternar_pausa(self):
         self._replay_pausado = not self._replay_pausado
@@ -675,6 +703,7 @@ class VistaGrafica:
         try:
             for identificador in getattr(self, "_animaciones", []):
                 self.root.after_cancel(identificador)
+            self._liberar_inicio()
             self.root.destroy()
         except tk.TclError:
             pass

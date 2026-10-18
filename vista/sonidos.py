@@ -5,6 +5,7 @@ from array import array
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import wave
+import shutil
 
 try:
     import winsound
@@ -78,6 +79,10 @@ class Sonidos:
 
     @staticmethod
     def _crear_efecto(ruta, notas, efecto=""):
+        preparado = Path(__file__).parent / "recursos" / "sonidos" / (efecto + ".wav")
+        if notas == _NOTAS.get(efecto) and preparado.is_file():
+            shutil.copyfile(preparado, ruta)
+            return
         frecuencia = 22050
         ambiente = efecto in ("inicio", "derrota")
         campana = efecto in ("boton", "inicio", "recoger", "usar", "retroceso", "victoria", "derrota")

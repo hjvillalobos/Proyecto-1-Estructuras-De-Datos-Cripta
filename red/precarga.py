@@ -2,6 +2,7 @@ from copy import copy, deepcopy
 from contextlib import contextmanager
 from dataclasses import dataclass
 from threading import Thread
+from utilidades.ordenamiento import ordenar
 
 from modelo.tipos import Sala, FichaCatalogo
 from red.errores import DatosInvalidos, VersionIncompatible
@@ -41,6 +42,7 @@ class GestorPrecarga:
         self.contenidos = []
         self.pendiente = None
         self.red_compatible = True
+        self._salas_ordenadas = []
 
     @contextmanager
     def transaccion_catalogo(self):
@@ -98,8 +100,11 @@ class GestorPrecarga:
             self.almacen.guardar_generales(datos)
         self.generales = datos
         self.catalogo.iniciar(version_catalogo)
+        self._salas_ordenadas = []
+        paginas_descargadas = []
         for pagina in range(1, datos["paginas"] + 1):
             respuesta = self.almacen.leer_pagina(cripta_id, datos["version"], pagina)
+            descargada = respuesta is None
             if respuesta is None:
                 self._comprobar_version_red()
                 respuesta = self.cliente.obtener_esqueleto(cripta_id, pagina)
@@ -116,27 +121,41 @@ class GestorPrecarga:
                 salidas = sala.get("salidas", {})
                 if not isinstance(salidas, dict):
                     raise DatosInvalidos("Las salidas deben ser un objeto JSON.")
-                if any(existente.id == sala["id"] for existente in self.salas):
-                    raise DatosInvalidos(f"Sala duplicada: {sala['id']}.")
                 for direccion, salida in salidas.items():
                     if direccion not in ("N", "S", "E", "O") or not isinstance(salida, dict):
                         raise DatosInvalidos("Salida inválida en el esqueleto.")
                     entero(salida.get("sala"), None)
                 self.salas.append(Sala(sala["id"], sala["nombre"], deepcopy(salidas)))
-            self.almacen.guardar_pagina(cripta_id, datos["version"], respuesta)
+            if descargada:
+                paginas_descargadas.append(respuesta)
         if len(self.salas) != datos["salas_total"]:
             raise DatosInvalidos("La cantidad de salas no coincide con los datos generales.")
+        self._salas_ordenadas = ordenar(self.salas, clave=lambda sala: sala.id)
+        for anterior, actual in zip(self._salas_ordenadas, self._salas_ordenadas[1:]):
+            if anterior.id == actual.id:
+                raise DatosInvalidos(f"Sala duplicada: {actual.id}.")
         for sala in self.salas:
             for salida in sala.salidas.values():
                 self._sala(salida["sala"])
         self._sala(datos["sala_inicial"])
         self._sala(datos["sala_salida"])
+        for respuesta in paginas_descargadas:
+            self.almacen.guardar_pagina(cripta_id, datos["version"], respuesta)
         self._incorporar(self._descargar(self._candidatas(datos["sala_inicial"])))
         inicial = self.preparar_entrada(datos["sala_inicial"], [])
         return CriptaPreparada(deepcopy(datos), deepcopy(self.salas), inicial, self.catalogo.version)
 
     def _sala(self, sala_id):
-        for sala in self.salas:
+        izquierda, derecha = 0, len(self._salas_ordenadas)
+        while izquierda < derecha:
+            medio = (izquierda + derecha) // 2
+            if self._salas_ordenadas[medio].id < sala_id:
+                izquierda = medio + 1
+            else:
+                derecha = medio
+        posicion = izquierda
+        if posicion < len(self._salas_ordenadas):
+            sala = self._salas_ordenadas[posicion]
             if sala.id == sala_id:
                 return sala
         raise DatosInvalidos(f"La sala {sala_id} no pertenece al esqueleto.")
@@ -206,6 +225,8 @@ class GestorPrecarga:
 
     def _candidatas(self, sala_id):
         self._sala(sala_id)
+        if len(self.contenidos) == len(self.salas):
+            return []
         cola = [sala_id]
         visitadas = [sala_id]
         candidatas = []

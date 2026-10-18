@@ -117,6 +117,39 @@ class TestFinPartida(unittest.TestCase):
             self.assertFalse(pantalla.panel.winfo_exists())
             self.assertEqual(self.vista._cola, [])
 
+    def test_volver_menu_en_victoria_y_derrota(self):
+        for resultado in ("victoria", "derrota"):
+            pantalla = self.pantalla(resultado)
+            boton = next(b for b in pantalla.botones
+                         if b.cget("text") == "Volver al menú principal")
+            self.vista.root.after(50, boton.invoke)
+            self.assertFalse(pantalla.mostrar())
+            self.assertTrue(pantalla.volver_menu)
+            self.assertFalse(pantalla.reiniciar)
+            self.assertEqual(self.vista._cola, [])
+
+    def test_aplicacion_regresa_al_menu_y_permite_otra_partida(self):
+        from controlador.aplicacion import ejecutar_juego
+        from unittest.mock import Mock
+        for resultado in ("victoria", "derrota"):
+            with self.subTest(resultado=resultado):
+                vista = Mock(spec=VistaGrafica)
+                vista.mostrar_menu.side_effect = [("jugar", None), ("jugar", None)]
+                vista.preguntar_menu_principal.side_effect = [True, False]
+                vista.preguntar_reinicio.return_value = False
+                sesion = Mock()
+                args = SimpleNamespace(gui=True, semilla=42, cripta="prueba")
+                with patch("vista.grafica.VistaGrafica", return_value=vista), \
+                        patch("modelo.juego.crear_juego", return_value=SimpleNamespace(resultado=resultado)) as crear, \
+                        patch("controlador.controlador.ControladorJuego") as controlador:
+                    self.assertEqual(ejecutar_juego(args, sesion, Mock()), 0)
+                self.assertEqual(vista.mostrar_menu.call_count, 2)
+                self.assertEqual(crear.call_count, 2)
+                self.assertEqual(controlador.return_value.iniciar.call_count, 2)
+                vista.reiniciar_presentacion.assert_called_once()
+                sesion.renovar.assert_called_once_with(tolerar_error=True)
+                vista.cerrar.assert_called_once()
+
     def test_replay_no_ofrece_reinicio(self):
         self.vista._en_replay = True
         pantalla = self.pantalla("derrota")

@@ -11,6 +11,7 @@ class FinPartida:
     def __init__(self, vista, resumen):
         self.vista, self.resumen = vista, resumen
         self.reiniciar = False
+        self.volver_menu = False
         self.panel = tk.Frame(vista.root, bg=FONDO)
         self.panel.place(relwidth=1, relheight=1)
         self.canvas = tk.Canvas(self.panel, bg=FONDO, highlightthickness=0)
@@ -24,8 +25,11 @@ class FinPartida:
         self.botones = []
         if self.permite_reinicio:
             self._boton("Jugar de nuevo", True, "Principal.Menu.TButton")
+        if not vista._en_replay:
+            self._boton("Volver al menú principal", "menu",
+                        "Menu.TButton" if self.permite_reinicio else "Principal.Menu.TButton")
         self._boton("Cerrar replay" if vista._en_replay else "Terminar", False,
-                    "Menu.TButton" if self.permite_reinicio else "Principal.Menu.TButton")
+                    "Menu.TButton" if not vista._en_replay else "Principal.Menu.TButton")
         self.boton_estadisticas = ttk.Button(self.panel, text="Ver estadísticas",
             style="Menu.TButton", command=self.alternar_estadisticas, takefocus=True)
         self.boton_estadisticas.place(relx=.64, rely=.40, anchor="n", width=308)
@@ -48,7 +52,8 @@ class FinPartida:
         self.botones.append(boton)
 
     def elegir(self, reiniciar=False):
-        self.reiniciar = bool(reiniciar and self.permite_reinicio)
+        self.volver_menu = reiniciar == "menu" and not self.vista._en_replay
+        self.reiniciar = bool(reiniciar is True and self.permite_reinicio)
         self.panel.destroy()
         return "break"
 
@@ -69,7 +74,7 @@ class FinPartida:
         color = AMARILLO if victoria else ROJO if derrota else TEXTO
         # Un solo telon de lectura, sobre el mismo escenario del inicio.
         x, margen = w * .64, 210
-        self.controles.place_configure(rely=.78 if self.estadisticas_visibles else .51)
+        self.controles.place_configure(rely=.73 if self.estadisticas_visibles else .51)
         c.create_rectangle(x - margen, h * .15, x + margen,
                            h * (.96 if self.estadisticas_visibles else .74),
                            fill=FONDO, outline="")

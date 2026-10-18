@@ -1,7 +1,7 @@
 import os
 
-from datos.bitacora_replay import BitacoraReplay
-from datos.guardado_binario import guardar_estado, cargar_estado
+from datos.bitacora_replay import BitacoraReplay, RUTA_REPLAY_PREDETERMINADA
+from datos.guardado_binario import guardar_estado, cargar_estado, RUTA_GUARDADO_PREDETERMINADA
 from datos.puntajes import RegistroPuntaje
 from vista.bitacora_pantalla import BufferCircular
 
@@ -28,7 +28,7 @@ class ControladorJuego:
         self,
         modelo,
         vista,
-        ruta_replay="datos_generados/partida.log",
+        ruta_replay=RUTA_REPLAY_PREDETERMINADA,
         tabla_puntajes=None,
         lanzador_replay=None,
     ):
@@ -356,7 +356,7 @@ class ControladorJuego:
             ruta = (
                 argumentos[0]
                 if argumentos
-                else "datos_generados/partida.bin"
+                else RUTA_GUARDADO_PREDETERMINADA
             )
 
             return self._guardar(ruta)
@@ -370,7 +370,7 @@ class ControladorJuego:
             ruta = (
                 argumentos[0]
                 if argumentos
-                else "datos_generados/partida.bin"
+                else RUTA_GUARDADO_PREDETERMINADA
             )
 
             return self._cargar(ruta)
@@ -425,10 +425,11 @@ class ControladorJuego:
 
     def _accion_modelo(self, accion, argumento=None):
 
-        resultado = self.modelo.ejecutar(
-            accion,
-            argumento,
-        )
+        if (callable(getattr(type(self.vista), "ejecutar_tarea", None))
+                and getattr(self.vista, "root", None) is not None):
+            resultado = self.vista.ejecutar_tarea(self.modelo.ejecutar, accion, argumento)
+        else:
+            resultado = self.modelo.ejecutar(accion, argumento)
 
         if not resultado.ok:
 
@@ -582,14 +583,8 @@ class ControladorJuego:
         if argumentos:
             ruta = argumentos[0]
 
-        elif hasattr(self.vista, "pedir_ruta_replay"):
-            ruta = self.vista.pedir_ruta_replay()
-
-            if not ruta:
-                return
-
         else:
-            # Sin argumento: repetir la partida en curso.
+            # Sin argumento: abrir directamente la grabacion de esta sesion.
             ruta = str(self.bitacora_replay.ruta)
 
         if not self._grabacion_valida and os.path.abspath(ruta) == os.path.abspath(self.bitacora_replay.ruta):

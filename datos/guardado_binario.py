@@ -10,6 +10,8 @@ from modelo.snapshots import (
     SalaGuardada, PuertaGuardada, EnemigoGuardado, ObjetoGuardado, TrampaGuardada)
 from utilidades.ordenamiento import ordenar
 
+RUTA_GUARDADO_PREDETERMINADA = "datos_generados/partida.bin"
+
 MAGIC = b"CRPT"
 FORMATO_VERSION = 3          # incluye evidencia de apertura con llave; rechaza formatos anteriores
 

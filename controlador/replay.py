@@ -1,6 +1,8 @@
 import time
+from pathlib import Path
 
-from datos.bitacora_replay import BitacoraReplay, ErrorReplay, ReplayIncompatible, aplicar_accion_replay
+from datos.bitacora_replay import (BitacoraReplay, ErrorReplay, ReplayIncompatible,
+                                  aplicar_accion_replay, RUTA_REPLAY_PREDETERMINADA)
 from vista.bitacora_pantalla import BufferCircular
 from red.errores import ErrorCripta
 
@@ -29,6 +31,9 @@ class ReproductorReplay:
 
         if hasattr(self._vista, "modo_replay"):
             self._vista.modo_replay()
+        if callable(getattr(type(self._vista), "establecer_titulo_replay", None)):
+            ultima = Path(ruta).resolve() == Path(RUTA_REPLAY_PREDETERMINADA).resolve()
+            self._vista.establecer_titulo_replay("\u00daltima partida" if ultima else "Partida guardada")
 
         def mostrar(juego, paso):
             try:

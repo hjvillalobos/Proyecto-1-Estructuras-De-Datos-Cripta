@@ -32,9 +32,12 @@ class EscenaCripta:
         if self.animacion is not None:
             self.animacion.agregar(identificador, fase, entrada, golpe, **movimiento)
 
-    def _imagen(self, nombre, ancho, alto):
+    def _imagen(self, nombre, ancho, alto, generica=False):
         recursos = getattr(self.vista, "recursos", None)
-        imagen = recursos.imagen(nombre, int(ancho), int(alto)) if recursos else None
+        cargar = (recursos.imagen_entidad if generica
+                  and callable(getattr(type(recursos), "imagen_entidad", None))
+                  else recursos.imagen) if recursos else None
+        imagen = cargar(nombre, int(ancho), int(alto)) if cargar else None
         if imagen is not None:
             self.imagenes.append(imagen)
         return imagen
@@ -95,15 +98,6 @@ class EscenaCripta:
                         self.animacion.decorar(ActivacionTrampa(c, origen, jugador[0],
                             int(min(280, alto - 175) * ESCALA_JUGADOR),
                             dardos=trampa.tipo == "trp_dardos", etiqueta="disparo_" + trampa.instancia))
-            if (self.anterior is None or any(getattr(self.anterior, atributo, None) != getattr(estado, atributo, None)
-                                            for atributo in ("arma_tipo", "armadura_tipo"))
-                    or (("antorcha" in getattr(self.anterior, "efectos", ())) != ("antorcha" in estado.efectos))):
-                recursos = getattr(v, "recursos", None)
-                if recursos is not None:
-                    for invertir in (False, True):
-                        recursos.fotogramas_jugador(290, int(min(280, alto - 175) * ESCALA_JUGADOR),
-                            invertir=invertir, armadura=getattr(estado, "armadura_tipo", None),
-                            arma=getattr(estado, "arma_tipo", None), antorcha="antorcha" in estado.efectos)
             if salir_hacia is None:
                 self.animacion.situar(paso_anterior)
             self.animacion.iniciar()
@@ -229,13 +223,13 @@ class EscenaCripta:
                         self.animacion.secuencia(sprite, (imagen, bebida, bebida, imagen),
                                                 reposo=imagen, pasos_por_cuadro=8, duracion=32)
                 elif accion:
-                    cuadros = self.vista.recursos.fotogramas_jugador(290, altura_jugador,
+                    cuadros = self.vista.recursos.fotogramas_accion(accion, 290, altura_jugador,
                         invertir=invertir, armadura=armadura, arma=arma if arma_integrada else None,
                         antorcha=antorcha)
                     self.imagenes.extend(cuadros)
-                    indices = {"correr": (0, 1, 2, 3), "atacar": (4, 5), "caer": (6, 7)}[accion]
-                    if len(cuadros) == 8:
-                        self.animacion.secuencia(sprite, [cuadros[i] for i in indices],
+                    indices = tuple(range(len(cuadros)))
+                    if cuadros:
+                        self.animacion.secuencia(sprite, cuadros,
                                                 reposo=imagen, mantener=accion == "caer",
                                                 pasos_por_cuadro=2 if accion == "correr" else 6,
                                                 duracion=PASOS_CARRERA if accion == "correr" else 18,
@@ -252,7 +246,7 @@ class EscenaCripta:
                                               px + 95, py - 105, smooth=True,
                                               fill=AMARILLO, width=3, tags=("efecto_visual",))
                         self.animacion.particula(golpe, duracion=14, desplazamiento=(16, 0))
-            elegidos = [cuadros[i] for i in indices] if len(cuadros) == 8 else ()
+            elegidos = [cuadros[i] for i in indices] if cuadros else ()
             dibujar_equipo(self, estado, sprite, imagen, elegidos, accion, self._objeto_recogido,
                             invertir=invertir, armadura_integrada=vestido is not None,
                             arma_integrada=arma_integrada)
@@ -299,7 +293,7 @@ class EscenaCripta:
             rata = getattr(enemigo, "tipo", "") == "ent_rata_gigante"
             if rata:
                 altura *= .54
-            imagen = self._imagen(getattr(enemigo, "tipo", ""), min(145 if rata else 205, celda - 16), altura)
+            imagen = self._imagen(getattr(enemigo, "tipo", ""), min(145 if rata else 205, celda - 16), altura, generica=True)
             sombra = min(celda * .32, imagen.width() * .35 if imagen is not None else altura * .35)
             c.create_oval(x - sombra, y - 6, x + sombra, y + 6, fill="#211a13", outline="", tags=(etiqueta,))
             if imagen is not None:
@@ -344,7 +338,7 @@ class EscenaCripta:
             x, y = 20 + col * w, alto - 76 + fila * 35
             etiqueta = f"objeto_{i}"
             c.create_rectangle(x + 2, y, x + w - 4, y + 30, fill="#30382a", outline="#77734e", tags=(etiqueta,))
-            imagen = self._imagen(getattr(objeto, "tipo", ""), 26, 26)
+            imagen = self._imagen(getattr(objeto, "tipo", ""), 26, 26, generica=True)
             margen = 34 if imagen is not None else 8
             if imagen is not None:
                 sprite = c.create_image(x + 18, y + 15, image=imagen, tags=(etiqueta,))

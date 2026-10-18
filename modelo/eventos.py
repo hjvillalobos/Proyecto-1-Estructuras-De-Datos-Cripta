@@ -32,31 +32,39 @@ class ColaEventos:
 
 
     def _sube(self, i):
+        datos = self._datos
+        evento = datos[i]
+        clave = (evento.tiempo, evento.secuencia)
         while i > 0:
-            padre = self._padre(i)
-            if self._es_menor(self._datos[i], self._datos[padre]):
-                self._intercambiar(i, padre)
-                i = padre
-            else:
+            padre = (i - 1) // 2
+            anterior = datos[padre]
+            if clave >= (anterior.tiempo, anterior.secuencia):
                 break
+            datos[i] = anterior
+            i = padre
+        datos[i] = evento
 
     def _baja(self, i):
-        n = len(self._datos)
-        while True:
-            izq = self._hijo_izq(i)
-            der = self._hijo_der(i)
-            menor = i
-
-            if izq < n and self._es_menor(self._datos[izq], self._datos[menor]):
-                menor = izq
-            if der < n and self._es_menor(self._datos[der], self._datos[menor]):
-                menor = der
-
-            if menor == i:
+        datos = self._datos
+        n = len(datos)
+        evento = datos[i]
+        clave = (evento.tiempo, evento.secuencia)
+        hijo = 2 * i + 1
+        # Desplazar hijos hacia el hueco requiere una escritura por nivel,
+        # conservando exactamente el orden (tiempo, secuencia) del heap propio.
+        while hijo < n:
+            menor = datos[hijo]
+            derecha = hijo + 1
+            if derecha < n:
+                otro = datos[derecha]
+                if (otro.tiempo, otro.secuencia) < (menor.tiempo, menor.secuencia):
+                    hijo, menor = derecha, otro
+            if clave <= (menor.tiempo, menor.secuencia):
                 break
-
-            self._intercambiar(i, menor)
-            i = menor
+            datos[i] = menor
+            i = hijo
+            hijo = 2 * i + 1
+        datos[i] = evento
 
 
     def insertar(self, tiempo, tipo, referencia):

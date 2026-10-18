@@ -23,8 +23,10 @@ Este cambio es exclusivamente visual; no modifica los turnos ni el reloj virtual
 
 La casilla Sonido activa o silencia efectos cortos de pasos, puertas, ataques,
 objetos, retroceso, victoria y derrota. En Windows usa winsound de la biblioteca
-estandar, sin Pygame ni dependencias adicionales. Los WAV se sintetizan y guardan
-en una carpeta temporal que se limpia al cerrar. Una melodia corta suena al abrir
+estandar, sin Pygame ni dependencias adicionales. Los WAV originales preparados
+en `vista/recursos/sonidos` evitan sintetizar audio al abrir el menu. Se copian
+a una carpeta temporal que se limpia al cerrar; si faltan, se conserva la sintesis
+como respaldo. Una melodia corta suena al abrir
 el menu de inicio, sin repetirse al redimensionar: un motivo original tenebroso
 con campanas, graves y eco. Pasos y puertas usan golpes y ruido amortiguado.
 No se usan sonidos ni melodias de otros juegos. No hay musica continua. Si el
@@ -40,7 +42,14 @@ Tkinter puede cargar los PNG con un escalado basico. Los enemigos sin imagen loc
 se muestran con una representacion generica, sin cambiar su tipo ni estadisticas.
 
 El inventario muestra los efectos del objeto seleccionado; las acciones muestran
-su costo temporal. La agenda contiene proximos sucesos observables y el registro
+su costo temporal. Las imagenes del personaje con equipo y bebidas se distribuyen
+preparadas, para evitar componerlas al equipar o usar un objeto. Si se modifica
+el arte o el compositor, regenerarlas con `python -m utilidades.preparar_visuales`.
+Sin ese paquete se mantiene la composicion original como respaldo. Para medir
+primer uso y repeticion de equipo, bebidas, objetos, combate y desplazamiento
+en la vista: `python -m tests.medir_presentacion` (detalle en `.cache/presentacion.json`).
+
+La agenda contiene proximos sucesos observables y el registro
 conserva los ultimos 20 mensajes de ataques, trampas y acciones. El dano flotante
 es visual y no modifica el reloj virtual.
 
@@ -128,6 +137,24 @@ Al revisitar una sala se debe conservar el estado del motor: las respuestas orig
 
 ### Pruebas y mediciones
 
+La carga inicial y las acciones de la ventana ejecutan el trabajo de datos fuera
+del hilo de Tk; mientras tanto la ventana procesa eventos y descarta comandos
+nuevos para impedir acciones duplicadas. Los widgets se actualizan en Tk al
+terminar. Cerrar espera la finalizacion del trabajo antes de cerrar la sesion.
+
+Auditoria de las cuatro criptas locales y de una cripta sintetica de 137 salas,
+con victoria, guardado y replay:
+
+```powershell
+python -m tests.medir_rendimiento --paquete .cache/cripta
+```
+
+Guarda `.cache/rendimiento.json`: separa la accion completa (incluye datos locales
+y espera de precarga) del ciclo de un evento. Muestra medias, p95, maximos y
+conteos de operaciones de al menos 20 ms. No mide HTTP ni certifica una cripta
+desconocida arbitraria. La preparacion grafica inicial sigue teniendo un costo
+propio; no debe confundirse con el rendimiento del motor.
+
 Desde la raíz del repositorio:
 
 ```powershell
@@ -150,6 +177,9 @@ muestran en el GUI y permiten regresar al menu para reintentar o salir.
 Con `--gui` aparece el menu de inicio: Jugar, Cargar partida, Replay, Puntajes y
 Salir. Se navega con raton, flechas y Enter. No inicia la simulacion ni avanza el
 reloj virtual. Una partida nueva empieza en t=0; cargar recupera el reloj guardado.
+Replay abre directamente la grabacion automatica y muestra "Ultima partida"
+en el reproductor, sin pedir seleccionar un archivo. Si no existe, muestra un
+aviso. `--replay ARCHIVO` conserva la reproduccion de otras bitacoras guardadas.
 
 La escena incluye respiracion suave, entrada a salas y reaccion visual al dano.
 La casilla Animaciones desactiva el movimiento. Estos efectos no consumen tiempo

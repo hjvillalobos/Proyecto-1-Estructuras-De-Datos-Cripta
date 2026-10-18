@@ -174,10 +174,11 @@ class TestGraficosTk(unittest.TestCase):
             self.assertIsNotNone(v._imagen_detalle)
             self.assertEqual(str(v.icono_detalle.cget("image")), str(v._imagen_detalle))
         v.mostrar_inventario([ItemVista("otro", "Otro", "llave", 1, 2)])
-        self.assertIsNone(v._imagen_detalle)
-        self.assertEqual(v.icono_detalle.cget("image"), "")
+        self.assertIs(v._imagen_detalle, v.recursos.imagen_neutra(52, 52))
+        self.assertEqual(str(v.icono_detalle.cget("image")), str(v._imagen_detalle))
         v.mostrar_inventario([])
         self.assertIsNone(v._imagen_detalle)
+        self.assertEqual(v.icono_detalle.cget("image"), "")
 
     def test_imagen_del_suelo_conserva_la_accion_de_recoger(self):
         datos = base.TestRegresionesJuego()

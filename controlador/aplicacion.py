@@ -1,4 +1,7 @@
 import random
+from pathlib import Path
+
+from datos.bitacora_replay import RUTA_REPLAY_PREDETERMINADA
 
 from red.errores import ErrorCripta
 
@@ -24,18 +27,24 @@ def ejecutar_juego(args, sesion, lanzador_replay):
         vista = VistaConsola()
 
     try:
+        def cargar_datos(funcion, *argumentos, **opciones):
+            if args.gui and callable(getattr(type(vista), "ejecutar_tarea", None)):
+                return vista.ejecutar_tarea(funcion, *argumentos, **opciones)
+            return funcion(*argumentos, **opciones)
+
         estado_inicial = None
         cripta_solicitada = args.cripta
         if args.gui:
             from datos.guardado_binario import cargar_estado, ErrorGuardado
 
             def abrir_replay():
-                ruta = vista.pedir_ruta_replay()
-                if ruta:
-                    try:
-                        lanzador_replay(ruta)
-                    except OSError as error:
-                        vista.mostrar_error_replay(str(error))
+                if not Path(RUTA_REPLAY_PREDETERMINADA).is_file():
+                    vista.mostrar_error_replay("Aun no hay una partida grabada para reproducir.")
+                    return
+                try:
+                    lanzador_replay(RUTA_REPLAY_PREDETERMINADA)
+                except OSError as error:
+                    vista.mostrar_error_replay(str(error))
 
             def ver_puntajes():
                 try:
@@ -71,7 +80,9 @@ def ejecutar_juego(args, sesion, lanzador_replay):
         while True:
             try:
                 if args.cripta is None:
-                    listado = sesion.cliente.listar_criptas()
+                    listado = cargar_datos(sesion.cliente.listar_criptas)
+                    if args.gui and getattr(vista, "_cerrada", False) is True:
+                        return 0
                     sesion.almacen.guardar_lista(listado)
                     lista = listado["criptas"] if isinstance(listado, dict) else listado
                     args.cripta = vista.elegir_cripta(lista)
@@ -88,7 +99,9 @@ def ejecutar_juego(args, sesion, lanzador_replay):
                                      ("version_cripta", getattr(args, "version_cripta", None)),
                                      ("version_catalogo", getattr(args, "version_catalogo", None)))
                                  if valor is not None})
-                juego = crear_juego(sesion.precarga, args.cripta, semilla, **versiones)
+                juego = cargar_datos(crear_juego, sesion.precarga, args.cripta, semilla, **versiones)
+                if args.gui and getattr(vista, "_cerrada", False) is True:
+                    return 0
             except (ErrorCripta, OSError) as error:
                 if not args.gui:
                     raise
@@ -115,6 +128,12 @@ def ejecutar_juego(args, sesion, lanzador_replay):
                     continue
             else:
                 controlador.iniciar()
+            if args.gui and vista.preguntar_menu_principal() is True:
+                vista.reiniciar_presentacion()
+                if not elegir_inicio():
+                    return 0
+                sesion.renovar(tolerar_error=True)
+                continue
             if not (args.gui and juego.resultado == "derrota" and vista.preguntar_reinicio()):
                 break
             while True:

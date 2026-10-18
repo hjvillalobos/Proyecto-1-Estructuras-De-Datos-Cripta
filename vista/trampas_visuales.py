@@ -68,7 +68,7 @@ def dibujar_trampas(escena, estado, ancho):
         x, y = 280 + celda * (i + .5), 102
         etiqueta = "trampa_" + trampa.instancia
         tags = ("trampa", etiqueta)
-        imagen = escena._imagen(trampa.tipo, 24, 24)
+        imagen = escena._imagen(trampa.tipo, 24, 24, generica=True)
         if imagen is not None:
             c.create_image(x, y, image=imagen, tags=tags)
         else:
