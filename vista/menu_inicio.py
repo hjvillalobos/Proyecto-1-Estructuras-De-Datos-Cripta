@@ -19,7 +19,8 @@ class MenuInicio:
         self._cargando = False
         self.fin = tk.BooleanVar(master=vista.root, value=False)
         self.panel = tk.Frame(vista.root, bg=FONDO)
-        self.panel.place(relwidth=1, relheight=1)
+        self.panel.place(x=0, y=0, relwidth=1, relheight=1)
+        self.panel.lift()
         self.canvas = tk.Canvas(self.panel, bg=FONDO, highlightthickness=0)
         self.canvas.pack(fill="both", expand=True)
         self.animacion = AnimacionEscena(vista.root, self.canvas)
@@ -61,11 +62,13 @@ class MenuInicio:
         self.elegir("cargar", RUTA_GUARDADO_PREDETERMINADA)
 
     def dibujar(self, _evento=None):
+        w, h = self.canvas.winfo_width(), self.canvas.winfo_height()
+        if w <= 1 or h <= 1:
+            return
         self.animacion.detener()
         self.animacion = AnimacionEscena(self.vista.root, self.canvas)
         self.canvas.delete("all")
         self.imagenes.clear()
-        w, h = self.canvas.winfo_width(), self.canvas.winfo_height()
         fondo = self.vista.recursos.fondo(w, h)
         if fondo is not None:
             self.imagenes.append(fondo)
@@ -91,6 +94,8 @@ class MenuInicio:
         self.vista._en_menu = True
         self.vista.root.protocol("WM_DELETE_WINDOW", lambda: self.elegir("salir"))
         try:
+            self.vista.root.update_idletasks()
+            self.dibujar()
             self.vista.root.update_idletasks()
             if getattr(self.vista, "sonidos", None) is not None:
                 self.vista.sonidos.reproducir("inicio")
