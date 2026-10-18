@@ -62,6 +62,7 @@ class MenuInicio:
 
     def dibujar(self, _evento=None):
         self.animacion.detener()
+        self.animacion = AnimacionEscena(self.vista.root, self.canvas)
         self.canvas.delete("all")
         self.imagenes.clear()
         w, h = self.canvas.winfo_width(), self.canvas.winfo_height()

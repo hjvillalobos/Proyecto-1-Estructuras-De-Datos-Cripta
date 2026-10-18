@@ -13,6 +13,80 @@ from tests import test_regresiones_juego as base
 
 
 class TestAnimacion(unittest.TestCase):
+    def test_redibujar_menu_crea_animacion_nueva_y_destruirlo_la_cancela(self):
+        from vista.menu_inicio import MenuInicio
+        vista = VistaGrafica()
+        self.addCleanup(vista.cerrar)
+        vista.root.withdraw()
+        menu = MenuInicio(vista, Mock(), Mock())
+        menu.dibujar()
+        anterior = menu.animacion
+        menu.dibujar()
+        self.assertIsNot(menu.animacion, anterior)
+        self.assertTrue(anterior._detenida)
+        self.assertIsNone(anterior.pendiente)
+        self.assertIsNotNone(menu.animacion.pendiente)
+        self.assertFalse(menu.animacion._detenida)
+        menu.panel.destroy()
+        self.assertIsNone(menu.animacion.pendiente)
+        self.assertTrue(menu.animacion._detenida)
+
+    def test_destruir_canvas_con_callback_pendiente_no_produce_error(self):
+        root = tk.Tk()
+        self.addCleanup(root.destroy)
+        root.withdraw()
+        canvas = tk.Canvas(root)
+        sprite = canvas.create_rectangle(0, 0, 10, 10)
+        animacion = AnimacionEscena(root, canvas)
+        animacion.agregar(sprite)
+        animacion.particula(canvas.create_line(0, 0, 10, 10))
+        animacion.decorar(SimpleNamespace(actualizar=Mock(), detener=Mock()))
+        animacion.recorrer(sprite, (20, 20), al_llegar=Mock())
+        errores = []
+        root.report_callback_exception = lambda *error: errores.append(error)
+        animacion.iniciar()
+        canvas.destroy()
+        root.after(60, root.quit)
+        root.mainloop()
+        self.assertEqual(errores, [])
+        self.assertIsNone(animacion.pendiente)
+        self.assertEqual(animacion.actores, [])
+        self.assertEqual(animacion.particulas, [])
+        self.assertEqual(animacion.decoraciones, [])
+        self.assertIsNone(animacion._al_llegar)
+        animacion.detener()  # Tambien debe poder limpiarse despues del destroy.
+
+    def test_callback_tardio_de_animacion_cancelada_no_toca_canvas(self):
+        root, canvas = Mock(), Mock()
+        canvas.coords.return_value = [20, 30]
+        animacion = AnimacionEscena(root, canvas)
+        animacion.agregar(1)
+        animacion.iniciar()
+        animacion.detener()
+        root.reset_mock()
+        canvas.reset_mock()
+        animacion._avanzar()
+        animacion.situar(20)
+        animacion.iniciar()
+        canvas.type.assert_not_called()
+        canvas.coords.assert_not_called()
+        root.after.assert_not_called()
+        self.assertIsNone(animacion.pendiente)
+        self.assertEqual(animacion.paso, 0)
+
+    def test_detener_despues_de_destruir_root_es_seguro(self):
+        root = tk.Tk()
+        root.withdraw()
+        canvas = tk.Canvas(root)
+        animacion = AnimacionEscena(root, canvas)
+        animacion.agregar(canvas.create_rectangle(0, 0, 10, 10))
+        animacion.iniciar()
+        root.destroy()
+        animacion.detener()
+        animacion._avanzar()
+        self.assertIsNone(animacion.pendiente)
+        self.assertEqual(animacion.actores, [])
+
     def test_carrera_repite_cuadros_y_se_asienta_sin_salto(self):
         root, canvas = Mock(), Mock()
         canvas.coords.return_value = [145, 200]

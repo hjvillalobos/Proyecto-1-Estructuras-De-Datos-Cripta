@@ -167,6 +167,7 @@ class TrampaVista:
     armada: bool
     dano: int
     tipo: str = ""
+    venenosa: bool = False
 
 
 @dataclass

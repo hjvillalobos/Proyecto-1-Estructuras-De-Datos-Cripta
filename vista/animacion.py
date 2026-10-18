@@ -1,4 +1,5 @@
 import math
+import tkinter as tk
 from time import perf_counter
 
 PASOS_CARRERA = 16
@@ -19,6 +20,26 @@ class AnimacionEscena:
         self._al_llegar = None
         self.decoraciones = []
         self._siguiente_tic = None
+        self._detenida = False
+        self._enlace_destruccion = canvas.bind("<Destroy>", self._al_destruir, add="+")
+
+    def _canvas_existe(self):
+        try:
+            return bool(self.canvas.winfo_exists())
+        except tk.TclError:
+            return False  # El interprete tambien puede haber cerrado.
+
+    def _al_destruir(self, evento):
+        if evento.widget == self.canvas:
+            self.detener()
+
+    def _vigente(self):
+        if self._detenida:
+            return False
+        if not self._canvas_existe():
+            self.detener()
+            return False
+        return True
 
     def decorar(self, decoracion):
         self.decoraciones.append(decoracion)
@@ -85,6 +106,8 @@ class AnimacionEscena:
                 posicion[i % 2] + valor for i, valor in enumerate(desplazamiento)])
 
     def iniciar(self):
+        if not self._vigente():
+            return
         if self.pendiente is None and (self.actores or self.particulas):
             ahora = perf_counter()
             if self._siguiente_tic is None or self._siguiente_tic <= ahora:
@@ -94,6 +117,8 @@ class AnimacionEscena:
 
     def situar(self, paso):
         """Restaura el dibujo sin avanzar tiempo ni programar otro callback."""
+        if not self._vigente():
+            return
         self.paso = paso
         self._actualizar_pose()
 
@@ -136,6 +161,8 @@ class AnimacionEscena:
             decoracion.actualizar(self.paso)
 
     def _avanzar(self):
+        if not self._vigente():
+            return
         self.pendiente = None
         if self._siguiente_tic is not None:
             self._siguiente_tic += .020
@@ -156,21 +183,35 @@ class AnimacionEscena:
         self.iniciar()
 
     def detener(self):
+        self._detenida = True
         if self.pendiente is not None:
-            self.root.after_cancel(self.pendiente)
+            try:
+                self.root.after_cancel(self.pendiente)
+            except tk.TclError:
+                pass  # No queda un callback util si su interprete ya cerro.
             self.pendiente = None
+        if self._enlace_destruccion is not None:
+            try:
+                self.canvas.unbind("<Destroy>", self._enlace_destruccion)
+            except tk.TclError:
+                pass
+            self._enlace_destruccion = None
         self._siguiente_tic = None
-        for identificador, origen, *_ in self.actores:
-            if self.canvas.type(identificador):
-                self.canvas.coords(identificador, *origen)
+        existe = self._canvas_existe()
+        if existe:
+            for identificador, origen, *_ in self.actores:
+                if self.canvas.type(identificador):
+                    self.canvas.coords(identificador, *origen)
         self.actores.clear()
         self.secuencias.clear()
-        for identificador, *_ in self.particulas:
-            self.canvas.delete(identificador)
+        if existe:
+            for identificador, *_ in self.particulas:
+                self.canvas.delete(identificador)
         self.particulas.clear()
         self.anclajes.clear()
-        for decoracion in self.decoraciones:
-            decoracion.detener()
+        if existe:
+            for decoracion in self.decoraciones:
+                decoracion.detener()
         self.decoraciones.clear()
         self.trayecto = None
         self._al_llegar = None

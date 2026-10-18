@@ -63,6 +63,8 @@ siguen usando los mismos respaldos; nada de esto modifica fichas ni estadisticas
   inventario mantienen nombre, instancia y datos del catalogo. La falta de PNG
   no define reglas ni cambia el tipo. Las imagenes conocidas siguen iguales;
   se recuerdan hasta 64 nombres ausentes para no repetir acceso a disco.
+  Las trampas con atributo veneno usan la representacion nativa de agujas
+  descrita mas abajo, aunque el identificador de catalogo sea nuevo.
 - El selector vive en `vista/selector_cripta.py`, usa una lista nativa accesible
   por teclado y muestra por separado salas y dificultad de la seleccion.
   Ocupa la ventana principal completa, sin ventana modal ni tablero visible
@@ -261,3 +263,15 @@ siguen usando los mismos respaldos; nada de esto modifica fichas ni estadisticas
   mantienen anclajes propios de esta pose. Apagado y derrota usan los originales
   sin llama; las acciones conservan sus fotogramas. El PNG original queda intacto
   y las dos caches invalidan sus copias cuando cambia la pose nueva.
+
+- Cada AnimacionEscena termina definitivamente al detenerse o destruir su canvas:
+  cancela el callback, libera su enlace Destroy y descarta referencias sin acceder
+  a widgets destruidos. Los callbacks tardios no dibujan ni se reprograman. El
+  menu, igual que la sala, crea otra animacion al redibujar.
+
+- TrampaVista comunica `venenosa` desde el atributo real del catalogo. Las trampas
+  venenosas muestran agujas de punta verde y etiqueta Veneno, tambien sin Pillow
+  o animaciones. Su activacion lanza tres agujas verdes y burbujas ascendentes
+  con impacto violeta; todo usa el callback existente y se limpia al cancelar
+  o al paso 32. Solo cambia la presentacion: no agrega trampas a las salas,
+  modifica danos ni aplica efectos por dibujar.

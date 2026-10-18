@@ -97,7 +97,9 @@ class EscenaCripta:
                     if trampa.instancia in self._trampas_activadas:
                         self.animacion.decorar(ActivacionTrampa(c, origen, jugador[0],
                             int(min(280, alto - 175) * ESCALA_JUGADOR),
-                            dardos=trampa.tipo == "trp_dardos", etiqueta="disparo_" + trampa.instancia))
+                            dardos=trampa.tipo == "trp_dardos",
+                            etiqueta="disparo_" + trampa.instancia,
+                            venenosa=getattr(trampa, "venenosa", False)))
             if salir_hacia is None:
                 self.animacion.situar(paso_anterior)
             self.animacion.iniciar()
