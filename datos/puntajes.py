@@ -24,6 +24,15 @@ class RegistroPuntaje:
     tiempo_final: int
     resultado: str            # "victoria", "derrota" o "abandono"
 
+    def __post_init__(self):
+        if any(not isinstance(v, str) or not v.strip()
+               for v in (self.nombre, self.cripta_id, self.cripta_version)):
+            raise ValueError("Identidad de puntaje invalida.")
+        if any(type(v) is not int or v < 0 for v in (self.acciones, self.derrotados, self.tiempo_final)):
+            raise ValueError("Contadores de puntaje invalidos.")
+        if self.resultado not in ("victoria", "derrota", "abandono"):
+            raise ValueError("Resultado de puntaje invalido.")
+
 
 def _clave_ranking(r: RegistroPuntaje):
     # Tupla comparable: victoria (0) antes que lo demás (1), luego tiempo, luego acciones.
@@ -56,7 +65,7 @@ class TablaPuntajes:
                     continue                    # una línea dañada no debe tumbar el ranking
         return registros
 
-    def ranking(self, cripta_id=None, limite=10):
+    def ranking(self, cripta_id=None, limite=None):
         registros = self.cargar()
         if cripta_id is not None:
             registros = [r for r in registros if r.cripta_id == cripta_id]

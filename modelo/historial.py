@@ -10,26 +10,48 @@ class RegistroTurno:
     completa del estado del juego.
     """
 
-    def __init__(self, reloj_anterior: int):
+    def __init__(self, reloj_anterior: int, registro_rastro, cola=None, referencias=()):
         self.reloj_anterior = reloj_anterior
-        self.cambios_vida = []        # [(actor, vida_anterior), ...]
-        self.cambios_rastro = []      # [(sala_id, tiempo_anterior), ...]
-        self.eventos_creados = []     # [Evento, ...] -> cancelar al revertir
-        self.eventos_cancelados = []  # [Evento, ...] -> reactivar al revertir
-        self.cambios_inventario = []  # [callable_sin_argumentos, ...]
-        self.cambios_puertas = []     # [(salida_dict, campo, valor_anterior), ...]
+        self._registro_rastro = registro_rastro
+        self._cola = cola
+        self.cambios = []
+        self.cambios_fallo = []
+        self.referencias = list(referencias)
+
+    def registrar_cambio(self, deshacer):
+        self.cambios.append(deshacer)
+        self.cambios_fallo.append(deshacer)
+
+    def registrar_fallo(self, deshacer):
+        self.cambios_fallo.append(deshacer)
+
+    def registrar_atributo(self, objeto, atributo):
+        anterior = getattr(objeto, atributo)
+        self.registrar_cambio(lambda: setattr(objeto, atributo, anterior))
 
     def registrar_vida(self, actor, vida_anterior: int):
-        self.cambios_vida.append((actor, vida_anterior))
+        self.registrar_cambio(lambda: setattr(actor, "vida", vida_anterior))
 
     def registrar_rastro(self, sala_id: int, tiempo_anterior):
-        self.cambios_rastro.append((sala_id, tiempo_anterior))
+        rastro = self._registro_rastro
+        self.registrar_cambio(
+            lambda: rastro.marcar_visita(sala_id, tiempo_anterior))
 
     def registrar_evento_creado(self, evento):
-        self.eventos_creados.append(evento)
+        self.registrar_cambio(lambda: setattr(evento, "cancelado", True))
 
     def registrar_evento_cancelado(self, evento):
-        self.eventos_cancelados.append(evento)
+        cola = self._cola
+        def reactivar():
+            evento.cancelado = False
+            if cola is not None:
+                cola.reinsertar(evento)
+        self.registrar_cambio(reactivar)
+
+    def registrar_evento_extraido(self, evento):
+        cola = self._cola
+        if cola is not None:
+            self.registrar_cambio(lambda: cola.reinsertar(evento))
 
     def registrar_inventario(self, deshacer):
         """`deshacer` es una función sin argumentos que revierte
@@ -41,10 +63,10 @@ class RegistroTurno:
         retroceso (recogerlo o soltarlo), quien llama NO debe registrar un
         `deshacer` para ese cambio puntual — la cantidad de pergaminos
         queda excluida del alcance de la reversión."""
-        self.cambios_inventario.append(deshacer)
+        self.registrar_cambio(deshacer)
 
     def registrar_puerta(self, salida_dict, campo: str, valor_anterior):
-        self.cambios_puertas.append((salida_dict, campo, valor_anterior))
+        self.registrar_cambio(lambda: salida_dict.__setitem__(campo, valor_anterior))
 
 
 class HistorialRetroceso:
@@ -69,16 +91,28 @@ class HistorialRetroceso:
     registrar_inventario.
     """
 
-    def __init__(self, registro_rastro):
+    def __init__(self, registro_rastro, cola=None):
         self._registro_rastro = registro_rastro
+        self._cola = cola
         self._turnos = []           # pila manual, tope HISTORIAL_MAX
         self._turno_actual = None   # RegistroTurno en construcción
 
     # --- ciclo de vida de un turno ---
 
-    def iniciar_turno(self, reloj_actual: int):
+    def iniciar_turno(self, reloj_actual: int, referencias=()):
         """Se llama justo antes de ejecutar una acción del jugador."""
-        self._turno_actual = RegistroTurno(reloj_actual)
+        self._turno_actual = RegistroTurno(reloj_actual, self._registro_rastro, self._cola, referencias)
+
+    def descartar_turno(self):
+        """Una accion rechazada no deja cambios ni ocupa historial."""
+        if self._turno_actual is not None:
+            for deshacer in reversed(self._turno_actual.cambios_fallo):
+                deshacer()
+            self._turno_actual = None
+
+    def registrar_fallo(self, deshacer):
+        if self._turno_actual is not None:
+            self._turno_actual.registrar_fallo(deshacer)
 
     def cerrar_turno(self):
         """Se llama cuando el jugador vuelve a tener una decisión, es
@@ -93,6 +127,18 @@ class HistorialRetroceso:
         self._turno_actual = None
 
     # --- ganchos de registro durante el intervalo ---
+
+    def registrar_cambio(self, deshacer):
+        if self._turno_actual is not None:
+            self._turno_actual.registrar_cambio(deshacer)
+
+    def registrar_atributo(self, objeto, atributo):
+        if self._turno_actual is not None:
+            self._turno_actual.registrar_atributo(objeto, atributo)
+
+    def registrar_evento_extraido(self, evento):
+        if self._turno_actual is not None:
+            self._turno_actual.registrar_evento_extraido(evento)
 
     def registrar_vida(self, actor, vida_anterior: int):
         if self._turno_actual is not None:
@@ -126,6 +172,9 @@ class HistorialRetroceso:
     def cantidad_turnos(self) -> int:
         return len(self._turnos)
 
+    def referencias_retroceso(self):
+        return list(self._turnos[-1].referencias) if self._turnos else []
+
     def usar_pergamino(self, inventario, tipo_pergamino: str = "itm_pergamino_retroceso"):
         """
         Revierte el turno más reciente. No consume tiempo virtual y no
@@ -143,23 +192,12 @@ class HistorialRetroceso:
 
         turno = self._turnos.pop()
 
-        for deshacer in reversed(turno.cambios_inventario):
+        # El orden global importa: un evento puede crearse y ejecutarse
+        # dentro del mismo intervalo, y un nodo puede cambiar varias veces.
+        for deshacer in reversed(turno.cambios):
             deshacer()
 
-        for salida_dict, campo, valor_anterior in reversed(turno.cambios_puertas):
-            salida_dict[campo] = valor_anterior
-
-        for evento in turno.eventos_creados:
-            evento.cancelado = True
-        for evento in turno.eventos_cancelados:
-            evento.cancelado = False
-
-        for sala_id, tiempo_anterior in reversed(turno.cambios_rastro):
-            self._registro_rastro.marcar_visita(sala_id, tiempo_anterior)
-
-        for actor, vida_anterior in reversed(turno.cambios_vida):
-            actor.vida = vida_anterior
-
         inventario.quitar_primero_de_tipo(tipo_pergamino)
+        inventario.normalizar_cursor()
 
         return turno.reloj_anterior

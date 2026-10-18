@@ -1,14 +1,26 @@
 # modelo/tipos.py
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Dict, Any, List
 
-@dataclass
+@dataclass(init=False)
 class Sala:
     id: int
     nombre: str
     salidas: Dict[str, Any]
-    trampa: Any = None
+    trampas: List[Any]
+
+    def __init__(self, id, nombre, salidas, trampa=None, trampas=None):
+        self.id, self.nombre, self.salidas = id, nombre, salidas
+        self.trampas = list(trampas) if trampas is not None else ([trampa] if trampa else [])
+
+    @property
+    def trampa(self):
+        return self.trampas[0] if self.trampas else None
+
+    @trampa.setter
+    def trampa(self, valor):
+        self.trampas = [valor] if valor is not None else []
 
 @dataclass(kw_only=True)
 class Actor:
@@ -20,6 +32,7 @@ class Actor:
     tiempo_siguiente: int
     evento_pendiente: Any = None
     veneno: Any = None
+    evento_velocidad: Any = None
 @dataclass(kw_only=True)
 class Jugador(Actor):
     inventario: Any
@@ -32,6 +45,7 @@ class InstanciaEnemigo(Actor):
     tipo_catalogo: str
     comportamiento: str
     sala_actual: int = None        # reemplaza el dict sala_de_enemigo
+    indice_sala: int = field(default=-1, compare=False, repr=False)
 
 @dataclass
 class FichaCatalogo:
@@ -47,6 +61,7 @@ class Evento:
     tipo: str
     referencia: Any
     cancelado: bool = False
+    en_cola: bool = False
 
 @dataclass
 class ObjetoInstancia:
@@ -54,6 +69,7 @@ class ObjetoInstancia:
     tipo_catalogo: str
     ubicacion: str
     sala: int = None
+    encendida: bool = False
 
 @dataclass
 class Trampa:

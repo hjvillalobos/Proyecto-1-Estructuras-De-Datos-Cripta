@@ -20,6 +20,7 @@ class MetaPartida:
 class PuertaGuardada:
     direccion: str          # "N", "S", "E", "O"
     cerrada: bool
+    abierta_con_llave: bool = False
 
 
 @dataclass
@@ -141,6 +142,8 @@ class ItemVista:
     peso: int
     valor: int
     equipado: bool = False
+    detalle: str = ""
+    tipo: str = ""
 
 
 @dataclass
@@ -149,6 +152,28 @@ class EnemigoVista:
     nombre: str             
     vida: int
     vida_max: int
+    tipo: str = ""
+    ataque: int = 0
+    defensa: int = 0
+    velocidad: int = 100
+    tiempo_siguiente: int = 0
+    comportamiento: str = ""
+
+
+@dataclass
+class TrampaVista:
+    instancia: str
+    nombre: str
+    armada: bool
+    dano: int
+    tipo: str = ""
+    venenosa: bool = False
+
+
+@dataclass
+class EventoVista:
+    tiempo: int
+    nombre: str
 
 
 @dataclass
@@ -157,6 +182,7 @@ class SalidaVista:
     destino: int
     cerrada: bool = False
     llave: str | None = None
+    apertura_pendiente: bool = False
 
 
 @dataclass
@@ -175,12 +201,18 @@ class EstadoVista:
     inventario_usado: int
     inventario_max: int
     efectos: list[str] = field(default_factory=list)   # ej. "veneno (faltan 120)"
+    trampas: list[TrampaVista] = field(default_factory=list)
+    agenda: list[EventoVista] = field(default_factory=list)
+    costos: list[tuple[str, int]] = field(default_factory=list)
+    arma_tipo: str | None = None
+    armadura_tipo: str | None = None
 
 
 @dataclass
 class ResultadoAccion:
     ok: bool                # False = acción rechazada (no consume tiempo, Apéndice B)
     mensaje: str = ""
+    trampas_activadas: list[str] = field(default_factory=list)
 
 
 @dataclass
