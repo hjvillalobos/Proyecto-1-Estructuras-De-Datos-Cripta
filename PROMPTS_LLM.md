@@ -652,3 +652,15 @@ cache visual sin perdida a fondos e imagenes estaticas. Probar igualdad de
 pixeles, invalidacion por cambios de PNG y respaldo para IDs nuevos. Cronometrar
 apertura fria y preparada sin modificar reglas, imagenes originales ni el PDF.
 
+# 2026-10-18: respuesta al pulsar Jugar
+
+Herramienta: Codex. Prompt textual:
+
+> puedes fijarte porque cuando le doy jugar es un poquiiiito lento, muy poco
+
+Uso: perfilar el selector nativo y preparar desde el menu la imagen del tigre
+al tamano que necesita. Cancelar la tarea al elegir o redimensionar. Comparacion
+local de tres aperturas por variante, con cache de disco nueva: mediana visual
+de 210.89 ms sin preparar y 30.91 ms preparada. No incluye HTTP ni la carga del
+motor. Las 34 pruebas de menu, selector, transicion e inicio pasan.
+

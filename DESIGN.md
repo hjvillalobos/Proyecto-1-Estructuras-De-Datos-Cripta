@@ -269,6 +269,11 @@ siguen usando los mismos respaldos; nada de esto modifica fichas ni estadisticas
   a widgets destruidos. Los callbacks tardios no dibujan ni se reprograman. El
   menu, igual que la sala, crea otra animacion al redibujar.
 
+- El menu prepara el tigre al tamano del selector 120 ms despues de dibujarse,
+  reutilizando la cache de imagenes en memoria. Redimensionar reemplaza esa
+  tarea y elegir una accion la cancela. La preparacion permanece en Tk, no
+  consulta datos ni cambia el tamano o los pixeles del selector.
+
 - TrampaVista comunica `venenosa` desde el atributo real del catalogo. Las trampas
   venenosas muestran agujas de punta verde y etiqueta Veneno, tambien sin Pillow
   o animaciones. Su activacion lanza tres agujas verdes y burbujas ascendentes

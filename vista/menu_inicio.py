@@ -17,6 +17,7 @@ class MenuInicio:
         configurar_botones_menu(vista.root)
         self.resultado = None
         self._cargando = False
+        self._precarga_selector = None
         self.fin = tk.BooleanVar(master=vista.root, value=False)
         self.panel = tk.Frame(vista.root, bg=FONDO)
         self.panel.place(x=0, y=0, relwidth=1, relheight=1)
@@ -89,6 +90,21 @@ class MenuInicio:
                 self.animacion.agregar(sprite, fase=fase)
         if self.vista._movimiento_activo:
             self.animacion.iniciar()
+        self._cancelar_precarga()
+        # Preparar el tamano del selector despues de pintar el menu. Tk y sus
+        # PhotoImage permanecen en el hilo principal; no se consulta la API.
+        self._precarga_selector = self.vista.root.after(120, self._preparar_selector)
+
+    def _cancelar_precarga(self):
+        if self._precarga_selector is not None:
+            self.vista.root.after_cancel(self._precarga_selector)
+            self._precarga_selector = None
+
+    def _preparar_selector(self):
+        self._precarga_selector = None
+        w, h = self.canvas.winfo_width(), self.canvas.winfo_height()
+        if w > 1 and h > 1:
+            self.vista.recursos.imagen("jugador", int(w * .29), int(h * .68))
 
     def mostrar(self):
         self.vista._en_menu = True
@@ -103,6 +119,7 @@ class MenuInicio:
             self.vista.root.wait_variable(self.fin)
             return self.resultado
         finally:
+            self._cancelar_precarga()
             self.animacion.detener()
             if (self.resultado is not None and self.resultado[0] in ("jugar", "cargar")
                     and callable(getattr(type(self.vista), "_conservar_inicio", None))):
