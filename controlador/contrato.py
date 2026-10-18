@@ -18,6 +18,9 @@ DIRECCIONES = ("N", "S", "E", "O")
 
 
 class ModeloJuego(Protocol):
+
+    def inventario_seleccionar(self, instancia: str) -> bool:
+        """Seleccion libre de cursor: no consume tiempo ni se registra en replay."""
     
     @property
     def meta(self) -> MetaPartida:

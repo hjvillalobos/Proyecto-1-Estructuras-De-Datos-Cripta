@@ -5,6 +5,7 @@ from typing import Any, Callable
 
 
 VERSION_FORMATO_REPLAY = 1
+RUTA_REPLAY_PREDETERMINADA = "datos_generados/partida.log"
 
 
 class ErrorReplay(Exception):
@@ -85,6 +86,17 @@ class BitacoraReplay:
             )
             archivo.write("\n")
 
+    def registrar_carga(self, estado=None):
+        """Anexa la base cargada; el replay no depende de un archivo mutable."""
+        with self.ruta.open(
+            "a",
+            encoding="utf-8",
+        ) as archivo:
+            archivo.write(
+                json.dumps({"tipo": "cargar", "estado": estado.a_dict() if estado else None})
+            )
+            archivo.write("\n")
+
     def registrar_accion(
         self,
         accion,
@@ -125,7 +137,7 @@ class BitacoraReplay:
                     if linea.strip()
                 ]
 
-        except OSError as error:
+        except (OSError, UnicodeError) as error:
             raise ReplayCorrupto(
                 f"No se pudo leer el replay: {error}"
             ) from error
@@ -144,6 +156,8 @@ class BitacoraReplay:
                 "El encabezado del replay no es JSON válido."
             ) from error
 
+        if not isinstance(encabezado, dict):
+            raise ReplayCorrupto("El encabezado debe ser un objeto JSON.")
         if encabezado.get("tipo") != "encabezado":
             raise ReplayCorrupto(
                 "Falta el encabezado del replay."
@@ -169,6 +183,12 @@ class BitacoraReplay:
                 raise ReplayCorrupto(
                     f"Falta '{campo}' en el encabezado."
                 )
+
+        for campo in campos[:-1]:
+            if not isinstance(encabezado[campo], str) or not encabezado[campo].strip():
+                raise ReplayCorrupto(f"Campo '{campo}' invalido en el encabezado.")
+        if type(encabezado["semilla"]) is not int:
+            raise ReplayCorrupto("La semilla debe ser un entero.")
 
         meta = MetaReplay(
             cripta_id=str(
@@ -200,6 +220,20 @@ class BitacoraReplay:
                     f"Línea {numero} inválida."
                 ) from error
 
+            if not isinstance(registro, dict):
+                raise ReplayCorrupto(f"Linea {numero}: se esperaba un objeto JSON.")
+            if registro.get("tipo") == "cargar":
+                if not isinstance(registro.get("estado"), dict):
+                    raise ReplayIncompatible("La carga no contiene el estado necesario para reproducirla.")
+                salas = registro["estado"].get("salas", [])
+                if isinstance(salas, list):
+                    for sala in salas:
+                        if isinstance(sala, dict) and isinstance(sala.get("puertas"), list):
+                            if any(isinstance(p, dict) and "abierta_con_llave" not in p for p in sala["puertas"]):
+                                raise ReplayIncompatible("La carga antigua no registra aperturas con llave; no se garantiza un replay fiel.")
+                acciones.append(AccionReplay("cargar", registro["estado"]))
+                continue
+
             if registro.get("tipo") != "accion":
                 raise ReplayCorrupto(
                     f"Línea {numero}: "
@@ -219,6 +253,8 @@ class BitacoraReplay:
                     "acción inválida."
                 )
 
+            if registro.get("argumento") is not None and not isinstance(registro["argumento"], str):
+                raise ReplayCorrupto(f"Linea {numero}: argumento invalido.")
             acciones.append(
                 AccionReplay(
                     accion=accion,
@@ -229,6 +265,17 @@ class BitacoraReplay:
             )
 
         return meta, acciones
+
+
+def aplicar_accion_replay(juego, accion):
+    if accion.accion == "cargar":
+        from modelo.snapshots import EstadoGuardado, ResultadoAccion
+        try:
+            juego.restaurar_estado(EstadoGuardado.desde_dict(accion.argumento))
+        except (ValueError, TypeError, KeyError, IndexError) as error:
+            raise ReplayIncompatible(f"No se puede restaurar la carga del replay: {error}") from error
+        return ResultadoAccion(ok=True)
+    return juego.ejecutar(accion.accion, accion.argumento)
 
 
 def reproducir(
@@ -262,7 +309,7 @@ def reproducir(
 
     if (
         str(version_cripta_actual)
-        != meta.cripta_version
+        != meta.version_cripta
     ):
         raise ReplayIncompatible(
             "La versión actual de la cripta "
@@ -271,7 +318,7 @@ def reproducir(
 
     if (
         str(version_catalogo_actual)
-        != meta.catalogo_version
+        != meta.version_catalogo
     ):
         raise ReplayIncompatible(
             "La versión actual del catálogo "
@@ -296,10 +343,7 @@ def reproducir(
         )
 
     for accion in acciones:
-        resultado = juego.ejecutar(
-            accion.accion,
-            accion.argumento,
-        )
+        resultado = aplicar_accion_replay(juego, accion)
 
         if not resultado.ok:
             raise ReplayCorrupto(

@@ -1,5 +1,8 @@
-from datos.bitacora_replay import BitacoraReplay
-from datos.guardado_binario import guardar_estado, cargar_estado
+import os
+
+from datos.bitacora_replay import BitacoraReplay, RUTA_REPLAY_PREDETERMINADA
+from datos.guardado_binario import guardar_estado, cargar_estado, RUTA_GUARDADO_PREDETERMINADA
+from datos.puntajes import RegistroPuntaje
 from vista.bitacora_pantalla import BufferCircular
 
 
@@ -25,19 +28,28 @@ class ControladorJuego:
         self,
         modelo,
         vista,
-        ruta_replay="datos_generados/partida.log",
+        ruta_replay=RUTA_REPLAY_PREDETERMINADA,
         tabla_puntajes=None,
+        lanzador_replay=None,
     ):
         self.modelo = modelo
         self.vista = vista
 
         self.mensajes = BufferCircular(20)
+        self._modelo_notifica = callable(getattr(type(modelo), "establecer_notificador", None))
+        if self._modelo_notifica:
+            modelo.establecer_notificador(self.notificar)
 
         self.bitacora_replay = BitacoraReplay(ruta_replay)
 
         self.tabla_puntajes = tabla_puntajes
 
+        # función(ruta) que abre un replay; la entrega main.py
+        self.lanzador_replay = lanzador_replay
+
         self.ejecutando = True
+        self._puntaje_registrado = False
+        self._grabacion_valida = True
 
     # ---------------------------------------------------------
     # BITÁCORA EN PANTALLA
@@ -50,19 +62,32 @@ class ControladorJuego:
     # INICIAR
     # ---------------------------------------------------------
 
-    def iniciar(self):
+    def iniciar(self, estado_inicial=None):
    
 
     # Iniciar bitácora de replay.
         if hasattr(self.modelo, "meta"):
             try:
                 self.bitacora_replay.iniciar(self.modelo.meta)
-            except Exception as error:
-                self.vista.mostrar_error(
-                    f"No se pudo iniciar la bitácora: {error}"
-                )
+            except OSError as error:
+                self._fallo_grabacion(error)
+                return False
 
         self.notificar("Partida iniciada.")
+        if estado_inicial is not None:
+            try:
+                self.modelo.restaurar_estado(estado_inicial)
+                self.bitacora_replay.registrar_carga(estado_inicial)
+            except OSError as error:
+                self._fallo_grabacion(error)
+                return False
+            except Exception as error:
+                self.ejecutando = False
+                if callable(getattr(type(self.vista), "mostrar_error_replay", None)):
+                    self.vista.mostrar_error_replay(f"No se pudo cargar: {error}")
+                else:
+                    self.vista.mostrar_error(f"No se pudo cargar: {error}")
+                return False
         self.vista.mostrar_ayuda()
 
         while self.ejecutando:
@@ -73,7 +98,11 @@ class ControladorJuego:
 
             self._mostrar_estado()
 
-            comando = self.vista.pedir_comando()
+            try:
+                comando = self.vista.pedir_comando()
+            except (EOFError, KeyboardInterrupt):
+                self.vista.mostrar_info("\nPartida interrumpida.")
+                break
 
             if comando is None:
                 break
@@ -104,6 +133,7 @@ class ControladorJuego:
         # Mostrar el último estado para que se vea cómo terminó.
         if getattr(self.modelo, "terminado", False):
             self._mostrar_estado()
+            self._registrar_puntaje()
 
             if hasattr(self.modelo, "resumen"):
                 self.vista.mostrar_fin(
@@ -113,6 +143,7 @@ class ControladorJuego:
         self.vista.mostrar_info(
             "Sesión finalizada."
         )
+        return True
 
     # ---------------------------------------------------------
     # ESTADO
@@ -126,17 +157,44 @@ class ControladorJuego:
             self.mensajes.ultimos(),
         )
 
+    def _registrar_puntaje(self):
+        if self.tabla_puntajes is None or self._puntaje_registrado or not self.modelo.terminado:
+            return
+        resumen = self.modelo.resumen()
+        meta = self.modelo.meta
+        try:
+            nombre = self.vista.pedir_texto("Nombre para la tabla de puntajes:") or "Jugador"
+        except (EOFError, KeyboardInterrupt):
+            nombre = "Jugador"
+        try:
+            self.tabla_puntajes.registrar(RegistroPuntaje(
+                nombre=nombre, cripta_id=meta.cripta_id, cripta_version=meta.cripta_version,
+                acciones=resumen.acciones, derrotados=resumen.derrotados,
+                tiempo_final=resumen.reloj_final, resultado=resumen.resultado))
+        except OSError as error:
+            self.vista.mostrar_error(f"No se pudo registrar el puntaje: {error}")
+            return
+        self._puntaje_registrado = True
+
     # ---------------------------------------------------------
     # PARSEAR COMANDOS
     # ---------------------------------------------------------
 
     def procesar_comando(self, texto):
 
-        partes = texto.split()
+        partes = texto.split(maxsplit=1)
+        if not partes:
+            return
 
         comando = partes[0].lower()
 
-        argumentos = partes[1:]
+        if comando in ("guardar", "cargar", "replay"):
+            ruta = partes[1].strip() if len(partes) > 1 else ""
+            if len(ruta) >= 2 and ruta[0] == ruta[-1] and ruta[0] in ("\"", "'"):
+                ruta = ruta[1:-1]
+            argumentos = [ruta] if ruta else []
+        else:
+            argumentos = partes[1].split() if len(partes) > 1 else []
 
         # ---------------------------------------------
         # MOVIMIENTO RÁPIDO
@@ -247,6 +305,11 @@ class ControladorJuego:
         if comando == "inv":
             return self._comando_inventario(argumentos)
 
+        if comando == "seleccionar":
+            if argumentos and self.modelo.inventario_seleccionar(argumentos[0]):
+                return
+            return self.vista.mostrar_error("No tienes ese objeto en el inventario.")
+
         if comando == "sig":
             return self._mover_cursor("siguiente")
 
@@ -293,7 +356,7 @@ class ControladorJuego:
             ruta = (
                 argumentos[0]
                 if argumentos
-                else "datos_generados/partida.bin"
+                else RUTA_GUARDADO_PREDETERMINADA
             )
 
             return self._guardar(ruta)
@@ -307,7 +370,7 @@ class ControladorJuego:
             ruta = (
                 argumentos[0]
                 if argumentos
-                else "datos_generados/partida.bin"
+                else RUTA_GUARDADO_PREDETERMINADA
             )
 
             return self._cargar(ruta)
@@ -328,6 +391,13 @@ class ControladorJuego:
             self.vista.mostrar_puntajes(registros)
 
             return
+
+        # ---------------------------------------------
+        # REPLAY
+        # ---------------------------------------------
+
+        if comando == "replay":
+            return self._replay(argumentos)
 
         # ---------------------------------------------
         # AYUDA
@@ -355,10 +425,11 @@ class ControladorJuego:
 
     def _accion_modelo(self, accion, argumento=None):
 
-        resultado = self.modelo.ejecutar(
-            accion,
-            argumento,
-        )
+        if (callable(getattr(type(self.vista), "ejecutar_tarea", None))
+                and getattr(self.vista, "root", None) is not None):
+            resultado = self.vista.ejecutar_tarea(self.modelo.ejecutar, accion, argumento)
+        else:
+            resultado = self.modelo.ejecutar(accion, argumento)
 
         if not resultado.ok:
 
@@ -378,14 +449,23 @@ class ControladorJuego:
             return False
 
         # Solo registramos acciones aceptadas.
-        self.bitacora_replay.registrar_accion(
-            accion,
-            argumento,
-        )
+        if callable(getattr(type(self.vista), "preparar_animacion", None)):
+            if accion == "usar":
+                self.vista.preparar_animacion(accion, argumento)
+            else:
+                self.vista.preparar_animacion(accion)
+        if (getattr(resultado, "trampas_activadas", None)
+                and callable(getattr(type(self.vista), "preparar_trampas", None))):
+            self.vista.preparar_trampas(resultado.trampas_activadas)
+        if self._grabacion_valida:
+            try:
+                self.bitacora_replay.registrar_accion(accion, argumento)
+            except OSError as error:
+                self._fallo_grabacion(error)
 
         if resultado.mensaje:
             self.notificar(resultado.mensaje)
-        else:
+        elif not self._modelo_notifica:
             if argumento is None:
                 self.notificar(
                     f"Acción: {accion}"
@@ -490,6 +570,42 @@ class ControladorJuego:
         return item.instancia
 
     # ---------------------------------------------------------
+    # REPLAY
+    # ---------------------------------------------------------
+
+    def _replay(self, argumentos):
+
+        if self.lanzador_replay is None:
+            return self.vista.mostrar_error(
+                "El replay no está disponible en esta sesión."
+            )
+
+        if argumentos:
+            ruta = argumentos[0]
+
+        else:
+            # Sin argumento: abrir directamente la grabacion de esta sesion.
+            ruta = str(self.bitacora_replay.ruta)
+
+        if not self._grabacion_valida and os.path.abspath(ruta) == os.path.abspath(self.bitacora_replay.ruta):
+            return self.vista.mostrar_error("La grabacion actual esta incompleta y no se puede reproducir.")
+        if not os.path.exists(ruta):
+            return self.vista.mostrar_error(
+                f"No existe el archivo de replay: {ruta}"
+            )
+
+        try:
+            self.lanzador_replay(ruta)
+
+        except OSError as error:
+            return self.vista.mostrar_error(
+                f"No se pudo abrir el replay: {error}"
+            )
+
+        self.notificar(f"Replay abierto: {ruta}")
+        self.vista.mostrar_info(f"Replay abierto: {ruta}")
+
+    # ---------------------------------------------------------
     # GUARDADO
     # ---------------------------------------------------------
 
@@ -522,6 +638,17 @@ class ControladorJuego:
                 f"No se pudo guardar: {error}"
             )
 
+    def _fallo_grabacion(self, error):
+        self._grabacion_valida = False
+        self.ejecutando = False
+        texto = (f"La accion se realizo, pero no pudo grabarse: {error}. "
+                 "La sesion se detiene para evitar un replay divergente. La bitacora esta incompleta.")
+        self.notificar(texto)
+        if callable(getattr(type(self.vista), "mostrar_error_replay", None)):
+            self.vista.mostrar_error_replay(texto)
+        else:
+            self.vista.mostrar_error(texto)
+
     # ---------------------------------------------------------
     # CARGA
     # ---------------------------------------------------------
@@ -539,6 +666,15 @@ class ControladorJuego:
             self.modelo.restaurar_estado(
                 estado
             )
+            if callable(getattr(type(self.vista), "preparar_animacion", None)):
+                self.vista.preparar_animacion("cargar")
+            if self._grabacion_valida:
+                try:
+                    self.bitacora_replay.registrar_carga(estado)
+                except OSError as error:
+                    self._fallo_grabacion(error)
+                    return
+            self._puntaje_registrado = False
 
             self.notificar(
                 f"Partida cargada desde {ruta}"

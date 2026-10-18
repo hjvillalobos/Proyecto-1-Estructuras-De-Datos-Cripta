@@ -10,8 +10,10 @@ from modelo.snapshots import (
     SalaGuardada, PuertaGuardada, EnemigoGuardado, ObjetoGuardado, TrampaGuardada)
 from utilidades.ordenamiento import ordenar
 
+RUTA_GUARDADO_PREDETERMINADA = "datos_generados/partida.bin"
+
 MAGIC = b"CRPT"
-FORMATO_VERSION = 1          # súbanla si cambian el layout; los archivos viejos se rechazan
+FORMATO_VERSION = 3          # incluye evidencia de apertura con llave; rechaza formatos anteriores
 
 _ENCABEZADO = struct.Struct("<4sHHIQIQ")     # 4+2+2+4+8+4+8 = 32 bytes
 _ENTRADA = struct.Struct("<IQI")             # sala_id, offset, longitud = 16 bytes
@@ -122,7 +124,7 @@ def _codificar_global(e: EstadoGuardado):
         w.texto(it.instancia)
         w.texto(it.tipo)
         w.booleano(it.equipado)
-    w.u8(len(j.extras))
+    w.u32(len(j.extras))
     for v in j.extras:
         w.i64(v)
 
@@ -155,7 +157,7 @@ def _decodificar_global(payload):
     vida, vida_max, ataque, defensa, velocidad, t_sig = (r.i64() for _ in range(6))
     inventario = [ItemInventarioGuardado(r.texto(), r.texto(), r.booleano())
                   for _ in range(r.u16())]
-    extras = [r.i64() for _ in range(r.u8())]
+    extras = [r.i64() for _ in range(r.u32())]
     jugador = JugadorGuardado(sala_id, vida, vida_max, ataque, defensa, velocidad,
                               t_sig, inventario, extras)
 
@@ -178,6 +180,7 @@ def _codificar_sala(s: SalaGuardada):
     for p in s.puertas:
         w.texto(p.direccion)
         w.booleano(p.cerrada)
+        w.booleano(p.abierta_con_llave)
     w.u16(len(s.enemigos))
     for en in s.enemigos:
         w.texto(en.instancia)
@@ -200,7 +203,7 @@ def _codificar_sala(s: SalaGuardada):
 def _decodificar_sala(payload):
     r = _Lector(payload)
     sala_id, rastro = r.u32(), r.i64()
-    puertas = [PuertaGuardada(r.texto(), r.booleano()) for _ in range(r.u8())]
+    puertas = [PuertaGuardada(r.texto(), r.booleano(), r.booleano()) for _ in range(r.u8())]
     enemigos = [EnemigoGuardado(r.texto(), r.texto(), r.i64(), r.booleano(), r.i64())
                 for _ in range(r.u16())]
     objetos = [ObjetoGuardado(r.texto(), r.texto()) for _ in range(r.u16())]
@@ -287,7 +290,8 @@ class ArchivoGuardado:
                 f"el guardado usa el formato v{version} y este programa entiende "
                 f"solo el v{FORMATO_VERSION}; no se puede cargar")
         tam = os.fstat(self._f.fileno()).st_size
-        if off_i + n * _ENTRADA.size != tam or off_g + len_g > off_i:
+        if (off_i + n * _ENTRADA.size != tam or off_g < _ENCABEZADO.size
+                or len_g < _U32.size or off_g + len_g > off_i):
             raise GuardadoCorrupto(f"'{ruta}' está truncado o tiene un encabezado inválido")
         self.n_salas, self._off_global, self._len_global, self._off_indice = n, off_g, len_g, off_i
 
@@ -325,7 +329,16 @@ class ArchivoGuardado:
         if hallada is None:
             return None
         off, ln = hallada
-        return _decodificar_sala(self._leer_bloque(off, ln, f"sala {sala_id}"))
+        self._validar_rango_sala(off, ln)
+        sala = _decodificar_sala(self._leer_bloque(off, ln, f"sala {sala_id}"))
+        if sala.sala_id != sala_id:
+            raise GuardadoCorrupto("El indice no corresponde al identificador de la sala.")
+        return sala
+
+    def _validar_rango_sala(self, off, ln):
+        if (off < self._off_global + self._len_global or ln < _U32.size
+                or off + ln > self._off_indice):
+            raise GuardadoCorrupto("Bloque de sala fuera de la zona de salas.")
 
     def ids_salas(self):
         """Ids de todas las salas guardadas (lee solo el índice, no los bloques)."""
@@ -344,13 +357,21 @@ class ArchivoGuardado:
         if len(zona) != self._off_indice - inicio or len(indice) != self.n_salas * _ENTRADA.size:
             raise GuardadoCorrupto("lectura incompleta de las salas")
         salas = []
+        anterior = -1
         for i in range(self.n_salas):
             sid, off, ln = _ENTRADA.unpack_from(indice, i * _ENTRADA.size)
+            if sid <= anterior:
+                raise GuardadoCorrupto("Indice de salas desordenado o repetido.")
+            anterior = sid
+            self._validar_rango_sala(off, ln)
             rel = off - inicio
             bloque = zona[rel:rel + ln] if rel >= 0 else b""
             if len(bloque) != ln:
                 raise GuardadoCorrupto(f"sala {sid}: bloque fuera de rango")
-            salas.append(_decodificar_sala(_verificar_crc(bloque, f"sala {sid}")))
+            sala = _decodificar_sala(_verificar_crc(bloque, f"sala {sid}"))
+            if sala.sala_id != sid:
+                raise GuardadoCorrupto("El indice no corresponde al identificador de la sala.")
+            salas.append(sala)
         estado.salas = salas
         return estado
 
