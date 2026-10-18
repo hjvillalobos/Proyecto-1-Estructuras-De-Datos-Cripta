@@ -213,19 +213,39 @@ class TestTransicionSalas(unittest.TestCase):
         self.assertEqual(self.vista.escena.anterior.sala_id,
                          self.datos.motor.jugador.posicion_actual)
 
+    @unittest.skipIf(Image is None, "Pillow no disponible")
     def test_primera_sala_precarga_ambas_orientaciones(self):
         v = self.vista
         v.mostrar_estado(self.datos.motor.estado_vista(), [])
-        alto = int(min(280, max(350, v.canvas.winfo_height()) - 175) * .70)
-        self.assertTrue(v.recursos.fotogramas_jugador(290, alto))
-        self.assertTrue(v.recursos.fotogramas_jugador(290, alto, invertir=True))
-        from vista import recursos_graficos
-        if recursos_graficos.Image is None:
-            self.skipTest("Pillow no disponible")
-        with patch.object(recursos_graficos.Image, "open", wraps=recursos_graficos.Image.open) as abrir:
+        # Ninguna preparacion manual: el primer recorrido debe estar listo
+        # desde mostrar_estado, incluidas las orientaciones de salida/entrada.
+        with patch.object(v.recursos, "_fotos_desde_hoja",
+                          side_effect=AssertionError("Convirtio imagenes durante el recorrido")):
             self.mover("N")
             avanzar(v, 26)
-        self.assertFalse(any("jugador_acciones" in str(c.args[0]) for c in abrir.call_args_list))
+
+    @unittest.skipIf(Image is None, "Pillow no disponible")
+    def test_equipo_y_antorcha_se_preparan_antes_del_recorrido(self):
+        v = self.vista
+        inicial = self.datos.motor.estado_vista()
+        v.mostrar_estado(inicial, [])
+        equipado = replace(inicial, arma_tipo="itm_daga_oxidada",
+                           armadura_tipo="itm_coraza_cuero", efectos=["antorcha"])
+        v.mostrar_estado(equipado, [])
+        destino = replace(equipado, sala_id=2, reloj=100)
+        with patch.object(v.recursos, "_fotos_desde_hoja",
+                          side_effect=AssertionError("Preparo equipo al entrar")):
+            v.preparar_animacion("mover")
+            v.mostrar_estado(destino, [])
+            avanzar(v, 26)
+        self.assertEqual(v.escena.anterior.sala_id, 2)
+
+    def test_animaciones_desactivadas_no_precargan_carrera(self):
+        v = self.vista
+        v._movimiento_activo = False
+        with patch.object(v.recursos, "fotogramas_accion",
+                          side_effect=AssertionError("Cargo animaciones desactivadas")):
+            v.mostrar_estado(self.datos.motor.estado_vista(), [])
 
     def test_movimientos_rapidos_no_restauran_destino_obsoleto(self):
         self.mover("N")

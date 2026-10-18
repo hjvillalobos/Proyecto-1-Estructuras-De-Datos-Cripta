@@ -652,6 +652,20 @@ cache visual sin perdida a fondos e imagenes estaticas. Probar igualdad de
 pixeles, invalidacion por cambios de PNG y respaldo para IDs nuevos. Cronometrar
 apertura fria y preparada sin modificar reglas, imagenes originales ni el PDF.
 
+# 2026-10-18: primer recorrido entre salas
+
+Herramienta: Codex. Solicitud del usuario:
+
+> sigue un poco lento
+
+Uso: preparar los fotogramas de carrera de ambas orientaciones antes de pedir
+comandos, usando equipo y antorcha actuales. Evitar convertir imagenes durante
+el primer recorrido, sin cambiar reglas, pasos ni duracion de la animacion.
+Comparacion local de tres muestras por variante a 1280x850: mediana del inicio
+visual del primer movimiento de 244.22 a 25.43 ms sin equipo y de 192.77 a
+20.59 ms con coraza, daga y antorcha. Dibujo de llegada cercano a 3 ms. Son salas
+sinteticas, sin HTTP; el costo inicial se adelanta a la preparacion del juego.
+Verificacion: 32 pruebas de transiciones, inicio, cadencia, gestos y vista pasan.
 # 2026-10-18: respuesta al pulsar Jugar
 
 Herramienta: Codex. Prompt textual:
