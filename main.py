@@ -3,6 +3,7 @@ import json
 import os
 import subprocess
 import sys
+from pathlib import Path
 
 from red.sesion import SesionDatos
 from red.errores import ErrorCripta
@@ -84,7 +85,17 @@ def leer_argumentos(argumentos):
     parser.add_argument("--replay", metavar="ARCHIVO")
     parser.add_argument("--gui", action="store_true",
                         help="Jugar en una ventana gráfica (tkinter) en vez de la consola.")
-    return parser.parse_args(argumentos)
+    args = parser.parse_args(argumentos)
+    # La cache incluida pertenece al proyecto, incluso al lanzar main.py desde
+    # otra carpeta. Las carpetas personalizadas siguen relativas al comando.
+    for campo in ("offline", "datos_dir"):
+        valor = getattr(args, campo)
+        if valor is not None:
+            ruta = Path(valor)
+            if ruta == Path(".cache/cripta"):
+                ruta = Path(__file__).resolve().parent / ruta
+            setattr(args, campo, str(ruta.resolve()))
+    return args
 
 
 def main(argv=None):

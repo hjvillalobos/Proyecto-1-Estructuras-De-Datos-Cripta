@@ -103,6 +103,9 @@ python main.py --offline .cache/cripta --gui
 Cada cripta usa una sesion y un presupuesto independientes. El UUID HTTP se
 mantiene durante la ejecucion. Las respuestas quedan en la cache local ignorada
 por Git; en otro equipo hay que descargarlas antes de jugar sin conexion.
+La ruta predeterminada `.cache/cripta` se resuelve dentro del proyecto, aunque
+se ejecute `main.py` desde otra carpeta. Una ruta personalizada se resuelve
+desde la carpeta del comando; los errores offline indican la carpeta consultada.
 
 Verificacion opcional del paquete completo descargado, sin solicitudes HTTP:
 

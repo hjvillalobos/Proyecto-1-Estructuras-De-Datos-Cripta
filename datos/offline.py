@@ -14,7 +14,9 @@ class ClienteOffline:
 
     def _exigir(self, datos, operacion):
         if datos is None:
-            raise DatosNoDisponibles(f"Offline: faltan datos para {operacion}.")
+            raise DatosNoDisponibles(
+                f"Offline: faltan datos para {operacion}. "
+                f"Carpeta consultada: {self.almacen.carpeta.resolve()}")
         return datos
 
     def listar_criptas(self):
