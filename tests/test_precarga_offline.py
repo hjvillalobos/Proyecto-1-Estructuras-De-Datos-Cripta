@@ -1,5 +1,6 @@
 from contextlib import redirect_stdout, redirect_stderr
 import io
+import os
 from pathlib import Path
 import tempfile
 import unittest
@@ -7,7 +8,7 @@ from unittest.mock import patch
 
 from datos.almacen import AlmacenLocal
 from datos.offline import ClienteOffline
-from main import main
+from main import main, leer_argumentos
 from red.cache import CacheCatalogoOrdenado
 from red.catalogo import GestorCatalogo
 from red.errores import DatosInvalidos, DatosNoDisponibles, PresupuestoAgotado, VersionIncompatible
@@ -171,6 +172,28 @@ class TestOffline(unittest.TestCase):
         with self.assertRaises(DatosNoDisponibles):
             cliente.obtener_contenido_salas("prueba", [999])
         self.assertEqual(cliente.solicitudes_realizadas, 0)
+
+    def test_cache_predeterminada_no_depende_de_carpeta_de_inicio(self):
+        raiz_proyecto = Path(__file__).resolve().parents[1]
+        anterior = Path.cwd()
+        try:
+            os.chdir(self.raiz)
+            for opciones in (["--offline"], ["--offline", ".cache/cripta"]):
+                with self.subTest(opciones=opciones):
+                    args = leer_argumentos(opciones)
+                    self.assertEqual(Path(args.offline), raiz_proyecto / ".cache" / "cripta")
+                    self.assertEqual(args.datos_dir, args.offline)
+            args = leer_argumentos(["--offline", "paquete", "--datos-dir", "sesion"])
+            self.assertEqual(Path(args.offline), self.paquete.resolve())
+            self.assertEqual(Path(args.datos_dir), self.raiz / "sesion")
+        finally:
+            os.chdir(anterior)
+
+    def test_error_offline_indica_carpeta_consultada(self):
+        cliente = ClienteOffline(self.paquete)
+        with self.assertRaises(DatosNoDisponibles) as fallo:
+            cliente.obtener_datos_generales("ausente")
+        self.assertIn(str(self.paquete.resolve()), str(fallo.exception))
 
     def test_cli_offline_y_reporte(self):
         salida = io.StringIO()
