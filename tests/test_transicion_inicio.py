@@ -67,3 +67,24 @@ class TestTransicionInicio(unittest.TestCase):
         self.assertEqual(menu.mostrar(), ("salir", None))
         self.assertIsNone(self.v._inicio_en_carga)
         self.assertFalse(menu.panel.winfo_exists())
+
+    def test_menu_prepara_imagen_del_selector_sin_reescalarla_al_jugar(self):
+        menu = MenuInicio(self.v, Mock(), Mock())
+        self.addCleanup(lambda: menu.panel.destroy() if menu.panel.winfo_exists() else None)
+        self.v.root.update_idletasks()
+        # Ejecutar la tarea pendiente sin depender de la velocidad del equipo.
+        self.assertIsNotNone(menu._precarga_selector)
+        menu._cancelar_precarga()
+        menu._preparar_selector()
+        from PIL import Image
+        with patch.object(Image.Image, "thumbnail", side_effect=AssertionError("Reescalo al jugar")):
+            selector = SelectorCripta(self.v, CRIPTAS)
+            try:
+                self.v.root.update_idletasks()
+                self.assertTrue(selector.imagenes)
+            finally:
+                selector.panel.destroy()
+
+    def test_clic_rapido_cancela_precarga_del_menu(self):
+        menu = self.iniciar()
+        self.assertIsNone(menu._precarga_selector)

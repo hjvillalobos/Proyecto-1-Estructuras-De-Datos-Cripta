@@ -571,6 +571,9 @@ class VistaGrafica:
         return not self._cerrada and messagebox.askyesno(
             "Jugar de nuevo", "Has perdido. ¿Quieres iniciar una partida nueva?", parent=self.root)
 
+    def marcar_volver_menu(self):
+        self._volver_menu_fin = True
+
     def preguntar_menu_principal(self):
         respuesta = getattr(self, "_volver_menu_fin", False)
         self._volver_menu_fin = False

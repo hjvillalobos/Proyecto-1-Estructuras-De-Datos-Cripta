@@ -666,4 +666,15 @@ visual del primer movimiento de 244.22 a 25.43 ms sin equipo y de 192.77 a
 20.59 ms con coraza, daga y antorcha. Dibujo de llegada cercano a 3 ms. Son salas
 sinteticas, sin HTTP; el costo inicial se adelanta a la preparacion del juego.
 Verificacion: 32 pruebas de transiciones, inicio, cadencia, gestos y vista pasan.
+# 2026-10-18: respuesta al pulsar Jugar
+
+Herramienta: Codex. Prompt textual:
+
+> puedes fijarte porque cuando le doy jugar es un poquiiiito lento, muy poco
+
+Uso: perfilar el selector nativo y preparar desde el menu la imagen del tigre
+al tamano que necesita. Cancelar la tarea al elegir o redimensionar. Comparacion
+local de tres aperturas por variante, con cache de disco nueva: mediana visual
+de 210.89 ms sin preparar y 30.91 ms preparada. No incluye HTTP ni la carga del
+motor. Las 34 pruebas de menu, selector, transicion e inicio pasan.
 

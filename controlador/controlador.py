@@ -413,6 +413,8 @@ class ControladorJuego:
 
         if comando == "salir":
             self.ejecutando = False
+            if callable(getattr(type(self.vista), "marcar_volver_menu", None)):
+                self.vista.marcar_volver_menu()
             return
 
         self.vista.mostrar_error(

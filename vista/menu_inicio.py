@@ -17,9 +17,11 @@ class MenuInicio:
         configurar_botones_menu(vista.root)
         self.resultado = None
         self._cargando = False
+        self._precarga_selector = None
         self.fin = tk.BooleanVar(master=vista.root, value=False)
         self.panel = tk.Frame(vista.root, bg=FONDO)
-        self.panel.place(relwidth=1, relheight=1)
+        self.panel.place(x=0, y=0, relwidth=1, relheight=1)
+        self.panel.lift()
         self.canvas = tk.Canvas(self.panel, bg=FONDO, highlightthickness=0)
         self.canvas.pack(fill="both", expand=True)
         self.animacion = AnimacionEscena(vista.root, self.canvas)
@@ -61,11 +63,13 @@ class MenuInicio:
         self.elegir("cargar", RUTA_GUARDADO_PREDETERMINADA)
 
     def dibujar(self, _evento=None):
+        w, h = self.canvas.winfo_width(), self.canvas.winfo_height()
+        if w <= 1 or h <= 1:
+            return
         self.animacion.detener()
         self.animacion = AnimacionEscena(self.vista.root, self.canvas)
         self.canvas.delete("all")
         self.imagenes.clear()
-        w, h = self.canvas.winfo_width(), self.canvas.winfo_height()
         fondo = self.vista.recursos.fondo(w, h)
         if fondo is not None:
             self.imagenes.append(fondo)
@@ -86,11 +90,28 @@ class MenuInicio:
                 self.animacion.agregar(sprite, fase=fase)
         if self.vista._movimiento_activo:
             self.animacion.iniciar()
+        self._cancelar_precarga()
+        # Preparar el tamano del selector despues de pintar el menu. Tk y sus
+        # PhotoImage permanecen en el hilo principal; no se consulta la API.
+        self._precarga_selector = self.vista.root.after(120, self._preparar_selector)
+
+    def _cancelar_precarga(self):
+        if self._precarga_selector is not None:
+            self.vista.root.after_cancel(self._precarga_selector)
+            self._precarga_selector = None
+
+    def _preparar_selector(self):
+        self._precarga_selector = None
+        w, h = self.canvas.winfo_width(), self.canvas.winfo_height()
+        if w > 1 and h > 1:
+            self.vista.recursos.imagen("jugador", int(w * .29), int(h * .68))
 
     def mostrar(self):
         self.vista._en_menu = True
         self.vista.root.protocol("WM_DELETE_WINDOW", lambda: self.elegir("salir"))
         try:
+            self.vista.root.update_idletasks()
+            self.dibujar()
             self.vista.root.update_idletasks()
             if getattr(self.vista, "sonidos", None) is not None:
                 self.vista.sonidos.reproducir("inicio")
@@ -98,6 +119,7 @@ class MenuInicio:
             self.vista.root.wait_variable(self.fin)
             return self.resultado
         finally:
+            self._cancelar_precarga()
             self.animacion.detener()
             if (self.resultado is not None and self.resultado[0] in ("jugar", "cargar")
                     and callable(getattr(type(self.vista), "_conservar_inicio", None))):

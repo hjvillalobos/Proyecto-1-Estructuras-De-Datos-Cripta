@@ -99,6 +99,9 @@ class ServidorFalso:
             elif clave == "pocion_vel":
                 entidades.append({"id": clave, "clase": "pocion", "nombre": "Poción de velocidad",
                                   "peso": 1, "valor": 3, "modificador_velocidad": 2.0, "duracion": 300})
+            elif clave == "obj_0":
+                entidades.append({"id": clave, "clase": "llave", "nombre": "Llave maestra",
+                                  "peso": 1, "valor": 5, "abre": "obj_0"})
             else:
                 entidades.append({"id": clave, "clase": "arma", "nombre": self.version_catalogo,
                                   "peso": 1, "valor": 3, "ataque_bonus": 1})
@@ -125,7 +128,8 @@ def crear_paquete(carpeta, salas=23):
         for contenido in servidor.obtener_contenido_salas("prueba", ids)["contenido"]:
             almacen.guardar_contenido("prueba", servidor.version, contenido)
     almacen.guardar_version_catalogo(servidor.version_catalogo)
-    ids = [f"obj_{i}" for i in range(7)] + ["enemigo", "pocion"]
+    ids = [f"obj_{i}" for i in range(7)] + ["enemigo", "pocion", "obj_0"]
+    ids = list(dict.fromkeys(ids))  # deduplicar
     for ficha in servidor.obtener_catalogo(ids)["entidades"]:
         almacen.guardar_ficha(servidor.version_catalogo, ficha)
     return almacen
