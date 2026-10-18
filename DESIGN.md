@@ -269,6 +269,13 @@ siguen usando los mismos respaldos; nada de esto modifica fichas ni estadisticas
   a widgets destruidos. Los callbacks tardios no dibujan ni se reprograman. El
   menu, igual que la sala, crea otra animacion al redibujar.
 
+- Antes de entregar el control se preparan los cuatro fotogramas de carrera en
+  ambas orientaciones, con el equipo y la antorcha actuales. La primera carga
+  permanece bajo la pantalla de inicio; cambiar equipo actualiza la preparacion.
+  El recorrido reutiliza las imagenes Tk residentes y conserva sus tiempos y
+  pasos. Sin animaciones o sin vida no se prepara carrera. El costo de convertir
+  imagenes se adelanta a la preparacion; no desaparece del tiempo total de carga.
+
 - TrampaVista comunica `venenosa` desde el atributo real del catalogo. Las trampas
   venenosas muestran agujas de punta verde y etiqueta Veneno, tambien sin Pillow
   o animaciones. Su activacion lanza tres agujas verdes y burbujas ascendentes

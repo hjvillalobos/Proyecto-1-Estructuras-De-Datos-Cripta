@@ -28,6 +28,24 @@ class EscenaCripta:
         if self.animacion is not None:
             self.animacion.detener()
 
+    def preparar_carrera(self, estado):
+        """Dejar ambas orientaciones listas antes del siguiente movimiento."""
+        v = self.vista
+        recursos = getattr(v, "recursos", None)
+        if (not getattr(v, "_movimiento_activo", True) or estado.vida <= 0
+                or not callable(getattr(type(recursos), "fotogramas_accion", None))):
+            return
+        alto = max(350, v.canvas.winfo_height())
+        altura = int(min(280, alto - 175) * ESCALA_JUGADOR)
+        antorcha = "antorcha" in getattr(estado, "efectos", ())
+        arma = getattr(estado, "arma_tipo", None)
+        # Solo la daga tiene fotogramas con el arma integrada en el tigre.
+        arma = arma if arma == "itm_daga_oxidada" else None
+        for invertir in (False, True):
+            recursos.fotogramas_accion("correr", 290, altura, invertir=invertir,
+                armadura=getattr(estado, "armadura_tipo", None), arma=arma,
+                antorcha=antorcha)
+
     def _actor(self, identificador, fase=0, entrada=False, golpe=False, **movimiento):
         if self.animacion is not None:
             self.animacion.agregar(identificador, fase, entrada, golpe, **movimiento)

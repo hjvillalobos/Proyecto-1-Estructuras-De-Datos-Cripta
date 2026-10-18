@@ -437,6 +437,10 @@ class VistaGrafica:
         if anterior and e.reloj >= anterior.reloj and e.vida != anterior.vida:
             self._animar_vida(e.vida - anterior.vida)
         self.root.update_idletasks()
+        # La primera preparacion ocurre bajo la capa de carga del inicio.
+        # Al cambiar equipo se prepara aqui, antes de volver a pedir comandos,
+        # para no convertir imagenes durante el recorrido entre puertas.
+        self.escena.preparar_carrera(e)
         self._liberar_inicio()
 
     def _ligar(self, etiqueta, comando):
