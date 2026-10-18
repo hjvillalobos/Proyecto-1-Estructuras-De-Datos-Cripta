@@ -13,6 +13,16 @@ from vista.recursos_graficos import Image, ImageTk
 
 
 class TestActivacionesTrampas(unittest.TestCase):
+    def test_snapshot_identifica_veneno_por_atributos_sin_depender_del_tipo(self):
+        d = base.TestRegresionesJuego()
+        d.setUp()
+        d.motor.salas[1].trampas = [Trampa("aguja-nueva", "trampa")]
+        self.assertFalse(d.motor.estado_vista().trampas[0].venenosa)
+        next(f for f in d.fichas if f.id == "trampa").atributos["veneno"] = {"dano_por_pulso": 2}
+        antes = d.motor.exportar_estado()
+        self.assertTrue(d.motor.estado_vista().trampas[0].venenosa)
+        self.assertEqual(d.motor.exportar_estado(), antes)
+
     def test_informa_activacion_aunque_la_trampa_se_rearme_antes_del_turno(self):
         d = base.TestRegresionesJuego()
         d.setUp()
@@ -42,6 +52,53 @@ class TestTrampasAntorchaVisual(unittest.TestCase):
         self.vista.root.update()
         self.datos = base.TestRegresionesJuego()
         self.datos.setUp()
+
+    def test_trampa_venenosa_desconocida_tiene_agujas_disparo_y_burbujas(self):
+        v, m = self.vista, self.datos.motor
+        m.sala_salida = None
+        m.salas[1].salidas["E"]["cerrada"] = False
+        next(f for f in self.datos.fichas if f.id == "trampa").atributos["veneno"] = {"dano_por_pulso": 2}
+        m.salas[2].trampas = [Trampa("agujas", "trampa")]
+        v.mostrar_estado(m.estado_vista(), [])
+        resultado = m.ejecutar("mover", "E")
+        self.assertTrue(resultado.ok)
+        v.preparar_animacion("mover")
+        v.preparar_trampas(resultado.trampas_activadas)
+        v.mostrar_estado(m.estado_vista(), [])
+        v.escena.animacion.situar(10)  # Completar salida de la sala anterior.
+        if v.transicion_salas.activa:
+            v.escena.animacion._al_llegar()
+        self.assertTrue(v.canvas.find_withtag("trampa_agujas"))
+        self.assertIn("Veneno", [v.canvas.itemcget(i, "text") for i in
+            v.canvas.find_withtag("trampa_agujas") if v.canvas.type(i) == "text"])
+        self.assertTrue(v.canvas.find_withtag("efecto_veneno"))
+        efecto = next(d for d in v.escena.animacion.decoraciones if getattr(d, "venenosa", False))
+        antes = m.exportar_estado()
+        v.escena.animacion.situar(12)
+        self.assertTrue(any(v.canvas.itemcget(i, "state") == "normal" for i in efecto.proyectiles))
+        v.escena.animacion.situar(20)
+        visibles = [i for i in efecto.burbujas if v.canvas.itemcget(i, "state") == "normal"]
+        self.assertTrue(visibles)
+        posiciones = [v.canvas.coords(i) for i in visibles]
+        v.escena.animacion.situar(22)
+        self.assertNotEqual(posiciones, [v.canvas.coords(i) for i in visibles])
+        self.assertEqual(m.exportar_estado(), antes)
+        v.escena.animacion.situar(32)
+        self.assertFalse(v.canvas.find_withtag("efecto_veneno"))
+
+    def test_sin_animaciones_veneno_conserva_indicacion_estatica(self):
+        v, m = self.vista, self.datos.motor
+        estado = replace(m.estado_vista(), trampas=[
+            TrampaVista("a", "Agujas", True, 2, tipo="ficha_nueva", venenosa=True)])
+        v.var_movimiento.set(False)
+        v._alternar_movimiento()
+        v.preparar_trampas(["a"])
+        antes = m.exportar_estado()
+        v.mostrar_estado(estado, [])
+        self.assertTrue(v.canvas.find_withtag("trampa_a"))
+        self.assertFalse(v.canvas.find_withtag("efecto_veneno"))
+        self.assertIsNone(v.escena.animacion)
+        self.assertEqual(m.exportar_estado(), antes)
 
     def test_todas_las_trampas_visibles_animan_y_limpian_sus_efectos(self):
         v, m = self.vista, self.datos.motor

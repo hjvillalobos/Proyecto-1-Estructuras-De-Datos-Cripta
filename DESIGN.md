@@ -63,6 +63,8 @@ siguen usando los mismos respaldos; nada de esto modifica fichas ni estadisticas
   inventario mantienen nombre, instancia y datos del catalogo. La falta de PNG
   no define reglas ni cambia el tipo. Las imagenes conocidas siguen iguales;
   se recuerdan hasta 64 nombres ausentes para no repetir acceso a disco.
+  Las trampas con atributo veneno usan la representacion nativa de agujas
+  descrita mas abajo, aunque el identificador de catalogo sea nuevo.
 - El selector vive en `vista/selector_cripta.py`, usa una lista nativa accesible
   por teclado y muestra por separado salas y dificultad de la seleccion.
   Ocupa la ventana principal completa, sin ventana modal ni tablero visible
@@ -219,6 +221,8 @@ siguen usando los mismos respaldos; nada de esto modifica fichas ni estadisticas
 - La antorcha activa se integra en el puno izquierdo del tigre, dejando la daga
   en el derecho. Reposo, carrera, ataque, caida y bebida conservan el agarre;
   el indicador de efecto del modelo determina cuando aparece y se apaga.
+  Al cambiar de sala, la animacion de salida usa los efectos ya actualizados
+  del destino: una antorcha vencida no reaparece durante el recorrido.
   Se componen los recursos existentes sin modificar los PNG originales.
   El mango es el pivote de giro; la llama se inclina hacia fuera del antebrazo,
   con direccion inversa al cruzar el brazo en ataque o durante la caida.
@@ -245,3 +249,29 @@ siguen usando los mismos respaldos; nada de esto modifica fichas ni estadisticas
 - Al finalizar una partida, victoria y derrota ofrecen Volver al menú principal
   y Terminar. Derrota conserva Jugar de nuevo. Volver limpia la presentacion
   y reutiliza el menu inicial para jugar o cargar; el replay conserva Cerrar replay.
+
+- Puntajes muestra todas las partidas registradas con su orden de ranking; un
+  limite explicito sigue disponible para consultas parciales. Las derrotas no
+  quedan ocultas por un top diez.
+- La llama desaparece al vencer el efecto y tambien durante la caida por derrota,
+  aunque el reloj virtual ya se haya detenido. La antorcha se sostiene erguida
+  en reposo y carrera, con un puno proporcional que cubre el mango.
+
+- La referencia de agarre usa `jugador_antorcha.png` solo durante el reposo con
+  antorcha activa: brazo del lado izquierdo de la pantalla doblado, mango vertical
+  envuelto por el puno y mano contraria cerrada para la daga. La coraza y la daga
+  mantienen anclajes propios de esta pose. Apagado y derrota usan los originales
+  sin llama; las acciones conservan sus fotogramas. El PNG original queda intacto
+  y las dos caches invalidan sus copias cuando cambia la pose nueva.
+
+- Cada AnimacionEscena termina definitivamente al detenerse o destruir su canvas:
+  cancela el callback, libera su enlace Destroy y descarta referencias sin acceder
+  a widgets destruidos. Los callbacks tardios no dibujan ni se reprograman. El
+  menu, igual que la sala, crea otra animacion al redibujar.
+
+- TrampaVista comunica `venenosa` desde el atributo real del catalogo. Las trampas
+  venenosas muestran agujas de punta verde y etiqueta Veneno, tambien sin Pillow
+  o animaciones. Su activacion lanza tres agujas verdes y burbujas ascendentes
+  con impacto violeta; todo usa el callback existente y se limpia al cancelar
+  o al paso 32. Solo cambia la presentacion: no agrega trampas a las salas,
+  modifica danos ni aplica efectos por dibujar.

@@ -99,7 +99,13 @@ class TestContenidoDesconocidoGUI(unittest.TestCase):
         for i, objeto in enumerate(estado.objetos_suelo[:8]):
             ligar.assert_any_call(f"objeto_{i}", f"recoger {objeto.instancia}")
         for trampa in estado.trampas:
-            self.assertTrue(any(v.canvas.type(i) == "image" for i in v.canvas.find_withtag("trampa_" + trampa.instancia)))
+            items = v.canvas.find_withtag("trampa_" + trampa.instancia)
+            if trampa.venenosa:
+                self.assertIn("Veneno", [v.canvas.itemcget(i, "text") for i in items
+                                       if v.canvas.type(i) == "text"])
+                self.assertTrue(any(v.canvas.type(i) == "line" for i in items))
+            else:
+                self.assertTrue(any(v.canvas.type(i) == "image" for i in items))
         v.escena.animacion.situar(20)
         self.assertEqual(motor.exportar_estado(), antes)
         v.var_movimiento.set(False)

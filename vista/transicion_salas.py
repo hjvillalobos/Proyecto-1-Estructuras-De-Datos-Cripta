@@ -1,4 +1,5 @@
 """Recorrido entre puertas exclusivamente visual, despues de un movimiento aceptado."""
+from dataclasses import replace
 
 
 def punto_puerta(direccion, ancho, alto):
@@ -32,7 +33,10 @@ class TransicionSalas:
             return False
         self.activa = True
         self.origen, self.destino = origen, destino
-        self.vista._dibujar_sala(origen, salir_hacia=destino.sala_id)
+        # La sala de salida conserva su geometria, pero los efectos ya avanzaron
+        # en el motor: no volver a encender una antorcha que expiro al moverse.
+        salida = replace(origen, efectos=list(destino.efectos))
+        self.vista._dibujar_sala(salida, salir_hacia=destino.sala_id)
         escena = self.vista.escena
         animacion = escena.animacion
         sprites = [i for i in self.vista.canvas.find_withtag("jugador")

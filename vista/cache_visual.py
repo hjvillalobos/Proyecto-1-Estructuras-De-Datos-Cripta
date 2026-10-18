@@ -17,7 +17,7 @@ class CacheVisual:
     def _firma_actual(self):
         if self._firma is None:
             partes = [str(self.recursos.resolve())]
-            for nombre in ("jugador", "jugador_acciones", "jugador_beber", "itm_coraza_cuero",
+            for nombre in ("jugador", "jugador_antorcha", "jugador_acciones", "jugador_beber", "itm_coraza_cuero",
                            "objetos_ilustrados", "itm_daga_oxidada", "itm_antorcha",
                            "fondo_cripta_ilustrado", "fondo_ladrillos"):
                 ruta = self.recursos / (nombre + ".png")

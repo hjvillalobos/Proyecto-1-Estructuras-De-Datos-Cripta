@@ -33,13 +33,14 @@ def iluminar_jugador(imagen, antorcha, puno, pose=None):
 
     mano = ((.36, .60) if pose == "beber" else (.38, .57) if pose is None
             else _MANOS_IZQUIERDAS[pose])
-    tamano = max(1, int(imagen.height * .42))
+    tamano = max(1, int(imagen.height * .38))
     objeto = antorcha.copy()
     objeto.thumbnail((tamano, tamano), Image.Resampling.LANCZOS)
     capa = Image.new("RGBA", (tamano * 2, tamano * 2))
     capa.alpha_composite(objeto, (tamano - int(objeto.width * .32), tamano - int(objeto.height * .78)))
     # La llama apunta fuera del antebrazo; el giro conserva el mango en la palma.
-    giro = -25 if pose in (5, 6) else -50 if pose == 7 else 80
+    giro = (-25 if pose in (5, 6) else -50 if pose == 7
+            else 55 if pose in (None, "beber") else 35)
     capa = capa.rotate(giro, resample=Image.Resampling.BICUBIC)
     x, y = int(mano[0] * imagen.width), int(mano[1] * imagen.height)
     resultado = imagen.copy()
@@ -61,10 +62,10 @@ def iluminar_jugador(imagen, antorcha, puno, pose=None):
     if abierta:
         cerrado = ImageOps.mirror(puno)
         cerrado.putalpha(cerrado.getchannel("A").point(lambda a: 0 if a < 16 else a))
-        altura = max(1, int(imagen.height * .105))
+        altura = max(1, int(imagen.height * .085))
         cerrado = cerrado.resize((max(1, int(cerrado.width * altura / cerrado.height)), altura),
                                  Image.Resampling.LANCZOS)
-        cerrado = cerrado.rotate(120 if pose in (None, "beber") else 15,
+        cerrado = cerrado.rotate(170 if pose in (None, "beber") else 15,
                                   expand=True, resample=Image.Resampling.BICUBIC)
         resultado.alpha_composite(cerrado, (x - cerrado.width // 2, y - cerrado.height // 2))
     else:
@@ -74,11 +75,11 @@ def iluminar_jugador(imagen, antorcha, puno, pose=None):
     return resultado
 
 
-def armar_jugador(imagen, daga, puno, pose=None):
+def armar_jugador(imagen, daga, puno, pose=None, mano=None, puno_cerrado=False):
     """Sustituye la mano abierta por un puno del propio tigre alrededor del mango."""
     from PIL import Image, ImageDraw
 
-    mano = (.835, .565) if pose is None else _MANOS[pose]
+    mano = mano or ((.835, .565) if pose is None else _MANOS[pose])
     tamano = max(1, int(imagen.height * .24))
     arma = daga.copy()
     arma.thumbnail((tamano, tamano), Image.Resampling.LANCZOS)
@@ -88,12 +89,13 @@ def armar_jugador(imagen, daga, puno, pose=None):
     capa = capa.rotate(angulo, resample=Image.Resampling.BICUBIC)
     x, y = int(mano[0] * imagen.width), int(mano[1] * imagen.height)
     resultado = imagen.copy()
-    mano_abierta = pose is None or pose >= 4
+    mano_abierta = not puno_cerrado and (pose is None or pose >= 4)
     if mano_abierta:
         borrar = Image.new("L", imagen.size)
         dibujo = ImageDraw.Draw(borrar)
         if pose is None:
-            dibujo.polygon([(int(px * imagen.width), int(py * imagen.height)) for px, py in
+            dx, dy = mano[0] - .835, mano[1] - .565
+            dibujo.polygon([(int((px + dx) * imagen.width), int((py + dy) * imagen.height)) for px, py in
                 ((.755, .535), (.91, .535), (.91, .66), (.755, .66))], fill=255)
         else:
             zonas = (
@@ -123,11 +125,11 @@ def armar_jugador(imagen, daga, puno, pose=None):
     return resultado
 
 
-def vestir_jugador(imagen, chaleco, pose=None):
+def vestir_jugador(imagen, chaleco, pose=None, torso=None):
     """Compone ropa ajustada al torso; no cambia el recurso original ni su alfa."""
     from PIL import Image, ImageChops, ImageDraw
 
-    puntos = ((.445, .205), (.695, .220), (.475, .425)) if pose is None else _TORSOS[pose]
+    puntos = torso or (((.445, .205), (.695, .220), (.475, .425)) if pose is None else _TORSOS[pose])
     (x, y), (derecha, arriba), (izquierda, abajo) = [
         (px * imagen.width, py * imagen.height) for px, py in puntos]
     ux, uy = derecha - x, arriba - y

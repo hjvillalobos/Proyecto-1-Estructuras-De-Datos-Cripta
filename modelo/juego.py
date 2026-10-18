@@ -485,7 +485,8 @@ class Motor:
         for trampa in sala.trampas:
             ficha = self._resolver_ficha(trampa.tipo_catalogo)
             trampas.append(TrampaVista(trampa.id_instancia, ficha.nombre, trampa.armada,
-                                      ficha.atributos.get("daño", 0), tipo=trampa.tipo_catalogo))
+                                      ficha.atributos.get("daño", 0), tipo=trampa.tipo_catalogo,
+                                      venenosa="veneno" in ficha.atributos))
         agenda = []
         nombres = (("pulso_veneno", "Pulso de veneno"), ("fin_veneno", "Fin del veneno"),
                    ("apagar_antorcha", "Se apaga la antorcha"),
