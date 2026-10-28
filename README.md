@@ -2,6 +2,78 @@
 
 Diseño, implementación y evaluación de estructuras de datos en un juego de mazmorra dirigido por eventos.
 
+## Preparación compartida de la Parte II
+
+El equipo utiliza Codex con las habilidades de spec-kit v1.2.3 y scripts de
+PowerShell. Las reglas comunes están en
+[la constitución](.specify/memory/constitution.md), versión 1.1.0.
+Los enunciados y las aclaraciones del profesor tienen prioridad.
+
+### Preparar el entorno
+
+Cada integrante necesita Git, PowerShell, acceso a Codex y Python 3.11 o superior
+para el juego. Para instalar la herramienta de especificación necesita también
+`uv`. El entorno de esta herramienta es independiente del entorno del juego.
+
+Una vez integrada esta preparación en `main`, actualizar la copia local desde
+esa rama y abrir la carpeta raíz del repositorio en Codex. No repetir `specify init`:
+la configuración compartida ya está incluida en `.specify/` y las habilidades
+están en `.agents/skills/`.
+
+Instalar la versión acordada de la herramienta y verificarla desde la raíz:
+
+```powershell
+uv tool install specify-cli --from git+https://github.com/github/spec-kit.git@v1.2.3
+specify version
+specify integration status
+```
+
+Si `specify` no se reconoce, ejecutar `uv tool update-shell` y abrir una nueva
+terminal. La versión esperada es 1.2.3; el estado debe indicar `OK`, integración
+predeterminada `codex` e integración instalada `codex`, sin archivos faltantes.
+Si el resultado es diferente, revisar la configuración antes de reinstalarla.
+
+### Flujo de trabajo por funcionalidad
+
+La constitución es compartida; no se crea otra por integrante. Cada nueva
+funcionalidad sigue estas habilidades en Codex, en este orden. Son instrucciones
+para el agente, no comandos para pegar en PowerShell.
+
+| Habilidad | Resultado que debe revisar el integrante |
+| --- | --- |
+| `$speckit-specify` | `spec.md`: comportamiento, requisitos y aceptación, sin adelantar la implementación. |
+| `$speckit-clarify` | Aclaraciones que resuelven ambigüedades de la especificación. |
+| `$speckit-plan` | `plan.md`: diseño, tecnologías, estructuras y cumplimiento de la constitución. |
+| `$speckit-tasks` | `tasks.md`: tareas ordenadas y vinculadas con los requisitos. |
+| `$speckit-analyze` | Revisión de coherencia entre especificación, plan y tareas. |
+| `$speckit-implement` | Implementación y validación de las tareas revisadas. |
+
+La especificación genera una rama y una carpeta de funcionalidad bajo `specs/`.
+Cada integrante debe comprobar que trabaja en la rama y carpeta de su tarea.
+La especificación debe estar revisada y confirmada en Git antes del código que
+la implementa. Si cambia, confirmar primero su corrección en un commit separado.
+Resolver los hallazgos críticos o altos del análisis antes de implementar.
+
+Registrar los prompts textuales en [PROMPTS_LLM.md](PROMPTS_LLM.md), con fecha,
+herramienta/modelo y uso de la respuesta. Las propuestas resumidas se identifican
+como tales y no sustituyen el historial textual. Documentar las decisiones y
+mediciones en [DECISIONES.md](DECISIONES.md), sin afirmar resultados no medidos.
+El agente debe presentar los cambios documentales para autorización antes de
+aplicarlos. Revisar el código y los resultados de las pruebas antes de integrar.
+
+### Compartir la preparación
+
+La rama de preparación es `preparacion-proyecto-parte-ii`. Su commit debe incluir
+la configuración de `.specify/`, las habilidades de `.agents/skills/`, el README
+y el registro de prompts. Revisar los archivos seleccionados antes de confirmar,
+sin incorporar puntajes locales, configuración del IDE ni salidas generadas.
+Después, publicar la rama y revisar su integración en `main`; los demás
+integrantes actualizan su copia antes de comenzar sus funcionalidades.
+
+Al completar esta documentación están preparados la constitución, la integración
+de Codex y las habilidades. Quedan pendientes el commit y la integración en
+`main`, y luego las especificaciones, planes, tareas y desarrollo de la Parte II.
+
 ## Jugar con la interfaz grafica
 
 ```powershell

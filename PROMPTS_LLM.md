@@ -678,3 +678,64 @@ local de tres aperturas por variante, con cache de disco nueva: mediana visual
 de 210.89 ms sin preparar y 30.91 ms preparada. No incluye HTTP ni la carga del
 motor. Las 34 pruebas de menu, selector, transicion e inicio pasan.
 
+## Preparación compartida de la Parte II
+
+Las tres propuestas siguientes fueron redactadas por el agente y aprobadas por
+el usuario para su inclusión el 2026-10-27. Son textos de referencia aprobados,
+no transcripciones retrospectivas de los mensajes que iniciaron el trabajo.
+La fecha corresponde a su incorporación documental. La variante exacta del
+modelo no se consigna porque no está confirmada para estas intervenciones.
+
+### 2026-10-27 — Configuración de spec-kit y Codex
+
+- **Herramienta/modelo:** Codex; variante del modelo no registrada.
+- **Prompt propuesto aprobado:**
+
+> Prepara el repositorio de CRIPTA para desarrollar la Parte II con spec-kit v1.2.3 y Codex como agente compartido del equipo. Utiliza la rama `preparacion-proyecto-parte-ii`, configura las habilidades para Codex y verifica que sea la única integración instalada y predeterminada. Conserva el código existente y la constitución. No hagas commit ni push.
+
+- **Prompt textual relacionado:**
+
+> Registra nuevamente la integracion de Codex y dejala como predeterminada sustituyendo lo implementado actualmente
+
+- **Uso de la respuesta:** Sustituir la integración genérica por Codex, conservar
+  spec-kit v1.2.3 y verificar sus diez habilidades. La comprobación de integración
+  terminó correctamente, sin archivos faltantes. La constitución se conservó.
+
+### 2026-10-27 — Constitución del proyecto
+
+- **Herramienta/modelo:** Codex; variante del modelo no registrada.
+- **Prompt propuesto aprobado:**
+
+> Revisa la constitución de CRIPTA tomando como base los enunciados de ambas partes y las aclaraciones del profesor. Conserva las reglas comunes sobre estructuras propias, determinismo, separación MVC, presupuesto de red, pruebas, rendimiento y especificación antes del código. Expresa principios claros y verificables. Documenta las tecnologías, versiones, herramientas y organización de archivos en los planes técnicos, y las instrucciones de ejecución en el README. Presenta los cambios antes de aplicarlos y modifica únicamente la constitución cuando los autorice.
+
+- **Prompt textual relacionado:**
+
+> Muy bien, aplica esto a la constitución del proyecto CRIPTA si no estaba ya implementada de esta manera
+
+- **Uso de la respuesta:** Actualizar la constitución a 1.1.0 para separar los
+  principios de las elecciones tecnológicas y precisar dónde documentarlas,
+  manteniendo las restricciones académicas. Se retiró la referencia a Amazon Q.
+  Durante la preparación del commit se eliminó su informe temporal de cambios.
+
+### 2026-10-27 — Documentación para el equipo
+
+- **Herramienta/modelo:** Codex; variante del modelo no registrada.
+- **Prompt propuesto aprobado:**
+
+> Propón una sección del README que explique cómo preparar el entorno de la Parte II y trabajar con spec-kit v1.2.3 y Codex. Incluye los requisitos, la comprobación de la instalación y el orden de trabajo: especificar, aclarar, planificar, generar tareas, analizar e implementar. Explica qué documentos debe revisar cada integrante, cuándo registrar los prompts y cómo compartir la preparación mediante Git. Distingue los pasos ya completados de los pendientes. Presenta el texto y solicita mi autorización antes de modificar el README o el registro de prompts.
+
+- **Prompts textuales relacionados:**
+
+> Sigue completar la documentación, en esta parte me gustaria conocer los prompts propuestos para esta preparacion antes de incluirlos
+
+> Estoy de acuerdo con los prompts propuestos, implementalos
+>
+> Despues selecciona unicamente los archivos correspondientes para el commit de preparacion con su mensaje correspondiente
+>
+> Y despues de esto continuaremos con la preparacion en main
+
+- **Uso de la respuesta:** Incorporar las tres propuestas aprobadas y sus
+  instrucciones textuales relacionadas, completar la guía del README y preparar
+  la selección de archivos del commit. La integración en `main` queda para el
+  siguiente paso; no se registra como realizada.
+
