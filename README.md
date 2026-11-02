@@ -300,3 +300,47 @@ El ordenamiento compara insercion, fusion y seleccion automatica con entradas al
 El ciclo mide cada llamada completa a `Motor.ejecutar("esperar")` y reporta el maximo y cuantos ciclos alcanzaron 20 ms. La preparacion queda fuera del cronometro; con paquete, el contenido se precarga antes. La carga sintetica procesa eventos de rearme; la carga local espera en la sala inicial y termina si acaba la partida. Estas cargas no certifican todas las rutas ni una cripta desconocida; repetir sin otras pruebas o aplicaciones intensivas durante la defensa.
 
 Las decisiones y la evidencia están en [DECISIONES.md](DECISIONES.md). La bitácora y los prompts de referencia están en [PROMPTS_LLM.md](PROMPTS_LLM.md).
+
+
+## Verificador de resolubilidad — Parte II
+
+La implementación de B está disponible en `modelo/resolubilidad.py` y
+`red/verificacion.py`. Usa listas, búsqueda binaria propia y recorrido incremental;
+no emplea tablas hash como índices. Analiza alcanzabilidad acumulada, confirmada
+por el profesor según lo comunicado el 2026-11-02. No garantiza una trayectoria
+única cuando existen salidas sin regreso.
+
+`verificar_resolubilidad(datos)` analiza registros preparados sin red ni disco.
+`verificar_cripta(cliente, almacen, cripta_id, version_cripta=None)` prepara los
+datos y devuelve `resoluble`, `no_resoluble` o `no_completada`. Una llave ausente
+en un listado válido es un obstáculo; un archivo ausente, formato inválido o cambio
+de versión impide completar la verificación. Las descargas nuevas se publican
+solo después de validar el conjunto y confirmar su versión.
+
+Ejemplo con datos locales previamente descargados:
+
+```python
+from datos.offline import ClienteOffline
+from red.verificacion import verificar_cripta
+
+cliente = ClienteOffline(".cache/resolubilidad/real")
+resultado = verificar_cripta(cliente, cliente.almacen, "cripta-06")
+print(resultado.estado)
+print(resultado.limitacion)
+print(resultado.causa)
+```
+
+Pruebas específicas:
+
+```powershell
+python -m unittest tests.test_resolubilidad tests.test_verificacion_datos tests.test_bench_resolubilidad -v
+```
+
+`utilidades/bench_resolubilidad.py` entrega `medir_resolubilidad`, `medir_datos` y
+`medir_preparacion_offline`. Las opciones de `main.py` y el subsistema de `bench.py`
+siguen pendientes de D; las funciones ya pueden utilizarse desde Python.
+La revisión ejecutada aprobó 175 pruebas y omitió una prueba opcional existente.
+Los comandos, los pendientes y las muestras están en la
+[guía de validación](specs/001-verificador-resolubilidad/quickstart.md),
+[DECISIONES.md](DECISIONES.md) y la
+[evidencia de mediciones](specs/001-verificador-resolubilidad/mediciones.json).

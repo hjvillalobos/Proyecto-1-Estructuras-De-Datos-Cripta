@@ -659,3 +659,95 @@ del sistema operativo. Los maximos de distintas columnas pueden ser casos distin
 Validacion de este ajuste: 31 pruebas aprobadas de animacion, cadencia, puertas,
 trampas y transicion de inicio; auditoria estatica sin hallazgos. El detalle de
 los recorridos posteriores esta en `.cache/puertas.json`.
+
+
+## Decisión de diseño: verificador de resolubilidad
+
+Fecha: 2026-11-02. Usamos arreglos ordenados con búsqueda binaria propia para
+convertir IDs a posiciones compactas. El recorrido usa una cola con lista e índice,
+marcas de salas alcanzadas y puertas pendientes agrupadas por llave. Cada sala se
+procesa una vez; obtener una llave habilita sus pendientes sin recorrer el mapa
+completo de nuevo. El orden es determinista y se conserva la primera evidencia
+de entrada a cada sala y obtención de cada llave.
+
+Las ubicaciones repetidas de una llave son alternativas. Si no aparece en un
+listado completo válido, no se puede obtener. Si faltan datos o la versión cambia,
+el resultado es `no_completada`, sin presentar un diagnóstico parcial como hecho.
+El criterio acumulativo fue aceptado por el profesor según lo informado por el
+usuario: no exige una trayectoria única y esa limitación se incluye en el resultado.
+
+Para explicar bloqueos guardamos un único grafo de condiciones: una sala o llave
+puede tener alternativas; pasar una puerta cerrada requiere su origen y su llave.
+Kosaraju iterativo identifica grupos circulares y muestra un ciclo concreto por
+grupo. Se conservan todas las alternativas mediante referencias compartidas y se
+distinguen bloqueo circular autónomo, dependencias con bloqueos externos y ciclos
+en regiones desconectadas. Un ciclo encontrado no se presenta como causa única.
+
+La preparación reutiliza el cliente y el almacén existentes. Las respuestas nuevas
+quedan en memoria hasta validar el conjunto y confirmar la versión final. Después
+se escriben páginas y llaves; los metadatos y `actual.json` se publican al final
+cuando corresponde una versión nueva. La escritura es atómica por archivo, no
+una transacción de todo el conjunto. El modo offline exige datos completos de la
+versión seleccionada y no hace HTTP.
+
+### Complejidad y comparación
+
+Con N = salas + salidas + llaves + ubicaciones, la normalización cuesta O(N log N)
+y el recorrido y diagnóstico O(N), más el tamaño del reporte. El total es
+O(N log N + salida), considerando aparte el costo de comparar IDs de texto.
+No se declara estrictamente lineal. FR-015 conserva pendiente la revisión académica
+de crecimiento aproximadamente lineal con la evidencia disponible.
+
+La referencia repetitiva vuelve a recorrer las salas después de obtener llaves;
+solo pertenece al benchmark. En una cadena de 128 salas procesó 8.256 salas frente
+a 128 del incremental. Los dos algoritmos se comparan después de validar dictámenes
+y órdenes. El incremental no tiene por qué ganar en todas las muestras pequeñas.
+
+Promedios de diez repeticiones, en milisegundos; semilla 20261102:
+
+| Familia | Salas | Incremental | Repetitivo |
+|---|---:|---:|---:|
+| cadena | 32 | 0.365 | 0.512 |
+| cadena | 64 | 0.786 | 1.320 |
+| cadena | 128 | 1.779 | 3.927 |
+| ciclo | 32 | 0.628 | 0.499 |
+| ciclo | 64 | 1.170 | 1.140 |
+| ciclo | 128 | 2.308 | 2.407 |
+| alternativas | 32 | 0.514 | 0.675 |
+| alternativas | 64 | 1.270 | 1.828 |
+| alternativas | 128 | 2.602 | 4.821 |
+
+### Cripta publicada y alcance de la evidencia
+
+El listado consultado identificó `cripta-06` como la mayor: 300 salas, versión
+`f9ed9afa683d`. Tiene 760 salidas y el verificador obtuvo cuatro llaves; el dictamen
+fue resoluble. El benchmark incluye normalización, recorrido y construcción del
+resultado; en un resultado positivo no se ejecuta diagnóstico de bloqueo.
+
+| Estrategia | Promedio ms | Mínimo ms | Máximo ms | Desviación ms |
+|---|---:|---:|---:|---:|
+| incremental | 2.721 | 2.522 | 3.586 | 0.295 |
+| repetitivo | 3.064 | 2.653 | 3.550 | 0.270 |
+
+Muestras incrementales totales (ms): 3.585800, 2.539700, 2.596400, 2.679100, 2.672600, 2.715600, 2.618800, 2.707800, 2.521500, 2.577100.
+
+La lectura local y validación se midieron aparte: promedio 6,519 ms y cero HTTP.
+La adquisición inicial tardó 4.894,375 ms y consumió 11 solicitudes, incluido el
+listado. Esa adquisición incluye validación y persistencia, no solo espera de red.
+
+Equipo: Windows 11, Intel64 Family 6 Model 170 Stepping 4, GenuineIntel;
+Python 3.15.0a5. Las muestras completas, mínimos, máximos, desviaciones, tamaños,
+longitudes de IDs, conteos y razones temporales por fase están en
+[mediciones.json](specs/001-verificador-resolubilidad/mediciones.json).
+
+Las diez muestras del análisis real quedaron por debajo de 200 ms. Esto demuestra
+el resultado observado en ese equipo y versión, no garantiza futuras criptas ni
+el límite de 20 ms del juego completo. Los negativos se cubren con mediciones
+sintéticas de ciclos. La integración del comando general de medición pertenece a D.
+
+Validación ampliada: 175 pruebas aprobadas y una opcional omitida. Se probaron
+además 60 mapas sintéticos contra un recorrido de referencia, certificados y
+arcos contrastados con la entrada, ciclos de 1.600 salas sin recursión, cambios de
+versión seguidos por una ejecución offline nueva y conservación de archivos previos.
+Auditoría estática de los tres módulos nuevos: sin índices hash, ordenamientos
+automáticos ni comentarios nuevos. No se modificaron `main.py` ni `bench.py`.
