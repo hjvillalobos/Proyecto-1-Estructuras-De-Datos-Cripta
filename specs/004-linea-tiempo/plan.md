@@ -8,6 +8,18 @@ Se conserva la constitución compartida 1.1.0 de main. Índices propios sin dict
 
 ## Decisión propuesta
 
+### Primer incremento independiente
+
+El núcleo recibe un estado histórico puro: campos de clave textual estable y valores inmutables (escalares o tuplas recursivas). Cada cambio conserva presencia y valor antes/después, para expresar creación y eliminación además de sustitución. No contiene objetos vivos, closures ni índices dict/set. El adaptador al estado del motor se implementará después.
+
+Un arreglo ordenado propio de campos con búsqueda binaria permite leer claves; insertar/eliminar desplaza campos y cuesta O(numero de campos). No se promete actualización constante. Se valida una acción completa sobre solo los campos afectados antes de modificar el estado actual, sin copiar todo el mundo por acción.
+
+Una acción registrada contiene sus cambios inmediatos, el reloj inicial/final y lotes de eventos ordenados por tiempo y secuencia. Cada acción ordinaria avanza el reloj; eventos dentro del intervalo tienen tiempo mayor al inicio y menor o igual al final. Los cambios inmediatos se observan para t mayor al inicio; en el instante inicial se devuelve el estado anterior a decidir. Si el motor produce eventos en el propio instante inicial, los entrega antes de publicar esa frontera, no como efectos futuros de la acción. Consultar #k identifica antes de la acción k. La adaptación del motor debe verificar estas precondiciones, no alterar el orden de eventos a escondidas.
+
+Se almacenan bloques de hasta K acciones y una base al principio de cada bloque. La búsqueda binaria propia de los tiempos finales localiza la frontera; un máximo de K acciones, incluidas las parciales, se aplica sobre una copia independiente. Se expone el conteo reconstruido como evidencia estructural del límite, sin afirmar tiempos de rendimiento.
+
+Recortar conserva un número dado de acciones completas, elimina el sufijo y permite continuar una rama. Las correcciones persistentes del pergamino se adjuntan a la frontera como cambios adicionales; al coincidir con un checkpoint se reemplaza esa base, sin añadir controles fuera de cadencia. Este incremento no escribe archivos ni conecta comandos del juego.
+
 Reconstrucción hacia adelante aplicando deltas completos de todos los cambios reales, no reejecutando comandos contra red o mundo presente. Base inicial y copia de control cada K acciones completadas. Una copia contiene un estado reconstruible independiente, incluido azar, agenda y secuencias. Los deltas deben incluir cambios de eventos automáticos entre decisiones y dentro de un instante; un delta solo por comando resulta insuficiente para consultar cualquier t.
 
 Historial segmentado en bloques de K acciones. Índice ordenado de checkpoints por frontera temporal y número de acción, con búsqueda binaria propia. Cada registro conserva tiempo y secuencia total para empates. Registros por eventos dentro de cada acción permiten detener reconstrucción en t sin aplicar eventos posteriores.

@@ -43,6 +43,6 @@ Todas pendientes de implementación. No se ha escrito código del juego.
 
 ## Dependencias y estrategia
 
-T001 → T002 → T003 → US1 → US2. US3 depende de US1 y persistencia para replay de cargas; bloqueo de inicio requiere contrato del verificador. US4 requiere productores de conocimiento y viaje. MVP: US1 con cambios sintéticos y pruebas H1/H3/H4. Luego incorporar captura real y persistencia. T019–T021 cierran aceptación, no preceden al núcleo.
+T001 → T002 → US1 sintética (T004–T006); T003 y T010 conectan los productores antes de la aceptación integrada. T009 puede probarse con cambios sintéticos sin T008 de persistencia binaria. US3 depende de US1 y persistencia para replay de cargas; bloqueo de inicio requiere contrato del verificador. US4 requiere productores de conocimiento y viaje. MVP: US1 con cambios sintéticos y pruebas H1/H3/H4. Luego incorporar captura real y persistencia. T019–T021 cierran aceptación, no preceden al núcleo.
 
 Trabajo independiente posible: fixtures de US3 y US4 una vez fijados contratos; no editar main.py ni snapshots.py simultáneamente sin coordinación. Las tareas aquí se ejecutarán secuencialmente salvo decisión explícita del equipo.
