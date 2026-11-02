@@ -300,3 +300,8 @@ El ordenamiento compara insercion, fusion y seleccion automatica con entradas al
 El ciclo mide cada llamada completa a `Motor.ejecutar("esperar")` y reporta el maximo y cuantos ciclos alcanzaron 20 ms. La preparacion queda fuera del cronometro; con paquete, el contenido se precarga antes. La carga sintetica procesa eventos de rearme; la carga local espera en la sala inicial y termina si acaba la partida. Estas cargas no certifican todas las rutas ni una cripta desconocida; repetir sin otras pruebas o aplicaciones intensivas durante la defensa.
 
 Las decisiones y la evidencia están en [DECISIONES.md](DECISIONES.md). La bitácora y los prompts de referencia están en [PROMPTS_LLM.md](PROMPTS_LLM.md).
+
+
+## Línea de tiempo: preparación para implementar
+
+La especificación, diseño, contratos, aceptación y tareas están en [specs/004-linea-tiempo](specs/004-linea-tiempo/spec.md). La constitución compartida sigue vigente sin cambios. Ver [guía](specs/004-linea-tiempo/quickstart.md) y [base de pruebas](specs/004-linea-tiempo/baseline.md). Esta entrega es documental: los comandos nuevos descritos allí están pendientes de implementación. El plan usa cambios serializables por evento y reconstrucción aislada; K=50 es inicial y se validará con mediciones antes de la entrega final.

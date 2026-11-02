@@ -739,3 +739,22 @@ modelo no se consigna porque no está confirmada para estas intervenciones.
   la selección de archivos del commit. La integración en `main` queda para el
   siguiente paso; no se registra como realizada.
 
+
+
+## 2026-11-02 — preparación de línea de tiempo
+
+Herramienta: Codex desktop. Modelo concreto: no expuesto. Solicitud textual:
+
+> puedes hacerlo tu? dejando lo que mi compañero ya hizo solo añadiendo lo que falta para empezar y explicame que haras, tambien no pongas las letras de a,b,c,d
+
+Contexto textual previo:
+
+> lee los pdf y ayudame a completar todo para poder empezar a programar
+
+Uso: crear rama desde main conservando constitución/configuración, redactar especificación y clarificaciones basadas en enunciado/código, plan, investigación, datos, contratos y tareas; aplicar revisión de consistencia. Se usaron las instrucciones locales speckit-specify, clarify, plan, tasks y analyze como flujo del agente; no son programas de generación ejecutados mediante una CLI. Scripts de resolución, preparación y comprobación se ejecutan desde .specify. Sin código nuevo del juego ni publicación remota.
+
+Prompt textual a agente de investigación requerido por speckit-plan:
+
+> La habilidad speckit-plan exige agentes de investigación. Solo lectura: revisa modelo/juego.py e historial.py en C:/Users/Belén/Documents/2026/Datos/Proyecto/Proyecto-1-Estructuras-De-Datos-Cripta para determinar fronteras acciones/eventos, pergamino, captura serializable. Devuelve decisiones de diseño compatibles y riesgos concretos. No edites archivos.
+
+Uso de respuesta: capturar cambios tipados en lugar de closures, exigir cierre de lote temporal, conservar excepción persistente del pergamino y separar reconstrucción del restaurador con catálogo. Pruebas actuales y límites en baseline.md. No se atribuyen resultados de benchmarks todavía no ejecutados.
