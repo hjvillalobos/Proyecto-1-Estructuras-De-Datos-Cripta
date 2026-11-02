@@ -1,7 +1,6 @@
 # Guía de implementación y validación
 
-Rama 004-linea-tiempo. Constitución compartida sin modificaciones. Implementación todavía pendiente.
-
+Rama 004-linea-tiempo. 
 ## Preparación
 
 Python >=3.11 y dependencias de requirements.txt. Desde raíz: `python -m unittest discover -v`. Si hay fallos gráficos, registrar cuáles y ejecutar por separado los módulos del núcleo indicados en baseline.md; no declarar aprobada la suite completa.

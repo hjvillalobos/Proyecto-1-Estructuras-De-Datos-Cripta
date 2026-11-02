@@ -1,6 +1,6 @@
 # Base de pruebas — 2026-11-02
 
-Base Git: origin/main 03716b2; rama documental 004-linea-tiempo. Python del runtime Codex, sin cambios de código del juego.
+Base Git: origin/main 03716b2; rama documental 004-linea-tiempo. Python del runtime Codex.
 
 1. `python -m unittest discover -v`: ejecución completa interrumpida después de atascarse en pruebas gráficas. Antes de interrumpir, test_redibujar_menu_crea_animacion_nueva_y_destruirlo_la_cancela registró FAIL y aparecieron mensajes Tcl de aplicación destruida. No hay resultado final válido de la suite completa; causa exacta del fallo gráfico no diagnosticada. No se afirma que sea un defecto del programa.
 2. Núcleo seleccionado, primer intento aislado: 134 casos, 42 errores; acceso denegado a temporales y dependencia ausente. Ese resultado no mide corrección del motor.
