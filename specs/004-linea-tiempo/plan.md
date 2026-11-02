@@ -45,6 +45,16 @@ Con motor = acciones, S = tamaño de estado y integración = volumen de cambios,
 
 ## Persistencia
 
+### Incremento independiente de persistencia histórica
+
+Antes de cambiar el archivo de partida, `datos/historia_binaria.py` implementará un fragmento binario independiente con firma CRLH y versión de fragmento 1. No se anuncia como archivo de partida P2 ni sustituye el formato CRPT 3 existente. Al recibir CRPT, el lector de historia informa incompatibilidad explícita.
+
+El contrato `HistoriaGuardada` contiene K, campos iniciales y acciones con sus tiempos, cambios, eventos y correcciones persistentes. Exportar conserva solo la rama vigente. Importar construye una línea nueva y valida todos los registros antes de entregarla; no muta una historia activa. Los checkpoints y el presente se regeneran determinísticamente a partir de base y deltas durante la carga, evitando duplicar copias completas dentro del fragmento. Esto conserva toda la información histórica; no promete carga aleatoria de checkpoints en disco.
+
+Valores codificados por etiquetas explícitas: nulo, booleano, entero de precisión arbitraria, real finito, texto UTF-8 y tuplas recursivas. Se incluyen longitud y CRC del contenido y versión. Se rechazan truncamientos, bytes sobrantes, etiquetas/UTF-8 inválidos, profundidad excesiva, valores incoherentes, K inválido y acciones fuera de orden. Guardar usa temporal único en la misma carpeta y reemplazo al completar; si falla, se conserva el archivo anterior.
+
+El formato integrado 4, acceso a salas y captura completa del motor siguen pendientes. El PDF P1 proporcionado el 2026-11-02 está vacío (0 bytes); no se da por revisado ese contrato heredado. El fragmento permite avanzar y comprobar ida/vuelta, continuación, azar sintético y recortes sin depender de los productores del motor.
+
 Formato 4 elegido para esta rama: encabezado con identidad/versiones, K, frontera vigente y descriptor de bloques; estado actual, base inicial, controles y deltas con longitudes y comprobaciones. Mantener capacidades de acceso a salas de P1; revisar el enunciado completo P1 antes de cerrar el diseño del archivo. Validar truncamiento, offsets fuera del archivo, K inválido, fronteras desordenadas y referencias inconsistentes antes de reemplazar la partida activa. Escribir en temporal y reemplazar al finalizar correctamente.
 
 ## Rendimiento y alternativas
