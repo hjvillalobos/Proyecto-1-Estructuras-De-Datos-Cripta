@@ -24,9 +24,11 @@ Primer incremento implementado con datos sintéticos. Las marcas completadas cor
 
 Incremento independiente dentro de T008/T011 (no completa el formato integrado):
 
-- [ ] T022 [US2] Definir exportación/importación tipada de rama vigente en modelo/snapshots.py y modelo/linea_tiempo.py; regenerar controles conservando K y correcciones (FR-007, FR-009, FR-010, FR-011).
-- [ ] T023 [US2] Probar igualdad de consultas, continuación, correcciones, RNG sintético, errores y rechazo CRPT en tests/test_persistencia_historia.py (FR-011, FR-012, FR-020).
-- [ ] T024 [US2] Implementar fragmento binario CRLH versionado y escritura atómica en datos/historia_binaria.py, sin modificar guardado de partidas (FR-011, FR-012).
+- [x] T022 [US2] Definir exportación/importación tipada de rama vigente en modelo/snapshots.py y modelo/linea_tiempo.py; regenerar controles conservando K y correcciones (FR-007, FR-009, FR-010, FR-011).
+- [x] T023 [US2] Probar igualdad de consultas, continuación, correcciones, RNG sintético, errores y rechazo CRPT en tests/test_persistencia_historia.py (FR-011, FR-012, FR-020).
+- [x] T024 [US2] Implementar fragmento binario CRLH versionado y escritura atómica en datos/historia_binaria.py, sin modificar guardado de partidas (FR-011, FR-012).
+
+- [ ] T025 Clasificar errores esperados en modelo/errores_historia.py; normalizar fallos de entrada/archivo, preservar el error principal y verificar atomicidad en tests/test_errores_historia.py. Completar decisiones, prompts y matriz en specs/004-linea-tiempo/errores.md (FR-005, FR-011, FR-012, FR-020).
 
 ## US3 — modos sin vista y preparación de partida (P2)
 
@@ -55,3 +57,6 @@ Trabajo independiente posible: fixtures de US3 y US4 una vez fijados contratos; 
 
 
 Avance 2026-11-02: T002/T004–T006/T009 se verificaron en aislamiento con registros sintéticos. H1–H4 cubren el núcleo; su aceptación integrada requiere T003/T010 y comandos reales. La persistencia de T008/T011 sigue pendiente.
+
+
+Avance de persistencia independiente 2026-11-02: T022–T024 completos. T008/T011/T020 permanecen pendientes para el guardado de partida integrado y captura real del motor. El fragmento CRLH conserva base y deltas; reconstruye checkpoints al cargar. El lector rechaza CRPT explícitamente, pero eso no certifica aún H6 mediante el comando de carga del juego.

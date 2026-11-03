@@ -45,6 +45,14 @@ Con motor = acciones, S = tamaño de estado y integración = volumen de cambios,
 
 ## Persistencia
 
+### Manejo de errores del núcleo independiente
+
+Los errores esperados del dominio se identificarán por clases en `modelo/errores_historia.py`: entrada inválida, referencia histórica inexistente/futura e incoherencia de cambios. Todas heredarán de ValueError para conservar compatibilidad. La consulta de un campo ausente mantiene KeyError; es distinta de un campo nulo.
+
+La capa binaria mantiene ErrorGuardado, FormatoIncompatible y GuardadoCorrupto ya compartidos por datos. Las rutas inválidas y los tipos no binarios se traducen a ErrorGuardado con mensaje claro. La carga no altera una historia viva; registrar/recortar valida antes de mutar. Si falla la escritura se conserva el destino y se intenta limpiar su temporal; si falla esa limpieza, se añade una nota al error principal, sin ocultarlo ni borrar otro archivo. Errores inesperados de programación no se silencian con `except Exception`.
+
+La matriz de errores y su comprobación se documentará en `errores.md`; el controlador deberá capturar las clases esperadas cuando se haga la integración real. Este incremento no simula que la interfaz ya los muestra.
+
 ### Incremento independiente de persistencia histórica
 
 Antes de cambiar el archivo de partida, `datos/historia_binaria.py` implementará un fragmento binario independiente con firma CRLH y versión de fragmento 1. No se anuncia como archivo de partida P2 ni sustituye el formato CRPT 3 existente. Al recibir CRPT, el lector de historia informa incompatibilidad explícita.
