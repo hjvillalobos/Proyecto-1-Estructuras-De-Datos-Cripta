@@ -659,3 +659,37 @@ del sistema operativo. Los maximos de distintas columnas pueden ser casos distin
 Validacion de este ajuste: 31 pruebas aprobadas de animacion, cadencia, puertas,
 trampas y transicion de inicio; auditoria estatica sin hallazgos. El detalle de
 los recorridos posteriores esta en `.cache/puertas.json`.
+
+
+## Parte II — fragmento persistible de línea de tiempo (incremento independiente)
+
+Especificación: [spec.md](specs/004-linea-tiempo/spec.md), FR-011/012. Diseño: [plan.md](specs/004-linea-tiempo/plan.md), sección de persistencia independiente. No es todavía la decisión final sobre el archivo integrado de partida.
+
+Problema: preservar y reconstruir la rama vigente sin copiar el estado completo en cada acción y sin depender de los productores reales del motor. Alternativas: almacenar controles redundantes o guardar base y registros y regenerarlos al cargar. Decisión: fragmento binario versionado CRLH 1 con base y deltas; K y correcciones conservados; regeneración determinista de controles. Se mantiene el guardado CRPT del juego intacto. Se evita pickle y no se usan índices dict/set ni bibliotecas de estructuras prohibidas.
+
+El tamaño del fragmento crece con la base y los registros, no con acciones por tamaño total del mundo. La carga recorre las acciones y aplica cambios, más copia del estado cada K acciones: no tiene el límite de K aplicable a consultas individuales. La búsqueda de campos es binaria propia; creación/eliminación puede desplazar el arreglo completo. Los valores repetidos grandes en deltas también ocupan espacio: no se afirma memoria óptima.
+
+Evidencia de corrección, no de rendimiento: 31 pruebas de historia/persistencia aprobadas, 164 con regresión seleccionada; detalle en [baseline.md](specs/004-linea-tiempo/baseline.md). Incluye 5000 acciones y continuación del azar sintético. La decisión coincide con el plan de este incremento. No hay mediciones finales de latencia/memoria ni elección empírica definitiva de K.
+
+Límites: acceso por salas, identidad/versiones de cripta y formato integrado 4 pendientes; el PDF P1 recibido estaba vacío y debe revisarse al estar disponible. Que el fragmento rechace CRPT no certifica la incompatibilidad mediante la carga interactiva del juego. No se atribuyen efectos reales del motor a registros sintéticos.
+
+
+## Parte II — núcleo histórico y política de errores
+
+Referencias: [spec.md](specs/004-linea-tiempo/spec.md), FR-001–FR-012 y FR-020; [plan.md](specs/004-linea-tiempo/plan.md); [matriz de errores](specs/004-linea-tiempo/errores.md). La decisión coincide con el plan documentado antes de este incremento; la aceptación dentro del juego sigue pendiente.
+
+### Registro, consultas y recorte
+
+Problema: consultar antes de una acción o entre eventos, conservando el presente y evitando una copia completa por acción. Se consideraron snapshots por acción (no permitidos fuera de la cadencia K), volver a simular comandos y aplicar cambios tipados sobre estado puro. Se eligieron cambios tipados, separados de los callbacks de retroceso P1, bloques de hasta K acciones y reconstrucción hacia adelante. Se registra presencia anterior/nueva para distinguir creación, eliminación y valor nulo. Las correcciones persistentes se adjuntan a la frontera recortada y actualizan un control existente si coincide con ella.
+
+El índice de acciones se consulta por búsqueda binaria propia; localizar un campo en arreglo ordenado cuesta O(log(numero de campos)), mientras insertar o eliminar puede desplazar O(numero de campos). Consultar copia una base y aplica cambios de <=K acciones, pero su tiempo también depende del tamaño del estado y de los cambios. Recortar no recorre el prefijo; liberar el sufijo cuesta según los registros descartados. Los bloques usan arreglos básicos; no se introducen dict/set como índices ni bibliotecas de estructuras prohibidas.
+
+Evidencia: pruebas por tiempo/ordinal, eventos empatados, consultas aisladas, creación/eliminación, errores atómicos, recorte/repetición y 5000 acciones. No se presentan esas pruebas como mediciones de tiempo o memoria; K=50 sigue siendo inicial, pendiente de bench.
+
+### Errores del dominio y de archivo
+
+Problema: permitir al controlador distinguir una entrada inválida, una referencia fuera de la rama, registros incoherentes y archivos incompatibles o dañados. Alternativas: un ValueError indiferenciado, valores centinela que el consumidor podría ignorar, captura genérica de todas las excepciones o clases específicas. Se eligieron clases del dominio derivadas de ValueError y las excepciones de archivo ya existentes en datos. Esto conserva compatibilidad y causas técnicas sin acoplar modelo a vista.
+
+Registrar/recortar valida antes de mutar; cargar construye una instancia nueva; guardar reemplaza el destino al completar el temporal. Si falla también la limpieza, se añade una nota al error principal para conservar el diagnóstico original. Rutas y tipos de entrada inválidos tienen mensajes presentables; errores inesperados de programación no se silencian.
+
+Evidencia: 8 pruebas nuevas de errores; 39 entre errores/historia/persistencia y 172 incluyendo regresión seleccionada, aprobadas. Casos y mensajes en errores.md; comando y alcance en baseline.md. No se afirma que el controlador ya maneje estos errores dentro del juego.

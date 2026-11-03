@@ -39,3 +39,8 @@ Los ejemplos son sintaxis, no capacidades ya disponibles.
 
 
 Fronteras, errores y retroceso se rigen por Assumptions de spec.md. No quedan preguntas de diseño abiertas para desarrollar el núcleo; cualquier cambio posterior se especifica y confirma antes del código.
+
+
+## API independiente ya disponible
+
+`LineaTiempo.exportar() -> HistoriaGuardada`; `LineaTiempo.desde_guardado(registro) -> LineaTiempo`. Los registros son inmutables; la importación no cambia una instancia viva. `datos.historia_binaria` ofrece codificar/decodificar a bytes y guardar/cargar por ruta; comparte ErrorGuardado, GuardadoCorrupto y FormatoIncompatible con la capa de datos existente. El fragmento CRLH es distinto de una partida CRPT y no reemplaza su lector. El adaptador posterior debe incluir identidad/versiones y todos los campos necesarios del motor en el formato integrado.

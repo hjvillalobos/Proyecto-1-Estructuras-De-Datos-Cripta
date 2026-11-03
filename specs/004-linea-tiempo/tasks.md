@@ -28,7 +28,7 @@ Incremento independiente dentro de T008/T011 (no completa el formato integrado):
 - [x] T023 [US2] Probar igualdad de consultas, continuación, correcciones, RNG sintético, errores y rechazo CRPT en tests/test_persistencia_historia.py (FR-011, FR-012, FR-020).
 - [x] T024 [US2] Implementar fragmento binario CRLH versionado y escritura atómica en datos/historia_binaria.py, sin modificar guardado de partidas (FR-011, FR-012).
 
-- [ ] T025 Clasificar errores esperados en modelo/errores_historia.py; normalizar fallos de entrada/archivo, preservar el error principal y verificar atomicidad en tests/test_errores_historia.py. Completar decisiones, prompts y matriz en specs/004-linea-tiempo/errores.md (FR-005, FR-011, FR-012, FR-020).
+- [x] T025 Clasificar errores esperados en modelo/errores_historia.py; normalizar fallos de entrada/archivo, preservar el error principal y verificar atomicidad en tests/test_errores_historia.py. Completar decisiones, prompts y matriz en specs/004-linea-tiempo/errores.md (FR-005, FR-011, FR-012, FR-020).
 
 ## US3 — modos sin vista y preparación de partida (P2)
 
@@ -60,3 +60,5 @@ Avance 2026-11-02: T002/T004–T006/T009 se verificaron en aislamiento con regis
 
 
 Avance de persistencia independiente 2026-11-02: T022–T024 completos. T008/T011/T020 permanecen pendientes para el guardado de partida integrado y captura real del motor. El fragmento CRLH conserva base y deltas; reconstruye checkpoints al cargar. El lector rechaza CRPT explícitamente, pero eso no certifica aún H6 mediante el comando de carga del juego.
+
+Avance de errores 2026-11-02: T025 completada en el núcleo independiente. Contrato y pruebas documentados en errores.md; mostrar mensajes desde el controlador real sigue dentro de las tareas de integración pendientes.

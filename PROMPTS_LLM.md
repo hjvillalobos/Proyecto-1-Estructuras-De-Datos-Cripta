@@ -743,9 +743,7 @@ modelo no se consigna porque no está confirmada para estas intervenciones.
 
 ## 2026-11-02 — preparación de línea de tiempo
 
-Herramienta: Codex desktop. Modelo concreto: no expuesto. Solicitud textual:
 
-> puedes hacerlo tu? dejando lo que mi compañero ya hizo solo añadiendo lo que falta para empezar y explicame que haras, tambien no pongas las letras de a,b,c,d
 
 Contexto textual previo:
 
@@ -758,3 +756,32 @@ Prompt textual a agente de investigación requerido por speckit-plan:
 > La habilidad speckit-plan exige agentes de investigación. Solo lectura: revisa modelo/juego.py e historial.py en C:/Users/Belén/Documents/2026/Datos/Proyecto/Proyecto-1-Estructuras-De-Datos-Cripta para determinar fronteras acciones/eventos, pergamino, captura serializable. Devuelve decisiones de diseño compatibles y riesgos concretos. No edites archivos.
 
 Uso de respuesta: capturar cambios tipados en lugar de closures, exigir cierre de lote temporal, conservar excepción persistente del pergamino y separar reconstrucción del restaurador con catálogo. Pruebas actuales y límites en baseline.md. No se atribuyen resultados de benchmarks todavía no ejecutados.
+
+
+## 2026-11-02 — núcleo de línea de tiempo
+
+Herramienta: Codex desktop; modelo concreto no expuesto. Prompt textual:
+
+> okay empecemos con el codigo entonces la parte que me toca a mi, que se puede ir haciendo sin depender de los compañeros?
+
+Uso: aplicar speckit-implement al subconjunto independiente T002/T004–T006/T009. Checklist de requisitos: 8 satisfechos, 0 pendientes; scripts de prerrequisitos correctos; sin extensions.yml ni hooks. Se precisó el plan y el orden del núcleo sintético antes del código en commit 9ac1088. Se implementaron contratos inmutables, estado puro con búsqueda propia, deltas/checkpoints, consultas y recorte. Pruebas escritas antes del módulo; fallo inicial esperado por importación aún inexistente. Después: 14 nuevas pruebas correctas, 147 incluyendo regresión seleccionada. Demo ejecutada. No se modificaron reglas del motor, guardado binario, red ni vista. Integración pendiente.
+
+
+## 2026-11-02 — persistencia del núcleo histórico
+
+Herramienta: Codex desktop; modelo concreto no expuesto. Solicitud textual:
+
+
+
+> okay hazlo, pero antes tengo una duda, tu puedes ver el primer enunciado? cripta parte 1? Es que necesito que todo vaya acorde a los dos enunciados para garantizar un trabajo correcto
+
+Uso: revisar archivo P1 indicado (0 bytes, imposible extraer contenido), continuar el guardado/carga del núcleo aislado conforme al plan. No se afirma haber leído P1. Se aplicó el subconjunto T022–T024 de speckit-implement tras prerrequisitos y checklist ya completos; no hay extensions.yml ni hooks. Precisión documental previa al código en commit 4bbc87b. Pruebas escritas primero, fallo esperado de módulo aún inexistente; implementados contratos exportables, carga validada y codec CRLH con escritura atómica. 164 pruebas aprobadas en regresión seleccionada, incluidas 31 nuevas de núcleo/persistencia. Sin cambios de reglas, guardado integrado, vista o red. No se publicaron cambios remotos.
+
+
+## 2026-11-02 — decisiones, prompts y manejo de errores
+
+Herramienta: Codex desktop; modelo concreto no expuesto. Prompt textual:
+
+> tambien ocupo que metas las deciciones, promots y los manejo de errores ya que nos bajaron puntos en la parte 1 por el manejo de errores le faltaba un poco mas de documentacion, es buena idea no?
+
+Uso: revisar y completar las decisiones del núcleo, conservar las entradas anteriores de esta bitácora y añadir la matriz de manejo de errores. Se precisó el diseño antes de cambiar el código, en commit 129bdbf. Bajo speckit-implement, prerrequisitos correctos, checklist previo completo y sin extensions.yml/hooks. Se escribió primero tests/test_errores_historia.py y se observó el fallo esperado por módulo aún inexistente. Se implementaron clases de dominio compatibles con ValueError, validación de claves/rutas/datos binarios y conservación del error principal si falla la limpieza del temporal. Regresión seleccionada: 172 pruebas aprobadas, incluidas 8 nuevas de errores. Sin cambios de vista, red o reglas del motor; no se anuncia integración completa ni rendimiento no medido.

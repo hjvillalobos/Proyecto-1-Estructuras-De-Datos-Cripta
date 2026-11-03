@@ -305,3 +305,14 @@ Las decisiones y la evidencia están en [DECISIONES.md](DECISIONES.md). La bitá
 ## Línea de tiempo: preparación para implementar
 
 La especificación, diseño, contratos, aceptación y tareas están en [specs/004-linea-tiempo](specs/004-linea-tiempo/spec.md). La constitución compartida sigue vigente sin cambios. Ver [guía](specs/004-linea-tiempo/quickstart.md) y [base de pruebas](specs/004-linea-tiempo/baseline.md). Esta entrega es documental: los comandos nuevos descritos allí están pendientes de implementación. El plan usa cambios serializables por evento y reconstrucción aislada; K=50 es inicial y se validará con mediciones antes de la entrega final.
+
+
+### Probar el núcleo de línea de tiempo
+
+En la rama de desarrollo, `python -m tests.demo_linea_tiempo` muestra consultas, eventos intermedios, recorte y nueva rama con datos sintéticos. `python -m unittest tests.test_linea_tiempo -v` ejecuta sus pruebas. Este núcleo no está conectado todavía a los comandos ni al guardado del juego. Ver specs/004-linea-tiempo/quickstart.md para el alcance y pendientes.
+
+
+El núcleo ahora exporta/importa la rama vigente y puede guardarse como fragmento binario independiente mediante `datos.historia_binaria`. La demostración anterior muestra también recarga y continuación. Pruebas: `python -m unittest tests.test_linea_tiempo tests.test_persistencia_historia -v`. Esto todavía no cambia el archivo de partida ni incorpora comandos nuevos al juego.
+
+
+Decisiones del núcleo histórico en [DECISIONES.md](DECISIONES.md), prompts textuales en [PROMPTS_LLM.md](PROMPTS_LLM.md) y [manejo de errores](specs/004-linea-tiempo/errores.md). Pruebas del contrato de errores: `python -m unittest tests.test_errores_historia -v`. La presentación de esos mensajes desde los comandos del juego está pendiente de integración.
