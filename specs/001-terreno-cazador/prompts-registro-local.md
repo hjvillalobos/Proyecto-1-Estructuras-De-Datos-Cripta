@@ -36,6 +36,9 @@ El registro recupera textos disponibles; no reconstruye una supuesta conversaci�
 | P18 | 2026-11-05 contextual; historial visible | Autorizar corrección I1/C1/I2/I3/I4/D1 y recuperación fiel de prompts; debajo. |
 | P19 | 2026-11-05 contextual; historial visible; Codex | Segunda revisión Analyze en lectura; texto íntegro añadido debajo. |
 | P20 | 2026-11-05 contextual; historial visible; Codex | Corregir I1/I5/C2, separar costos/rango y registrar comunicación de B; texto íntegro añadido debajo. |
+| P21 | 2026-11-05 contextual; historial visible; Codex | Implementación limitada T005–T010 y sus pruebas; texto íntegro añadido debajo. |
+| P22 | 2026-11-05 contextual; historial visible; Codex | Preparar y ejecutar exclusivamente pruebas T011/T012 y fundamentos; texto íntegro añadido debajo. |
+| P23 | 2026-11-05 contextual; historial visible; Codex | Corregir defectos auditados de pruebas/fixtures T011/T012 y registrar evidencia; texto íntegro añadido debajo. |
 
 Los tres registros enlazados contienen texto íntegro, fecha/herramienta/finalidad y forman parte de este archivo lógico local. Se conservan físicamente sin sobrescribirlos. Para un traslado posterior se deben anexar sus textos, no solo los enlaces. Anexos de habilidades referenciados: ../../.agents/skills/speckit-specify/SKILL.md, ../../.agents/skills/speckit-clarify/SKILL.md, ../../.agents/skills/speckit-plan/SKILL.md, ../../.agents/skills/speckit-tasks/SKILL.md, ../../.agents/skills/speckit-analyze/SKILL.md. En P15 se adjuntaron además Analyze/Implement/Tasks como contexto; el cuerpo del usuario prohibía ejecutarlos y prevaleció. No se interpreta un anexo como autorización contraria al cuerpo.
 
@@ -504,4 +507,426 @@ Q3 también permanece pendiente.
 - No marcar tareas como completadas.
 
 Al finalizar, informa los archivos modificados, los entregables nuevos, las dependencias corregidas y los bloqueos restantes.
+```
+
+## P21 — implementación limitada de fundamentos
+
+**Fecha contextual:** 2026-11-05, America/Costa_Rica; sin timestamp individual. **Herramienta:** aplicación Codex; modelo exacto no confirmado. **Uso de la respuesta:** revisar constitución, documentos y permisos; implementar solo T005–T010 en el módulo aislado de rutas y pruebas nuevas; registrar 13 pruebas aprobadas y conservar Q1–Q3/entregas externas pendientes. La documentación compartida no se modifica; traslado posterior sigue pendiente de autorización. El índice se amplía a 21 entradas; no certifica totalidad de todas las interacciones: las solicitudes intermedias de diagnóstico Git, preparación/autorización del commit y diagnóstico de dependencias de B no se consolidan aquí en esta etapa limitada, y quedan pendientes de registro posterior. La habilidad adjunta speckit-implement es contexto instalado; no sustituye el texto propio siguiente ni amplía su alcance.
+
+```text
+$speckit-implement
+
+Vamos a iniciar de forma controlada la implementación de `001-terreno-cazador`, correspondiente a la Persona A de Cripta Parte II.
+
+Estamos en la rama `feature/motor-eventos`. La documentación provisional está protegida en el commit local `4ee04ff`.
+
+Antes de modificar código:
+
+1. Lee la constitución vigente y todos los documentos de `specs/001-terreno-cazador/`, especialmente `spec.md`, `plan.md`, `tasks.md` y `contracts/integracion.md`.
+2. Revisa las correcciones más recientes de Analyze y confirma que los hallazgos I1, I5 y C2 estén reflejados correctamente.
+3. Comprueba el estado de Git y que no existan cambios seguidos pendientes.
+4. Identifica las tareas de fundamentos que puedan ejecutarse usando exclusivamente datos válidos, sin depender de Q1–Q3 ni de entregas externas.
+5. Comprueba que las rutas y archivos que necesitarías modificar no pertenezcan a B, C o D.
+
+**Alcance autorizado para esta primera implementación:**
+
+- Únicamente las tareas T005–T010 de preparación y fundamentos, en el orden permitido por sus dependencias.
+- Implementar estructuras de datos propias para índices, adyacencias y heap de rutas conforme al Plan.
+- Crear las pruebas correspondientes y ejecutarlas.
+- Utilizar exclusivamente grafos sintéticos con costos positivos, simétricos y datos válidos.
+- Respetar las restricciones académicas: no utilizar dict, set, heapq, bisect, collections ni bibliotecas de grafos como sustitutos de estructuras propias.
+- Mantener intacto el comportamiento existente del juego.
+
+**Restricciones:**
+
+- No implementar todavía T011–T051, terreno integrado, cazador conectado al motor, invalidación, historia ni interfaz visual.
+- No modificar archivos de B, C o D, incluidos red/, datos/, modelo/enemigos.py, modelo/tipos.py, modelo/snapshots.py, vista/, main.py y bench.py.
+- No modificar modelo/juego.py, modelo/eventos.py ni modelo/efectos.py en esta primera etapa.
+- No integrar ramas de compañeros.
+- No inventar políticas para rango ausente/null, costo null ni datos inconsistentes.
+- No modificar constitución ni documentación compartida.
+- No ejecutar operaciones Git de integración, commit o push.
+
+Si alguna tarea requiere modificar archivos fuera de `modelo/rutas.py`, las pruebas nuevas de fundamentos o la documentación propia de A, detente y solicita autorización antes de escribirlos. Si una tarea depende de un acuerdo todavía pendiente, no la ejecutes.
+
+**Al finalizar:**
+
+- Indica exactamente qué tareas implementaste y cuáles siguen bloqueadas.
+- Enumera archivos creados/modificados.
+- Presenta resultados reales de las pruebas.
+- Informa si se respetaron todas las restricciones.
+- No avances automáticamente a US1, US2 ni otras fases.
+
+No marques tareas como completadas sin pruebas o evidencia verificable.
+```
+
+## P22 — pruebas T011/T012 sin modificar el motor
+
+**Fecha contextual:** 2026-11-05, America/Costa_Rica; hora individual y modelo exacto no confirmados. **Herramienta:** aplicación Codex. **Uso de la respuesta:** crear las dos suites, ampliar fixtures propios reutilizando ServidorFalso existente y componentes reales, ejecutar cuatro suites autorizadas y registrar 22 aprobadas/10 fallos pendientes de integración, sin completar T011/T012 ni modificar motor o estructuras anteriores. El registro se amplía a 22 entradas; conserva los límites y omisiones intermedias declarados en P21. Traslado a PROMPTS_LLM.md pendiente de autorización. La habilidad adjunta corresponde a speckit-implement instalado, sin ampliar el alcance del mensaje.
+
+```text
+$speckit-implement
+
+Continúa la implementación de `001-terreno-cazador`, Persona A, exclusivamente con las tareas T011 y T012 de US1 (terreno y tiempos).
+
+Las tareas T005–T010 están implementadas y cuentan con 13 pruebas aprobadas. Sus cambios locales todavía no tienen commit.
+
+Antes de empezar, revisa el estado de Git, la constitución, spec.md, plan.md y tasks.md, y comprueba que las dependencias de T011 y T012 están satisfechas.
+
+**Alcance autorizado:**
+
+1. Crear `tests/test_costos_terreno.py` para T011, verificando con datos válidos el costo de movimiento, los intervalos, el mínimo de 1 y la conservación de los demás costos de acciones.
+2. Crear `tests/test_velocidad_terreno.py` para T012, verificando cambios de velocidad a mitad del intervalo, cancelación/reprogramación y secuencia nueva según Parte I.
+3. Utilizar fixtures existentes o ampliar exclusivamente `tests/datos_terreno_cazador.py` si es necesario.
+4. Ejecutar las dos nuevas suites y las pruebas de fundamentos previamente aprobadas.
+5. Distinguir los fallos esperados porque el motor todavía no integra costos variables de los defectos reales de las estructuras ya implementadas.
+
+**Restricciones:**
+
+- No modificar todavía `modelo/juego.py`, `modelo/eventos.py` ni `modelo/efectos.py`.
+- No modificar archivos de B, C o D, interfaz gráfica ni recursos visuales.
+- No implementar T013 ni ninguna tarea posterior.
+- No inventar políticas para valores null, rangos ausentes o costos inconsistentes.
+- No ejecutar merge, pull, fetch, push, commit, reset, clean ni stash.
+- No modificar documentación compartida.
+
+Puedes actualizar únicamente los documentos de Persona A necesarios para registrar los resultados reales y las tareas ejecutadas.
+
+No marques T011 o T012 como completadas si sus criterios todavía fallan porque requieren código de T013–T015. En ese caso, informa qué pruebas están listas y qué implementación falta.
+
+Al finalizar, muestra los archivos modificados y los resultados de las pruebas, distinguiendo las que pasaron de las que quedaron pendientes.
+```
+
+## P23 — corrección de pruebas y fixtures tras auditoría
+
+**Fecha contextual:** 2026-11-05, America/Costa_Rica; sin hora individual ni modelo exacto confirmado. **Herramienta:** aplicación Codex. **Uso de la respuesta:** consultar enunciados y corregir exclusivamente los fixtures/pruebas T011/T012: reciprocidad con acciones completas, enemigos despachados por agenda, preparación de datos antes del motor y separación cola/ataque único. Resultado real final: 35 pruebas, 25 aprobadas, 10 fallos pendientes de costos y cero errores; sin completar T011/T012 ni modificar código de producción. El índice se amplía a 23 entradas inventariadas, conservando límites anteriores; la solicitud de auditoría de lectura inmediatamente anterior está disponible en el chat pero su transcripción queda pendiente de consolidación posterior, junto con las omisiones intermedias declaradas en P21. No se presenta esta entrada como prueba de completitud. PROMPTS_LLM.md permanece intacto.
+
+```text
+Quiero corregir los tres defectos confirmados por la auditoría de las pruebas T011 y T012 de `001-terreno-cazador`.
+
+Antes de modificar archivos, revisa las reglas oficiales de Cripta Parte I y II, la constitución, `spec.md`, `plan.md`, `tasks.md`, las pruebas actuales y los métodos correspondientes del motor.
+
+**Alcance autorizado: corregir exclusivamente las pruebas y los fixtures de T011/T012.**
+
+1. Corregir la prueba de movimiento recíproco para que respete las decisiones y el reloj virtual del jugador. Utiliza `motor.ejecutar()` si su contrato permite representar correctamente ambos movimientos, o dos fixtures independientes preparados coherentemente. No fuerces eventos ni omitas el tiempo para hacer pasar las pruebas.
+2. Corregir las pruebas de enemigos para que no presenten como turnos normales acciones ejecutadas antes de su evento programado. Preparar su comportamiento, posición y velocidad de forma coherente con la agenda. Distinguir claramente una prueba unitaria artificial de una integración real.
+3. Separar los criterios de descarte de eventos cancelados de la verificación de una única ejecución semántica. Conservar las pruebas de cola como pruebas de cola. Para demostrar ejecución única, utilizar el motor y comprobar las acciones realmente procesadas. Si ello requiere una tarea posterior o integración aún no autorizada, documentar esa limitación sin fingir cobertura.
+4. Revisar que los fixtures no dejen inconsistencias entre `_puertas_iniciales` y puertas actuales cuando la prueba pretenda verificar restauración. No agregar pruebas de restauración fuera del alcance.
+5. Conservar los casos de costo 250, costo 1, intervalo mínimo 1, costo ausente 100 y T7.
+6. No alterar resultados esperados para que coincidan con el comportamiento incorrecto del motor actual.
+
+**Archivos autorizados:**
+
+- `tests/test_costos_terreno.py`
+- `tests/test_velocidad_terreno.py`
+- `tests/datos_terreno_cazador.py`
+- Documentación propia de A estrictamente necesaria para registrar la corrección y resultados.
+
+**Restricciones:**
+
+- No modificar `modelo/juego.py`, `modelo/eventos.py`, `modelo/efectos.py` ni `modelo/rutas.py`.
+- No modificar código de B, C o D, interfaz, constitución ni documentación compartida.
+- No implementar T013 ni tareas posteriores.
+- No introducir nuevos mocks o bibliotecas prohibidas.
+- No inventar políticas para Q1/Q2 ni afirmar cumplimiento de Q3.
+- No hacer commits, push, pull, fetch, merge, rebase, reset ni clean.
+
+Ejecuta las suites T011/T012 y fundamentos después de los cambios. Registra los resultados reales, incluidos los fallos que permanezcan porque todavía falta integrar costos variables.
+
+No marques T011/T012 como completas mientras sus criterios no se cumplan.
+
+Al finalizar, explica exactamente qué defectos corregiste, qué pruebas siguen fallando y qué evidencia demuestra ahora cada suite.
+```
+
+## P24 — implementación controlada de T013
+
+**Fecha contextual:** 2026-11-05, America/Costa_Rica; sin hora individual ni modelo exacto confirmado. **Herramienta:** aplicación Codex, habilidad speckit-implement. **Fuente:** texto íntegro de la solicitud actual disponible en el chat. **Finalidad y uso de la respuesta:** implementar exclusivamente costo de movimiento del jugador en Motor.mover con entradas válidas, reutilizando fórmula y agenda; ejecutar suites existentes y registrar evidencia. Resultado: 31/35 aprobadas, cuatro fallos de movimiento enemigo pendientes de T014, y 53/53 regresiones aprobadas antes y después. T013 implementada para datos válidos, con cierre integrado pendiente E-B-COSTOS. No se resuelven Q1–Q3, no se modifica PROMPTS_LLM.md ni se ejecuta T014. El inventario se amplía a 24 entradas, conservando las ausencias y límites de completitud ya declarados; no acredita un historial global completo.
+
+```text
+$speckit-implement
+
+Continúa la implementación de `001-terreno-cazador`, Persona A, únicamente con T013: costo variable del movimiento del jugador.
+
+Las pruebas T011/T012 fueron corregidas y la última ejecución reportó 25 aprobadas y 10 fallos relacionados con el costo fijo del movimiento. T005–T010 ya tienen sus pruebas aprobadas.
+
+Antes de modificar código, revisa:
+
+- Constitución vigente y enunciados oficiales de Cripta Parte I y II.
+- `spec.md`, `plan.md`, `tasks.md` y `contracts/integracion.md`.
+- `modelo/juego.py`, especialmente `mover()`, `_avanzar_actor()` y `calcular_intervalo()`.
+- Las pruebas T011/T012 y los fixtures existentes.
+
+**Autorización específica:**
+
+1. Implementa exclusivamente T013 en la lógica de movimiento del jugador de `modelo/juego.py`.
+2. Obtén el costo de la salida real utilizada por el jugador, antes de modificar su posición.
+3. Para entradas válidas, utiliza costo declarado entero ≥1 o costo 100 si el campo está ausente, conforme a Parte II §3.1.
+4. Conserva la fórmula oficial `max(1, costo_salida * 100 // velocidad)`.
+5. Mantén el comportamiento existente de activación, efectos, puertas, agenda, rastro, azar y demás acciones.
+6. No modifiques la fórmula de reprogramación de velocidad que ya pasó las pruebas aisladas.
+7. Ejecuta las suites T011/T012 y fundamentos, identificando qué fallos corresponden todavía a T014, que no está autorizada.
+8. Ejecuta las regresiones existentes pertinentes al movimiento del jugador si pueden ejecutarse sin modificar dependencias ni archivos ajenos.
+
+**Restricciones estrictas:**
+
+- No implementar T014 ni otras tareas posteriores.
+- No modificar la lógica de movimiento de enemigos.
+- No modificar `modelo/rutas.py`, `modelo/eventos.py`, `modelo/efectos.py` ni archivos de B, C o D.
+- No tocar interfaz visual, historial ni persistencia.
+- No inventar comportamiento para costo null, rango ausente o costos inconsistentes.
+- No introducir estructuras o bibliotecas prohibidas.
+- No cambiar pruebas esperadas para ocultar fallos.
+- No ejecutar commits, push, pull, fetch, merge, rebase, reset ni clean.
+
+Si T013 necesita cambios fuera de la rama específica de movimiento del jugador, explica por qué y solicita autorización antes de realizarlos.
+
+Actualiza únicamente la documentación de Persona A necesaria para registrar los resultados.
+
+Al finalizar, informa:
+
+- Qué líneas o funciones cambiaste.
+- Cuáles pruebas aprobaron y cuáles fallaron.
+- Qué requisitos oficiales respaldan el cambio.
+- Si se conservaron las regresiones.
+- Si T013 puede marcarse completada con evidencia suficiente.
+
+No avances automáticamente a T014.
+```
+
+## P25 — implementación controlada de T014
+
+**Fecha contextual:** 2026-11-06, America/Costa_Rica; sin hora individual ni modelo exacto confirmado. **Herramienta:** aplicación Codex, habilidad speckit-implement. **Fuente:** texto íntegro de la solicitud actual disponible en el chat; las instrucciones de la habilidad fueron aportadas a continuación por el usuario como contexto operativo, no como un nuevo requisito funcional. **Finalidad y uso de la respuesta:** integrar exclusivamente el costo del movimiento de enemigos existentes en la rama mover de Motor._ejecutar_turno_enemigo, usando salida de origen y datos válidos. Resultado: cuatro suites 35/35 y regresiones seleccionadas 53/53 aprobadas, cero fallos/errores; activación inicial 100 conservada. T014 implementada/verificada localmente, sin acreditar E-B-COSTOS ni resolver Q1–Q3. No se modifica PROMPTS_LLM.md ni se ejecuta T015. El inventario aumenta a 25 entradas, con las ausencias y límites de completitud previamente declarados; no afirma recuperación de textos faltantes ni completitud global.
+
+```text
+$speckit-implement
+
+Continúa la funcionalidad `001-terreno-cazador` de la Persona A, exclusivamente con T014: integrar el costo variable del movimiento de enemigos existentes.
+
+Estado confirmado:
+
+- T005–T010: fundamentos implementados; 13 pruebas aprobadas.
+- T011: 9/13 pruebas aprobadas.
+- T012: 9/9 pruebas aprobadas, sin acreditar todavía T7 integral.
+- T013: movimiento del jugador implementado y verificado con datos válidos.
+- Regresiones existentes: 53 aprobadas antes y después de T013.
+- Quedan cuatro fallos asociados al movimiento de errantes y rastreadores.
+
+Antes de modificar código, revisa los enunciados oficiales de Cripta Parte I y II, constitución, spec.md, plan.md, tasks.md, las pruebas actuales y la implementación existente de `modelo/juego.py`.
+
+**Alcance autorizado:**
+
+1. Implementar únicamente T014 en la rama de movimiento de `_ejecutar_turno_enemigo()` dentro de `modelo/juego.py`.
+2. Obtener el costo desde la salida real de la sala de origen antes de cambiar la posición del enemigo.
+3. Para datos válidos, utilizar costo declarado entero ≥1 o costo 100 si está ausente, según Parte II §3.1.
+4. Pasar ese costo a `_avanzar_actor()`, conservando la fórmula existente.
+5. Mantener intacta la decisión de movimiento de errantes y rastreadores, así como la activación inicial con costo 100, ataques, esperas, efectos, agenda, rastro, puertas y azar.
+6. No alterar `modelo/enemigos.py`, sus interfaces ni la lógica del cazador.
+7. Verificar que los cuatro fallos pendientes de T014 desaparezcan sin modificar los resultados esperados de las pruebas.
+8. Ejecutar nuevamente las cuatro suites de terreno, velocidad y fundamentos, además de las 53 regresiones previamente seleccionadas.
+9. Revisar cualquier nueva regresión antes de dar por correcta la tarea. No modificar otras funcionalidades para ocultar fallos.
+
+**Restricciones:**
+
+- Solo se autoriza modificar la rama específica de movimiento enemigo en `modelo/juego.py` y la documentación propia de A necesaria para registrar evidencias.
+- No modificar pruebas, fixtures, modelo/rutas.py, eventos.py, efectos.py, tipos.py, enemigos.py ni componentes de B, C o D.
+- No implementar T015 ni tareas posteriores.
+- No modificar la interfaz visual, historial o persistencia.
+- No inventar políticas para costo null, rango ausente o datos inconsistentes.
+- No ejecutar operaciones Git de escritura, integración o publicación.
+- No afirmar cumplimiento de rendimiento sin mediciones.
+
+Si se necesita modificar otro archivo o cambiar un contrato existente, detente y solicita autorización.
+
+Al finalizar, informa los cambios exactos realizados, pruebas aprobadas/fallidas, regresiones, evidencia de conservación del costo de activación y cualquier condición pendiente.
+
+No avances automáticamente a la siguiente tarea.
+```
+
+## P26 — verificación de T015 y revisión del diff T013/T014
+
+**Fecha contextual:** 2026-11-06, America/Costa_Rica; sin hora individual ni modelo exacto confirmado. **Herramienta:** aplicación Codex, habilidad speckit-implement. **Fuente:** solicitud íntegra disponible en el chat; instrucciones de la habilidad aportadas a continuación como contexto operativo. **Finalidad y uso de la respuesta:** revisar todas las líneas eliminadas/agregadas de T013/T014, verificar reprogramación existente y distinguir T7 parcial de integral. Resultado: velocidad 9/9 y regresiones 53/53, cero fallos/errores, sin defecto observado que exija modificar producción; documentación de evidencia y cobertura pendiente. T015 verificada en alcance probado, sin cierre global ni ejecución de T016. No cambia PROMPTS_LLM.md. Inventario de 26 entradas, con ausencias y límites de completitud previos conservados; no se reconstruyen mensajes faltantes ni se afirma completitud global.
+
+```text
+$speckit-implement
+
+Continuemos con `001-terreno-cazador`, Persona A, exclusivamente con la verificación de T015.
+
+T013 y T014 ya están implementadas para datos válidos. Las últimas ejecuciones reportaron 35/35 pruebas de terreno, velocidad y fundamentos y 53/53 regresiones aprobadas.
+
+ANTES DE MODIFICAR CÓDIGO:
+
+1. Revisa el diff completo de modelo/juego.py correspondiente a T013 y T014, incluyendo todas las líneas eliminadas (rojas) y agregadas (verdes).
+2. Comprueba que solo se reemplazó el costo fijo por el costo de salida en el movimiento del jugador y enemigos.
+3. Confirma que no se eliminaron reglas de activación, ataques, esperas, puertas, rastro, eventos, azar ni efectos.
+4. Revisa los enunciados oficiales de Parte I y II, constitución, spec.md, plan.md y tasks.md.
+5. Examina cambiar_velocidad(), \_avanzar_actor() y las pruebas de T7.
+
+ALCANCE AUTORIZADO:
+
+- Verificar T015 con el código actual.
+- Ejecutar pruebas de reprogramación con aceleración, ralentización, intervalo mínimo y finalización del efecto.
+- Comprobar cancelación del evento anterior, nueva secuencia y ausencia de acciones duplicadas.
+- Ejecutar las regresiones pertinentes.
+- Revisar qué falta para acreditar el escenario T7 completo.
+
+RESTRICCIONES:
+
+- Si la fórmula y la implementación existentes son correctas, NO modificar código de producción.
+- Si encontrás un defecto real, documentá el caso, la evidencia y el cambio mínimo propuesto, pero pedí mi autorización antes de modificarlo.
+- No modificar pruebas para ocultar fallos.
+- No tocar B, C, D, interfaz, historial, persistencia ni archivos compartidos.
+- No ejecutar T016 ni tareas posteriores.
+- No inventar políticas para Q1–Q3.
+- No hacer commits, push, pull, fetch, merge, rebase, reset ni clean.
+
+Podés actualizar únicamente la documentación propia de A para registrar resultados verificados.
+
+Al finalizar, presentá el diff revisado de T013/T014, las pruebas ejecutadas, sus resultados y si T015 requiere cambios reales o puede considerarse verificada dentro del alcance probado.
+
+No avances automáticamente a otra tarea.
+```
+
+## P27 — cobertura integrada de T7 con eventos existentes
+
+**Fecha contextual:** 2026-11-06, America/Costa_Rica; sin hora individual ni modelo exacto confirmado. **Herramienta:** aplicación Codex, habilidad speckit-implement. **Fuente:** solicitud íntegra disponible en el chat; instrucciones de la habilidad aportadas como contexto operativo. **Finalidad y uso de la respuesta:** comprobar viabilidad y añadir tres cronologías integradas T7 con restaurar_velocidad de efectos iniciales coherentes, sin reloj manual ni acciones anticipadas. Resultado: velocidad 12/12, cuatro suites 38/38 y regresiones 53/53, cero fallos/errores; T012 completa en el alcance de datos válidos del jugador. No se implementa la cadena particular 250→150→225 ni un evento nuevo de aplicación diferida, no se modifica producción/fixture, no se ejecuta T016 ni se cierran Q1–Q3. PROMPTS_LLM.md permanece intacto. Inventario de 27 entradas, conservando ausencias y límites de completitud ya declarados; no se reconstruyen textos faltantes ni se afirma completitud global.
+
+```text
+$speckit-implement
+
+Continúa con `001-terreno-cazador`, Persona A, exclusivamente para completar la cobertura de pruebas del escenario T7 de Cripta Parte II.
+
+T013 y T014 están implementadas para entradas válidas. T015 fue verificada sin necesitar modificaciones de producción.
+
+Antes de escribir, revisa la constitución, Parte I §2.3, Parte II §3.1 y Apéndice B, spec.md, plan.md, tasks.md, quickstart.md y los métodos reales del motor de eventos.
+
+OBJETIVO:
+
+Crear una prueba integrada de T7 que reproduzca una cronología completa, sin cambiar manualmente el reloj ni ejecutar acciones del jugador antes de su turno.
+
+Debe comprobar, cuando el motor y sus eventos existentes lo permitan:
+
+1. Movimiento real mediante salida de costo 250, velocidad 100, en t=0; siguiente turno previsto t=250.
+2. Cambio de velocidad a 200 en t=50 por un evento procesado por el motor; nueva programación t=150.
+3. Cancelación del evento anterior, nueva secuencia y una única acción semántica en el turno correspondiente.
+4. Que el evento cancelado de t=250 no provoque una acción adicional.
+5. Variantes de ralentización y terminación del efecto, conservando las fórmulas oficiales.
+
+Primero comprueba si los tipos de eventos y mecanismos existentes permiten construir esos escenarios sin inventar una mecánica nueva.
+
+Si alguna variante requiere introducir un tipo de evento nuevo, modificar reglas de producción o simular una acción ilegal, detente y explica el impedimento antes de modificarla.
+
+ARCHIVOS AUTORIZADOS:
+
+- tests/test_velocidad_terreno.py
+- tests/datos_terreno_cazador.py, únicamente si se necesita ampliar el fixture válido.
+- Documentación propia en specs/001-terreno-cazador/ para registrar resultados y límites.
+
+RESTRICCIONES:
+
+- No modificar modelo/juego.py, eventos.py, efectos.py, rutas.py ni otros archivos de producción.
+- No alterar pruebas existentes para hacerlas pasar artificialmente.
+- No introducir nuevos mocks de servicios o comportamientos inventados.
+- No modificar archivos de B, C o D, interfaz, constitución o documentación compartida.
+- No implementar T016 ni tareas posteriores.
+- No ejecutar commits, push, pull, fetch, merge, reset ni rebase.
+- No cerrar Q1–Q3 ni inventar contratos pendientes.
+
+Ejecuta las pruebas autorizadas y las regresiones pertinentes.
+
+Al finalizar, informa qué pruebas añadiste, qué eventos reales utilizaste, sus resultados, si T7 quedó íntegramente acreditado y cualquier cobertura todavía pendiente.
+
+No avances automáticamente a otra tarea.
+```
+
+## P28 — verificación limitada de T016
+
+**Fecha contextual:** 2026-11-06, America/Costa_Rica; sin hora individual ni modelo exacto confirmado. **Herramienta:** aplicación Codex, habilidad speckit-implement. **Fuente:** solicitud íntegra disponible en el chat; instrucciones de la habilidad aportadas como contexto operativo. **Finalidad y uso de la respuesta:** reutilizar las pruebas de costos y añadir solo la cobertura faltante de ataques gratuitos/agenda/empates. Resultado: un nuevo método con dos subcasos, costos 14/14, velocidad 12/12, fundamentos 13/13 (39/39) y regresiones 53/53, cero fallos/errores. Sin cambios de producción/fixture ni expectativas existentes. T016 verificada localmente, casilla pendiente por cierre formal T014/T015; no se ejecuta T017 ni se cierran Q1–Q3. PROMPTS_LLM.md intacto. Inventario de 28 entradas, conservando ausencias y límites de completitud declarados previamente; no se reconstruyen mensajes ni se afirma completitud global.
+
+```text
+$speckit-implement
+
+Continúa con `001-terreno-cazador`, Persona A, exclusivamente con T016 de US1.
+
+Antes de modificar archivos, revisa la constitución, los enunciados oficiales de Parte I y II, spec.md, plan.md, tasks.md, el código actual y las pruebas existentes.
+
+Objetivo: ampliar únicamente las pruebas necesarias para verificar que los costos de las acciones distintas de movimiento siguen siendo los oficiales y que mover conserva la posición inmediata sin provocar ataques gratuitos.
+
+Comprueba:
+
+- Atacar y esperar: costo 100.
+- Usar, equipar y abrir: costo 50.
+- Recoger y soltar: costo 25.
+- Movimiento: costo real de salida y posición inmediata.
+- Ausencia de ataques adicionales provocados por el movimiento.
+- Conservación de la agenda y el orden de eventos en los escenarios probados.
+
+Reutiliza los fixtures existentes y evita duplicar pruebas que ya acrediten exactamente el requisito. Si una comprobación necesita una situación adicional, justifica su necesidad y utiliza las reglas reales del motor.
+
+Archivos autorizados:
+
+- tests/test_costos_terreno.py
+- tests/datos_terreno_cazador.py, únicamente si es indispensable.
+- Documentos propios de specs/001-terreno-cazador/ para registrar evidencia.
+
+Restricciones:
+
+- No modificar código de producción.
+- No alterar resultados esperados para ocultar fallos.
+- No introducir mocks nuevos ni comportamientos inventados.
+- No modificar archivos de B, C o D, interfaz o documentación compartida.
+- No ejecutar T017 ni tareas posteriores.
+- No realizar operaciones Git de escritura, integración o publicación.
+- No cerrar Q1–Q3 ni asumir contratos externos pendientes.
+
+Ejecuta las pruebas de costos, velocidad y fundamentos, además de las regresiones pertinentes.
+
+Al finalizar, informa qué pruebas nuevas fueron necesarias, cuáles ya existían, los resultados reales y qué queda pendiente de US1. No marques T016 completada sin evidencia.
+```
+
+## P29 — verificación conjunta de US1, T017
+
+**Fecha contextual:** 2026-11-06, America/Costa_Rica; sin hora individual ni modelo exacto confirmado. **Herramienta:** aplicación Codex, habilidad speckit-implement. **Fuente:** solicitud íntegra actual del chat; instrucciones de la habilidad aportadas como contexto operativo. **Finalidad y uso de la respuesta:** corrida conjunta, revisión de diff/cobertura y separación de verificación local e integración de B. Resultado: 99/99 aprobadas (39 propias + 53 regresiones seleccionadas + 7 enemigos), cero fallos/errores/omisiones/fallos esperados, sin modificar Python. US1 funcionalmente verificada en escenarios válidos; T011 consolida cierre de pruebas, T013–T017 conservan condiciones formales de integración/prerrequisitos. No se ejecuta T018/US2 ni se resuelven Q1–Q3/E-B-COSTOS. PROMPTS_LLM.md intacto. Inventario de 29 entradas, con ausencias y límites de completitud anteriores preservados; no se reconstruyen textos faltantes ni se afirma completitud global.
+
+```text
+$speckit-implement
+
+Continúa con `001-terreno-cazador`, Persona A, exclusivamente con T017: verificación conjunta de US1, terreno y tiempos.
+
+Estado actual:
+
+- T005–T010: fundamentos probados.
+- T012: completada.
+- T013/T014: movimiento ponderado implementado y verificado para datos válidos, pendiente de cierre integrado E-B-COSTOS.
+- T015: reprogramación verificada sin cambios de producción, con cierre formal condicionado.
+- T016: comprobaciones realizadas satisfactoriamente, con cierre formal pendiente.
+- Última ejecución: 39/39 pruebas de terreno, velocidad y fundamentos, más 53/53 regresiones.
+
+Antes de actuar, revisa la constitución, Parte I y II, spec.md, plan.md, tasks.md y quickstart.md.
+
+**Objetivo exclusivo de T017:**
+
+1. Ejecutar y verificar conjuntamente todas las suites de terreno, velocidad y fundamentos autorizadas.
+2. Ejecutar las regresiones existentes pertinentes.
+3. Confirmar la cobertura de T6 y T7, señalando las limitaciones que sigan presentes.
+4. Verificar la conservación de costos de las demás acciones, activación inicial de enemigos, determinismo, secuencias y efectos.
+5. Comprobar que las pruebas nuevas no oculten fallos mediante skips, expectedFailure o expectativas artificiales.
+6. Revisar el diff completo de código de producción y confirmar que únicamente contiene los cambios autorizados en `Motor.mover()` y `_ejecutar_turno_enemigo()`.
+7. Registrar resultados reales, requisitos cubiertos y limitaciones en la documentación propia de A.
+8. Distinguir implementación local verificada de integración real con los datos de B.
+
+**Restricciones:**
+
+- Trabaja en modo de verificación, sin modificar código de producción ni pruebas.
+- Si identificas un defecto, informa la evidencia y solicita autorización antes de corregirlo.
+- No modificar archivos de B, C o D, interfaz ni recursos visuales.
+- No ejecutar T018 ni tareas de US2.
+- No marcar como resueltos Q1, Q2, Q3 o E-B-COSTOS.
+- No realizar commits, push, pull, fetch, merge, rebase, reset ni clean.
+- No modificar documentación compartida.
+
+Puedes actualizar exclusivamente tasks.md, quickstart.md y prompts-registro-local.md de Persona A para registrar T017.
+
+Al terminar, indica si US1 está funcionalmente verificada con datos válidos, cuáles tareas pueden cerrarse con evidencia y cuáles deben seguir condicionadas por contratos externos.
+
+No avances automáticamente a US2.
 ```
