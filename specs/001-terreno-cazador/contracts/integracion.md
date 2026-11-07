@@ -1,0 +1,78 @@
+# Contratos de integración propuestos — no acordados
+
+**Fecha:** 2026-11-02. Documentación de Plan, no interfaces implementadas. [Modelo](../data-model.md), [requisitos](../spec.md). Nombres descriptivos revisables; ningún componente de B/C/D se considera disponible por aparecer aquí.
+
+**Actualización documental:** 2026-11-05, I1. Cada fila siguiente es un entregable independiente. Registrar responsable, alcance exacto, fuente/evidencia y fecha antes de cambiar su estado; una propuesta o una solicitud enviada no equivale a aceptación. La tarea T003 consolida este registro, pero sus consumidores solo esperan sus filas concretas. No se requiere completar todas las filas para acreditar una sola. Estado actual: todas pendientes, sin contratos aprobados.
+
+| ID | Responsable del acuerdo/entrega | Evidencia verificable requerida | Consumidores principales | Estado |
+| --- | --- | --- | --- | --- |
+| E-B-COSTOS | B con A | Suministro y acceso verificables a costos de salidas, versiones, identidad y datos válidos para el motor, sin HTTP durante búsqueda. Aceptación independiente de rango; no cierra Q2. | T013, T014, T025 | PENDIENTE |
+| E-B-RANGO | B con A | Suministro y acceso verificables al rango de cazadores, versiones, identidad y datos válidos, sin HTTP durante búsqueda. Aceptación independiente de costos; no cierra Q1. | T025; no T013/T014 | PENDIENTE |
+| E-BC-PUERTA | B/C/A | Identidad de puerta, lectura de ambos extremos y coherencia de cambios reales. | T029, T032 | PENDIENTE |
+| E-C-RUTA | C con A | Fuente filtrada, firmas/modos/estados de consulta y criterios de aceptación acordados. | T023, T024 y solo las extensiones filtradas que lo usen | PENDIENTE |
+| E-C-DESPACHO | C con A | Punto de conexión del cazador, firma y conservación de decisiones existentes. | T025 | PENDIENTE |
+| E-C-OBS | C con A | Observaciones de entrada/puertas/antorcha y sus efectos de conocimiento definidos por C. | T032 | PENDIENTE |
+| E-C-UNDO | C con A | Uso acordado de historial/deltas y límites de reversión del motor. | T032, T034, T035 | PENDIENTE |
+| E-D-CAMBIOS | D con A | Sobre reconstruible, identidades, tiempo/secuencia/azar y puntos de captura. | T035 | PENDIENTE |
+| E-D-RESTAURA | D con A | Contrato y entrega utilizable de carga/restauración, sin exigir a A implementarla. | T034 | PENDIENTE |
+| E-D-MEDICION | D con A | Función de A acordada, conexión sin vista entregada por D y evidencia de recepción. | T045, T046 | PENDIENTE |
+
+Q1/Q2 y Q3 tienen registros de evidencia separados en research.md. A puede describir estos acuerdos con autorización documental; no puede aprobar por B/C/D, resolver preguntas oficiales ni implementar sus entregas.
+
+**Corrección I1/I5/C2 posterior al segundo Analyze, 2026-11-05:** hay diez entregables independientes. E-B-COSTOS y E-B-RANGO sustituyen el entregable agrupado anterior; ambos siguen pendientes. Una comunicación sobre el esquema no acredita suministro/acceso efectivo. T027 necesita T024 para su cierre completo; una ejecución parcial del núcleo no completa el contrato de C ni la tarea.
+
+## A–B: entrada de datos
+
+- B provee esqueleto completo con versiones de cripta, IDs, conexiones y costos; fichas de enemigos y rango ya disponibles sin red dentro de rutas.
+- Para datos válidos: costo ausente equivale a 100, declarado entero ≥1, igual en ambos sentidos; rango es entero en unidades de costo. No inferir mínimo, default, rechazo o normalización: Q1/Q2 abiertas.
+- A recibe una vista de datos de juego; desconoce si origen fue HTTP u offline. B administra presupuesto, UUID, lotes, versiones, fichas retenidas y errores de adquisición.
+- Salida ponderada propuesta: origen/dirección/destino/costo/referencia de puerta. Identidad de puerta entre extremos y sincronización deben acordarse antes del cache de A. A no copia unilateralmente el costo de un extremo al otro.
+- Si cambia cripta/versión se reconstruye identidad del grafo; no reutilizar índices de una versión distinta.
+- Pendiente con B: campos garantizados, disponibilidad de rango sin descarga durante búsqueda y cómo representar/reportar datos fuera de contrato. Mocks solo con autorización posterior.
+
+**Comunicación de B sobre OpenAPI 1.1.0:** el usuario transmite que B encontró Enemy.rango opcional y nullable, entero ≥1 cuando tiene valor, sin default ni obligación adicional para cazador; Exit dirigido con costo opcional y nullable, entero ≥1 cuando tiene valor, sin default ni garantía de simetría declarados. No disponemos de copia verificable ni fragmentos originales: esto no es verificación independiente ni contrato aprobado. El [contraste y procedencia](../research.md#comunicación-reportada-de-b-sobre-openapi-110) mantiene la autoridad de Parte II §§3.1–3.2: costo ausente 100, igual en ambos sentidos y ficha de cazador con rango. Rango ausente/null, costo null e inconsistencias siguen pendientes Q1/Q2; no equiparar null con campo ausente ni normalizar/rechazar por iniciativa de A.
+
+## A–C: ruta y despacho
+
+**Consulta conceptual propuesta:** fuente de grafo, origen, destino, modo de límite y contexto de validez. Los nombres siguientes describen un protocolo por acordar con C; no son interfaces aprobadas ni implementadas.
+
+- `ACOTADA(limite)`: costo máximo explícitamente suministrado para una consulta de cazador con datos válidos; Q1 no queda resuelta por esta notación.
+- `SIN_LIMITE`: ausencia explícita de tope de costo para «ir a», sin usar un entero enorme como falso infinito. No es el valor predeterminado del rango de un cazador. C entrega exclusivamente salas exploradas y arcos que recuerda abiertos; sin límite de costo no significa sin filtro de conocimiento. La búsqueda puede recorrer toda la región alcanzable de ese subgrafo y se evalúa con el presupuesto de «ir a» de la capacidad de C.
+
+**Resultados propuestos, mutuamente excluyentes:**
+
+| Estado conceptual | Condición verificable | Datos del resultado |
+| --- | --- | --- |
+| `LLEGADA` | Origen y destino son la misma sala admitida por la fuente. | Distancia 0, sin primer paso ni movimiento; no consumir tiempo. |
+| `RUTA_VALIDA` | Se demuestra ruta óptima y, en modo acotado, distancia ≤ límite. | Primer vecino/dirección, costo del arco atravesado y costo total mínimo; desempate por menor ID del primer vecino. |
+| `SIN_RUTA` | Se demuestra que el destino no es alcanzable en la fuente suministrada. | Sin paso; evidencia de búsqueda completa de la región alcanzable, sin ramas pendientes omitidas por límite, o certificado exacto vigente. |
+| `SIN_RUTA_DENTRO_LIMITE` | Se agotó correctamente la búsqueda acotada sin alcanzar destino y hubo ramas excluidas por costo. | Sin paso; no existe ruta de costo ≤ límite. Existencia de una ruta más costosa: no determinada. |
+| `FUERA_LIMITE` | Existe evidencia exacta vigente de una distancia mínima finita mayor que el límite. | Sin paso y distancia certificada > límite; no se obtiene mediante un recorrido global adicional para una consulta pequeña. |
+
+Una búsqueda limitada por sí sola no siempre permite distinguir un destino desconectado de uno alcanzable fuera del rango. `SIN_RUTA_DENTRO_LIMITE` expresa precisamente esa incertidumbre; no debe etiquetarse como `SIN_RUTA` ni como distancia finita conocida. `FUERA_LIMITE` solo puede devolverse con evidencia suficiente ya disponible y válida, no por inventar una distancia o ampliar automáticamente la búsqueda. La implementación base no necesita producir ese estado para cumplir las reglas del cazador.
+
+Para el cazador, `SIN_RUTA`, `SIN_RUTA_DENTRO_LIMITE` y `FUERA_LIMITE` se traducen en esperar con costo 100. La coincidencia con el jugador se resuelve como ataque antes de consultar rutas; `LLEGADA` no sustituye esa regla. Para el viaje de C, `LLEGADA` significa destino alcanzado y `SIN_RUTA` ausencia de ruta conocida en su fuente filtrada. La consulta no mueve actores, no programa eventos, no consume azar ni modifica el conocimiento.
+
+Validación de contrato propuesta: origen=destino; ruta dentro del límite y exactamente igual a él; destino desconectado en modo sin límite; agotamiento acotado con ramas excluidas; y distancia certificada mayor al límite. En «ir a», comprobar que una ruta disponible solo por salas no exploradas o puertas reales que no se recuerdan abiertas nunca aparece como ruta válida. Estos son escenarios previstos, no pruebas implementadas ni permiso para añadir mocks.
+
+- Para A: fuente del esqueleto completo y puertas reales actuales; independiente del contenido descargado.
+- Para C: fuente distinta con solo salas exploradas y puertas recordadas abiertas. Identidad/revisión separada de la real. No filtrar solo al mostrar un resultado ya calculado sobre información prohibida.
+- C conserva sus tres comportamientos. Propuesta de conexión: A detecta cazador en despacho propio y mantiene la firma actual de decidir_accion para los demás; revisar con C si conviene callback común antes de tocar enemigos.py. No modificarlo unilateralmente.
+- El motor de A ejecuta el paso ordinario; el viaje de C llama acciones ordinarias, recibe resultado/daño/enemigos/motivo de detención y recalcula conforme a su propia spec.
+- A emite entrada/observación de puerta/antorcha; C define cambios de conocimiento y sus deltas. Una antorcha revela esqueleto de vecinas, no activa su contenido.
+- Pendiente: firma, tipos compartidos, observación desde ambos extremos, orden de notificaciones y tratamiento de rollback. No se implementan contratos nuevos de C en esta fase.
+
+## A–D y C–D: cambios reconstruibles
+
+Propuesta de sobre conceptual de cambio: identidad estable de entidad, campo u operación, valor anterior/nuevo, instante virtual y orden semántico. Debe cubrir posición, vida, efectos, puertas, eventos creados/cancelados/extraídos, secuencias y estado de azar donde corresponda. No entregar referencias Python/callbacks como si fueran persistibles.
+
+- A instrumenta su motor; C entrega inventario/conocimiento. D define agregación, serialización, checkpoints y reconstrucción, sin deducir reglas del motor.
+- A informa límites entre acciones del jugador y eventos; acordar numeración de acciones y eventos simultáneos con D. Orden de eventos sigue tiempo/secuencia; historia en t incluye todos los eventos ≤t y, si hay decisión del jugador, muestra estado anterior a decidir según P2 §3.6. No cambiar el motor unilateralmente para resolver tensiones de integración.
+- C/D coordinan recorte tras pergamino; A invalida todo derivado de rutas al restaurar. Época del cache no es secuencia semántica ni se rebobina para identificar estados viejos como nuevos.
+- D versiona formato de guardado; preservar o rechazar/migrar explícitamente formatos anteriores. No añadir campos a snapshots.py ni alterar persistencia desde A sin acuerdo.
+- D recibe costo de salidas y tipo cazador para presentación; si necesita recurso gráfico debe consultarlo. A no genera ni reemplaza arte.
+- D conecta funciones de medición de A a bench.py y revisa ejecución sin vista. El replay actual sin GUI instancia VistaConsola; no usarlo como certificación headless hasta revisión de D.
+
+## Criterios de acuerdo pendientes
+
+Revisión cruzada A↔C y B↔D; equipo revisa tipos/guardado y determinismo. Ningún texto de este documento constituye consentimiento de los compañeros. Q1/Q2 requieren evidencia; Q3 requiere referencia oficial. Todos los cambios de archivos fuera del alcance de A siguen requiriendo autorización.
