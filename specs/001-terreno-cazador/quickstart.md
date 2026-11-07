@@ -614,3 +614,11 @@ Los dos casos de `tests.test_rutas_cazador` comparan el costo mínimo total y el
 En dos cuadrículas ponderadas se compararon 144 pares ordenados de salas distintas. Se verificaron puertas cerradas, destinos inalcanzables y límites inclusivos de costo. Para las rutas con costo mayor que 1 también se comprobó el rechazo con un límite una unidad menor.
 
 Resultados de la ejecución de T026: 12/12 rutas, 9/9 decisión, 11/11 FR-020 y 99/99 regresiones. Total: 131 pruebas aprobadas.
+
+## Validación local de T039
+
+Con rango 4 y cinco salas alcanzables fijas, la prueba P2 amplía el mapa a 6, 69 y 8.197 salas. Prepara grafo, índices y arreglos antes de instrumentar cada consulta. La enumeración independiente de caminos simples confirma primer vecino 3, dirección N, costo del paso 2 y total 4. La consulta al destino exterior devuelve `None`.
+
+En cada tamaño se observaron 4 extracciones, 4 accesos a adyacencias, 75 lecturas y 37 escrituras de auxiliares y 1 descarte final para el destino local. Para el destino exterior se observaron 5, 5, 81, 38 y 0, respectivamente. La revisión repitió los conteos y comprobó que la consulta sin sondas devuelve el mismo resultado. El pico de `tracemalloc` expresa bytes trazados de la consulta instrumentada y se registra por separado de los conteos de operaciones.
+
+La reejecución de `tests.test_localidad_rutas`, rutas, decisión, FR-020 y las 99 regresiones del comando de AD-01 pasó 132/132 pruebas. T046 sigue pendiente de la referencia oficial Q3, la conexión de D y la medición del ciclo completo.
