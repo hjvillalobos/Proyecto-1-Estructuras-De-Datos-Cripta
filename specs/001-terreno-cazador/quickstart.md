@@ -499,6 +499,43 @@ La duración de unittest no prueba <20 ms: no se ejecuta benchmark y Q3 sigue pe
 
 T019 y T021 verificadas/completadas para los escenarios válidos de núcleo autorizados. T020 no está preparada y no se implementa T022 ni modelo/cazador.py. No se conecta al motor o compañeros, no se incorpora main ni se cambia la frontera temporal. Permanecen pendientes Q1–Q3, E-B-COSTOS/E-B-RANGO/E-C-RUTA/E-C-DESPACHO y demás acuerdos. Archivos modificados en esta etapa: modelo/rutas.py y documentación propia tasks.md, quickstart.md, prompts-registro-local.md (P31). La suite T019 sin seguimiento procede de la etapa anterior y permanece intacta. No se realizan operaciones Git de escritura; constitución, PROMPTS_LLM.md, interfaz y restantes archivos de producción/pruebas se conservan.
 
+## Preparación TDD de decisión del cazador — T020 — 2026-11-06
+
+Autorización posterior exclusiva para tests/test_decision_cazador.py y documentación propia. Se revisan constitución, Parte II §3.2, spec/plan/tasks, contratos y buscar_ruta real. T020 depende de T006/T010, ambas completas; T021 también está verificada y se utiliza sin editar. A3 exige atacar antes de buscar al compartir sala; A5 exige basarse en esqueleto/puertas reales sin dependencia del conocimiento o contenido descargado. Rangos enteros positivos explícitos y costos válidos permiten preparar esos escenarios sin cerrar Q1–Q3. Checklist conserva sus pendientes y ningún contrato E-* se acredita.
+
+### Propuesta interna y controles
+
+La suite propone decidir_cazador(origen_indice, destino_indice, rango, consultar_ruta) en el futuro modelo/cazador.py. Devuelve (accion, direccion_o_None, costo_base): atacar/esperar con 100, o mover con dirección y costo del primer arco, sin ejecutar la acción. No cambia decidir_accion de C ni constituye contrato aprobado con B/C/D. La consulta inyectada solo recibe índices y límite; una clausura local instrumentada registra llamadas y delega en buscar_ruta real con GrafoTerreno/EspacioBusqueda/HeapRutas existentes. Se espera cero llamadas al coincidir y una al buscar. Esa sonda no fabrica caminos, no implementa la política y no es un nuevo mock de servicio.
+
+| Método preparado | Regla / resultado esperado aún no comprobado |
+| --- | --- |
+| test_a3_compartir_sala_ataca_antes_de_consultar_rutas | Atacar, costo 100, cero consultas; rango positivo explícito 1. |
+| test_ruta_admisible_devuelve_primer_paso_optimo_y_su_costo | Camino de dos pasos/200 frente a directo/500: mover N con costo de paso 100, no total 200. |
+| test_t1_destino_desconectado_espera_con_costo_100 | Esperar, sin dirección, costo 100. |
+| test_t2_costo_101_supera_rango_100_y_espera | Esperar con costo 100. |
+| test_a4_distancia_igual_al_rango_permite_perseguir | Distancia/rango 200: mover N, paso 100. |
+| test_unica_puerta_cerrada_impide_movimiento | Esperar 100 sin abrirla. |
+| test_atajo_cerrado_no_impide_usar_alternativa_abierta | Ignorar atajo cerrado de costo 50 y seguir alternativa abierta de costo 200, pagando paso 100. |
+| test_consulta_no_modifica_posiciones_azar_agenda_ni_puertas | Conservar exportación de estado, RNG, posiciones, identidad/tiempos/secuencias/cancelación/en_cola de eventos y puertas reales. |
+| test_a5_misma_decision_sin_descargas_adicionales_de_contenido | Dos subcasos antes/después de descargar contenido: misma decisión y contadores/llamadas sin incremento durante consulta. |
+
+Se reutiliza crear_salas sin modificarlo ni añadir un fixture. Para observar estado real, motor_terreno ejecuta primero un movimiento completo legal del jugador, separándolo del enemigo en t=250; entonces se consulta la política con sus posiciones reales. No se mueve/teletransporta al enemigo ni se cambia su comportamiento, velocidad o evento: se prueba la futura función pura sobre esos índices, no un turno de un cazador conectado al motor. Los auxiliares de rutas pueden cambiar sus generaciones; las observaciones protegidas son las del juego/puertas/agenda/azar, no esos derivados.
+
+Para A5 se reutiliza ServidorFalso ya existente (ningún doble externo nuevo): una llamada explícita de preparación obtiene el esqueleto y, solo antes del segundo subcaso, otra obtiene el contenido de cuatro salas. La política no recibe ese servidor, contenido ni conocimiento; solo la consulta sobre el mismo grafo. Se comparan sus contadores y lista de llamadas antes/después de cada decisión, esperando cero descargas adicionales. No se afirma una prueba de integración con la red real, precarga/conocimiento de C o datos HTTP de B, ni una intercepción global de cualquier HTTP posible. El origen/rango del catálogo y conexión al motor siguen reservados a acuerdos/T025; no se añade campo rango a tipos.py. El valor None en la tupla indica ausencia de dirección, no una política para rango null.
+
+### Ejecuciones reales y límites actuales
+
+```powershell
+python -B -m unittest tests.test_decision_cazador -v
+python -B -m unittest tests.test_rutas_cazador tests.test_costos_terreno tests.test_velocidad_terreno tests.test_grafo_terreno tests.test_heap_rutas tests.test_juego tests.test_enemigos tests.test_regresiones_juego tests.test_integridad_operaciones.TestIntegridadOperaciones.test_precarga_fallida_no_rompe_movimiento_ni_replay
+```
+
+Comandos portables; intérprete original Python 3.12.14, -B y acceso autorizado a temporales. Nueva suite: nueve métodos/diez casos, diez errores en 0.082 s, FAILED (errors=10)/salida 1 por ModuleNotFoundError: modelo.cazador todavía no existe. La importación se hace por caso para que todos se enumeren; no hay skip/expectedFailure ni implementación provisional que falsee resultados. Las preparaciones se ejecutan pero no se alcanzan las comprobaciones de decisiones/ausencia de efectos posteriores a la llamada: no se acredita aceptación ni independencia de descargas por preparar un assert.
+
+Rutas y regresiones existentes: 109/109 métodos en 2.026 s, OK/salida 0, cero fallos/errores/skips. Son diez métodos de T019 (once casos) y las 99 pruebas anteriores; incluyen las 13 de grafo/heap, sin contarlas dos veces. No se ejecuta benchmark ni se afirma rendimiento Q3.
+
+T020 queda preparada, casilla pendiente hasta verificación satisfactoria tras T022. La siguiente tarea exacta es T022, implementar la decisión en modelo/cazador.py usando la búsqueda T021, previa autorización. No se crea ese módulo ni se ejecuta otra tarea; los comportamientos existentes de C permanecen intactos. Archivos nuevos/modificados de esta etapa: tests/test_decision_cazador.py, tasks.md, quickstart.md y prompts-registro-local.md (P32). Producción, pruebas/fixtures existentes, constitución y documentación compartida no cambian. No se incorpora main ni se realizan operaciones Git de escritura. Q1–Q3 y entregas externas siguen abiertas; PROMPTS_LLM.md espera traslado autorizado. No existe .specify/extensions.yml al revisar hooks antes/después.
+
 ## Frontera temporal AD-01
 
 2026-11-06: preparación TDD de FR-020, sin tocar producción. Se reutiliza `motor_terreno` con motor/agenda reales. La sonda de prueba registra los eventos retornados por `ejecutar_ciclo` sin sustituir el despacho ni sus resultados. Los casos sintéticos preparan contador, vida inicial herida o efecto vigente en t=0 cuando corresponde; no cambian el reloj ni ejecutan acciones antes de un turno. No se prueba aún `historia` ni el registro de D.
@@ -552,3 +589,20 @@ Los cuatro resultados de interfaz restantes se reprodujeron con `modelo/juego.py
 Las sondas en memoria comprobaron que un evento insertado en t durante el despacho se procesa por secuencia, que los eventos vigentes y cancelados de t+1 permanecen en cola y que los mensajes se publican con el estado final del turno. Una excepción después del ataque empatado restauró reloj, vida, posición, RNG, contador, agenda e historial y dejó la publicación vacía.
 
 AD-03 cierra la validación local de FR-020. La validación con la línea de tiempo de D, su formato serializable y E-D-CAMBIOS quedan pendientes. Q1–Q3 y T020/T022 conservan su estado.
+
+## Cierre local de T020 y T022
+
+T020 verifica el contrato interno de `decidir_cazador(origen_indice, destino_indice, rango, consultar_ruta)`. T022 lo implementa para datos válidos en `modelo/cazador.py` según Parte II §3.2. En la misma sala devuelve atacar con costo 100 y cero consultas. En salas distintas delega el rango inclusivo a T021. Si no hay paso admisible devuelve esperar con costo 100. Si lo hay, devuelve la dirección y el costo de la primera salida. T021 resuelve el desempate por menor ID de la primera vecina sobre el esqueleto y las puertas reales.
+
+La corrida de cierre reemplaza el resultado inicial de preparación TDD de T020. Los casos verifican puertas, costo, rango, estado del motor y ausencia de descargas adicionales durante la decisión.
+
+| Suite | Resultado |
+| --- | --- |
+| `tests.test_decision_cazador` | 9/9 métodos, incluidos los dos subcasos de A5. |
+| `tests.test_rutas_cazador` | 10/10 métodos. |
+| `tests.test_frontera_temporal` | 11/11. |
+| Regresiones anteriores del comando de AD-01 | 99/99. |
+
+Total: 129 métodos aprobados, con cero fallos, errores u omisiones. Se marcan T020 y T022 para el alcance local con entradas válidas. Q1–Q3 y los contratos externos siguen pendientes.
+
+La corrida usa `buscar_ruta` de T021 en el árbol de trabajo. Esa función todavía falta en `HEAD` (`299079d`). La suite de decisión importa `buscar_ruta` directamente, así que el commit de T020/T022 debe quedar después de confirmar T019/T021.
