@@ -218,6 +218,7 @@ Esta matriz indica tareas previstas, no cobertura ejecutada. SC-001–SC-006 se 
 | FR-017 | T015, T030, T033, T036 | T7, A11 |
 | FR-018 | T031, T032, T034, T035, T038 | A12 |
 | FR-019 | T003, T037 | A13 |
+| FR-020 | AD-01–AD-03 (adenda, abajo) | A14–A18 |
 | NFR-001 | T004, T040, T046, T047 | P1 |
 | NFR-002 | T008, T010, T021, T039, T041–T043 | P2 |
 | NFR-003 | T038, T040–T048 | P1–P3 |
@@ -236,3 +237,17 @@ Esta matriz indica tareas previstas, no cobertura ejecutada. SC-001–SC-006 se 
 **Balance posterior al cierre de cobertura T7, 2026-11-06:** 7 completadas (T005–T010 y T012), 44 pendientes. Los balances anteriores son históricos. T015 conserva su verificación sin cambios, con cierre formal pendiente de T014; completar T012 no acredita E-B-COSTOS ni autoriza tareas posteriores.
 
 **Balance posterior a verificación conjunta T017, 2026-11-06:** 8 completadas (T005–T012), 43 pendientes. Se consolida únicamente el cierre local de pruebas T011; T013–T017 tienen evidencia local satisfactoria pero sus casillas conservan condiciones de integración/prerrequisitos. No se completa T018 ni tareas de US2 y no se resuelven entregas externas.
+
+## Adenda A–D — frontera temporal, fuera de US2
+
+Estas actividades no renumeran T001–T051 ni cambian sus casillas. La autorización específica del 2026-11-06 permite AD-01, conservando los tres puntos pendientes del checklist. No libera producción ni acredita E-D-CAMBIOS.
+
+- **AD-01 — Preparación autorizada:** especificar FR-020, A14–A18, y preparar `tests/test_frontera_temporal.py` con el motor real y fixture existente. Registrar resultados contra el motor anterior y el motivo de los fallos. No requiere Q1–Q3 ni datos integrados de B.
+- [x] **AD-02 — Frontera del motor implementada localmente.** Con la enmienda confirmada en `26be407` y la autorización específica, el motor cierra el instante del turno del jugador dentro de la transacción existente. La extracción comprueba el límite antes de retirar cada raíz, incluso al descartar cancelados. Depende de AD-01. La implementación está pendiente de commit.
+- [x] **AD-03 — Validación local de FR-020 completada.** Pasaron 11/11 pruebas de frontera, 99/99 regresiones y 10/10 pruebas de rutas. La corrida ampliada reprodujo cuatro incidencias de interfaz con el motor anterior. Los casos de red simulada y precarga que requerían `requests` pasaron en el entorno local del proyecto. Depende de AD-02. La aceptación de `historia` y su registro serializable quedan en el alcance de D y E-D-CAMBIOS. [Resultados de AD-03](quickstart.md#validación-local-ad-03).
+
+**T016:** conservar movimiento inmediato, ausencia de ataques gratuitos, costos, activación y orden por secuencia. El subcaso costo 100 llama directamente a `ejecutar_ciclo()`; su aserción de que queda el enemigo de secuencia mayor tras extraer el turno del jugador sigue siendo válida para una extracción individual. Lo anterior es la interpretación de ese estado como decisión ya habilitada y procesar ese ataque recién al llamar a `ejecutar("esperar")`. No se modifican sus expectativas en AD-01: las nuevas pruebas ejercen `ejecutar()` desde la acción de movimiento y verifican que el daño se observe antes de devolver. En el caso de costo 250 no hay empate del jugador en la frontera; se conserva la cobertura previa.
+
+**Evidencia histórica de AD-01, antes de implementar FR-020.** De las 11 pruebas nuevas, 7 pasaron y 4 reprodujeron la devolución anticipada. Las 99 regresiones existentes pasaron con las expectativas de entonces. [Comandos y resultados](quickstart.md#frontera-temporal-ad-01).
+
+**Conciliación posterior a AD-02.** La primera corrida del motor nuevo dejó 95/99 regresiones aprobadas. Las cuatro restantes observaban la agenda, el daño o la regeneración antes de cerrar el instante. Las pruebas reconciliadas conservan las comprobaciones del intervalo de movimiento, daño, azar y retroceso. AD-03 verifica el alcance local de Persona A. T020 y T022 siguen pendientes, al igual que Q1–Q3 y E-D-CAMBIOS.

@@ -423,3 +423,57 @@ US1 está funcionalmente verificada localmente para los escenarios válidos ejec
 T011 tiene evidencia suficiente para cerrar sus pruebas válidas y se consolida su checkbox; T012 y T005–T010 ya están completadas. T013/T014 tienen implementación local comprobada, pero conservan cierre integrado bloqueado por E-B-COSTOS. T015/T016 y la ejecución/verificación de T017 están cumplidas localmente, sin necesidad de ajuste; sus checkboxes conservan pendiente el cierre formal de sus prerrequisitos, sin convertir una cadena documental en un fallo funcional ni repetir pruebas sin motivo. T018 sigue bloqueada por evidencia Q1/Q2 y prerrequisitos; no se ejecuta. No se autoriza ni inicia US2.
 
 Solo se actualizan tasks.md, quickstart.md y prompts-registro-local.md (P29). Se verifican huellas SHA-256 de los Python antes/después para acreditar que código y pruebas no cambian. Rama feature/motor-eventos conservada; no operaciones Git de escritura, integración o publicación. Constitución, PROMPTS_LLM.md y documentación compartida intactas.
+
+## Frontera temporal AD-01
+
+2026-11-06: preparación TDD de FR-020, sin tocar producción. Se reutiliza `motor_terreno` con motor/agenda reales. La sonda de prueba registra los eventos retornados por `ejecutar_ciclo` sin sustituir el despacho ni sus resultados. Los casos sintéticos preparan contador, vida inicial herida o efecto vigente en t=0 cuando corresponde; no cambian el reloj ni ejecutan acciones antes de un turno. No se prueba aún `historia` ni el registro de D.
+
+```powershell
+python -B -X utf8 -m unittest tests.test_frontera_temporal -v
+python -B -X utf8 -m unittest tests.test_costos_terreno tests.test_velocidad_terreno tests.test_grafo_terreno tests.test_heap_rutas tests.test_juego tests.test_enemigos tests.test_regresiones_juego tests.test_integridad_operaciones.TestIntegridadOperaciones.test_precarga_fallida_no_rompe_movimiento_ni_replay -v
+```
+
+| Caso nuevo | Resultado histórico antes de AD-02 |
+| --- | --- |
+| A14: jugador 10, enemigo 11 | Falla: vida 30 al devolver en t=100; esperada 28. |
+| A14: enemigo 10, jugador 11 | Pasa: ataque, turno, daño y azar en orden. |
+| A15: ataque letal empatado | Falla: `terminado` es falso al devolver. |
+| A16: futuro t+1 | Pasa: cierre de puerta en t=101 pendiente e intacto. |
+| A16: cierre cancelado en t | Pasa: sin cierre ni adelanto de reloj. |
+| A16/A17: cancelado posterior al turno | Pasa: restaurar velocidad sustituye turno enemigo t=100 por t=101; el nuevo queda pendiente sin ataque ni tirada. Protege contra ejecutar t+1 al descartar cancelados. |
+| A17: fin de efecto en t | Pasa: ataque, restauración y turno en secuencia; enemigo reprogramado a t=150. |
+| A17: reprogramar al jugador | Pasa: restauración en t=50, frontera vigente en t=75. |
+| A18: dos decisiones sucesivas | Falla: vida 28 en t=200; esperada 26 por dos ataques. |
+| A18: repetir con misma semilla | Falla: las dos ejecuciones coinciden, pero conservan un evento vigente en la frontera. |
+| Control de API: un evento por `ejecutar_ciclo` | Pasa: el paso individual sigue dejando los demás en cola. |
+
+Corrida histórica de AD-01: 11 pruebas en 0.581 s, 7 aprobadas, 4 fallos de aserción, 0 errores u omisiones, salida 1. Las 99 regresiones pasaron en 2.028 s, incluida T016 con su expectativa anterior. Los cuatro fallos reproducían el corte en `turno_jugador`. Las duraciones de unittest corresponden a la ejecución de las suites.
+
+## Validación local AD-03
+
+FR-020 aplica el orden por tiempo y secuencia de Parte I §2.3 y permite observar el estado previo a la decisión descrito para `historia <t>` en Parte II §3.6 y Apéndice B. La especificación quedó confirmada en `26be407`. En AD-02, el bucle del motor conserva el instante del turno vigente como límite y continúa el despacho en la misma transacción. La cola comprueba el límite en cada raíz antes de extraerla. `ejecutar_ciclo()` sin límite sigue procesando un evento vigente por llamada.
+
+Los cuatro casos reconciliados se contrastaron con las trazas. Errante y rastreador programan t=21 al moverse en t=20. El ataque empatado en t=21 programa t=31. La sonda de costos llama una vez al método real, devuelve el mismo evento y registra ambos tiempos del movimiento en una lista local al caso. El fixture crea un motor nuevo por caso. T016 verifica ambos ataques con el daño derivado de dos tiradas, el estado final del RNG y el turno pendiente en t=300. La regresión de regeneración comprueba vida 18 tras los pulsos en t=50 y t=100, y mantiene la comprobación de vida 10 y agenda original al retroceder.
+
+Corrida de AD-03 con el intérprete auxiliar y `unittest`, API real deshabilitada y sin paquete oficial opcional:
+
+| Grupo | Resultado |
+| --- | --- |
+| `tests.test_frontera_temporal` | 11/11, incluidos ambos órdenes del empate, derrota, cancelaciones, efectos, reprogramación y RNG. |
+| Las 99 regresiones del comando de AD-01 | 99/99, incluidos T016, T7, retroceso y el caso de precarga y replay. |
+| `tests.test_rutas_cazador` | 10/10. |
+| Descubrimiento adicional en `tests/`, excluidos los grupos ya ejecutados y T020 | 360 entradas de unittest. 350 aprobadas, 2 fallos, 5 errores y 3 omisiones. |
+| `tests.test_cliente_api` y los dos casos de `TestOffline` que requieren `requests`, con el Python de `.venv` | 12/12. Sustituyen el error de importación del módulo y dos errores de precarga de la corrida anterior. |
+
+Las tres omisiones corresponden a la API real y a dos pruebas del paquete oficial opcional. T020 queda excluida de la corrida de funcionalidades disponibles porque depende de T022 y de `modelo.cazador`.
+
+Los cuatro resultados de interfaz restantes se reprodujeron con `modelo/juego.py` y `modelo/eventos.py` de `26be407` cargados en memoria y el mismo intérprete auxiliar:
+
+- `test_redibujar_menu_crea_animacion_nueva_y_destruirlo_la_cancela`: misma instancia de animación tras redibujar.
+- `test_reposo_preparado_conserva_pose_de_agarre_y_daga_contraria`: diferencia de píxeles.
+- `test_refresco_de_inventario_no_borra_la_animacion_de_dano`: el fixture de `VistaGrafica` carece de `escena`.
+- `test_menu_reproduce_intro_una_vez_al_mostrarse`: el fixture de `MenuInicio` carece de `canvas` y `_precarga_selector`.
+
+Las sondas en memoria comprobaron que un evento insertado en t durante el despacho se procesa por secuencia, que los eventos vigentes y cancelados de t+1 permanecen en cola y que los mensajes se publican con el estado final del turno. Una excepción después del ataque empatado restauró reloj, vida, posición, RNG, contador, agenda e historial y dejó la publicación vacía.
+
+AD-03 cierra la validación local de FR-020. La validación con la línea de tiempo de D, su formato serializable y E-D-CAMBIOS quedan pendientes. Q1–Q3 y T020/T022 conservan su estado.

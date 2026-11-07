@@ -1099,10 +1099,13 @@ class Motor:
         self.registro_rastro.marcar_visita(sala_origen, self.reloj)
         self._sincronizar_referencias()
 
+        frontera = None
         while not self.terminado:
-            evento = self.ejecutar_ciclo(decidir_accion)
-            if evento is None or evento.tipo == "turno_jugador" or self.terminado:
+            evento = self.ejecutar_ciclo(decidir_accion, hasta=frontera)
+            if evento is None:
                 break
+            if evento.tipo == "turno_jugador":
+                frontera = evento.tiempo
 
         self._sincronizar_referencias()
 
@@ -1116,8 +1119,8 @@ class Motor:
         self.historial.descartar_turno()
         return ResultadoAccion(ok=False, mensaje=mensaje)
 
-    def ejecutar_ciclo(self, decidir_accion_enemigo):
-        evento = self.cola.extraer_minimo()
+    def ejecutar_ciclo(self, decidir_accion_enemigo, *, hasta=None):
+        evento = self.cola.extraer_minimo(hasta=hasta)
         if evento is None:
             return None
 
