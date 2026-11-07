@@ -801,3 +801,18 @@ Herramienta: Codex desktop. Prompts textuales:
 Uso: revisar el enunciado, el reparto y las referencias Git, actualizar la copia
 local a a7acb0e, analizar los requisitos y ejecutar la implementación y las
 pruebas de D en 004-linea-tiempo. Registrar decisiones y resultados reproducibles.
+
+Alcance confirmado por la usuaria: D implementa el receptor y sus
+consumidores. A conserva los puntos de captura y las reglas del ciclo,
+incluido el cierre de empates. El receptor se prueba con el protocolo
+propuesto y no atribuye esa prueba al motor todavía sin instrumentar.
+La integración consume el verificador de B cuando esté disponible en la rama.
+
+Prompts textuales adicionales del 2026-11-06 (Codex desktop):
+
+> porfa nunca hagas trabajo de A
+
+> solo trabaja con la parte de D plis, haz todo lo que puedas
+
+Uso: retirar la instrumentación local iniciada en archivos del motor y delimitar
+el incremento al receptor, los adaptadores y la validación a cargo de D.

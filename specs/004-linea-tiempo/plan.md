@@ -106,3 +106,9 @@ distinción entre dictamen negativo y verificación incompleta. La presentación
 de mapa y viaje se valida con un productor de prueba mientras no haya una
 implementación de C disponible. No se alteran sus reglas ni se declara
 aceptación integrada con C sin su implementación.
+
+La captura de los productores permanece a cargo de A/C. D entrega un receptor
+con inicio, acción completa, recorte y restauración. La adhesión al protocolo
+se comprueba con dobles de prueba y se declara separada de la aceptación con
+los productores reales. La CLI puede señalar que el verificador aún no está
+disponible en esta rama, sin sustituir el algoritmo de B.
