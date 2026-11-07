@@ -36,3 +36,21 @@ Además del tiempo, instrumentar número de acciones reconstruidas para certific
 | 50 | Pendiente | Pendiente | Pendiente | Pendiente | Pendiente | Pendiente | Pendiente |
 | 100 | Pendiente | Pendiente | Pendiente | Pendiente | Pendiente | Pendiente | Pendiente |
 | Sin controles | Pendiente | Pendiente | Pendiente | Pendiente | Pendiente | Puede superar K | Pendiente |
+
+## Evidencia del incremento de D (2026-11-07)
+
+| Caso | Evidencia del consumidor | Dependencia para aceptación real |
+|---|---|---|
+| H1, H4, EX01–EX03 | Consultas válidas e inválidas, estado/RNG/log iguales antes y después, límite K | Conectar productor del motor para repetir en partida |
+| H2 | Recorte y corrección de inventario con productor de prueba, rama nueva | A/C producen retroceso y correcciones reales |
+| H3, EX08 | Cambios empatados ordenados y resumen de sala, enemigos y mapa con fixture | A cierra el lote real y C entrega conocimiento |
+| H5, EX05 | CLI sin constructores de vista, replay hasta t y después del final; replay simple con motor actual | A entrega los cambios para `--hasta` real |
+| H6, EX04, EX07 | Carga interactiva rechaza v3; v4 conserva K, RNG, historia y continuación; CRC y offsets inválidos no restauran | A/C confirman la restauración conjunta real |
+| R4 | Rechazo/inicio forzado, diagnóstico y exclusividad de CLI probados con el contrato de B | Integrar la entrega de B a esta rama |
+| EX06 | Consola y botones GUI, mapa filtrado del fixture, viaje delegado y log de pasos; costo real de salida ponderada | C entrega mapa/viaje y A el cazador real |
+| SC-003 | Cargas sintéticas de 5.000 y 10.000 acciones, cuatro variantes y comparación de dirección | Repetir con los productores y cripta de referencia |
+
+El resultado del benchmark está en [DECISIONES.md](../../DECISIONES.md).
+Los casos de contratos probados con fixtures quedan pendientes de
+aceptación con los módulos del equipo. T003, T010 y el cierre integrado
+T021 permanecen abiertos.

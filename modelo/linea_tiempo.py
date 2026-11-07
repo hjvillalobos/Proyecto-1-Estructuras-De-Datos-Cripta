@@ -155,13 +155,15 @@ class LineaTiempo:
                 # Aquí una ausencia también es una entrada de transacción.
                 tocados._campos.insert(pos, entrada)
 
-    def registrar_accion(self, tiempo_final, cambios=(), eventos=(), *, correcciones=()):
+    def registrar_accion(self, tiempo_final, cambios=(), eventos=(), *, correcciones=(), terminal=False):
         """Anexa una acción completa, validada antes de tocar la historia.
 
         Los efectos inmediatos se excluyen al consultar su instante de decisión.
         El productor debe entregar cerrado cada lote de eventos empatados.
         """
-        _entero(tiempo_final, self._reloj + 1, "Tiempo final")
+        _entero(tiempo_final, self._reloj + (not terminal), "Tiempo final")
+        if self._cantidad and self._accion(self._cantidad - 1).inicio == self._reloj:
+            raise CambioHistoriaIncoherente("No se puede continuar una acción terminal.")
         _cambios_validos(cambios)
         _cambios_validos(correcciones)
         if type(eventos) is not tuple:
@@ -197,14 +199,21 @@ class LineaTiempo:
         _entero(tiempo, 0, "Tiempo")
         if tiempo > self._reloj:
             raise ReferenciaHistoricaInvalida("No se puede consultar un instante futuro.")
+        return self._consultar_desde(tiempo, self._buscar_acciones_completas(tiempo))
+
+    def _buscar_acciones_completas(self, tiempo):
         # Primer intervalo que termina después de t: búsqueda binaria propia.
         bajo, alto = 0, self._cantidad
         while bajo < alto:
             medio = (bajo + alto) // 2
-            if self._accion(medio).fin <= tiempo:
+            accion = self._accion(medio)
+            if accion.fin <= tiempo and accion.inicio < tiempo:
                 bajo = medio + 1
             else:
                 alto = medio
+        return bajo
+
+    def _consultar_desde(self, tiempo, bajo):
         estado, reconstruidas = self._reconstruir_completas(bajo)
         if bajo < self._cantidad:
             accion = self._accion(bajo)
@@ -216,6 +225,10 @@ class LineaTiempo:
                     self._aplicar(estado, evento.cambios)
                 reconstruidas += 1
         return ConsultaHistoria(tiempo, estado, reconstruidas)
+
+    def consultar_final(self):
+        """Estado efectivo al terminar, incluso si la última acción fue instantánea."""
+        return ConsultaHistoria(self._reloj, self._actual.copiar(), 0)
 
     def consultar_accion(self, numero):
         _entero(numero, 1, "Acción")
@@ -278,5 +291,6 @@ class LineaTiempo:
             if accion.inicio != historia.reloj:
                 raise CambioHistoriaIncoherente("La acción no continúa la historia vigente.")
             historia.registrar_accion(
-                accion.fin, accion.cambios, accion.eventos, correcciones=accion.correcciones)
+                accion.fin, accion.cambios, accion.eventos, correcciones=accion.correcciones,
+                terminal=accion.inicio == accion.fin)
         return historia

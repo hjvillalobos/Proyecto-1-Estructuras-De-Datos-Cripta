@@ -245,16 +245,16 @@ El personaje usa fotogramas de carrera al cambiar de sala, ataque tras una accio
 aceptada y caida al perder. Son secuencias visuales desactivables; no avanzan el
 reloj ni bloquean el juego. Sin Pillow o sin la hoja de acciones se usa el PNG original.
 
-El replay mantiene visible el reloj virtual, permite Salir y muestra errores de
-datos/red sin continuar la reproduccion. Los errores al preparar una partida se
-muestran en el GUI y permiten regresar al menu para reintentar o salir.
+El replay muestra el reloj virtual en el resumen y reporta los errores de
+datos o de red. Los errores al preparar una partida se muestran en la interfaz
+gráfica y permiten regresar al menú para reintentar o salir.
 
 Con `--gui` aparece el menu de inicio: Jugar, Cargar partida, Replay, Puntajes y
 Salir. Se navega con raton, flechas y Enter. No inicia la simulacion ni avanza el
 reloj virtual. Una partida nueva empieza en t=0; cargar recupera el reloj guardado.
-Replay abre directamente la grabacion automatica y muestra "Ultima partida"
-en el reproductor, sin pedir seleccionar un archivo. Si no existe, muestra un
-aviso. `--replay ARCHIVO` conserva la reproduccion de otras bitacoras guardadas.
+Replay reproduce la grabación automática en un proceso separado sin vista y
+muestra su resumen en la ventana de juego. `--replay ARCHIVO` reproduce una
+bitácora indicada por ruta y presenta el resumen en la terminal.
 
 La escena incluye respiracion suave, entrada a salas y reaccion visual al dano.
 La casilla Animaciones desactiva el movimiento. Estos efectos no consumen tiempo
@@ -316,3 +316,35 @@ El núcleo ahora exporta/importa la rama vigente y puede guardarse como fragment
 
 
 Decisiones del núcleo histórico en [DECISIONES.md](DECISIONES.md), prompts textuales en [PROMPTS_LLM.md](PROMPTS_LLM.md) y [manejo de errores](specs/004-linea-tiempo/errores.md). Pruebas del contrato de errores: `python -m unittest tests.test_errores_historia -v`. La presentación de esos mensajes desde los comandos del juego está pendiente de integración.
+
+## Parte II · Línea de tiempo (D)
+
+```powershell
+python main.py --cripta ID --checkpoint-cada 50
+python main.py --verificar ID
+python main.py --cripta ID --forzar
+python main.py --replay partida.log --hasta 200
+python main.py --bench --subsistemas historia --operaciones 5000 --salas 256 --repeticiones 5
+python -m unittest tests.test_linea_tiempo tests.test_persistencia_historia tests.test_errores_historia tests.test_historia_motor tests.test_modos_historia tests.test_comandos_integracion tests.test_bench_historia -v
+```
+
+Durante el juego, `historia 200` consulta un instante y `historia #3` el
+estado previo a la tercera acción. `mapa` muestra el mapa conocido, e
+`ir a <sala>` muestra el motivo de detención del viaje. Los botones Historia,
+Mapa y Viajar están disponibles en la interfaz gráfica. El replay, el
+benchmark y la verificación por CLI funcionan sin crear vistas.
+
+El guardado de Parte II usa CRPT v4. Conserva el estado actual y el bloque
+histórico con su K y rama vigente. La entrada de carga de Parte II informa la
+incompatibilidad de archivos v3. `--forzar` autoriza el inicio tras un
+dictamen de cripta no resoluble. Una verificación incompleta impide iniciar.
+
+El adaptador de D y sus pruebas están en esta rama. Los comandos que requieren
+datos reales se habilitan al integrar los productores de A/C y el módulo
+`red.verificacion` de B. Mientras falte el verificador, el inicio informa que
+la verificación está incompleta. Véanse el
+[contrato de integración](specs/004-linea-tiempo/contracts/interfaces.md) y la
+[matriz de aceptación](specs/004-linea-tiempo/aceptacion.md).
+
+Para reproducir la comparación v4 y JSON de Parte I, usar
+`python main.py --bench --subsistemas guardado-historia --operaciones 5000 --salas 256 --repeticiones 5`.

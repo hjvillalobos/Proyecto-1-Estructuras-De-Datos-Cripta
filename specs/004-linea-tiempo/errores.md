@@ -41,3 +41,16 @@ python -m unittest tests.test_errores_historia tests.test_linea_tiempo tests.tes
 ```
 
 Estos módulos contienen 39 pruebas. Con las regresiones seleccionadas del núcleo, 172 pruebas aprobaron en la ejecución registrada en baseline.md. No equivale a la suite gráfica completa ni a una medición de rendimiento.
+
+## Errores en las entradas de D (2026-11-07)
+
+| Entrada | Diagnóstico y efecto |
+|---|---|
+| Consulta inválida, futura o de acción inexistente | Mensaje en la vista y salida del comando sin mover reloj ni escribir log. |
+| Guardado v3 desde la partida de Parte II | Incompatibilidad explícita y partida intacta. |
+| CRPT v4 truncado, offset inválido, CRC incorrecto o rama incoherente | Error antes de invocar la restauración del productor. |
+| Fallo al reemplazar el guardado | Se conserva el destino previo, se limpia el temporal y se conserva la causa. |
+| Argumentos incompatibles de CLI | Error de uso antes de abrir la sesión de datos. |
+| Replay inválido o productor histórico ausente | Error de replay; no se construye la vista ni se muestra un resumen incorrecto. |
+| Verificación incompleta | Se presenta la causa y se bloquea el inicio, incluso con `--forzar`. |
+| Mapa/viaje sin productor | Se informa que la capacidad no está disponible. No se muestra el esqueleto descargado. |

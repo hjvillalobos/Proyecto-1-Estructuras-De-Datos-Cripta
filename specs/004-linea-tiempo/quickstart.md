@@ -7,11 +7,16 @@ Python >=3.11 y dependencias de requirements.txt. Desde raíz: `python -m unitte
 
 ## Al implementar
 
-tests/test_linea_tiempo.py ya existe; test_persistencia_historia.py también existe para el fragmento independiente. test_modos_historia.py y test_comandos_integracion.py siguen pendientes en tasks.md.
+Las pruebas del núcleo están en tests/test_linea_tiempo.py y
+tests/test_persistencia_historia.py. Las pruebas del consumidor están en
+tests/test_historia_motor.py, tests/test_modos_historia.py y
+tests/test_comandos_integracion.py. Los escenarios de productor se prueban
+con un doble hasta que el motor y el mapa entreguen sus interfaces reales.
 
 Validar con una cripta obtenida del servicio o un fixture determinista: historia 0; varias acciones; historia #1; consulta futura rechazada; pergamino y consulta de rama; guardar/cargar e igualdad. No escribir IDs reales en la lógica.
 
-Comandos previstos tras implementar: `python main.py --checkpoint-cada 50`, `python main.py --replay partida.log --hasta 200`, `python main.py --verificar ID`, inicio no resoluble con/sin `--forzar`. No anunciar estos argumentos como disponibles antes de implementarlos. Replay/verificar/bench no instancian vista.
+Comandos implementados en el consumidor de D: `python main.py --checkpoint-cada 50`, `python main.py --replay partida.log --hasta 200`, `python main.py --verificar ID`, inicio no resoluble con/sin `--forzar`. Replay, verificación y benchmark no instancian vista. La verificación real
+requiere el módulo entregado por B.
 
 Usar aceptacion.md para casos H1–H6 y extras; bench con K 10/50/100 y sin controles, >=5000 acciones. Resultados medidos en DECISIONES.md.
 

@@ -5,6 +5,7 @@ import unittest
 from contextlib import redirect_stdout
 from copy import deepcopy
 from unittest.mock import Mock, patch
+from tests.datos_integracion_d import reporte_prueba
 
 from controlador.controlador import ControladorJuego
 from red.cache import CacheSinEspacioError
@@ -58,7 +59,9 @@ class TestFallosTransaccionales(unittest.TestCase):
         vista.mostrar_menu.side_effect = [("cargar", "base.bin"), ("salir", None)]
         with tempfile.TemporaryDirectory() as carpeta, redirect_stdout(io.StringIO()), \
                 patch("vista.grafica.VistaGrafica", return_value=vista), \
-                patch("datos.guardado_binario.cargar_estado", return_value=estado), \
+                patch("controlador.aplicacion.verificar", return_value=reporte_prueba()), \
+                patch.object(d.motor, "linea_tiempo", True, create=True), \
+                patch("datos.guardado_binario.cargar_estado_partida", return_value=estado), \
                 patch("modelo.juego.crear_juego", return_value=d.motor), \
                 patch("controlador.controlador.BitacoraReplay"):
             self.assertEqual(main.main(["--gui", "--offline", ".cache/cripta", "--datos-dir", carpeta]), 0)

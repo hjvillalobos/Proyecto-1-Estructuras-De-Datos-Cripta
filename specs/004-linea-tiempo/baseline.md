@@ -40,3 +40,28 @@ No se certifican suite gráfica, red con requests ausente, guardado integrado ni
 8 pruebas nuevas en tests/test_errores_historia.py: clases compatibles, entrada/referencia/incoherencia diferenciadas, atomicidad, campo ausente, ruta/tipo inválidos, corrupción/incompatibilidad, permisos y limpieza que preserva causa principal. Total de errores/historia/persistencia: 39.
 
 Comando: `python -m unittest tests.test_errores_historia tests.test_linea_tiempo tests.test_persistencia_historia tests.test_juego tests.test_historial tests.test_inventario tests.test_enemigos tests.test_rastro tests.test_cache tests.test_catalogo tests.test_regresiones_juego tests.test_fallos_transaccionales -q`. Resultado fuera del aislamiento para temporales: 172 pruebas aprobadas, 4.813 segundos. Es duración de suite, no benchmark; suite gráfica y cliente API no incluidos.
+
+## Incremento de integración D — 2026-11-07
+
+Base de implementación: a7acb0e en 004-linea-tiempo. El registro del
+diseño precede al código en ce72074 y 75c55d9. Se comprobó el checklist
+de requisitos (8 completos) y se analizaron FR-001–FR-020 frente al plan
+y la constitución. Se contrastaron §§2.11 y 4.10–4.11 de Parte I con la
+transcripción existente del enunciado, además del PDF de Parte II.
+
+La regresión seleccionada se ejecutó con Python 3.14.6, requests 2.34.2
+y Pillow 12.3.0. Pasaron 202 pruebas de historia, guardado, comandos,
+replay, motor, verificación de CLI, cache offline y cliente API. El
+benchmark de guardado v4 se verificó después con 15 pruebas de medición
+e integridad de archivos. Los casos reales y simulados están distinguidos
+en aceptacion.md.
+
+La ejecución completa por descubrimiento se interrumpió después de que
+quedó sin avanzar en el diálogo Tk de nombre de puntaje. La continuación
+por módulos permitió probar el resto. Quedaron el fallo ya documentado
+de redibujo de menú y dos errores de fixtures antiguos que construyen
+VistaGrafica sin escena y MenuInicio sin canvas ni precarga. También se
+detectaron dos regresiones de prueba en rutas cortas de Windows y en el
+nuevo flujo de verificación. Se ajustaron sus escenarios de CLI y pasaron
+en la regresión de 202. El caso opcional con paquete oficial quedó omitido.
+No se declara aprobada la suite completa ni la aceptación con A/B/C.

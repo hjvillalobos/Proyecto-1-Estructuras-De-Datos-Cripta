@@ -179,8 +179,8 @@ def codificar_historia(historia):
         raise ErrorGuardado(f'No se pudo codificar la historia: {error}') from error
 
 
-def decodificar_historia(datos):
-    """Valida versión, longitudes, CRC y coherencia antes de devolver estado."""
+def validar_fragmento(datos):
+    """Comprueba la envoltura y devuelve el payload sin reconstruir la historia."""
     if not isinstance(datos, (bytes, bytearray, memoryview)):
         raise ErrorGuardado('Se requieren datos binarios para cargar la historia.')
     try:
@@ -201,6 +201,12 @@ def decodificar_historia(datos):
         raise GuardadoCorrupto('Longitud de historia incorrecta o bytes sobrantes.')
     if zlib.crc32(payload) != crc:
         raise GuardadoCorrupto('CRC de historia incorrecto.')
+    return payload
+
+
+def decodificar_historia(datos):
+    """Valida versión, longitudes, CRC y coherencia antes de devolver estado."""
+    payload = validar_fragmento(datos)
     try:
         lector = _Lector(payload)
         k = lector.u64()

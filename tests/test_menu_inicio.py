@@ -5,6 +5,7 @@ import tkinter as tk
 import unittest
 from pathlib import Path
 from unittest.mock import Mock, patch
+from tests.datos_integracion_d import reporte_prueba
 from types import SimpleNamespace
 
 from controlador.controlador import ControladorJuego
@@ -74,7 +75,9 @@ class TestMenuInicio(unittest.TestCase):
         controlador = Mock()
         with tempfile.TemporaryDirectory() as carpeta, redirect_stdout(io.StringIO()), \
                 patch("vista.grafica.VistaGrafica", return_value=vista), \
-                patch("datos.guardado_binario.cargar_estado", return_value=estado), \
+                patch("controlador.aplicacion.verificar", return_value=reporte_prueba()), \
+                patch.object(datos.motor, "linea_tiempo", True, create=True), \
+                patch("datos.guardado_binario.cargar_estado_partida", return_value=estado), \
                 patch("modelo.juego.crear_juego", return_value=datos.motor) as crear, \
                 patch("controlador.controlador.ControladorJuego", return_value=controlador):
             self.assertEqual(main.main(["--gui", "--offline", ".cache/cripta", "--datos-dir", carpeta]), 0)

@@ -816,3 +816,13 @@ Prompts textuales adicionales del 2026-11-06 (Codex desktop):
 
 Uso: retirar la instrumentación local iniciada en archivos del motor y delimitar
 el incremento al receptor, los adaptadores y la validación a cargo de D.
+
+## 2026-11-07 — evidencia de implementación de D
+
+Herramienta: Codex desktop. Se aplicaron las instrucciones locales
+speckit-analyze y speckit-implement a la solicitud textual ya registrada.
+Se contrastaron las reglas de tiempo, guardado, replay y benchmark con
+los enunciados. Se incorporaron consumidores y pruebas de D, con
+productores simulados donde todavía faltan contratos reales. Se registraron
+decisiones, mediciones, errores, regresiones y dependencias en sus archivos.
+No se enviaron prompts a otros agentes ni se atribuyen acuerdos a compañeros.

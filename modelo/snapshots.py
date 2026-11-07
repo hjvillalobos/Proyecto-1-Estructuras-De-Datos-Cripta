@@ -107,9 +107,16 @@ class EstadoGuardado:
     eventos: list[EventoGuardado] = field(default_factory=list)
     salas: list[SalaGuardada] = field(default_factory=list)
 
-    #Solo para comparar contra JSON en --bench (§4.10)
+    historia: bytes | None = None
+
+    # El log conserva su base de carga. JSON también se usa en --bench.
     def a_dict(self):
-        return asdict(self)
+        datos = asdict(self)
+        if self.historia is None:
+            del datos["historia"]
+        else:
+            datos["historia"] = self.historia.hex()
+        return datos
 
     @classmethod
     def desde_dict(cls, d):
@@ -132,7 +139,7 @@ class EstadoGuardado:
             rng_estado=(rng[0], tuple(rng[1]), rng[2]),
             jugador=jugador,
             eventos=[EventoGuardado(**e) for e in d["eventos"]],
-            salas=salas)
+            salas=salas, historia=bytes.fromhex(d["historia"]) if "historia" in d else None)
 
 
 # Estado para la vista (lo llena el modelo con estado_vista())
@@ -185,6 +192,7 @@ class SalidaVista:
     cerrada: bool = False
     llave: str | None = None
     apertura_pendiente: bool = False
+    costo: int = 100
 
 
 @dataclass

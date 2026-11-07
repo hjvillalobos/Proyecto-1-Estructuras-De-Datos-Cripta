@@ -166,25 +166,36 @@ def motor_sintetico(tamano, semilla):
     return motor
 
 
-def medir_guardado(cantidad, repeticiones, tamano, semilla):
+def medir_guardado(cantidad, repeticiones, tamano, semilla, *, historia=None):
     motor = motor_sintetico(tamano, semilla)
     for i in range(1, tamano + 1):
         motor.contenido_cargado[i] = True
     estado = motor.exportar_estado()
     resultados = []
     vueltas = max(1, cantidad // tamano)
+    etiqueta = "guardado"
+    if historia is not None:
+        from datos.historia_binaria import codificar_historia, decodificar_historia
+
+        estado.historia = codificar_historia(historia)
+        estado.reloj = historia.reloj
+        estado.jugador.tiempo_siguiente = estado.reloj
+        estado.acciones_jugador = historia.cantidad_acciones
+        vueltas = 1
+        etiqueta = "guardado-historia"
     with tempfile.TemporaryDirectory() as carpeta:
         for nombre, guardar, cargar in (("binario", guardar_estado, cargar_estado),
                                          ("json", guardar_json, cargar_json)):
             ruta = str(Path(carpeta) / nombre)
             guardar(estado, ruta)
-            print(f"guardado/{nombre}: salas={tamano} bytes={Path(ruta).stat().st_size}")
+            print(f"{etiqueta}/{nombre}: salas={tamano} bytes={Path(ruta).stat().st_size}")
             for operacion in ("guardar", "cargar", "sala_directa"):
                 if operacion == "sala_directa" and nombre == "json":
                     continue
 
                 def preparar(operacion=operacion, guardar=guardar, cargar=cargar, ruta=ruta):
                     leidos = []
+                    reconstruidas = []
 
                     def ejecutar():
                         for _ in range(vueltas):
@@ -192,6 +203,8 @@ def medir_guardado(cantidad, repeticiones, tamano, semilla):
                                 guardar(estado, ruta)
                             elif operacion == "cargar":
                                 leidos[:] = [cargar(ruta)]
+                                if historia is not None:
+                                    reconstruidas[:] = [decodificar_historia(leidos[0].historia)]
                             else:
                                 with ArchivoGuardado(ruta) as archivo:
                                     leidos[:] = [archivo.leer_sala(tamano)]
@@ -201,8 +214,10 @@ def medir_guardado(cantidad, repeticiones, tamano, semilla):
                             assert leidos[0] == estado.salas[-1]
                         else:
                             assert (leidos[0] if leidos else cargar(ruta)) == estado
+                        if reconstruidas:
+                            assert reconstruidas[0].exportar() == historia.exportar()
                     return ejecutar, validar
-                resultados.append(medir_carga(f"guardado/{nombre}/{operacion}", vueltas, repeticiones, preparar))
+                resultados.append(medir_carga(f"{etiqueta}/{nombre}/{operacion}", vueltas, repeticiones, preparar))
     return resultados
 
 
