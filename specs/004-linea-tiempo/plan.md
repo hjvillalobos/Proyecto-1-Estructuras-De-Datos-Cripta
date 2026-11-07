@@ -90,3 +90,19 @@ Retroceso restaura azar, secuencia y contador; después descuenta pergamino fuer
 Preparación y contratos → núcleo sintético → captura real → recorte/persistencia → modos sin vista → interfaz → mediciones/defensa. Tareas concretas en tasks.md. La integración real requiere entregas de motor, conocimiento y verificador; el núcleo sintético no depende de que estén terminadas.
 
 K inicial elegido para desarrollo: 50. Es un parámetro configurable, no una conclusión de rendimiento. La elección definitiva debe revisarse con T019. Formato P2: 4, después de confirmar en esta rama que el actual es 3. Sin migración automática.
+
+## Incremento de integración de D
+
+El reloj de la consulta se toma del motor, con pruebas de salidas ponderadas y
+eventos empatados. Una acción terminal puede completar sin avanzar el reloj:
+la consulta por el instante de decisión conserva el estado previo y el
+resumen final del replay posterior al fin usa el resultado de la partida.
+El historial recibe proyecciones y cambios serializables en puntos de mutación
+del motor, nunca copias de salas completas por acción. El estado vivo y el
+conocimiento que pueda aportar su productor se guardan junto a la rama vigente.
+
+Para la verificación se consume el módulo entregado por B y se mantiene su
+distinción entre dictamen negativo y verificación incompleta. La presentación
+de mapa y viaje se valida con un productor de prueba mientras no haya una
+implementación de C disponible. No se alteran sus reglas ni se declara
+aceptación integrada con C sin su implementación.

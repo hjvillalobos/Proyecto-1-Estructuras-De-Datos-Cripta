@@ -785,3 +785,19 @@ Herramienta: Codex desktop; modelo concreto no expuesto. Prompt textual:
 > tambien ocupo que metas las deciciones, promots y los manejo de errores ya que nos bajaron puntos en la parte 1 por el manejo de errores le faltaba un poco mas de documentacion, es buena idea no?
 
 Uso: revisar y completar las decisiones del núcleo, conservar las entradas anteriores de esta bitácora y añadir la matriz de manejo de errores. Se precisó el diseño antes de cambiar el código, en commit 129bdbf. Bajo speckit-implement, prerrequisitos correctos, checklist previo completo y sin extensions.yml/hooks. Se escribió primero tests/test_errores_historia.py y se observó el fallo esperado por módulo aún inexistente. Se implementaron clases de dominio compatibles con ValueError, validación de claves/rutas/datos binarios y conservación del error principal si falla la limpieza del temporal. Regresión seleccionada: 172 pruebas aprobadas, incluidas 8 nuevas de errores. Sin cambios de vista, red o reglas del motor; no se anuncia integración completa ni rendimiento no medido.
+
+## 2026-11-06 — integración de la persona D
+
+Herramienta: Codex desktop. Prompts textuales:
+
+> en base a los enunciados y mi parte D no puedo seguir avanzando ? con el codigo? puedes revisar github tambien
+
+> ya me traje los cambios a mi rama linea del tiempo, los cambios son del motor, que puedo ir avanzando?
+
+> hazlo todo, pero haz pruebas de todo, sigue el enunciado al pie de le letra, haz los prompts, deciciones no te equivoques por favor sigue la parte D
+
+> solo puedes trabajar en la rama linea tiempo
+
+Uso: revisar el enunciado, el reparto y las referencias Git, actualizar la copia
+local a a7acb0e, analizar los requisitos y ejecutar la implementación y las
+pruebas de D en 004-linea-tiempo. Registrar decisiones y resultados reproducibles.
