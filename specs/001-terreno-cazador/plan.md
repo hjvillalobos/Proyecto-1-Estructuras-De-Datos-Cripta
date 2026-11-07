@@ -12,11 +12,19 @@
 
 La búsqueda individual limitada por rango es la base propuesta, con Dijkstra lexicográfico, heap indexado y arreglos propios con marcas por generación. Comparar contra selección lineal, heap con entradas obsoletas y búsquedas compartidas hacia el jugador. El cálculo compartido es exclusivamente alternativa de evaluación: no se integra automáticamente en producción ni tiene umbrales de activación seleccionados. Conservar la agenda actual como candidata inicial y medir su cancelación perezosa frente a eliminación indexada. Son decisiones propuestas con justificación analítica; no ganadoras empíricas.
 
-Los contratos de [integración](contracts/integracion.md) son borradores para B/C/D, no acuerdos aceptados. El algoritmo usa datos válidos suministrados y no hace HTTP. La búsqueda del cazador usa puertas reales; la de C debe usar exclusivamente conocimiento permitido.
+Los entregables de integración siguen pendientes. La adenda describe la decisión técnica de Persona A para compatibilidad con `historia <t>`, pendiente de validación de integración con D. El algoritmo usa datos válidos suministrados y no hace HTTP. La búsqueda del cazador usa puertas reales. La de C debe usar exclusivamente conocimiento permitido. [Contratos de integración](contracts/integracion.md).
 
 E-B-COSTOS y E-B-RANGO son entregables independientes: T013/T014 requieren solo costos; T025 requiere ambos y el despacho de C. T027 necesita T024 para su finalización completa; una ejecución parcial del núcleo no libera el cierre. La [comunicación reportada de B sobre OpenAPI 1.1.0](research.md#comunicación-reportada-de-b-sobre-openapi-110) carece de copia primaria verificable y no resuelve Q1/Q2 ni acredita entregas. Las reglas del enunciado permanecen vigentes, incluido costo ausente 100 y simetría; rango ausente/null, costo null e inconsistencias siguen pendientes. La espera del profesor no bloquea estas correcciones documentales.
 
 ## Technical Context
+
+### Adenda de frontera temporal (2026-11-06)
+
+El cambio futuro se concentra en el bucle de `Motor._ejecutar_accion()` llamado por `Motor.ejecutar()`. Al obtener el turno vigente del jugador, usar su tiempo como límite, despachar los eventos de ese instante por la ruta existente y cerrar la misma transacción de historial antes de devolver el resultado. Terminar inmediatamente si acaba la partida. El alcance se limita al momento de devolución del control, con el despacho, los costos, el orden del heap, el RNG y la lógica de rutas y cazador actuales. `ejecutar_ciclo()` sin límite conserva su contrato de un evento. [FR-020 y A14–A18](spec.md#frontera-temporal-del-jugador).
+
+El límite debe aplicarse **antes de extraer un evento vigente posterior**, también al descartar raíces canceladas. Una sola inspección de la raíz seguida de `extraer_minimo()` sin límite no basta: esa extracción puede saltar cancelados en t y alcanzar t+1. Opción propuesta: un límite opcional propagado por `ejecutar_ciclo()` al extractor del heap, que compruebe el tiempo de la raíz en cada iteración. Reutiliza el heap y evita escanear `pendientes()` o sacar/reinsertar un evento futuro. Ese auxiliar requeriría autorizar expresamente el ajuste en `modelo/eventos.py`; esta etapa no autoriza ningún cambio de producción.
+
+El lote debe quedar dentro de los deltas y la publicación diferida de mensajes de la acción anterior. Mantener restauración en caso de fallo, contador y azar, y verificar regresiones de retroceso/replay cuando se implemente. La frontera queda pendiente de validación de integración con D. El formato de cambios, las capturas y la reconstrucción siguen pendientes en E-D-CAMBIOS. La medición del ciclo incluirá este trabajo futuro. Q3 sigue pendiente.
 
 **Language/Version**: Python ≥3.11 por enunciado; versión exacta y equipo de medición por registrar. No se impone el intérprete auxiliar de lectura de PDF.
 
