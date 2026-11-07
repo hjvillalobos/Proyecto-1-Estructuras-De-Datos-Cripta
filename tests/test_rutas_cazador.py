@@ -1,13 +1,55 @@
-"""T019: FR-008/009/010, NFR-005; T1–T4 y A4 con datos válidos.
+"""T019/T026: FR-008/009/010/014, NFR-005; T1–T4, A4 y A7.
 
-Pruebas rojas del núcleo T021 aún ausente; no son decisión de cazador ni
-contrato compartido con C. No usan mocks, búsqueda de referencia o skips.
+Pruebas del núcleo T021 y contraste exhaustivo en grafos sintéticos pequeños.
 """
 
 import unittest
 
 from modelo import rutas
 from tests.datos_terreno_cazador import crear_salas
+
+
+def referencia_caminos_simples(salas, origen, destino):
+    """Enumera caminos abiertos sobre los descriptores originales de sala."""
+    visitados = [origen]
+    mejor = None
+
+    def recorrer(sala_id, total, primer_paso):
+        nonlocal mejor
+        if sala_id == destino:
+            candidato = (total, *primer_paso)
+            if mejor is None or candidato[:2] < mejor[:2]:
+                mejor = candidato
+            return
+
+        sala = next(sala for sala in salas if sala.id == sala_id)
+        for direccion, salida in sala.salidas.items():
+            vecino = salida["sala"]
+            if salida.get("cerrada", False) or vecino in visitados:
+                continue
+            costo = salida.get("costo", 100)
+            paso = (vecino, direccion, costo) if primer_paso is None else primer_paso
+            visitados.append(vecino)
+            recorrer(vecino, total + costo, paso)
+            visitados.pop()
+
+    recorrer(origen, 0, None)
+    if mejor is None:
+        return None
+    total, primer_id, direccion, costo_paso = mejor
+    return primer_id, direccion, costo_paso, total
+
+
+def conexiones_cuadricula():
+    conexiones = []
+    for fila in range(3):
+        for columna in range(3):
+            origen = fila * 3 + columna
+            if columna < 2:
+                conexiones.append((origen, "E", origen + 1, "O", 1, False))
+            if fila < 2:
+                conexiones.append((origen, "S", origen + 3, "N", 1, False))
+    return conexiones
 
 
 class PruebasRutasCazador(unittest.TestCase):
@@ -111,6 +153,43 @@ class PruebasRutasCazador(unittest.TestCase):
             (2, "E", 3, "S", 1, False),
         ])
         self.comprobar_consulta(salas, 90, 80, 100, (3, "N", 4, 5))
+
+    def test_t026_seis_caminos_optimos_con_enumeraciones_distintas(self):
+        ids = [90, 7, 34, 3, 22, 11, 65, 1, 80]
+        conexiones = conexiones_cuadricula()
+        ordenes = (conexiones, conexiones[::-1], conexiones[1::2] + conexiones[::2])
+        for numero, orden in enumerate(ordenes):
+            with self.subTest(enumeracion=numero):
+                salas = crear_salas(ids, orden)
+                # De esquina a esquina hay seis caminos de dos E y dos S.
+                esperado = referencia_caminos_simples(salas, 90, 80)
+                self.assertEqual(esperado, (3, "S", 1, 4))
+                self.comprobar_consulta(salas, 90, 80, 4, esperado)
+                self.comprobar_consulta(salas[::-1], 90, 80, 4, esperado)
+
+    def test_t026_grafos_ponderados_con_puertas_cerradas_y_limites(self):
+        ids = [90, 7, 34, 3, 22, 11, 65, 1, 80]
+        for aislar_esquina in (False, True):
+            conexiones = [
+                (o, direccion, d, vuelta, 1 + i % 7,
+                 i in (2, 8) or (aislar_esquina and (o == 0 or d == 0)))
+                for i, (o, direccion, d, vuelta, _, _) in enumerate(conexiones_cuadricula())
+            ]
+            salas = crear_salas(ids, conexiones)
+            for origen in ids:
+                for destino in ids:
+                    if origen == destino:
+                        continue
+                    with self.subTest(aislada=aislar_esquina, origen=origen,
+                                      destino=destino):
+                        esperado = referencia_caminos_simples(salas, origen, destino)
+                        if esperado is None:
+                            self.comprobar_consulta(salas, origen, destino, 56, None)
+                        else:
+                            total = esperado[3]
+                            self.comprobar_consulta(salas, origen, destino, total, esperado)
+                            if total > 1:
+                                self.comprobar_consulta(salas, origen, destino, total - 1, None)
 
 
 if __name__ == "__main__":

@@ -606,3 +606,11 @@ La corrida de cierre reemplaza el resultado inicial de preparación TDD de T020.
 Total: 129 métodos aprobados, con cero fallos, errores u omisiones. Se marcan T020 y T022 para el alcance local con entradas válidas. Q1–Q3 y los contratos externos siguen pendientes.
 
 La corrida usa `buscar_ruta` de T021 en el árbol de trabajo. Esa función todavía falta en `HEAD` (`299079d`). La suite de decisión importa `buscar_ruta` directamente, así que el commit de T020/T022 debe quedar después de confirmar T019/T021.
+
+## Validación local de T026
+
+Los dos casos de `tests.test_rutas_cazador` comparan el costo mínimo total y el ID de la primera sala vecina con una enumeración independiente de caminos simples, sin usar el heap de producción. La cuadrícula uniforme tiene seis rutas óptimas empatadas y conserva el mismo resultado al variar el orden de las conexiones y de las salas.
+
+En dos cuadrículas ponderadas se compararon 144 pares ordenados de salas distintas. Se verificaron puertas cerradas, destinos inalcanzables y límites inclusivos de costo. Para las rutas con costo mayor que 1 también se comprobó el rechazo con un límite una unidad menor.
+
+Resultados de la ejecución de T026: 12/12 rutas, 9/9 decisión, 11/11 FR-020 y 99/99 regresiones. Total: 131 pruebas aprobadas.
