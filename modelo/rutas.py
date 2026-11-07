@@ -1,4 +1,4 @@
-"""Fundamentos de rutas de A (T008/T010), sin búsqueda ni integración.
+"""Fundamentos y búsqueda limitada de A (T008/T010/T021), sin integración.
 
 Precondición del grafo: salas/IDs únicos y destinos existentes, costos válidos
 positivos y simétricos. No define políticas de datos inválidos de B (Q1/Q2).
@@ -211,3 +211,43 @@ class HeapRutas:
         """
         while self._nodos:
             self.espacio._posiciones[self._nodos.pop()] = -1
+
+
+def buscar_ruta(grafo, espacio, frontera, origen_indice, destino_indice, limite):
+    """Dijkstra limitado: (primer índice, dirección, costo del paso, total).
+
+    Entrada interna válida: índices distintos del mismo grafo/espacio,
+    frontera asociada vacía, costos positivos y límite explícito. Retorna
+    None si no encuentra paso admisible; no certifica distancia fuera del
+    límite ni define llegada, datos inválidos o contratos compartidos.
+    """
+    frontera.iniciar()
+    try:
+        frontera.insertar_o_disminuir(origen_indice, 0, None)
+        while frontera:
+            actual, distancia, primer_id = frontera.extraer()
+            espacio.cerrar(actual)
+            if actual == destino_indice:
+                primer_arco = None
+                for arco in grafo.adyacencias[origen_indice]:
+                    if (grafo.ids[arco.destino] == primer_id
+                            and not arco.puerta.get("cerrada", False)
+                            and (primer_arco is None or arco.costo < primer_arco.costo)):
+                        primer_arco = arco
+                if primer_arco is not None:
+                    return (primer_arco.destino, primer_arco.direccion,
+                            primer_arco.costo, distancia)
+                return None
+
+            for arco in grafo.adyacencias[actual]:
+                if (arco.puerta.get("cerrada", False)
+                        or espacio.esta_cerrado(arco.destino)):
+                    continue
+                candidata = distancia + arco.costo
+                if candidata > limite:
+                    continue
+                primero = grafo.ids[arco.destino] if actual == origen_indice else primer_id
+                frontera.insertar_o_disminuir(arco.destino, candidata, primero)
+        return None
+    finally:
+        frontera.finalizar()
