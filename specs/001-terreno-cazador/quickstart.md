@@ -622,3 +622,9 @@ Con rango 4 y cinco salas alcanzables fijas, la prueba P2 amplía el mapa a 6, 6
 En cada tamaño se observaron 4 extracciones, 4 accesos a adyacencias, 75 lecturas y 37 escrituras de auxiliares y 1 descarte final para el destino local. Para el destino exterior se observaron 5, 5, 81, 38 y 0, respectivamente. La revisión repitió los conteos y comprobó que la consulta sin sondas devuelve el mismo resultado. El pico de `tracemalloc` expresa bytes trazados de la consulta instrumentada y se registra por separado de los conteos de operaciones.
 
 La reejecución de `tests.test_localidad_rutas`, rutas, decisión, FR-020 y las 99 regresiones del comando de AD-01 pasó 132/132 pruebas. T046 sigue pendiente de la referencia oficial Q3, la conexión de D y la medición del ciclo completo.
+
+## Cierre documental local de T051
+
+El [registro local](prompts-registro-local.md#corte-documental-en-p77) consolida 77 solicitudes íntegras hasta P77, con una fila por ID en orden de envío. Se verificaron 73 cuerpos en el registro y cuatro en los tres anexos. Se conservaron P01–P75 y los anexos, y se cotejaron P76 y P77 con el registro original de la sesión de Codex.
+
+Los dos mensajes incompletos entre P48 y P33 conservan sus fragmentos literales y sus finales siguen pendientes de recuperación. La autorización de este cierre es posterior al corte y queda para el mantenimiento incremental. El traslado a `PROMPTS_LLM.md` sigue pendiente de autorización.
