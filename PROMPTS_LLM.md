@@ -758,3 +758,33 @@ Prompt textual a agente de investigación requerido por speckit-plan:
 > La habilidad speckit-plan exige agentes de investigación. Solo lectura: revisa modelo/juego.py e historial.py en C:/Users/Belén/Documents/2026/Datos/Proyecto/Proyecto-1-Estructuras-De-Datos-Cripta para determinar fronteras acciones/eventos, pergamino, captura serializable. Devuelve decisiones de diseño compatibles y riesgos concretos. No edites archivos.
 
 Uso de respuesta: capturar cambios tipados en lugar de closures, exigir cierre de lote temporal, conservar excepción persistente del pergamino y separar reconstrucción del restaurador con catálogo. Pruebas actuales y límites en baseline.md. No se atribuyen resultados de benchmarks todavía no ejecutados.
+
+## Persona C — inicio de especificación — 2026-11-08
+
+Herramienta: Codex desktop; identificador exacto de modelo no registrado. Fecha de esta sesión, no atribuida retrospectivamente a mensajes anteriores.
+
+Prompts textuales de la secuencia actual:
+
+> puedes volver a revisar el repositorio y las ramas para ver si ya podemos avanzar con algo
+
+> entonces por donde empezamos
+
+> okay, entonces tratemos de hacerlo asi de la mejor manera
+
+Uso: revisar referencias remotas y contratos; actualizar la rama existente de C por avance directo a main, respaldando y conservando puntajes; preparar borrador de especificación de niebla y viaje, lista de calidad y coordinación. Se aplicó la habilidad versionada `speckit-specify` leyendo sus instrucciones; no se atribuye una invocación CLI que no ocurrió. Se resolvió la plantilla con el script del repositorio. Directorio explícito de capacidad: `specs/002-niebla-viaje`, conforme al reparto acordado. No se crearon plan ni tareas ni código de la capacidad; clarify queda pendiente por Q1.
+
+Fuentes: enunciado Parte II y reparto aportados por el usuario; constitución publicada y acuerdo textual previamente pegado en este chat. Esta entrada no reemplaza ni reconstruye los prompts anteriores de C: la conciliación del registro histórico completo desde P1 continúa pendiente; no se declaran completos los registros históricos ni se inventan sus fechas.
+
+### Persona C — revisión y commit documental — 2026-11-08
+
+Herramienta: Codex desktop; identificador exacto de modelo no registrado.
+
+Prompts textuales:
+
+> ya te fijaste que nada cause conflicto?
+
+> okay, que mas podemos hacer para hacer aportes, ya que me van a llamar la atencion
+
+> okay, entonces haz ese commit en mi rama, recuerda no subir nada a la main hasta tener una version estable sin conflictos e inteligente de eso
+
+Uso: comprobar estado y posibles conflictos textuales entre commits mediante merge-tree sin fusionar ramas; explicar límites de esa comprobación y acuerdos funcionales pendientes; preparar commit local de la especificación en borrador y documentos asociados exclusivamente en `codex/002-niebla-viaje`. Se excluyen puntajes locales; no se autoriza ni realiza publicación o integración en main. La aclaración Q1, contratos compartidos y fases posteriores permanecen pendientes.
