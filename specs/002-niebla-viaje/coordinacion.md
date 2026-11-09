@@ -29,4 +29,6 @@ Referencias revisadas: `origin/feature/motor-eventos` 934eaff, contrato `specs/0
 
 ## Siguiente fase
 
+Actualización tras mensajes del grupo aportados por el usuario: el equipo identifica expresamente la constitución de main como compartida. No se necesita otra constitución. Se preparó [una propuesta concreta de contratos](contracts/propuesta-integracion.md) que incluye inventario, además de conocimiento y viaje. Sus firmas son candidatas; la preparación no equivale a completar la fase plan ni a obtener aceptación de A/D.
+
 Resolver Q1 y ejecutar clarify; acordar contratos concretos antes de implementar conexiones. Después preparar plan, tareas y análisis, y confirmar especificación en Git antes del código. La especificación actual puede revisarse sin elegir estructuras. No se atribuyen pruebas ni rendimiento de las ramas ajenas como verificados localmente.

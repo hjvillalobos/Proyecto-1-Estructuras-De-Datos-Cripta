@@ -15,3 +15,5 @@ Fecha: 2026-11-08. Documento: [spec.md](../spec.md).
 - [ ] Revisión cruzada del equipo realizada.
 
 Resultado: borrador apto para iniciar clarify, no para implementar. Los escenarios son criterios futuros; no son pruebas ejecutadas. No existe extensions.yml ni hooks before_specify/after_specify en la base utilizada.
+
+Seguimiento: iniciada la revisión de aclaraciones. El usuario pidió mantener Q1 pendiente de respuesta oficial. No se cambia su casilla ni se considera resuelta por haber acordado posponerla. El alcance pendiente está delimitado en la especificación.

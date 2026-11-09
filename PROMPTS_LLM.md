@@ -788,3 +788,45 @@ Prompts textuales:
 > okay, entonces haz ese commit en mi rama, recuerda no subir nada a la main hasta tener una version estable sin conflictos e inteligente de eso
 
 Uso: comprobar estado y posibles conflictos textuales entre commits mediante merge-tree sin fusionar ramas; explicar límites de esa comprobación y acuerdos funcionales pendientes; preparar commit local de la especificación en borrador y documentos asociados exclusivamente en `codex/002-niebla-viaje`. Se excluyen puntajes locales; no se autoriza ni realiza publicación o integración en main. La aclaración Q1, contratos compartidos y fases posteriores permanecen pendientes.
+
+### Persona C — propuesta de contratos — 2026-11-08
+
+Herramienta: Codex desktop; identificador exacto de modelo no registrado.
+
+Prompt textual que autoriza continuar:
+
+> okay, entonces debemos de actuar de la mejor manera o de forma mas eficiente
+
+Uso: contrastar contratos disponibles de A/D con historial e inventario actuales; redactar propuesta de interfaces y casos verificables, pendiente de aceptación, sin modificar código del juego. Se registran como riesgos concretos el resultado booleano insuficiente del movimiento, la interrupción entre pasos y las funciones no serializables del retroceso actual. Los mensajes del grupo y capturas aportados anteriormente se usan como contexto reportado, sin atribuirlos como pruebas locales ni copiar teléfonos. Su transcripción histórica completa no se declara incorporada por esta entrada.
+
+### Persona C — contraste con ramas actualizadas — 2026-11-08
+
+Herramienta: Codex desktop; identificador exacto de modelo no registrado.
+
+> okay, si mis compañeros han subido algo a las ramas o algo así, tambien seria bueno guiarse para que coincida o si no hay nada asi, empezamos nosotros
+
+Uso: actualizar referencias remotas, revisar el incremento 97ee910 de D y contrastar consumidores reales del mapa/viaje, tipos históricos y firma de rutas de A. Actualizar la propuesta de integración con nombres existentes y diferencias pendientes, sin fusionar ramas ni cambiar código. La lectura de la habilidad clarify no se presenta como ejecución completa de esa fase.
+
+### Persona C — seguimiento de aclaración Q1 — 2026-11-08
+
+Herramienta: Codex desktop; identificador exacto de modelo no registrado.
+
+Prompt textual:
+
+> okay, entonces dejalo como pendiente
+
+Uso: registrar Q1 como pendiente de aclaración oficial, sin convertir la interpretación sugerida en una regla aceptada. Delimitar el caso de puertas remotas sin observación física y distinguirlo de la puerta observable desde la sala actual. Mantener abierta la revisión de aclaraciones y señalar el trabajo documental independiente. No se modifica código ni se publica nada.
+
+### Persona C — investigación y plan provisional — 2026-11-08
+
+Herramienta: Codex desktop; identificador exacto de modelo no registrado.
+
+> de acuerdo, sigamos
+
+Uso: leer habilidades de plan, tareas y análisis; ejecutar setup-plan; preparar plan provisional e investigación técnica. Se conserva Q1 abierta. No se ejecutan tasks/analyze ni implementación: la puerta de control de plan no está superada. Se revisaron restricciones de estructuras propias y formatos reales de D; no hay resultados nuevos de pruebas o mediciones.
+
+Prompt textual de investigación delegada, requerida por speckit-plan:
+
+> La habilidad speckit-plan pide investigación delegada. Solo lectura: revisa modelo/historial.py, inventario.py, rastro.py, tipos.py y las interfaces de origin/004-linea-tiempo/modelo/snapshots.py (git show). Propón estructura propia para conocimiento y deltas que cumpla actualización incremental, IDs dispersos y serialización. Identifica límites reales, no afirmes contratos aprobados. No edites archivos ni implementes. Q1 antorcha sigue pendiente; concentra diseño independiente.
+
+Uso de respuesta: comparar índice compacto con indexación directa por ID, conservar diferencia entre rollback y retroceso, señalar restauración de cursor y adaptar valores a los tipos históricos existentes. Son decisiones candidatas documentadas; no contratos aceptados.

@@ -3,6 +3,8 @@
 **Feature Branch**: `codex/002-niebla-viaje`
 **Created**: 2026-11-08
 **Status**: Borrador; pendiente de clarify y revisión cruzada. No autoriza implementación.
+
+**Actualización de alcance I1:** el usuario autorizó implementar lo independiente de sus compañeros. Se cierra la aclaración del incremento de conocimiento básico descrito abajo; la capacidad completa continúa pendiente. Esta autorización sustituye la prohibición general de implementar únicamente para I1.
 **Input**: Persona C según asignación confirmada por el usuario. Preparar su capacidad conforme a Parte II §§3.3–3.4, 5.3, 5.6, 6.1 y Apéndice B.
 
 ## User Scenarios & Testing
@@ -120,6 +122,26 @@ Los identificadores FR son locales a esta capacidad y se citarán con el prefijo
 
 ## Clarifications pendientes
 
+### Alcance aclarado del incremento I1
+
+- Autorización textual: «okay, entonces hagamos todo lo que no dependa de mis compañeros o sea util y no les cause conflicto».
+- Incluye FR-001–005 y FR-017, y la parte local de FR-014: estados, avistamiento, observación física de puertas, proyección filtrada y aplicación/inversión de cambios de conocimiento. PR-002 se comprueba con carga local; no certifica PR-001.
+- Excluye antorcha (Q1), búsqueda y ejecución de viaje, cambios de inventario/historial existentes, guardado y conexiones reales con A/D. No declara completos N1–N6 ni FR-016.
+- El componente recibe esqueleto y observaciones explícitas. No infiere estado real de puertas por precarga. La sala inicial se explora al construirlo y sus puertas se conocen solamente mediante observaciones suministradas desde esa sala.
+- La entrada física explora la sala y avista destinos directos; repetirla no degrada estados. Una observación de puerta exige que la sala indicada sea uno de sus extremos y ya esté explorada. El llamador deberá garantizar ocupación actual; el componente no mantiene una segunda posición del jugador.
+- Los cambios se entregan como datos inmutables, sin callbacks; aplicar y revertir lotes coherentes reconstruye el estado. Un lote incompatible se rechaza sin dejar modificaciones parciales.
+- C12: dados cambios de varias entradas y observaciones, aplicar cada lote sobre un estado equivalente produce el mismo mapa; invertirlos en orden contrario recupera el inicial. Un lote incompatible no modifica ese mapa. FR-014, FR-017.
+- C13: dados IDs dispersos y mapas de tamaños crecientes, el almacenamiento depende de la cantidad de entidades; una entrada procesa solo su sala y salidas, además de búsquedas de identificadores. PR-002.
+- C14: datos internos incompletos o contradictorios se rechazan antes de construir el componente; esta precondición local no define cómo B debe tratar null, asimetría u otros problemas de la API.
+
 **Q1 — puertas de salas reveladas con antorcha.** [NEEDS CLARIFICATION: ¿qué información recibe el jugador sobre una puerta que pertenece a una vecina revelada por antorcha, pero cuyos extremos nunca ha ocupado? §3.3 exige exploración de la vecina y memoria de la última observación, pero define observación estando en un extremo. Confirmar si queda sin observación utilizable para viaje o si la antorcha también permite observar esa puerta; no asumir el estado real como recuerdo.]
 
 Esta pregunta requiere aclaración del enunciado o referencia oficial; una preferencia técnica no la resuelve. La revisión obligatoria de clarify podrá identificar otros casos antes de cerrar el diseño.
+
+### Seguimiento de Q1
+
+El usuario indicó: «okay, entonces dejalo como pendiente». Q1 permanece abierta; no se adopta ninguna de las interpretaciones como regla del juego. La revisión de la sección 3.3 y del reparto de C no encontró una aclaración expresa para puertas cuyos extremos nunca ocupó el jugador. El texto extraído del enunciado `Cripta - Parte II (3).pdf` coincide con el de la copia anterior.
+
+El caso pendiente se limita a una puerta entre una vecina revelada y otra sala, sin observación física previa. La puerta que conecta la sala ocupada con esa vecina sí se observa desde la posición actual conforme a FR-004.
+
+Se puede continuar revisando y preparando el conocimiento por entrada física, avistamiento, memoria de puertas observadas y cambios reversibles. Las decisiones y pruebas sobre información de puertas remotas reveladas por antorcha quedan pendientes de respuesta oficial. Esto no declara completa la fase de aclaración ni autoriza omitir plan, tareas y análisis antes de implementar.
