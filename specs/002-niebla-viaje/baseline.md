@@ -65,3 +65,11 @@ Python 3.12.10; Windows-11-10.0.26300-SP0. Comando de benchmark indicado arriba.
 Memoria medida con tracemalloc exclusivamente durante la construcción del componente, sobre esqueleto ya creado. Representa asignaciones rastreadas durante ese intervalo; no incluye todo el esqueleto referenciado, memoria total del proceso ni archivo de guardado. La reutilización interna de memoria de Python puede influir en cargas pequeñas; no inferir proporcionalidad exacta de una sola ejecución. La proyección completa recorre el mapa y no debe reconstruirse por paso de viaje. Ninguna cifra acredita PR-001 ni las mediciones integradas de historia/inventario.
 
 I2 entrega una decisión de detención aislada, no rutas ni el comando `ir a`. Integración con A/D, Q1, antorcha y persistencia siguen pendientes. El estilo gráfico del juego no se modificó.
+
+## Revisión posterior y corrección documental — 2026-11-09
+
+Se repitieron las 148 pruebas seleccionadas: 17.395 s, OK. Se verificó la secuencia de commits con especificación anterior al código, ausencia de modificaciones en módulos preexistentes del juego, restricciones de estructuras en los módulos nuevos y preservación de puntajes.
+
+Se corrigieron encabezados y frases obsoletas del plan/especificación/lista de calidad para distinguir I1/I2 terminados de la capacidad completa pendiente. La aplicación/inversión cuesta O(D log(V+P)), no O(D); memoria auxiliar O(D). La preparación incluye también índices de puertas y ordenamiento de salidas. Son correcciones de documentación al comportamiento existente, sin cambios de reglas o código. Los detalles de función pura y responsabilidades del adaptador permanecen en documentos técnicos; la especificación expresa resultados observables.
+
+Continúan pendientes la revisión cruzada, integración, Q1 y conciliación histórica completa de prompts. No se cambian casillas generales a cumplidas ni se presenta esta revisión local como aprobación del equipo.

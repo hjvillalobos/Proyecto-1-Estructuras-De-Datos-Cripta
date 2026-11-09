@@ -862,3 +862,17 @@ Prompts textuales:
 > adelante, recuerda ser muy inteligente con lo que se hace y no uses cosas que no se deberían usar
 
 Uso: definir FR-018/PR-004 y C15–C17, actualizar plan/tareas, revisar consistencia del alcance y confirmar documentación en e3e16a6 antes del código. Reutilizar instrucciones de las fases spec-kit ya leídas, consultar constitución y scripts de requisitos; sin hooks configurados. Implementar decisión pura de detención, pruebas de secuencias y combinaciones, demostración por consola y mediciones separadas de memoria/tiempo. No se añade GUI ni se alteran estilos. Q1 y conexiones ajenas siguen pendientes. Se ejecutaron 148 pruebas seleccionadas con resultado OK; benchmark y límites están en baseline.md. No hay publicación ni cambio en main.
+
+### Revisión y corrección documental de C — 2026-11-09
+
+Herramienta: Codex desktop; identificador exacto de modelo no registrado.
+
+Prompts textuales:
+
+> hasta el momento, de lo que hemos hecho, todo está correcto y sigue el plan a como deberíamos de estar trabajando de forma correcta? Revisa eso super bien y luego continuamos
+
+> ENTONCES?
+
+Uso: revisar código, trazabilidad, historial y restricciones; repetir 148 pruebas seleccionadas (17.395 s, OK); verificar puntajes y ausencia de cambios en módulos preexistentes del juego. Corregir estados documentales obsoletos, separar resultados locales de pendientes integrados y ajustar complejidad de aplicación/inversión y preparación al código real. Reexpresar FR-018 y aclaraciones de I1/I2 como comportamiento, manteniendo detalles técnicos en plan/data-model. Sin cambios funcionales, nuevos resultados de rendimiento ni publicación.
+
+Registro histórico: estas entradas conservan los prompts aquí disponibles y no certifican exhaustividad de todo el período desde P1. La conciliación de mensajes anteriores sigue pendiente; no se inventan fechas ni se sustituye texto original por resúmenes para cerrar ese requisito.

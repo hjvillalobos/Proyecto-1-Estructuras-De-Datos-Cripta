@@ -2,9 +2,9 @@
 
 **Feature Branch**: `codex/002-niebla-viaje`
 **Created**: 2026-11-08
-**Status**: Borrador; pendiente de clarify y revisión cruzada. No autoriza implementación.
+**Status**: Incrementos independientes I1 e I2 implementados y probados. Capacidad completa pendiente de Q1, integración y revisión cruzada.
 
-**Actualización de alcance I1:** el usuario autorizó implementar lo independiente de sus compañeros. Se cierra la aclaración del incremento de conocimiento básico descrito abajo; la capacidad completa continúa pendiente. Esta autorización sustituye la prohibición general de implementar únicamente para I1.
+**Actualización de alcance I1:** el usuario autorizó implementar lo independiente de sus compañeros. Se cierra la aclaración del incremento de conocimiento básico descrito abajo; la capacidad completa continúa pendiente. La autorización posterior de I2 amplía ese alcance únicamente con las operaciones independientes indicadas en su apartado.
 **Input**: Persona C según asignación confirmada por el usuario. Preparar su capacidad conforme a Parte II §§3.3–3.4, 5.3, 5.6, 6.1 y Apéndice B.
 
 ## User Scenarios & Testing
@@ -118,7 +118,7 @@ Los identificadores FR son locales a esta capacidad y se citarán con el prefijo
 - El usuario confirma que le corresponde C, aunque el documento de reparto se dirige a B en su introducción.
 - Continúan las reglas de P1 salvo modificación expresa. No se redefinen movimiento, activación, costo del pergamino ni orden temporal desde esta capacidad.
 - Se depende de A para movimiento, eventos y observaciones; de B para datos válidos; de D para interfaz, persistencia y reconstrucción histórica. Los contratos todavía no están aceptados por todas las partes.
-- El borrador no considera completadas clarify, plan, tasks, analyze, implementación ni pruebas de la capacidad.
+- I1 e I2 cuentan con alcance aclarado, plan, tareas, revisión de consistencia e implementación local. Eso no cierra las fases ni la aceptación de la capacidad completa; Q1 y acuerdos de integración siguen abiertos.
 
 ## Clarifications pendientes
 
@@ -126,9 +126,9 @@ Los identificadores FR son locales a esta capacidad y se citarán con el prefijo
 
 Autorizado el 2026-11-09 para continuar trabajo independiente. No modifica la interfaz ni el estilo visual. Amplía C12/C13 con secuencias reproducibles, ciclos, componentes desconectados y puertas paralelas de identidad distinta. La demostración usa datos sintéticos separados del código del juego.
 
-- **FR-018**: Evaluar, a partir de hechos explícitos de un paso, si el viaje debe detenerse por llegada, daño recibido, entrada con enemigos, ausencia de ruta conocida o cancelación. Conservar todas las causas coincidentes; su orden de presentación será fijo, sin prioridad que cambie la decisión. La función no mueve actores, no busca rutas, no ejecuta retroceso ni cambia conocimiento/reloj.
+- **FR-018**: Evaluar, a partir de hechos explícitos de un paso, si el viaje debe detenerse por llegada, daño recibido, entrada con enemigos, ausencia de ruta conocida o cancelación. Conservar todas las causas coincidentes; su orden de presentación será fijo, sin prioridad que cambie la decisión. Esta evaluación no ejecuta movimientos ni retroceso y no modifica el conocimiento ni el reloj.
 - C15: ante cualquiera de las causas de FR-018, el resultado impide continuar; sin ninguna causa permite continuar. Enemigos solo cuentan para esta condición si hubo entrada. Daño sigue siendo un hecho aunque la vida se recupere después.
-- C16: causas simultáneas se conservan y el mismo conjunto de hechos produce el mismo resultado, sin mutar la entrada. Una cancelación suministrada impide continuar aunque también haya ruta. Quien integra conserva el estado de cancelación entre llamadas; esta función pura no gestiona un viaje activo.
+- C16: causas simultáneas se conservan y el mismo conjunto de hechos produce el mismo resultado, sin mutar la entrada. Una cancelación suministrada impide continuar aunque también haya ruta. Un viaje cancelado no continúa automáticamente; la coordinación del viaje activo queda fuera de este incremento.
 - C17: una secuencia larga de entradas/observaciones, reconstruida e invertida, coincide con un registro de referencia de prueba independiente. Dos puertas entre las mismas salas conservan recuerdos distintos; una región desconectada no se revela desde otra.
 - **PR-004**: Medir memoria asignada al componente y tiempos de consulta de puertas y proyección, con carga/entorno/unidades documentados. La instrumentación de memoria y las mediciones de tiempo se ejecutan por separado. No se presenta como evidencia del límite de viaje completo.
 
@@ -141,7 +141,7 @@ I2 aclara solamente estas operaciones independientes. Q1 y los contratos de moto
 - Excluye antorcha (Q1), búsqueda y ejecución de viaje, cambios de inventario/historial existentes, guardado y conexiones reales con A/D. No declara completos N1–N6 ni FR-016.
 - El componente recibe esqueleto y observaciones explícitas. No infiere estado real de puertas por precarga. La sala inicial se explora al construirlo y sus puertas se conocen solamente mediante observaciones suministradas desde esa sala.
 - La entrada física explora la sala y avista destinos directos; repetirla no degrada estados. Una observación de puerta exige que la sala indicada sea uno de sus extremos y ya esté explorada. El llamador deberá garantizar ocupación actual; el componente no mantiene una segunda posición del jugador.
-- Los cambios se entregan como datos inmutables, sin callbacks; aplicar y revertir lotes coherentes reconstruye el estado. Un lote incompatible se rechaza sin dejar modificaciones parciales.
+- Los cambios permiten reconstruir y revertir exactamente el conocimiento correspondiente a la secuencia de acciones. Un lote incompatible se rechaza sin dejar modificaciones parciales.
 - C12: dados cambios de varias entradas y observaciones, aplicar cada lote sobre un estado equivalente produce el mismo mapa; invertirlos en orden contrario recupera el inicial. Un lote incompatible no modifica ese mapa. FR-014, FR-017.
 - C13: dados IDs dispersos y mapas de tamaños crecientes, el almacenamiento depende de la cantidad de entidades; una entrada procesa solo su sala y salidas, además de búsquedas de identificadores. PR-002.
 - C14: datos internos incompletos o contradictorios se rechazan antes de construir el componente; esta precondición local no define cómo B debe tratar null, asimetría u otros problemas de la API.

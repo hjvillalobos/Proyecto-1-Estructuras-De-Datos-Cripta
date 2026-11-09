@@ -1,12 +1,12 @@
-# Plan técnico provisional: conocimiento y viaje
+# Plan técnico: incrementos I1 e I2 y pendientes de integración
 
 **Rama:** `codex/002-niebla-viaje` · **Fecha:** 2026-11-08 · **Especificación:** [spec.md](spec.md)
 
 ## Resumen
 
-**Alcance vigente I1:** tras la autorización del usuario se ejecuta únicamente conocimiento básico y deltas locales. Las restricciones generales de cierre que siguen en este documento corresponden a la capacidad completa. I1 tiene alcance aclarado en spec.md, diseño en data-model.md y tareas propias; no depende de Q1 ni de aceptar interfaces ajenas. Se usa la investigación ya realizada. Los índices de puertas reciben identificadores explícitos del llamador, sin deducirlos de extremos.
+**Alcance vigente I1 e I2:** se implementaron conocimiento básico, deltas locales y evaluación independiente de detención. Las restricciones generales de cierre que siguen en este documento corresponden a la capacidad completa. I1 tiene alcance aclarado en spec.md, diseño en data-model.md y tareas propias; no depende de Q1 ni de aceptar interfaces ajenas. Se usa la investigación ya realizada. Los índices de puertas reciben identificadores explícitos del llamador, sin deducirlos de extremos.
 
-El primer incremento administrará conocimiento sin modificar el motor: exploración por entrada física, avistamiento, recuerdos de puertas observadas y cambios reversibles. Después se conectarán mapa e historia y, con los acuerdos correspondientes, antorcha y viaje. Este documento recoge decisiones candidatas y dependencias; no declara terminado el flujo de planificación.
+I1 administra conocimiento sin modificar el motor: exploración por entrada física, avistamiento, recuerdos de puertas observadas y cambios reversibles. I2 añade evaluación de detención, pruebas ampliadas y demostración. Mapa/historia, antorcha y viaje completo todavía requieren conexiones y acuerdos. Las decisiones de I1/I2 están implementadas; las propuestas de integración permanecen provisionales.
 
 ## Contexto técnico
 
@@ -26,24 +26,25 @@ El primer incremento administrará conocimiento sin modificar el motor: explorac
 | MVC y presupuesto | C no descarga datos ni lee/escribe archivos. No se incorporan esperas de interfaz al reloj. |
 | Datos generales | El tamaño depende del esqueleto recibido, no de criptas conocidas ni del mayor ID. |
 | Especificación previa | Existe commit documental bcb44b8. Los cambios posteriores de especificación deben confirmarse antes de su código. |
-| Medición | Se definen cargas y límites; aún no hay resultados de Parte II de C. |
+| Medición | Hay mediciones locales de I1/I2 en baseline.md; faltan mediciones integradas y el presupuesto del viaje. |
 | Flujo y acuerdos | Revisión de aclaraciones abierta; Q1 y contratos impiden declarar aprobado el plan completo. |
 
-**Estado de la puerta de control:** pendiente. El usuario pidió dejar Q1 abierta y continuar la preparación independiente. Esto no equivale a resolverla, aprobar contratos ni completar plan/tasks/analyze. No se generan tareas ejecutables de implementación hasta cerrar o delimitar formalmente el alcance admitido en el flujo del equipo.
+**Estado de revisión:** el alcance independiente I1/I2 fue delimitado, documentado, revisado y autorizado antes de implementarse. Las tareas T001–T013 están terminadas dentro de ese alcance. Q1 y la aceptación de contratos siguen pendientes para los siguientes incrementos; no se consideran resueltos por autorización local.
 
-## Organización prevista
+## Organización y estado actual
 
-| Archivo | Responsabilidad propuesta |
+| Archivo | Responsabilidad y estado |
 | --- | --- |
-| `modelo/conocimiento.py` | Índices de salas/puertas, grados de conocimiento, observaciones y deltas del mapa. |
+| `modelo/conocimiento.py` | Implementado: índices, estados, observaciones y deltas del mapa. |
+| `modelo/detencion_viaje.py` | Implementado: decisión local de detención, sin ejecutar viaje. |
 | `modelo/viaje.py` | Coordinación de pasos y causas de detención, sin ejecutar eventos por su cuenta. |
 | `modelo/historial.py`, `modelo/inventario.py` | Mantener retroceso y aportar registros de datos reconstruibles; modificación posterior al acuerdo C/A/D. |
 | `tests/test_conocimiento.py` | Estados, memoria, filtrado y reversión. |
 | `tests/test_viaje.py` | Rutas conocidas, condiciones de parada y cancelación. |
 | `tests/test_conocimiento_historia.py` | Adaptación a tipos reales de D y reconstrucción. |
-| `utilidades/bench_conocimiento.py` | Consultas, revelación incremental y cálculo de paso. |
+| `utilidades/bench_conocimiento.py` | Implementado: consultas, revelación, inversión, memoria y proyección; no mide cálculo de paso. |
 
-Los archivos propuestos aún no existen. `modelo/juego.py` y `modelo/rutas.py` se coordinan con A; controlador, snapshots y persistencia con D. No se crean versiones paralelas de sus tipos en C para aparentar integración.
+Existen conocimiento, detención, sus pruebas, la demostración y el benchmark local. Los archivos de viaje completo y prueba de historia siguen propuestos; historial e inventario existentes no se modificaron. `modelo/juego.py` y `modelo/rutas.py` se coordinan con A; controlador, snapshots y persistencia con D. No se crean versiones paralelas de sus tipos en C para aparentar integración.
 
 ## Diseño candidato
 
@@ -51,13 +52,13 @@ Los archivos propuestos aún no existen. `modelo/juego.py` y `modelo/rutas.py` s
 
 Preparar una sola vez un arreglo de IDs ordenado mediante el ordenamiento propio y búsqueda binaria manual. Asociar cada ID a un índice compacto. Las salidas internas retienen índices ya resueltos, evitando búsquedas repetidas al revelar vecinas. El conocimiento ocupa arreglos separados de los datos descargados: desconocida, avistada o explorada, y memoria de puertas independiente del estado real.
 
-Una consulta pública por ID cuesta O(log V); por índice interno O(1). Inicializar índices cuesta O((V+E) log V) como cota de referencia; memoria O(V+E+P). No se atribuye ese trabajo a una entrada normal. La actualización recorre solo las salas y salidas afectadas, O(R+A), donde R son salas procesadas y A sus salidas; se mide aparte cualquier traducción inicial de ID. No se recorre todo el mapa conocido para descubrir qué cambió.
+Una consulta pública por ID cuesta O(log V); por índice interno O(1). Inicializar índices cuesta O((V+P+E) log(V+P) + suma de g·log g por sala), donde g es su grado; incluye ordenar IDs, resolver extremos/destinos y ordenar salidas. Memoria O(V+E+P). No se atribuye ese trabajo a una entrada normal. La actualización recorre solo las salas y salidas afectadas, O(R+A), donde R son salas procesadas y A sus salidas; se mide aparte cualquier traducción inicial de ID. No se recorre todo el mapa conocido para descubrir qué cambió.
 
 La proyección de mapa puede recorrer el índice y costar O(V+E); es una consulta de presentación, no la operación de revelar ni la fuente que se reconstruye antes de cada paso. Si las mediciones justifican un índice adicional de salas conocidas se documentará antes de introducirlo.
 
 ### Cambios reversibles
 
-Registrar por operación únicamente valores que cambian: estado anterior/posterior de sala, recuerdo anterior/posterior de puerta y metadatos necesarios. Revertir un lote invierte su orden. Si una operación vuelve a tocar un mismo campo, se pueden registrar cambios consecutivos sin construir una tabla de deduplicación prohibida. Memoria y aplicación O(D), para D cambios registrados.
+Registrar por operación únicamente valores que cambian: estado anterior/posterior de sala, recuerdo anterior/posterior de puerta y metadatos necesarios. Revertir un lote invierte su orden. Si una operación vuelve a tocar un mismo campo, se pueden registrar cambios consecutivos sin construir una tabla de deduplicación prohibida. Memoria auxiliar O(D); aplicación e inversión O(D log(V+P)) por resolver el ID de cada cambio mediante búsqueda binaria, para D cambios registrados.
 
 El retroceso actual conserva funciones. No se serializan: el plan final debe decidir cómo producir registros de datos en el mismo punto de mutación y reutilizarlos para retroceso/historia sin doble aplicación. Inventario requiere identidad, orden, cursor y equipamiento; la excepción de pergaminos se conserva. No se transforma cada acción en una copia completa del inventario o del mapa.
 
@@ -81,7 +82,7 @@ Revelar vecinas no activa contenido y no se propaga recursivamente. Q1 queda fue
 4. **Viaje:** FR-007–013, FR-015 y FR-017, N1–N3/N6 y C05–C09. Requiere ruta filtrada y resultado/cancelación acordados; verifica la regla de antorcha cuando intervenga.
 5. **Integración y medición:** PR-001–003 y SC-001–004. Solo se cierra con código real de A/D, regresiones, trazabilidad y mediciones; pruebas aisladas no acreditan partida integrada.
 
-Estas son entregas propuestas, no tareas ejecutadas. La lista formal de tareas y el análisis cruzado se prepararán al superar la puerta de control.
+I1 y la evaluación independiente de I2 están implementados conforme a tasks.md. Los puntos de historia, antorcha, viaje completo e integración de esta lista siguen pendientes. Una tarea local terminada no equivale a aceptación de la capacidad completa.
 
 ## Mediciones previstas
 

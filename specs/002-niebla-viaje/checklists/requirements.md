@@ -14,6 +14,6 @@ Fecha: 2026-11-08. Documento: [spec.md](../spec.md).
 - [ ] Fase clarify completada y respuestas registradas.
 - [ ] Revisión cruzada del equipo realizada.
 
-Resultado: borrador apto para iniciar clarify, no para implementar. Los escenarios son criterios futuros; no son pruebas ejecutadas. No existe extensions.yml ni hooks before_specify/after_specify en la base utilizada.
+Estado al 2026-11-09: esta lista evalúa la capacidad completa y conserva sus cuatro pendientes. I1/I2 se delimitaron y autorizaron por separado; su implementación y pruebas están registradas en tasks.md y baseline.md. N1–N6 siguen siendo criterios futuros de integración. No existe extensions.yml ni hooks before_specify/after_specify en la base utilizada.
 
 Seguimiento: iniciada la revisión de aclaraciones. El usuario pidió mantener Q1 pendiente de respuesta oficial. No se cambia su casilla ni se considera resuelta por haber acordado posponerla. El alcance pendiente está delimitado en la especificación.
