@@ -122,6 +122,18 @@ Los identificadores FR son locales a esta capacidad y se citarán con el prefijo
 
 ## Clarifications pendientes
 
+### Incremento I2: pruebas, demostración y decisión de detención
+
+Autorizado el 2026-11-09 para continuar trabajo independiente. No modifica la interfaz ni el estilo visual. Amplía C12/C13 con secuencias reproducibles, ciclos, componentes desconectados y puertas paralelas de identidad distinta. La demostración usa datos sintéticos separados del código del juego.
+
+- **FR-018**: Evaluar, a partir de hechos explícitos de un paso, si el viaje debe detenerse por llegada, daño recibido, entrada con enemigos, ausencia de ruta conocida o cancelación. Conservar todas las causas coincidentes; su orden de presentación será fijo, sin prioridad que cambie la decisión. La función no mueve actores, no busca rutas, no ejecuta retroceso ni cambia conocimiento/reloj.
+- C15: ante cualquiera de las causas de FR-018, el resultado impide continuar; sin ninguna causa permite continuar. Enemigos solo cuentan para esta condición si hubo entrada. Daño sigue siendo un hecho aunque la vida se recupere después.
+- C16: causas simultáneas se conservan y el mismo conjunto de hechos produce el mismo resultado, sin mutar la entrada. Una cancelación suministrada impide continuar aunque también haya ruta. Quien integra conserva el estado de cancelación entre llamadas; esta función pura no gestiona un viaje activo.
+- C17: una secuencia larga de entradas/observaciones, reconstruida e invertida, coincide con un registro de referencia de prueba independiente. Dos puertas entre las mismas salas conservan recuerdos distintos; una región desconectada no se revela desde otra.
+- **PR-004**: Medir memoria asignada al componente y tiempos de consulta de puertas y proyección, con carga/entorno/unidades documentados. La instrumentación de memoria y las mediciones de tiempo se ejecutan por separado. No se presenta como evidencia del límite de viaje completo.
+
+I2 aclara solamente estas operaciones independientes. Q1 y los contratos de motor/controlador/persistencia siguen pendientes. FR-018 prepara parte de FR-011/015, pero no acredita esos requisitos integrados ni N3/N6 por sí solo.
+
 ### Alcance aclarado del incremento I1
 
 - Autorización textual: «okay, entonces hagamos todo lo que no dependa de mis compañeros o sea util y no les cause conflicto».

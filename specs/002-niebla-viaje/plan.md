@@ -91,4 +91,12 @@ Para viaje: mapa completo de referencia, alternativas de costo distinto, empates
 
 ## Riesgos y alternativas
 
+### Ampliación I2 (2026-11-09)
+
+Implementar `modelo/detencion_viaje.py` como función pura sobre un registro inmutable de hechos booleanos: llegada, daño, entrada, enemigos, ruta disponible y cancelación. Devolver registro inmutable con tupla de causas y propiedad continuar. Orden fijo: cancelación, daño, enemigos, llegada, sin ruta; se retienen todas las causas. Son etiquetas internas, no prioridades nuevas del juego. Costo O(1); no necesita índice, reloj, azar ni búsquedas. Alternativa descartada en este incremento: máquina de estados de viaje, pues requeriría acordar el ciclo del controlador. No se altera la función de rutas de A ni la fachada de D.
+
+Ampliar pruebas con referencia independiente de arreglos de prueba, semilla fija y snapshots permitidos solo como oráculo de pruebas. Añadir `tests/demo_conocimiento.py`; escenarios fijos permanecen bajo tests. La demostración imprime estados y reversión con el formato de datos de C, no reemplaza la vista del juego.
+
+Ampliar `utilidades/bench_conocimiento.py`: cadena con puertas explícitas; consultas y proyección con mapa totalmente conocido; tracemalloc para memoria viva/pico del constructor (esqueleto preparado antes), sin mantener instrumentación durante medidas de tiempo. El uso de tracemalloc es herramienta de medición, no estructura de la solución evaluada. Sin dependencias nuevas. Uso de memoria no equivale al tamaño de un archivo de guardado ni al consumo total del proceso.
+
 Véase [research.md](research.md). No se solicita excepción a estructuras propias. El riesgo de comenzar conexiones antes de acordar sus datos es mayor que el de mantener temporalmente un módulo independiente. Este plan no promete ausencia de conflictos futuros ni cumplimiento de 5 ms sin mediciones.
