@@ -10,3 +10,5 @@ Desde la raíz del repositorio, después de implementar las tareas:
 Se espera que las pruebas comprueben mapa filtrado, memoria independiente y reconstrucción/reversión sin red ni vista. El benchmark local separado no sustituye la futura conexión a `--bench` de D ni acredita el límite del viaje.
 
 El juego todavía no consume el componente. No aparecerá el mapa nuevo en la interfaz por ejecutar main. El contrato local está en data-model.md; la adaptación a A/D sigue en contracts/propuesta-integracion.md. Q1 no se implementa.
+
+Validación realizada: 16 pruebas específicas pasan. El benchmark anterior se ejecutó; valores y entorno en baseline.md. `mapa_conocido()` devuelve datos inmutables, no la secuencia de líneas que espera la fachada de D: se conserva explícitamente esa frontera para su futura adaptación.

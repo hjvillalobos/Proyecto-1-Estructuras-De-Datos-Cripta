@@ -830,3 +830,19 @@ Prompt textual de investigación delegada, requerida por speckit-plan:
 > La habilidad speckit-plan pide investigación delegada. Solo lectura: revisa modelo/historial.py, inventario.py, rastro.py, tipos.py y las interfaces de origin/004-linea-tiempo/modelo/snapshots.py (git show). Propón estructura propia para conocimiento y deltas que cumpla actualización incremental, IDs dispersos y serialización. Identifica límites reales, no afirmes contratos aprobados. No edites archivos ni implementes. Q1 antorcha sigue pendiente; concentra diseño independiente.
 
 Uso de respuesta: comparar índice compacto con indexación directa por ID, conservar diferencia entre rollback y retroceso, señalar restauración de cursor y adaptar valores a los tipos históricos existentes. Son decisiones candidatas documentadas; no contratos aceptados.
+
+### Persona C — implementación del incremento I1 — 2026-11-08
+
+Herramienta: Codex desktop; identificador exacto de modelo no registrado.
+
+Prompts textuales recientes:
+
+> okay, que mas se puede hacer?
+
+> o sea, no se puede avanzar mas?
+
+> okay, entonces hagamos todo lo que no dependa de mis compañeros o sea util y no les cause conflicto
+
+Uso: delimitar y aclarar I1, adaptar plan y datos, generar tareas mediante flujo speckit-tasks y revisar consistencia antes de implementar. La autorización permite continuar I1 sin resolver las casillas generales ajenas a ese alcance; no se marcaron como cumplidas. Se usó speckit-implement con pruebas previas, implementación propia, regresión y mediciones locales. No existe extensions.yml; no hubo hooks de las fases. La investigación de planificación anterior se reutilizó, sin agentes de edición adicionales.
+
+Se confirmó primero documentación en fa5418a, después se implementó conocimiento básico, observaciones y deltas en archivos nuevos. Resultado: 16 pruebas nuevas y 125 seleccionadas existentes pasan. Q1, contratos compartidos, historia/inventario, antorcha y viaje permanecen pendientes. No se publica ni se modifica main, y puntajes se excluyen de los commits.
