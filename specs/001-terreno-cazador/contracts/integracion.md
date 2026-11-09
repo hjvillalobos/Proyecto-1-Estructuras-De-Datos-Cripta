@@ -9,7 +9,7 @@
 | ID | Responsable del acuerdo/entrega | Evidencia verificable requerida | Consumidores principales | Estado |
 | --- | --- | --- | --- | --- |
 | E-B-COSTOS | B con A | B debe demostrar cómo llegan al motor de A los costos válidos de las salidas, con identidad y versión de cripta verificables y sin HTTP durante la búsqueda. El profesor confirmó, según el usuario, que el costo ausente vale 100 y se asume simétrico. [Aclaración y límites de Q2](../research.md#aclaración-del-profesor-sobre-q2). La aceptación es independiente de E-B-RANGO. | T013, T014, T025 | PENDIENTE |
-| E-B-RANGO | B con A | Suministro y acceso verificables al rango de cazadores, versiones, identidad y datos válidos, sin HTTP durante búsqueda. Aceptación independiente de costos; no cierra Q1. | T025; no T013/T014 | PENDIENTE |
+| E-B-RANGO | B con A | Suministro y acceso verificables al rango de cazadores, con identidad y versión, sin HTTP durante la búsqueda. B debe preservar tres estados: entero válido (límite inclusivo), `null` explícito (sin tope de costo) y campo ausente (tratamiento pendiente en Q1). También sigue pendiente el tratamiento de valores inválidos. Aceptación independiente de costos. | T025; no T013/T014 | PENDIENTE |
 | E-BC-PUERTA | B/C/A | Identidad de puerta, lectura de ambos extremos y coherencia de cambios reales. | T029, T032 | PENDIENTE |
 | E-C-RUTA | C con A | Fuente filtrada, firmas/modos/estados de consulta y criterios de aceptación acordados. | T023, T024 y solo las extensiones filtradas que lo usen | PENDIENTE |
 | E-C-DESPACHO | C con A | Punto de conexión del cazador, firma y conservación de decisiones existentes. | T025 | PENDIENTE |
@@ -26,13 +26,13 @@ Q1/Q2 y Q3 tienen registros de evidencia separados en research.md. A puede descr
 ## A–B: entrada de datos
 
 - B provee esqueleto completo con versiones de cripta, IDs, conexiones y costos; fichas de enemigos y rango ya disponibles sin red dentro de rutas.
-- Para datos válidos: costo ausente equivale a 100, declarado entero ≥1, igual en ambos sentidos; rango es entero en unidades de costo. No inferir mínimo, default, rechazo o normalización: Q1/Q2 abiertas.
+- Para datos válidos: costo ausente equivale a 100, declarado entero ≥1, igual en ambos sentidos; un rango entero válido limita el costo en forma inclusiva y un `null` explícito indica búsqueda sin tope de costo, según la [aclaración del profesor](../research.md#aclaración-del-profesor-sobre-q1). Q1 y Q2 conservan los casos pendientes de ausencia, invalidez o inconsistencia que correspondan.
 - A recibe una vista de datos de juego; desconoce si origen fue HTTP u offline. B administra presupuesto, UUID, lotes, versiones, fichas retenidas y errores de adquisición.
 - Salida ponderada propuesta: origen/dirección/destino/costo/referencia de puerta. Identidad de puerta entre extremos y sincronización deben acordarse antes del cache de A. A no copia unilateralmente el costo de un extremo al otro.
 - Si cambia cripta/versión se reconstruye identidad del grafo; no reutilizar índices de una versión distinta.
 - Pendiente con B: campos garantizados, disponibilidad de rango sin descarga durante búsqueda y cómo representar/reportar datos fuera de contrato. Mocks solo con autorización posterior.
 
-**Comunicación de B sobre OpenAPI 1.1.0:** el usuario transmite que B encontró Enemy.rango opcional y nullable, entero ≥1 cuando tiene valor, sin default ni obligación adicional para cazador; Exit dirigido con costo opcional y nullable, entero ≥1 cuando tiene valor, sin default ni garantía de simetría declarados. No disponemos de copia verificable ni fragmentos originales: esto no es verificación independiente ni contrato aprobado. El [contraste y procedencia](../research.md#comunicación-reportada-de-b-sobre-openapi-110) mantiene la autoridad de Parte II §§3.1–3.2: costo ausente 100, igual en ambos sentidos y ficha de cazador con rango. Rango ausente/null, costo null e inconsistencias siguen pendientes Q1/Q2; no equiparar null con campo ausente ni normalizar/rechazar por iniciativa de A.
+**Comunicación de B sobre OpenAPI 1.1.0:** el usuario transmite que B encontró Enemy.rango opcional y nullable, entero ≥1 cuando tiene valor, sin default ni obligación adicional para cazador; Exit dirigido con costo opcional y nullable, entero ≥1 cuando tiene valor, sin default ni garantía de simetría declarados. No disponemos de copia verificable ni fragmentos originales: esto no es verificación independiente ni contrato aprobado. El [contraste y procedencia](../research.md#comunicación-reportada-de-b-sobre-openapi-110) mantiene la autoridad de Parte II §§3.1–3.2: costo ausente 100, igual en ambos sentidos y ficha de cazador con rango. El rango ausente o inválido sigue pendiente en Q1. El costo `null` y las inconsistencias siguen pendientes en Q2. El rango `null` explícito se rige por la aclaración del profesor y debe distinguirse del campo ausente.
 
 ## A–C: ruta y despacho
 

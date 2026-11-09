@@ -140,3 +140,28 @@ class PruebasLocalidadRutas(unittest.TestCase):
                         # Holgura para objetos temporales de Python, menor
                         # que reservar un arreglo proporcional al mapa mayor.
                         self.assertLessEqual(pico, pico_local + 4096)
+
+    def test_busqueda_finita_reutiliza_estructuras_despues_de_una_ilimitada(self):
+        grafo, espacio, frontera = preparar_mapa(64)
+        esperado, operaciones, _ = self.medir_consulta(grafo, espacio, frontera, 80)
+
+        # La salida temprana deja pendientes. La consulta larga alcanza
+        # salas que una búsqueda finita con LIMITE nunca visita.
+        for destino, ruta in ((80, (3, "N", 2, 4)), (1062, (7, "E", 1, 68))):
+            with self.subTest(destino=destino):
+                resultado = buscar_ruta(
+                    grafo, espacio, frontera, grafo.indice(90),
+                    grafo.indice(destino), None,
+                )
+                self.assertEqual(resultado, (grafo.indice(ruta[0]), *ruta[1:]))
+                if destino == 80:
+                    self.assertGreater(frontera.descartados, 0)
+                else:
+                    self.assertGreater(frontera.extraidos, operaciones[0])
+                self.assertEqual(len(frontera), 0)
+
+                actual, operaciones_actuales, _ = self.medir_consulta(
+                    grafo, espacio, frontera, 80,
+                )
+                self.assertEqual(actual, esperado)
+                self.assertEqual(operaciones_actuales, operaciones)
