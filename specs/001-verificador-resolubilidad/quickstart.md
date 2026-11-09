@@ -1,6 +1,6 @@
 # Guía de validación del verificador
 
-Implementación de B realizada el 2026-11-02, después del commit de preparación `17dc4bc`. Están disponibles el análisis, la preparación HTTP/offline y las funciones de medición. La integración de D con el inicio del juego y el comando general de benchmark continúa pendiente.
+Implementación de B realizada el 2026-11-02, después del commit de preparación `17dc4bc`. Están disponibles el análisis, la preparación HTTP/offline y las funciones de medición. D conectó el inicio y el benchmark en `004-linea-tiempo`.
 
 ## Entorno
 
@@ -61,13 +61,23 @@ finally:
 
 El ID es un ejemplo de uso, no una condición incrustada en el algoritmo. El catálogo publicado puede cambiar. Las carpetas de caché son locales y no acompañan el repositorio.
 
-## Medición prevista tras integración con D
+## Medición desde la CLI
 
 ```powershell
 python bench.py --subsistemas resolubilidad --tamanos 32 256 1024 --repeticiones 10 --semilla 20261101
 ```
 
-La opción del subsistema todavía no existe. Comparar incremental y repetitivo con cadenas, ciclos y ubicaciones alternativas; comprobar igualdad de dictámenes y validez de órdenes antes de medir. Incluir normalización, diagnóstico y reporte en el total. Red y lectura de disco se miden aparte.
+Sin paquete se comparan ambos algoritmos con cadenas, ciclos y ubicaciones
+alternativas. Para medir una cripta preparada se usa el modo offline.
+
+```powershell
+python main.py --bench --subsistemas resolubilidad --paquete .cache/cripta --cripta ID --repeticiones 10
+```
+
+Se puede indicar `--version-cripta VERSION` para seleccionar una copia
+histórica. El comando separa lectura y validación del paquete del análisis,
+que incluye normalización, recorrido, diagnóstico y reporte. Muestra
+las muestras y la dispersión de cada estrategia sin hacer solicitudes.
 
 Medir además la mayor cripta publicada con datos locales completos, registrando ID, versión, tamaños y equipo. Informar todas las muestras, promedio, dispersión y máximo; no declarar aprobado el límite de 200 ms por cumplir solo el promedio.
 
@@ -104,6 +114,5 @@ Los datos observados cumplen 200 ms para esa versión y equipo; no certifican ot
 mapas ni el ciclo de juego de 20 ms. La evaluación académica del crecimiento
 aproximadamente lineal se conserva pendiente.
 
-Pendientes compartidos: T025, T026 y T030, más la revisión cruzada B↔D.
-No usar `--verificar`, `--forzar` ni el subsistema `resolubilidad` del comando general
-como si esta rama ya los hubiera conectado.
+Pendientes compartidos: revisión cruzada B↔D y medición de aceptación con
+el paquete de referencia. [Evidencia de integración de D](../004-linea-tiempo/aceptacion.md).

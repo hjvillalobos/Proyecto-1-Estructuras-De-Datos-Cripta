@@ -54,7 +54,9 @@ class TestSeleccionCriptas(unittest.TestCase):
         sesion = Mock()
         sesion.cliente.listar_criptas.return_value = {"criptas": CRIPTAS}
         sesion.precarga.preparar_cripta.return_value.salas = [Mock(id=1)]
-        with patch("main.SesionDatos", return_value=sesion), redirect_stdout(io.StringIO()):
+        with patch("main.SesionDatos", return_value=sesion), \
+                patch("red.verificacion.preparar_verificacion", return_value=Mock(version="v1")), \
+                redirect_stdout(io.StringIO()):
             self.assertEqual(main.main(["--descargar-todo"]), 0)
         self.assertEqual(sesion.renovar.call_count, 3)
         self.assertEqual([llamada.args[0] for llamada in sesion.precarga.preparar_cripta.call_args_list],

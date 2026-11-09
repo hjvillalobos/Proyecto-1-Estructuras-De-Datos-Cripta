@@ -7,12 +7,14 @@ from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
 from controlador.partida_historica import integrar_historia
+from controlador.resumen_historia import consultar
 from datos.guardado_binario import (ArchivoGuardado, ErrorGuardado, FormatoIncompatible, GuardadoCorrupto,
                                      guardar_estado, cargar_estado_partida)
 from datos.historia_binaria import codificar_historia, decodificar_historia
 from modelo.errores_historia import CambioHistoriaIncoherente, ReferenciaHistoricaInvalida
 from modelo.linea_tiempo import LineaTiempo
 from tests.datos_integracion_d import ProductorPrueba, cambio
+from tests.datos_terreno_cazador import motor_terreno
 
 
 class HistoriaMotorTest(unittest.TestCase):
@@ -30,6 +32,30 @@ class HistoriaMotorTest(unittest.TestCase):
         with self.assertRaises(ReferenciaHistoricaInvalida):
             historia.consultar_t(251)
         self.assertEqual(estado, partida.exportar_estado())
+        self.assertTrue(partida.ejecutar("esperar").ok)
+        self.assertEqual(consultar(historia, "250").estado.obtener("jugador")[0],
+                         estado.jugador.vida)
+        self.assertEqual(consultar(historia, "#2").estado.obtener("jugador")[0],
+                         estado.jugador.vida)
+
+    def test_fr002_fr003_h3_frontera_del_motor_real(self):
+        with motor_terreno() as motor:
+            motor.cola.fijar_contador(10)
+            partida = integrar_historia(motor, 2)
+            if partida is motor:
+                self.skipTest("Falta el productor de cambios históricos del motor.")
+            vida_inicial = motor.jugador.vida
+            self.assertTrue(partida.ejecutar("mover", "E").ok)
+            self.assertEqual(motor.reloj, 100)
+            vida_en_la_frontera = motor.jugador.vida
+            self.assertLess(vida_en_la_frontera, vida_inicial)
+            self.assertTrue(partida.ejecutar("esperar").ok)
+            historia = partida.linea_tiempo
+            for referencia, vida in (("99", vida_inicial), ("100", vida_en_la_frontera),
+                                     ("#2", vida_en_la_frontera)):
+                with self.subTest(referencia=referencia):
+                    self.assertEqual(consultar(historia, referencia).estado.obtener("jugador")[0],
+                                     vida)
 
     def test_fr002_fr011_accion_terminal_instantanea_respeta_la_decision(self):
         historia = LineaTiempo(ProductorPrueba().estado_historico_inicial(), 1)

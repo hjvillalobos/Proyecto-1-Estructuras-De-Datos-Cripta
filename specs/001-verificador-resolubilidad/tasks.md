@@ -140,4 +140,9 @@ Primero base + US1 como MVP verificable con datos sintéticos. Añadir diagnóst
 - T031: mediciones y decisión documentadas; las muestras de la cripta real cumplen 200 ms en este equipo. Se mantiene abierta por la dependencia de T030 y la revisión del crecimiento aproximadamente lineal de FR-015. No se deduce cumplimiento asintótico de los tiempos.
 - T032: auditoría de B y regresiones completadas sin fallos; cierre transversal pendiente de la integración y pruebas de D.
 - T034: prompt y trazabilidad registrados con autorización. Falta revisión cruzada B↔D; conservar esta casilla pendiente hasta completarla.
+
+Avance de D del 2026-11-08. La conexión de T030 se implementó y verificó
+en `004-linea-tiempo` con paquetes de prueba. Se conservan pendientes la
+revisión de B y la medición de aceptación con la mayor cripta publicada.
+[Evidencia de D](../004-linea-tiempo/aceptacion.md#benchmark-de-un-paquete-offline).
 - `.idea/` se conserva sin modificaciones. No hay hooks de implementación en `.specify/extensions.yml`.
