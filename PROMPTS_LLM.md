@@ -846,3 +846,19 @@ Prompts textuales recientes:
 Uso: delimitar y aclarar I1, adaptar plan y datos, generar tareas mediante flujo speckit-tasks y revisar consistencia antes de implementar. La autorización permite continuar I1 sin resolver las casillas generales ajenas a ese alcance; no se marcaron como cumplidas. Se usó speckit-implement con pruebas previas, implementación propia, regresión y mediciones locales. No existe extensions.yml; no hubo hooks de las fases. La investigación de planificación anterior se reutilizó, sin agentes de edición adicionales.
 
 Se confirmó primero documentación en fa5418a, después se implementó conocimiento básico, observaciones y deltas en archivos nuevos. Resultado: 16 pruebas nuevas y 125 seleccionadas existentes pasan. Q1, contratos compartidos, historia/inventario, antorcha y viaje permanecen pendientes. No se publica ni se modifica main, y puntajes se excluyen de los commits.
+
+### Persona C — ampliación I2 — 2026-11-09
+
+Herramienta: Codex desktop; identificador exacto de modelo no registrado.
+
+Prompts textuales:
+
+> de acuerdo, quedamos hasta ahí o se puede hacer mas?
+
+> algo mas o solo eso podemos hacer sin depender de ellos?
+
+> hazlo y si tienes que hacer algo grafico, tiene que mantener el mismo mismo estilo con el que se ha venido trabajando
+>
+> adelante, recuerda ser muy inteligente con lo que se hace y no uses cosas que no se deberían usar
+
+Uso: definir FR-018/PR-004 y C15–C17, actualizar plan/tareas, revisar consistencia del alcance y confirmar documentación en e3e16a6 antes del código. Reutilizar instrucciones de las fases spec-kit ya leídas, consultar constitución y scripts de requisitos; sin hooks configurados. Implementar decisión pura de detención, pruebas de secuencias y combinaciones, demostración por consola y mediciones separadas de memoria/tiempo. No se añade GUI ni se alteran estilos. Q1 y conexiones ajenas siguen pendientes. Se ejecutaron 148 pruebas seleccionadas con resultado OK; benchmark y límites están en baseline.md. No hay publicación ni cambio en main.

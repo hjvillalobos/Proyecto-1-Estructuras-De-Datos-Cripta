@@ -13,3 +13,7 @@ Diseño local de C; no modifica tipos compartidos. Python 3.11+, dataclasses inm
 Aplicación de lotes: validar tipo/ámbito/valores, comparar anterior esperado, aplicar secuencialmente y deshacer el prefijo aplicado si falla. Revertir recorre en orden inverso e intercambia anterior/nuevo. Esto conserva atomicidad sin copiar todo el mapa ni crear índices dict/set. No valida una historia externa completa; requiere misma definición del esqueleto. Solo la integración futura administra versiones.
 
 `entrar(sala_id)` devuelve cambios de exploración/avistamiento. `observar_puerta(sala_id, puerta_id, cerrada)` devuelve cambio de memoria. `aplicar(cambios)` y `revertir(cambios)` usan lotes de tuplas. `estado_sala`, `recuerdo_puerta` y `mapa_conocido` son lecturas. `mapa_conocido` devuelve datos, no las líneas que espera la fachada de D: ese adaptador queda pendiente y no se instala en el motor.
+
+## Datos locales de I2
+
+`HechosPaso(llegada, recibio_dano, hubo_entrada, enemigos_al_entrar, ruta_disponible, cancelado)` exige seis booleanos explícitos; no acepta 0/1 como sustitutos. Es inmutable. `evaluar_detencion` produce `DecisionDetencion(causas)`, también inmutable; `continuar` es verdadero solo cuando la tupla de causas está vacía. Las causas son etiquetas internas para un futuro adaptador, no mensajes que se insertan en la vista. El registro no incluye vida final porque no permite deducir con fiabilidad si ocurrió daño.

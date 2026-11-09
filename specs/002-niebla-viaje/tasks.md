@@ -28,10 +28,10 @@ Pendientes fuera de I1: FR-006–013, FR-015–016, PR-001/003 y SC-001; FR-014/
 
 ## I2: ampliación independiente autorizada
 
-- [ ] T009 [US3] Añadir secuencias C17 con semilla fija y referencia independiente, ciclos, desconexión y puertas paralelas en `tests/test_conocimiento_secuencias.py` (FR-003/004/014/017).
-- [ ] T010 [US2] Escribir C15/C16 en `tests/test_detencion_viaje.py` y luego implementar función pura en `modelo/detencion_viaje.py` (FR-018).
-- [ ] T011 Preparar demostración reproducible con aserciones en `tests/demo_conocimiento.py`, sin vista nueva ni persistencia (FR-001–005/014).
-- [ ] T012 Ampliar medición separada de memoria, puerta y proyección en `utilidades/bench_conocimiento.py`; registrar resultados en `baseline.md` (PR-004).
-- [ ] T013 Verificar pruebas nuevas/regresión y actualizar `quickstart.md` y `baseline.md`, con límites de I2 (FR-017/018, PR-004).
+- [x] T009 [US3] Añadir secuencias C17 con semilla fija y referencia independiente, ciclos, desconexión y puertas paralelas en `tests/test_conocimiento_secuencias.py` (FR-003/004/014/017).
+- [x] T010 [US2] Escribir C15/C16 en `tests/test_detencion_viaje.py` y luego implementar función pura en `modelo/detencion_viaje.py` (FR-018).
+- [x] T011 Preparar demostración reproducible con aserciones en `tests/demo_conocimiento.py`, sin vista nueva ni persistencia (FR-001–005/014).
+- [x] T012 Ampliar medición separada de memoria, puerta y proyección en `utilidades/bench_conocimiento.py`; registrar resultados en `baseline.md` (PR-004).
+- [x] T013 Verificar pruebas nuevas/regresión y actualizar `quickstart.md` y `baseline.md`, con límites de I2 (FR-017/018, PR-004).
 
 T009 y T010 son independientes, pero cada prueba precede a su implementación. T011 utiliza I1 existente. T012 usa carga propia de medición; T013 depende de T009–T012. No modifica interfaz ni módulos de los demás integrantes.
