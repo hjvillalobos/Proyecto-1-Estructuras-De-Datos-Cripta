@@ -4,6 +4,9 @@ AYUDA = """\
 Comandos:
   n / s / e / o           moverse (norte, sur, este, oeste)      [mover <dir>]
   abrir <dir>             abrir la puerta de esa dirección con la llave adecuada
+  historia <t|#k>         consultar el pasado de la partida
+  mapa                    mostrar el mapa conocido
+  ir a <sala>             viajar por el mapa conocido
   atacar [id]             atacar (si hay un solo enemigo, el id es opcional)
   esperar                 pasar el tiempo
   recoger [id]            recoger un objeto del suelo
@@ -55,7 +58,7 @@ class VistaConsola:
         if e.salidas:
             partes = []
             for sal in e.salidas:
-                txt = f"{sal.direccion} -> sala {sal.destino}"
+                txt = f"{sal.direccion} -> sala {sal.destino} (costo {sal.costo})"
                 if sal.cerrada:
                     txt += " [CERRADA" + (f", llave {sal.llave}" if sal.llave else "") + "]"
                 partes.append(txt)
@@ -65,7 +68,8 @@ class VistaConsola:
         if e.enemigos:
             s("Enemigos:")
             for en in e.enemigos:
-                s(f"   [{en.instancia}] {en.nombre}  vida {en.vida}/{en.vida_max}")
+                tipo = " [cazador]" if en.comportamiento == "cazador" else ""
+                s(f"   [{en.instancia}] {en.nombre}{tipo}  vida {en.vida}/{en.vida_max}")
         else:
             s("Enemigos: (ninguno)")
         if e.objetos_suelo:
@@ -102,6 +106,9 @@ class VistaConsola:
 
     def mostrar_error(self, texto):
         self._salida(f"(!) {texto}")
+
+    def mostrar_informe(self, titulo, texto):
+        self._salida(texto)
 
     def mostrar_info(self, texto):
         self._salida(texto)

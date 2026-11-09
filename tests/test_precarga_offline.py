@@ -185,7 +185,7 @@ class TestOffline(unittest.TestCase):
                     self.assertEqual(args.datos_dir, args.offline)
             args = leer_argumentos(["--offline", "paquete", "--datos-dir", "sesion"])
             self.assertEqual(Path(args.offline), self.paquete.resolve())
-            self.assertEqual(Path(args.datos_dir), self.raiz / "sesion")
+            self.assertEqual(Path(args.datos_dir), (self.raiz / "sesion").resolve())
         finally:
             os.chdir(anterior)
 
@@ -211,6 +211,6 @@ class TestOffline(unittest.TestCase):
         errores = io.StringIO()
         with redirect_stdout(salida), redirect_stderr(errores):
             codigo = main(["--offline", str(self.paquete), "--cripta", "ausente",
-                           "--datos-dir", str(self.raiz / "sesion")])
+                           "--datos-dir", str(self.raiz / "sesion"), "--descargar-todo"])
         self.assertEqual(codigo, 1)
         self.assertIn("faltan datos", errores.getvalue())

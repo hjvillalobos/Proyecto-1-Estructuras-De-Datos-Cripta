@@ -6,6 +6,7 @@ from copy import deepcopy
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import Mock, patch
+from tests.datos_integracion_d import reporte_prueba
 
 import main
 from datos.guardado_binario import guardar_estado, cargar_estado
@@ -104,6 +105,7 @@ class TestCuatroFallosRevision(unittest.TestCase):
                 args = ["--cripta", "prueba", "--version-cripta", "v1",
                         "--version-catalogo", "cat1", "--semilla", "42"]
                 with patch("main.SesionDatos", return_value=sesion), \
+                        patch("controlador.aplicacion.verificar", return_value=reporte_prueba()), \
                         patch("vista.consola.VistaConsola", return_value=vista), \
                         patch("vista.grafica.VistaGrafica", return_value=vista), \
                         patch("modelo.juego.crear_juego", return_value=Mock(resultado=None)) as crear, \

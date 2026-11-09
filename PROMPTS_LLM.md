@@ -877,3 +877,90 @@ modelo no se consigna porque no está confirmada para estas intervenciones.
 - **Herramienta/modelo:** Codex.
 - **Prompt textual:** «Continua con el speckit-implement».
 - **Uso de la respuesta:** Implementación del verificador de resolubilidad siguiendo la especificación, el plan y las tareas previamente aprobados. Las tareas completadas y las pruebas ejecutadas se registran según los resultados reales.
+
+
+## 2026-11-02 — preparación de línea de tiempo
+
+
+
+Contexto textual previo:
+
+> lee los pdf y ayudame a completar todo para poder empezar a programar
+
+Uso: crear rama desde main conservando constitución/configuración, redactar especificación y clarificaciones basadas en enunciado/código, plan, investigación, datos, contratos y tareas; aplicar revisión de consistencia. Se usaron las instrucciones locales speckit-specify, clarify, plan, tasks y analyze como flujo del agente; no son programas de generación ejecutados mediante una CLI. Scripts de resolución, preparación y comprobación se ejecutan desde .specify. Sin código nuevo del juego ni publicación remota.
+
+Prompt textual a agente de investigación requerido por speckit-plan:
+
+> La habilidad speckit-plan exige agentes de investigación. Solo lectura: revisa modelo/juego.py e historial.py en C:/Users/Belén/Documents/2026/Datos/Proyecto/Proyecto-1-Estructuras-De-Datos-Cripta para determinar fronteras acciones/eventos, pergamino, captura serializable. Devuelve decisiones de diseño compatibles y riesgos concretos. No edites archivos.
+
+Uso de respuesta: capturar cambios tipados en lugar de closures, exigir cierre de lote temporal, conservar excepción persistente del pergamino y separar reconstrucción del restaurador con catálogo. Pruebas actuales y límites en baseline.md. No se atribuyen resultados de benchmarks todavía no ejecutados.
+
+
+## 2026-11-02 — núcleo de línea de tiempo
+
+Herramienta: Codex desktop; modelo concreto no expuesto. Prompt textual:
+
+> okay empecemos con el codigo entonces la parte que me toca a mi, que se puede ir haciendo sin depender de los compañeros?
+
+Uso: aplicar speckit-implement al subconjunto independiente T002/T004–T006/T009. Checklist de requisitos: 8 satisfechos, 0 pendientes; scripts de prerrequisitos correctos; sin extensions.yml ni hooks. Se precisó el plan y el orden del núcleo sintético antes del código en commit 9ac1088. Se implementaron contratos inmutables, estado puro con búsqueda propia, deltas/checkpoints, consultas y recorte. Pruebas escritas antes del módulo; fallo inicial esperado por importación aún inexistente. Después: 14 nuevas pruebas correctas, 147 incluyendo regresión seleccionada. Demo ejecutada. No se modificaron reglas del motor, guardado binario, red ni vista. Integración pendiente.
+
+
+## 2026-11-02 — persistencia del núcleo histórico
+
+Herramienta: Codex desktop; modelo concreto no expuesto. Solicitud textual:
+
+
+
+> okay hazlo, pero antes tengo una duda, tu puedes ver el primer enunciado? cripta parte 1? Es que necesito que todo vaya acorde a los dos enunciados para garantizar un trabajo correcto
+
+Uso: revisar archivo P1 indicado (0 bytes, imposible extraer contenido), continuar el guardado/carga del núcleo aislado conforme al plan. No se afirma haber leído P1. Se aplicó el subconjunto T022–T024 de speckit-implement tras prerrequisitos y checklist ya completos; no hay extensions.yml ni hooks. Precisión documental previa al código en commit 4bbc87b. Pruebas escritas primero, fallo esperado de módulo aún inexistente; implementados contratos exportables, carga validada y codec CRLH con escritura atómica. 164 pruebas aprobadas en regresión seleccionada, incluidas 31 nuevas de núcleo/persistencia. Sin cambios de reglas, guardado integrado, vista o red. No se publicaron cambios remotos.
+
+
+## 2026-11-02 — decisiones, prompts y manejo de errores
+
+Herramienta: Codex desktop; modelo concreto no expuesto. Prompt textual:
+
+> tambien ocupo que metas las deciciones, promots y los manejo de errores ya que nos bajaron puntos en la parte 1 por el manejo de errores le faltaba un poco mas de documentacion, es buena idea no?
+
+Uso: revisar y completar las decisiones del núcleo, conservar las entradas anteriores de esta bitácora y añadir la matriz de manejo de errores. Se precisó el diseño antes de cambiar el código, en commit 129bdbf. Bajo speckit-implement, prerrequisitos correctos, checklist previo completo y sin extensions.yml/hooks. Se escribió primero tests/test_errores_historia.py y se observó el fallo esperado por módulo aún inexistente. Se implementaron clases de dominio compatibles con ValueError, validación de claves/rutas/datos binarios y conservación del error principal si falla la limpieza del temporal. Regresión seleccionada: 172 pruebas aprobadas, incluidas 8 nuevas de errores. Sin cambios de vista, red o reglas del motor; no se anuncia integración completa ni rendimiento no medido.
+
+## 2026-11-06 — integración de la persona D
+
+Herramienta: Codex desktop. Prompts textuales:
+
+> en base a los enunciados y mi parte D no puedo seguir avanzando ? con el codigo? puedes revisar github tambien
+
+> ya me traje los cambios a mi rama linea del tiempo, los cambios son del motor, que puedo ir avanzando?
+
+> hazlo todo, pero haz pruebas de todo, sigue el enunciado al pie de le letra, haz los prompts, deciciones no te equivoques por favor sigue la parte D
+
+> solo puedes trabajar en la rama linea tiempo
+
+Uso: revisar el enunciado, el reparto y las referencias Git, actualizar la copia
+local a a7acb0e, analizar los requisitos y ejecutar la implementación y las
+pruebas de D en 004-linea-tiempo. Registrar decisiones y resultados reproducibles.
+
+Alcance confirmado por la usuaria: D implementa el receptor y sus
+consumidores. A conserva los puntos de captura y las reglas del ciclo,
+incluido el cierre de empates. El receptor se prueba con el protocolo
+propuesto y no atribuye esa prueba al motor todavía sin instrumentar.
+La integración consume el verificador de B cuando esté disponible en la rama.
+
+Prompts textuales adicionales del 2026-11-06 (Codex desktop):
+
+> porfa nunca hagas trabajo de A
+
+> solo trabaja con la parte de D plis, haz todo lo que puedas
+
+Uso: retirar la instrumentación local iniciada en archivos del motor y delimitar
+el incremento al receptor, los adaptadores y la validación a cargo de D.
+
+## 2026-11-07 — evidencia de implementación de D
+
+Herramienta: Codex desktop. Se aplicaron las instrucciones locales
+speckit-analyze y speckit-implement a la solicitud textual ya registrada.
+Se contrastaron las reglas de tiempo, guardado, replay y benchmark con
+los enunciados. Se incorporaron consumidores y pruebas de D, con
+productores simulados donde todavía faltan contratos reales. Se registraron
+decisiones, mediciones, errores, regresiones y dependencias en sus archivos.
+No se enviaron prompts a otros agentes ni se atribuyen acuerdos a compañeros.

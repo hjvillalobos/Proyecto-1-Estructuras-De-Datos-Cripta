@@ -3,7 +3,10 @@ from pathlib import Path
 
 from datos.bitacora_replay import RUTA_REPLAY_PREDETERMINADA
 
-from red.errores import ErrorCripta
+from red.errores import DatosNoDisponibles, ErrorCripta
+from controlador.verificacion import permite_inicio, texto_reporte, verificar
+from controlador.partida_historica import integrar_historia
+from subprocess import CalledProcessError
 
 
 def ejecutar_juego(args, sesion, lanzador_replay):
@@ -26,6 +29,7 @@ def ejecutar_juego(args, sesion, lanzador_replay):
 
         vista = VistaConsola()
 
+    checkpoint = getattr(args, "checkpoint_cada", None)
     try:
         def cargar_datos(funcion, *argumentos, **opciones):
             if args.gui and callable(getattr(type(vista), "ejecutar_tarea", None)):
@@ -35,21 +39,23 @@ def ejecutar_juego(args, sesion, lanzador_replay):
         estado_inicial = None
         cripta_solicitada = args.cripta
         if args.gui:
-            from datos.guardado_binario import cargar_estado, ErrorGuardado
+            from datos.guardado_binario import cargar_estado, cargar_estado_partida, ErrorGuardado
 
             def abrir_replay():
                 if not Path(RUTA_REPLAY_PREDETERMINADA).is_file():
                     vista.mostrar_error_replay("Aun no hay una partida grabada para reproducir.")
                     return
                 try:
-                    lanzador_replay(RUTA_REPLAY_PREDETERMINADA)
-                except OSError as error:
+                    salida = cargar_datos(lanzador_replay, RUTA_REPLAY_PREDETERMINADA)
+                    if isinstance(salida, str):
+                        vista.mostrar_informe("Replay", salida)
+                except (OSError, CalledProcessError) as error:
                     vista.mostrar_error_replay(str(error))
 
             def ver_puntajes():
                 try:
                     vista.mostrar_puntajes(TablaPuntajes("datos_generados/puntajes.jsonl").ranking())
-                except OSError as error:
+                except (OSError, CalledProcessError) as error:
                     vista.mostrar_error_replay(str(error))
 
             def elegir_inicio():
@@ -63,7 +69,7 @@ def ejecutar_juego(args, sesion, lanzador_replay):
                     semilla = args.semilla if args.semilla is not None else random.randint(0, 2**32 - 1)
                     if accion == "cargar":
                         try:
-                            estado_inicial = cargar_estado(ruta)
+                            estado_inicial = (cargar_estado_partida if checkpoint else cargar_estado)(ruta)
                         except (OSError, ErrorGuardado, ValueError) as error:
                             vista.mostrar_error_replay(f"No se pudo cargar: {error}")
                             continue
@@ -99,7 +105,29 @@ def ejecutar_juego(args, sesion, lanzador_replay):
                                      ("version_cripta", getattr(args, "version_cripta", None)),
                                      ("version_catalogo", getattr(args, "version_catalogo", None)))
                                  if valor is not None})
+                if checkpoint is not None:
+                    reporte = cargar_datos(verificar, sesion, args.cripta,
+                                           versiones.get("version_cripta"))
+                    texto = texto_reporte(reporte)
+                    if not permite_inicio(reporte, args.forzar):
+                        if not args.gui:
+                            vista.mostrar_error(texto)
+                            return 1
+                        vista.mostrar_error_replay(texto)
+                        sesion.renovar(tolerar_error=True)
+                        if not elegir_inicio():
+                            return 0
+                        continue
+                    vista.mostrar_informe("Verificación de resolubilidad", texto)
+                    if args.gui and getattr(vista, "_cerrada", False) is True:
+                        return 0
+                    if reporte.version is not None:
+                        versiones["version_cripta"] = reporte.version
                 juego = cargar_datos(crear_juego, sesion.precarga, args.cripta, semilla, **versiones)
+                if checkpoint is not None:
+                    juego = integrar_historia(juego, checkpoint)
+                    if estado_inicial is not None and getattr(juego, "linea_tiempo", None) is None:
+                        raise DatosNoDisponibles("El motor todavía no admite restaurar la historia.")
                 if args.gui and getattr(vista, "_cerrada", False) is True:
                     return 0
             except (ErrorCripta, OSError) as error:
@@ -114,6 +142,7 @@ def ejecutar_juego(args, sesion, lanzador_replay):
                 modelo=juego, vista=vista,
                 tabla_puntajes=TablaPuntajes("datos_generados/puntajes.jsonl"),
                 lanzador_replay=lanzador_replay,
+                partida_p2=checkpoint is not None,
             )
             if estado_inicial is not None:
                 iniciado = controlador.iniciar(estado_inicial=estado_inicial)

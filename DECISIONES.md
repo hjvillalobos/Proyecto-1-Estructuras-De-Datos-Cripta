@@ -751,3 +751,127 @@ arcos contrastados con la entrada, ciclos de 1.600 salas sin recursión, cambios
 versión seguidos por una ejecución offline nueva y conservación de archivos previos.
 Auditoría estática de los tres módulos nuevos: sin índices hash, ordenamientos
 automáticos ni comentarios nuevos. No se modificaron `main.py` ni `bench.py`.
+## Parte II — fragmento persistible de línea de tiempo (incremento independiente)
+
+Especificación: [spec.md](specs/004-linea-tiempo/spec.md), FR-011/012. Diseño: [plan.md](specs/004-linea-tiempo/plan.md), sección de persistencia independiente. No es todavía la decisión final sobre el archivo integrado de partida.
+
+Problema: preservar y reconstruir la rama vigente sin copiar el estado completo en cada acción y sin depender de los productores reales del motor. Alternativas: almacenar controles redundantes o guardar base y registros y regenerarlos al cargar. Decisión: fragmento binario versionado CRLH 1 con base y deltas; K y correcciones conservados; regeneración determinista de controles. Se mantiene el guardado CRPT del juego intacto. Se evita pickle y no se usan índices dict/set ni bibliotecas de estructuras prohibidas.
+
+El tamaño del fragmento crece con la base y los registros, no con acciones por tamaño total del mundo. La carga recorre las acciones y aplica cambios, más copia del estado cada K acciones: no tiene el límite de K aplicable a consultas individuales. La búsqueda de campos es binaria propia; creación/eliminación puede desplazar el arreglo completo. Los valores repetidos grandes en deltas también ocupan espacio: no se afirma memoria óptima.
+
+Evidencia de corrección, no de rendimiento: 31 pruebas de historia/persistencia aprobadas, 164 con regresión seleccionada; detalle en [baseline.md](specs/004-linea-tiempo/baseline.md). Incluye 5000 acciones y continuación del azar sintético. La decisión coincide con el plan de este incremento. No hay mediciones finales de latencia/memoria ni elección empírica definitiva de K.
+
+Límites: acceso por salas, identidad/versiones de cripta y formato integrado 4 pendientes; el PDF P1 recibido estaba vacío y debe revisarse al estar disponible. Que el fragmento rechace CRPT no certifica la incompatibilidad mediante la carga interactiva del juego. No se atribuyen efectos reales del motor a registros sintéticos.
+
+
+## Parte II — núcleo histórico y política de errores
+
+Referencias: [spec.md](specs/004-linea-tiempo/spec.md), FR-001–FR-012 y FR-020; [plan.md](specs/004-linea-tiempo/plan.md); [matriz de errores](specs/004-linea-tiempo/errores.md). La decisión coincide con el plan documentado antes de este incremento; la aceptación dentro del juego sigue pendiente.
+
+### Registro, consultas y recorte
+
+Problema: consultar antes de una acción o entre eventos, conservando el presente y evitando una copia completa por acción. Se consideraron snapshots por acción (no permitidos fuera de la cadencia K), volver a simular comandos y aplicar cambios tipados sobre estado puro. Se eligieron cambios tipados, separados de los callbacks de retroceso P1, bloques de hasta K acciones y reconstrucción hacia adelante. Se registra presencia anterior/nueva para distinguir creación, eliminación y valor nulo. Las correcciones persistentes se adjuntan a la frontera recortada y actualizan un control existente si coincide con ella.
+
+El índice de acciones se consulta por búsqueda binaria propia; localizar un campo en arreglo ordenado cuesta O(log(numero de campos)), mientras insertar o eliminar puede desplazar O(numero de campos). Consultar copia una base y aplica cambios de <=K acciones, pero su tiempo también depende del tamaño del estado y de los cambios. Recortar no recorre el prefijo; liberar el sufijo cuesta según los registros descartados. Los bloques usan arreglos básicos; no se introducen dict/set como índices ni bibliotecas de estructuras prohibidas.
+
+Evidencia: pruebas por tiempo/ordinal, eventos empatados, consultas aisladas, creación/eliminación, errores atómicos, recorte/repetición y 5000 acciones. No se presentan esas pruebas como mediciones de tiempo o memoria; K=50 sigue siendo inicial, pendiente de bench.
+
+### Errores del dominio y de archivo
+
+Problema: permitir al controlador distinguir una entrada inválida, una referencia fuera de la rama, registros incoherentes y archivos incompatibles o dañados. Alternativas: un ValueError indiferenciado, valores centinela que el consumidor podría ignorar, captura genérica de todas las excepciones o clases específicas. Se eligieron clases del dominio derivadas de ValueError y las excepciones de archivo ya existentes en datos. Esto conserva compatibilidad y causas técnicas sin acoplar modelo a vista.
+
+Registrar/recortar valida antes de mutar; cargar construye una instancia nueva; guardar reemplaza el destino al completar el temporal. Si falla también la limpieza, se añade una nota al error principal para conservar el diagnóstico original. Rutas y tipos de entrada inválidos tienen mensajes presentables; errores inesperados de programación no se silencian.
+
+Evidencia: 8 pruebas nuevas de errores; 39 entre errores/historia/persistencia y 172 incluyendo regresión seleccionada, aprobadas. Casos y mensajes en errores.md; comando y alcance en baseline.md. No se afirma que el controlador ya maneje estos errores dentro del juego.
+
+## Parte II · Integración y mediciones de la persona D
+
+Referencias: [especificación](specs/004-linea-tiempo/spec.md),
+[plan](specs/004-linea-tiempo/plan.md) y
+[contrato](specs/004-linea-tiempo/contracts/interfaces.md).
+
+**Captura y reconstrucción.** Se mantiene la decisión del plan de avanzar
+desde la base o el punto de control más cercano anterior. Los productores
+entregan cambios por acción y evento. El consumidor localiza la acción con
+búsqueda binaria propia (O(log A)) y reconstruye como máximo K acciones.
+El costo también depende del número de cambios por acción y del tamaño de
+la base que se copia. El recorte reconstruye hasta el límite, aplica las
+correcciones persistentes y libera el sufijo, sin recorrer el prefijo.
+
+**Persistencia.** CRPT v4 conserva el índice ordenado de salas y añade un
+descriptor de un bloque CRLH. El estado actual conserva identidad, versiones,
+agenda y RNG. CRLH guarda K, base y deltas de la rama vigente. Al cargar se
+regeneran los controles. Se prefirió esto a escribir también las copias de
+control, que son derivables. El lector de partida detecta v3, longitudes
+inválidas, corrupción y fronteras incoherentes antes de entregar la restauración
+al productor. La escritura usa temporal único en el directorio de destino y
+reemplazo atómico. Leer una sala continúa sin cargar la historia.
+
+**Comandos y replay.** La consulta interactiva y el replay comparten un
+formateador puro. Replay se ejecuta sin vista y no detiene la reproducción
+por tiempo si el resto del log todavía contiene una carga o un posible
+pergamino capaz de sustituir esa rama. Si la acción terminal ocurre en el
+instante de decisión, la consulta exacta muestra el estado previo. Un replay
+pedido después del fin muestra el estado final efectivo. El verificador
+mantiene separado un dictamen negativo de una comprobación incompleta.
+
+**Protocolo de medición.** Windows 11, AMD Ryzen 7 7730U, Python 3.12.14,
+semilla 20261001, una pasada de calentamiento y cinco repeticiones.
+37 instantes por repetición, con extremos y consultas reproducibles.
+Se comparan resultados de cada consulta antes de aceptar una medición.
+Los tiempos no incluyen red, archivos ni vista. Memoria retenida y pico
+son asignaciones observadas por tracemalloc durante la construcción,
+no el consumo total del proceso. El recorte descarta cinco acciones
+en prefijos del 25 %, 50 % y final de la carga.
+
+```powershell
+python main.py --bench --subsistemas historia --operaciones 5000 --salas 256 --cambios-historia 2 --repeticiones 5 --semilla 20261001
+python main.py --bench --subsistemas historia --operaciones 10000 --salas 128 --cambios-historia 3 --repeticiones 5 --semilla 20261001
+```
+
+| Acciones | K | Controles | Memoria B | Pico B | Consulta mediana / p95 / máx. ms | >50 ms | Máx. acciones |
+|---:|:---|---:|---:|---:|---:|---:|---:|
+| 5.000 | 10 | 501 | 6.310.928 | 6.523.072 | 0,0958 / 0,2114 / 1,1034 | 0/185 | 10 |
+| 5.000 | 50 | 101 | 5.052.248 | 5.327.504 | 0,3199 / 0,9172 / 1,3961 | 0/185 | 50 |
+| 5.000 | 100 | 51 | 4.965.136 | 5.240.392 | 0,6760 / 1,6518 / 2,0596 | 0/185 | 100 |
+| 5.000 | Sin controles | 1 | 4.428.008 | 4.703.672 | 39,7454 / 77,3422 / 100,3585 | 67/185 | 5.000 |
+| 10.000 | 10 | 1.001 | 15.081.760 | 15.616.024 | 0,1043 / 0,2935 / 0,3933 | 0/185 | 10 |
+| 10.000 | 50 | 201 | 13.433.032 | 13.974.464 | 0,4197 / 1,1137 / 1,4751 | 0/185 | 50 |
+| 10.000 | 100 | 101 | 12.970.400 | 13.511.832 | 0,8310 / 2,4120 / 2,9470 | 0/185 | 100 |
+| 10.000 | Sin controles | 1 | 12.206.248 | 12.775.248 | 104,8145 / 183,3384 / 253,1964 | 139/185 | 10.000 |
+
+K=50 usa 20 % menos memoria retenida que K=10 con 5.000 acciones, y su
+p95 es 0,9172 ms. K=100 ahorra alrededor de 1,7 % adicional en esa carga
+y reconstruye hasta el doble de acciones. Por eso se conserva K=50.
+En las dos cargas, la búsqueda para K=50 tuvo p95 de 0,0308 y 0,0344 ms.
+La reconstrucción medida por separado tuvo p95 de 0,9755 y 1,1854 ms.
+El máximo de recorte con K=50 fue 0,8678 y 1,7655 ms. La alternativa
+inversa desde el presente superó 50 ms en 68/185 y 132/185 consultas al
+medirla junto a K=50. Para una misma carga, CRLH ocupó los mismos bytes
+en las cuatro variantes: 586.434 con 5.000 acciones y 1.544.634 con 10.000.
+
+Son mediciones de estructuras históricas con dos cargas sintéticas. La
+segunda se ejecutó en el mismo equipo durante parte de las regresiones.
+La medición con el motor instrumentado, el conocimiento real y la cripta
+de referencia queda pendiente para evaluar su costo de captura y repetir
+las mediciones de Parte I con la carga integrada.
+
+**Guardado v4 frente a JSON (Parte I §4.10).** Python 3.14.6, 256 salas,
+5.000 acciones, K=50, misma semilla, cinco repeticiones tras calentamiento.
+
+```powershell
+python main.py --bench --subsistemas guardado-historia --operaciones 5000 --salas 256 --repeticiones 5 --semilla 20261001
+```
+
+| Formato | Bytes | Escritura media ms | Carga media ms | Lectura de una sala ms |
+|---|---:|---:|---:|---:|
+| CRPT v4 | 601.167 | 8,89 | 460,17 | 0,53 |
+| JSON | 1.207.040 | 23,22 | 445,07 | No disponible |
+
+Se comprobó la igualdad de datos y de historia reconstruida. JSON usa la
+misma representación hexadecimal del fragmento que el log de replay.
+La escritura v4 incluye sincronización a disco. La comparación de carga
+incluye decodificar la historia en ambos formatos. En esta muestra el
+binario ocupa cerca de la mitad y conserva la lectura directa de una sala.
+La carga completa resultó similar y el JSON fue algo más rápido en esta
+ejecución.

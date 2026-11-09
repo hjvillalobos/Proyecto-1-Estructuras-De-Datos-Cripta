@@ -197,6 +197,7 @@ class Motor:
 
         salida = self.salas[self.jugador.posicion_actual].salidas[direccion]
         id_destino = salida["sala"]
+        costo_salida = salida.get("costo", 100)
 
         if not self.contenido_cargado[id_destino]:
             sala_preparada = self.gestor_precarga.preparar_entrada(id_destino, self._ids_en_uso(id_destino))
@@ -219,7 +220,7 @@ class Motor:
         self.historial.registrar_inventario(lambda p=pos_anterior: setattr(self.jugador, "posicion_actual", p))
         self.jugador.posicion_actual = id_destino
         self._sincronizar_referencias()
-        self._avanzar_actor(self.jugador, _COSTO_MOVER)
+        self._avanzar_actor(self.jugador, costo_salida)
         self.historial.registrar_rastro(id_destino, self.registro_rastro.tiempo_de(id_destino))
         self.registro_rastro.marcar_visita(id_destino, self.reloj)
 
@@ -353,7 +354,9 @@ class Motor:
             self.atacar(enemigo, self.jugador)
         elif accion == "mover":
             direccion = dato
-            nuevo_id = sala_actual.salidas[direccion]["sala"]
+            salida = sala_actual.salidas[direccion]
+            nuevo_id = salida["sala"]
+            costo_salida = salida.get("costo", 100)
             lista_origen = self.enemigos_por_sala[id_sala]
             lista_destino = self.enemigos_por_sala[nuevo_id]
             indice = lista_origen.extraer(enemigo)
@@ -364,7 +367,7 @@ class Motor:
                     ld.extraer(e), lo.restaurar(e, i), setattr(e, "sala_actual", s)
                 )
             )
-            self._avanzar_actor(enemigo, _COSTO_MOVER)
+            self._avanzar_actor(enemigo, costo_salida)
         else:
             self._avanzar_actor(enemigo, _COSTO_ESPERAR)
 
@@ -1096,10 +1099,13 @@ class Motor:
         self.registro_rastro.marcar_visita(sala_origen, self.reloj)
         self._sincronizar_referencias()
 
+        frontera = None
         while not self.terminado:
-            evento = self.ejecutar_ciclo(decidir_accion)
-            if evento is None or evento.tipo == "turno_jugador" or self.terminado:
+            evento = self.ejecutar_ciclo(decidir_accion, hasta=frontera)
+            if evento is None:
                 break
+            if evento.tipo == "turno_jugador":
+                frontera = evento.tiempo
 
         self._sincronizar_referencias()
 
@@ -1113,8 +1119,8 @@ class Motor:
         self.historial.descartar_turno()
         return ResultadoAccion(ok=False, mensaje=mensaje)
 
-    def ejecutar_ciclo(self, decidir_accion_enemigo):
-        evento = self.cola.extraer_minimo()
+    def ejecutar_ciclo(self, decidir_accion_enemigo, *, hasta=None):
+        evento = self.cola.extraer_minimo(hasta=hasta)
         if evento is None:
             return None
 

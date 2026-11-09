@@ -6,6 +6,7 @@ from contextlib import redirect_stdout
 from dataclasses import replace
 from pathlib import Path
 from unittest.mock import Mock, patch
+from tests.datos_integracion_d import reporte_prueba
 
 import main
 from datos.almacen import AlmacenLocal
@@ -127,6 +128,7 @@ class TestContenidoDesconocidoGUI(unittest.TestCase):
         vista.elegir_cripta.return_value = criptas[6]["id"]
         sesion.cliente.listar_criptas.return_value = {"criptas": criptas}
         with patch("main.SesionDatos", return_value=sesion), \
+                patch("controlador.aplicacion.verificar", return_value=reporte_prueba()), \
                 patch("vista.grafica.VistaGrafica", return_value=vista), \
                 patch("modelo.juego.crear_juego", return_value=Mock(resultado=None)) as crear, \
                 patch("controlador.controlador.ControladorJuego"), redirect_stdout(io.StringIO()):

@@ -245,16 +245,16 @@ El personaje usa fotogramas de carrera al cambiar de sala, ataque tras una accio
 aceptada y caida al perder. Son secuencias visuales desactivables; no avanzan el
 reloj ni bloquean el juego. Sin Pillow o sin la hoja de acciones se usa el PNG original.
 
-El replay mantiene visible el reloj virtual, permite Salir y muestra errores de
-datos/red sin continuar la reproduccion. Los errores al preparar una partida se
-muestran en el GUI y permiten regresar al menu para reintentar o salir.
+El replay muestra el reloj virtual en el resumen y reporta los errores de
+datos o de red. Los errores al preparar una partida se muestran en la interfaz
+gráfica y permiten regresar al menú para reintentar o salir.
 
 Con `--gui` aparece el menu de inicio: Jugar, Cargar partida, Replay, Puntajes y
 Salir. Se navega con raton, flechas y Enter. No inicia la simulacion ni avanza el
 reloj virtual. Una partida nueva empieza en t=0; cargar recupera el reloj guardado.
-Replay abre directamente la grabacion automatica y muestra "Ultima partida"
-en el reproductor, sin pedir seleccionar un archivo. Si no existe, muestra un
-aviso. `--replay ARCHIVO` conserva la reproduccion de otras bitacoras guardadas.
+Replay reproduce la grabación automática en un proceso separado sin vista y
+muestra su resumen en la ventana de juego. `--replay ARCHIVO` reproduce una
+bitácora indicada por ruta y presenta el resumen en la terminal.
 
 La escena incluye respiracion suave, entrada a salas y reaccion visual al dano.
 La casilla Animaciones desactiva el movimiento. Estos efectos no consumen tiempo
@@ -344,3 +344,49 @@ Los comandos, los pendientes y las muestras están en la
 [guía de validación](specs/001-verificador-resolubilidad/quickstart.md),
 [DECISIONES.md](DECISIONES.md) y la
 [evidencia de mediciones](specs/001-verificador-resolubilidad/mediciones.json).
+## Línea de tiempo: preparación para implementar
+
+La especificación, diseño, contratos, aceptación y tareas están en [specs/004-linea-tiempo](specs/004-linea-tiempo/spec.md). La constitución compartida sigue vigente sin cambios. Ver [guía](specs/004-linea-tiempo/quickstart.md) y [base de pruebas](specs/004-linea-tiempo/baseline.md). Esta entrega es documental: los comandos nuevos descritos allí están pendientes de implementación. El plan usa cambios serializables por evento y reconstrucción aislada; K=50 es inicial y se validará con mediciones antes de la entrega final.
+
+
+### Probar el núcleo de línea de tiempo
+
+En la rama de desarrollo, `python -m tests.demo_linea_tiempo` muestra consultas, eventos intermedios, recorte y nueva rama con datos sintéticos. `python -m unittest tests.test_linea_tiempo -v` ejecuta sus pruebas. Este núcleo no está conectado todavía a los comandos ni al guardado del juego. Ver specs/004-linea-tiempo/quickstart.md para el alcance y pendientes.
+
+
+El núcleo ahora exporta/importa la rama vigente y puede guardarse como fragmento binario independiente mediante `datos.historia_binaria`. La demostración anterior muestra también recarga y continuación. Pruebas: `python -m unittest tests.test_linea_tiempo tests.test_persistencia_historia -v`. Esto todavía no cambia el archivo de partida ni incorpora comandos nuevos al juego.
+
+
+Decisiones del núcleo histórico en [DECISIONES.md](DECISIONES.md), prompts textuales en [PROMPTS_LLM.md](PROMPTS_LLM.md) y [manejo de errores](specs/004-linea-tiempo/errores.md). Pruebas del contrato de errores: `python -m unittest tests.test_errores_historia -v`. La presentación de esos mensajes desde los comandos del juego está pendiente de integración.
+
+## Parte II · Línea de tiempo (D)
+
+```powershell
+python main.py --cripta ID --checkpoint-cada 50
+python main.py --verificar ID
+python main.py --cripta ID --forzar
+python main.py --replay partida.log --hasta 200
+python main.py --bench --subsistemas historia --operaciones 5000 --salas 256 --repeticiones 5
+python -m unittest tests.test_linea_tiempo tests.test_persistencia_historia tests.test_errores_historia tests.test_historia_motor tests.test_modos_historia tests.test_comandos_integracion tests.test_bench_historia -v
+```
+
+Durante el juego, `historia 200` consulta un instante y `historia #3` el
+estado previo a la tercera acción. `mapa` muestra el mapa conocido, e
+`ir a <sala>` muestra el motivo de detención del viaje. Los botones Historia,
+Mapa y Viajar están disponibles en la interfaz gráfica. El replay, el
+benchmark y la verificación por CLI funcionan sin crear vistas.
+
+El guardado de Parte II usa CRPT v4. Conserva el estado actual y el bloque
+histórico con su K y rama vigente. La entrada de carga de Parte II informa la
+incompatibilidad de archivos v3. `--forzar` autoriza el inicio tras un
+dictamen de cripta no resoluble. Una verificación incompleta impide iniciar.
+
+El adaptador de D y sus pruebas están en esta rama. Los comandos que requieren
+datos reales se habilitan al integrar los productores de A/C y el módulo
+`red.verificacion` de B. Mientras falte el verificador, el inicio informa que
+la verificación está incompleta. Véanse el
+[contrato de integración](specs/004-linea-tiempo/contracts/interfaces.md) y la
+[matriz de aceptación](specs/004-linea-tiempo/aceptacion.md).
+
+Para reproducir la comparación v4 y JSON de Parte I, usar
+`python main.py --bench --subsistemas guardado-historia --operaciones 5000 --salas 256 --repeticiones 5`.

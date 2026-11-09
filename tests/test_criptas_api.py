@@ -8,6 +8,7 @@ import unittest
 from contextlib import redirect_stdout
 from pathlib import Path
 from unittest.mock import Mock, patch
+from tests.datos_integracion_d import reporte_prueba
 
 import main
 from datos.almacen import AlmacenLocal
@@ -40,6 +41,7 @@ class TestSeleccionCriptas(unittest.TestCase):
                 sesion.cliente.listar_criptas.return_value = {"criptas": CRIPTAS}
                 juego = Mock(resultado=None)
                 with patch("main.SesionDatos", return_value=sesion), \
+                        patch("controlador.aplicacion.verificar", return_value=reporte_prueba()), \
                         patch("vista.grafica.VistaGrafica", return_value=vista), \
                         patch("modelo.juego.crear_juego", return_value=juego) as crear, \
                         patch("controlador.controlador.ControladorJuego"), \

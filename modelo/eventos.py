@@ -86,15 +86,18 @@ class ColaEventos:
         self._sube(len(self._datos) - 1)
         return evento
 
-    def extraer_minimo(self):
+    def extraer_minimo(self, *, hasta=None):
         """
         Saca y devuelve el evento válido (no cancelado) con menor
         (tiempo, secuencia). Descarta silenciosamente los cancelados
         que encuentre en el camino (invalidación perezosa).
-        Devuelve None si la cola queda vacía sin encontrar ninguno válido.
+        Si se indica hasta, solo extrae eventos con tiempo <= hasta.
+        Devuelve None si no hay un evento válido dentro del límite.
         """
         while not self.esta_vacia():
             raiz = self._datos[0]
+            if hasta is not None and raiz.tiempo > hasta:
+                return None
             ultimo = self._datos.pop()
             raiz.en_cola = False
 

@@ -7,6 +7,8 @@ from pathlib import Path
 
 from red.sesion import SesionDatos
 from red.errores import ErrorCripta
+from datos.bitacora_replay import ErrorReplay
+from modelo.errores_historia import ErrorHistoria
 
 
 def entero_positivo(texto):
@@ -16,30 +18,13 @@ def entero_positivo(texto):
     return valor
 
 
-def ejecutar_replay(args, gestor_precarga, cliente):
-    """--replay ARCHIVO: reproduce la partida (con --gui, en una ventana)."""
-    from controlador.replay import ReproductorReplay
+def ejecutar_replay(args, gestor_precarga):
+    from controlador.replay_sin_vista import reproducir
     from modelo.juego import crear_juego
 
-    if args.gui:
-        from vista.grafica import VistaGrafica
-
-        vista = VistaGrafica()
-    else:
-        from vista.consola import VistaConsola
-
-        vista = VistaConsola()
-
-    try:
-        ReproductorReplay(
-            cliente,
-            gestor_precarga,
-            vista,
-            crear_juego,
-        ).reproducir(args.replay)
-    finally:
-        if args.gui:
-            vista.cerrar()
+    print(reproducir(args.replay, gestor_precarga, crear_juego,
+                     args.checkpoint_cada, args.hasta))
+    return 0
 
 
 def crear_lanzador_replay(args):
@@ -61,12 +46,14 @@ def crear_lanzador_replay(args):
             "--replay", ruta,
         ]
 
-        if args.gui:
-            # Ventana propia; la partida sigue jugable mientras tanto.
-            subprocess.Popen(comando + ["--gui"])
-        else:
-            # Consola: se muestra en línea y se vuelve a la partida.
-            subprocess.run(comando)
+        comando += ["--checkpoint-cada", str(args.checkpoint_cada)]
+        resultado = subprocess.run(
+            comando, capture_output=True, text=True, encoding="utf-8",
+            env={**os.environ, "PYTHONIOENCODING": "utf-8"},
+        )
+        if resultado.returncode:
+            raise OSError(resultado.stderr.strip() or "No se pudo reproducir la partida.")
+        return resultado.stdout.strip()
 
     return lanzar
 
@@ -82,10 +69,22 @@ def leer_argumentos(argumentos):
     parser.add_argument("--version-catalogo")
     parser.add_argument("--descargar-todo", action="store_true")
     parser.add_argument("--semilla", type=int, default=None)
-    parser.add_argument("--replay", metavar="ARCHIVO")
+    modos = parser.add_mutually_exclusive_group()
+    modos.add_argument("--replay", metavar="ARCHIVO")
+    modos.add_argument("--verificar", metavar="CRIPTA")
+    parser.add_argument("--checkpoint-cada", type=entero_positivo, default=50, metavar="K")
+    parser.add_argument("--hasta", type=int, metavar="T")
+    parser.add_argument("--forzar", action="store_true")
     parser.add_argument("--gui", action="store_true",
                         help="Jugar en una ventana gráfica (tkinter) en vez de la consola.")
     args = parser.parse_args(argumentos)
+    if args.hasta is not None and (args.hasta < 0 or not args.replay):
+        parser.error("--hasta requiere --replay y un instante entero no negativo.")
+    if (args.replay or args.verificar) and (args.gui or args.cripta is not None
+            or args.listar or args.descargar_todo or args.forzar or args.semilla is not None):
+        parser.error("--verificar y --replay se ejecutan como modos independientes.")
+    if args.forzar and (args.listar or args.descargar_todo or (args.cripta is None and not args.gui)):
+        parser.error("--forzar requiere iniciar una partida.")
     # La cache incluida pertenece al proyecto, incluso al lanzar main.py desde
     # otra carpeta. Las carpetas personalizadas siguen relativas al comando.
     for campo in ("offline", "datos_dir"):
@@ -110,6 +109,12 @@ def main(argv=None):
     sesion = SesionDatos(args)
     try:
         sesion.abrir()
+        if args.verificar:
+            from controlador.verificacion import texto_reporte, verificar
+
+            reporte = verificar(sesion, args.verificar, args.version_cripta)
+            print(texto_reporte(reporte))
+            return 0 if reporte.estado == "resoluble" else 1
         if args.listar or (args.cripta is None and not args.replay and not args.gui) or args.descargar_todo:
             listado = sesion.cliente.listar_criptas()
             sesion.almacen.guardar_lista(listado)
@@ -120,8 +125,7 @@ def main(argv=None):
 
         sesion.preparar()
         if args.replay:
-            ejecutar_replay(args, sesion.precarga, sesion.cliente)
-            return 0
+            return ejecutar_replay(args, sesion.precarga)
         if args.descargar_todo:
             ids = ([args.cripta] if args.cripta is not None
                    else [cripta["id"] for cripta in listado["criptas"]])
@@ -137,7 +141,7 @@ def main(argv=None):
 
         from controlador.aplicacion import ejecutar_juego
         return ejecutar_juego(args, sesion, crear_lanzador_replay(args))
-    except ErrorCripta as error:
+    except (ErrorCripta, ErrorReplay, ErrorHistoria, OSError) as error:
         print(f"Error: {error}", file=sys.stderr)
         return 1
     except ModuleNotFoundError as error:
@@ -147,7 +151,7 @@ def main(argv=None):
         return 1
     finally:
         try:
-            sesion.cerrar(reportar=True)
+            sesion.cerrar(reportar=not (args.verificar or args.replay))
         except (ErrorCripta, OSError) as error:
             print(f"Aviso al cerrar la sesion: {error}", file=sys.stderr)
 

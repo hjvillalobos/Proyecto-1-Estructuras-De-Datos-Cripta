@@ -1,7 +1,8 @@
 
 import time
 import tkinter as tk
-from tkinter import filedialog, messagebox, ttk
+from tkinter import filedialog, messagebox, simpledialog, ttk
+from tkinter.scrolledtext import ScrolledText
 from vista.recursos_graficos import RecursosGraficos
 from vista.escena import EscenaCripta
 from vista.transicion_salas import TransicionSalas
@@ -27,9 +28,10 @@ BOTONES
   en el inventario. El selector ordena la vista sin cambiar el
   orden real del inventario.
 
-REPLAY
-  El botón «Replay» abre la última grabación y la reproduce
-  paso a paso en otra ventana, con Pausa, Detener y selector de velocidad.
+HISTORIA Y MAPA
+  Historia acepta un instante o #acción. Mapa muestra las salas conocidas.
+  Viajar solicita el identificador de la sala y muestra por qué se detuvo.
+  Replay reproduce la última grabación y muestra su resumen.
 """
 
 
@@ -95,6 +97,12 @@ class VistaGrafica:
         for texto, comando in (("Guardar", "guardar"), ("Cargar", "cargar"), ("Replay", "replay"),
                                ("Puntajes", "puntajes"), ("Ayuda", "ayuda"), ("Salir", "salir")):
             ttk.Button(cabecera, text=texto, command=lambda c=comando: self._enviar(c)).pack(side="left", padx=3)
+        for texto, accion in (
+            ("Historia", lambda: self._pedir_comando("historia", "Instante o #acción")),
+            ("Mapa", lambda: self._enviar("mapa")),
+            ("Viajar", lambda: self._pedir_comando("ir a", "Identificador de la sala")),
+        ):
+            ttk.Button(cabecera, text=texto, command=accion).pack(side="left", padx=3)
         izq = tk.Frame(self.root, bg=FONDO)
         izq.grid(row=1, column=0, sticky="nsew", padx=(22, 12), pady=(0, 16))
         der = tk.Frame(self.root, bg=FONDO, width=320)
@@ -601,6 +609,26 @@ class VistaGrafica:
         self._ultimo_clic = ("", 0)
         self.mostrar_inventario([])
         self._aviso("Nueva partida.", AMARILLO)
+
+    def _pedir_comando(self, prefijo, pregunta):
+        texto = simpledialog.askstring("CRIPTA", pregunta, parent=self.root)
+        if texto is not None and texto.strip():
+            self._enviar(f"{prefijo} {texto.strip()}")
+
+    def mostrar_informe(self, titulo, texto):
+        if self._cerrada:
+            return
+        ventana = tk.Toplevel(self.root)
+        ventana.title(titulo)
+        ventana.transient(self.root)
+        cuerpo = ScrolledText(ventana, wrap="word", width=70, height=18)
+        cuerpo.pack(fill="both", expand=True, padx=12, pady=12)
+        cuerpo.insert("1.0", texto)
+        cuerpo.configure(state="disabled")
+        ttk.Button(ventana, text="Cerrar", command=ventana.destroy).pack(pady=(0, 12))
+        ventana.bind("<Escape>", lambda _evento: ventana.destroy())
+        ventana.grab_set()
+        self.root.wait_window(ventana)
 
     def mostrar_info(self, texto):
         self._aviso(texto, AMARILLO)
