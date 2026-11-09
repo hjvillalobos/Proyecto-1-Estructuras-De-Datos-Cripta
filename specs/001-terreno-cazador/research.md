@@ -11,12 +11,12 @@ P1 oficial, 20 páginas: §§2.3–2.11, 4.1, 5–8 y apéndices. P2 oficial, 13
 | ID | Evidencia disponible | Estado |
 | --- | --- | --- |
 | Q1 | Parte II incluye rango entero en la ficha del cazador. B reporta Enemy.rango opcional/null, entero ≥1 si tiene valor, sin default ni obligación adicional para cazador; fuente primaria no disponible. Política ante ausencia/null/invalidez y conciliación pendientes del profesor. | NEEDS CLARIFICATION |
-| Q2 | Parte II: costo ausente 100, declarado entero ≥1 y simétrico. B reporta Exit dirigido con costo opcional/null, entero ≥1 si tiene valor, sin default ni garantía de simetría; fuente primaria no disponible. Costo null e inconsistencias sin política confirmada. | NEEDS CLARIFICATION |
+| Q2 | Parte II: costo ausente 100, declarado entero ≥1 y simétrico. B reporta Exit dirigido con costo opcional/null, entero ≥1 si tiene valor, sin default ni garantía de simetría; fuente primaria no disponible. El profesor confirmó, según el usuario, el costo 100 ante ausencia y la simetría. El costo `null`, los valores inválidos y los datos contradictorios siguen sin política confirmada. | PARCIALMENTE ACLARADA |
 | Q3 | <20 ms y condiciones oficiales; falta identificación de referencia y enmiendas. | NEEDS CLARIFICATION |
 
 ## Comunicación reportada de B sobre OpenAPI 1.1.0
 
-**Registro:** 2026-11-05, fecha contextual de esta corrección. **Procedencia:** mensaje del usuario que transmite la revisión realizada por el compañero B del OpenAPI oficial versión 1.1.0. No se dispone de la fecha original de comunicación de B, de una copia verificable del documento ni de sus fragmentos originales. No se consultó independientemente OpenAPI ni se ejecutaron validadores. El profesor todavía no responde Q1/Q2. Esta limitación no impide registrar evidencia parcial con autorización documental, pero impide presentarla como contrato verificado o aclaración definitiva.
+**Registro:** 2026-11-05, fecha contextual de esta corrección. **Procedencia:** mensaje del usuario que transmite la revisión realizada por el compañero B del OpenAPI oficial versión 1.1.0. No se dispone de la fecha original de comunicación de B, de una copia verificable del documento ni de sus fragmentos originales. No se consultó independientemente OpenAPI ni se ejecutaron validadores. En ese momento aún no se había comunicado una respuesta del profesor sobre Q1/Q2. Esta limitación no impide registrar evidencia parcial con autorización documental, pero impide presentarla como contrato verificado o aclaración definitiva.
 
 | Elemento | Información comunicada por B, sin verificación independiente | Autoridad del enunciado y cuestión pendiente |
 | --- | --- | --- |
@@ -26,6 +26,10 @@ P1 oficial, 20 páginas: §§2.3–2.11, 4.1, 5–8 y apéndices. P2 oficial, 13
 La ausencia reportada de restricciones en un esquema no deroga las reglas del juego ni demuestra por sí sola que los datos reales las incumplan. Se conserva FR-001 y la ficha de cazador de §3.2; no se adopta una política de normalización, rechazo, copia entre sentidos o fabricación de rango. E-B-COSTOS/E-B-RANGO requieren además evidencia independiente de suministro/acceso a datos válidos; ninguno se marca entregado por este reporte.
 
 **Consultas pendientes:** al profesor, cómo conciliar la ficha de cazador con rango ausente/null y qué hacer ante costo null o datos inconsistentes con §3.1; a B, copia o fragmentos originales identificados de Enemy/Exit en OpenAPI 1.1.0 y contratos efectivos de acceso. Q3 conserva la referencia/enmiendas pendientes y <20 ms; esta comunicación no aporta evidencia de rendimiento.
+
+## Aclaración del profesor sobre Q2
+
+**Registro del 2026-11-09.** El usuario comunicó que el profesor confirmó dos reglas de Parte II §3.1: si falta el campo `costo`, se usa 100, y se asume el mismo costo en ambos sentidos de una puerta entre salas adyacentes. Sigue pendiente cómo tratar `costo=null`, valores inválidos y contradicciones entre descriptores. La simetría del costo no acredita que el estado abierto o cerrado esté sincronizado entre extremos. E-B-COSTOS sigue pendiente de que B demuestre el suministro versionado de costos válidos hasta el motor de A. Q1 (rango ausente, `null` o inválido) y Q3 (referencia de rendimiento) siguen abiertas.
 
 ## Notación
 

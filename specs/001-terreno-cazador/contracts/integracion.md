@@ -8,7 +8,7 @@
 
 | ID | Responsable del acuerdo/entrega | Evidencia verificable requerida | Consumidores principales | Estado |
 | --- | --- | --- | --- | --- |
-| E-B-COSTOS | B con A | Suministro y acceso verificables a costos de salidas, versiones, identidad y datos válidos para el motor, sin HTTP durante búsqueda. Aceptación independiente de rango; no cierra Q2. | T013, T014, T025 | PENDIENTE |
+| E-B-COSTOS | B con A | B debe demostrar cómo llegan al motor de A los costos válidos de las salidas, con identidad y versión de cripta verificables y sin HTTP durante la búsqueda. El profesor confirmó, según el usuario, que el costo ausente vale 100 y se asume simétrico. [Aclaración y límites de Q2](../research.md#aclaración-del-profesor-sobre-q2). La aceptación es independiente de E-B-RANGO. | T013, T014, T025 | PENDIENTE |
 | E-B-RANGO | B con A | Suministro y acceso verificables al rango de cazadores, versiones, identidad y datos válidos, sin HTTP durante búsqueda. Aceptación independiente de costos; no cierra Q1. | T025; no T013/T014 | PENDIENTE |
 | E-BC-PUERTA | B/C/A | Identidad de puerta, lectura de ambos extremos y coherencia de cambios reales. | T029, T032 | PENDIENTE |
 | E-C-RUTA | C con A | Fuente filtrada, firmas/modos/estados de consulta y criterios de aceptación acordados. | T023, T024 y solo las extensiones filtradas que lo usen | PENDIENTE |
