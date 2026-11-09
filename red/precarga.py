@@ -52,22 +52,7 @@ class GestorPrecarga:
             yield preparado
 
     def _validar_generales(self, datos, cripta_id):
-        if not isinstance(datos, dict) or datos.get("id") != cripta_id:
-            raise DatosInvalidos(f"Datos generales inválidos para {cripta_id}.")
-        identificador(datos.get("version"))
-        identificador(datos.get("llave_salida"))
-        for campo in ("salas_total", "paginas", "salas_por_pagina"):
-            entero(datos.get(campo), 1)
-        for campo in ("sala_inicial", "sala_salida"):
-            entero(datos.get(campo), None)
-        for campo in ("presupuesto_solicitudes", "inventario_max"):
-            entero(datos.get(campo))
-        if not isinstance(datos.get("jugador"), dict):
-            raise DatosInvalidos("Faltan las estadísticas iniciales del jugador.")
-        for campo in ("vida_max", "velocidad"):
-            entero(datos["jugador"].get(campo), 1)
-        for campo in ("ataque", "defensa"):
-            entero(datos["jugador"].get(campo), None)
+        validar_generales(datos, cripta_id)
 
     def preparar_cripta(self, cripta_id, version_cripta=None, version_catalogo=None):
         if self.generales is not None:
@@ -108,24 +93,7 @@ class GestorPrecarga:
             if respuesta is None:
                 self._comprobar_version_red()
                 respuesta = self.cliente.obtener_esqueleto(cripta_id, pagina)
-            if (not isinstance(respuesta, dict) or respuesta.get("pagina") != pagina
-                    or respuesta.get("total_paginas") != datos["paginas"]
-                    or not isinstance(respuesta.get("salas"), list)
-                    or len(respuesta["salas"]) > 50):
-                raise DatosInvalidos(f"Página de esqueleto inválida: {pagina}.")
-            for sala in respuesta["salas"]:
-                if not isinstance(sala, dict):
-                    raise DatosInvalidos("Sala inválida en el esqueleto.")
-                entero(sala.get("id"), None)
-                texto(sala.get("nombre"))
-                salidas = sala.get("salidas", {})
-                if not isinstance(salidas, dict):
-                    raise DatosInvalidos("Las salidas deben ser un objeto JSON.")
-                for direccion, salida in salidas.items():
-                    if direccion not in ("N", "S", "E", "O") or not isinstance(salida, dict):
-                        raise DatosInvalidos("Salida inválida en el esqueleto.")
-                    entero(salida.get("sala"), None)
-                self.salas.append(Sala(sala["id"], sala["nombre"], deepcopy(salidas)))
+            self.salas.extend(validar_pagina_esqueleto(respuesta, pagina, datos["paginas"]))
             if descargada:
                 paginas_descargadas.append(respuesta)
         if len(self.salas) != datos["salas_total"]:
@@ -302,3 +270,47 @@ class GestorPrecarga:
 
     def cerrar(self):
         self.incorporar_pendientes(esperar=True)
+
+
+def validar_generales(datos, cripta_id):
+    if not isinstance(datos, dict) or datos.get("id") != cripta_id:
+        raise DatosInvalidos(f"Datos generales inválidos para {cripta_id}.")
+    identificador(datos.get("version"))
+    identificador(datos.get("llave_salida"))
+    for campo in ("salas_total", "paginas", "salas_por_pagina"):
+        entero(datos.get(campo), 1)
+    for campo in ("sala_inicial", "sala_salida"):
+        entero(datos.get(campo), None)
+    for campo in ("presupuesto_solicitudes", "inventario_max"):
+        entero(datos.get(campo))
+    if not isinstance(datos.get("jugador"), dict):
+        raise DatosInvalidos("Faltan las estadísticas iniciales del jugador.")
+    for campo in ("vida_max", "velocidad"):
+        entero(datos["jugador"].get(campo), 1)
+    for campo in ("ataque", "defensa"):
+        entero(datos["jugador"].get(campo), None)
+
+
+def validar_pagina_esqueleto(respuesta, pagina, total_paginas):
+    salas = []
+    if (not isinstance(respuesta, dict) or respuesta.get("pagina") != pagina
+            or respuesta.get("total_paginas") != total_paginas
+            or not isinstance(respuesta.get("salas"), list)
+            or len(respuesta["salas"]) > 50):
+        raise DatosInvalidos(f"Página de esqueleto inválida: {pagina}.")
+    entero(respuesta.get("pagina"), 1)
+    entero(respuesta.get("total_paginas"), 1)
+    for sala in respuesta["salas"]:
+        if not isinstance(sala, dict):
+            raise DatosInvalidos("Sala inválida en el esqueleto.")
+        entero(sala.get("id"), None)
+        texto(sala.get("nombre"))
+        salidas = sala.get("salidas", {})
+        if not isinstance(salidas, dict):
+            raise DatosInvalidos("Las salidas deben ser un objeto JSON.")
+        for direccion, salida in salidas.items():
+            if direccion not in ("N", "S", "E", "O") or not isinstance(salida, dict):
+                raise DatosInvalidos("Salida inválida en el esqueleto.")
+            entero(salida.get("sala"), None)
+        salas.append(Sala(sala["id"], sala["nombre"], deepcopy(salidas)))
+    return salas

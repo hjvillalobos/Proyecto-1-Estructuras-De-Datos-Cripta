@@ -739,6 +739,144 @@ modelo no se consigna porque no está confirmada para estas intervenciones.
   la selección de archivos del commit. La integración en `main` queda para el
   siguiente paso; no se registra como realizada.
 
+### 2026-10-30 — Especificación del verificador de resolubilidad
+
+- **Herramienta/modelo:** Codex; variante del modelo no registrada.
+- **Prompt textual:**
+
+> Integra la preparacion en main, asi todos podemos partir de la misma constitucion y configuracion
+>
+> Y genera la especificacion de mi nueva parte, el verificador de resolubilidad, definiendo primero que debe hacer y como se acepta, despues seguiriamos con las declaraciones, plan, tareas y codigo
+
+- **Uso de la respuesta:** Comprobar que la preparación ya estaba integrada en
+  `main` y sincronizar la copia local. Generar con `speckit-specify` el borrador
+  de la especificación del verificador, con requisitos, escenarios de aceptación,
+  criterios de éxito y separación de responsabilidades entre B y D. Revisar su
+  calidad documental. No se implementó código ni se generaron el plan o las tareas.
+
+### 2026-11-01 — Aclaraciones del verificador de resolubilidad
+
+- **Herramienta/modelo:** Codex; variante del modelo no registrada.
+- **Prompt textual:**
+
+> Mantén ambos criterios con esa distinción, con el fin de rechazar ubicaciones alternativas validas y separar los obstáculos del juego de los errores de información, implementa la solución
+
+- **Uso de la respuesta:** Aplicar mediante `speckit-clarify` los criterios aceptados:
+  un mismo ID puede tener ubicaciones alternativas y una llave ausente del listado
+  completo y válido se considera imposible de obtener. Distinguir estos obstáculos
+  de las descargas fallidas, datos incompletos o inválidos y versiones incompatibles,
+  que impiden completar la verificación. Por el contexto de aceptación de ambos
+  criterios, «rechazar ubicaciones alternativas validas» se interpretó como
+  «evitar rechazar ubicaciones alternativas válidas», conservando arriba el texto
+  original. Actualizar requisitos y escenarios de aceptación, sin implementar código
+  ni generar todavía el plan o las tareas. No se atribuye esta interpretación al profesor.
+
+
+### 2026-11-01 — Plan técnico del verificador de resolubilidad
+
+- **Herramienta/modelo:** Codex; variante del modelo no registrada.
+- **Prompt textual:**
+
+> Me parece la opcion mas sensata, dejemoslo asi, continuemos con el `speckit-plan`, para definir como implementarlo con estructuras propias y sencillas, despues seguiriamos con tareas, analisis y guardar la especificacion en un commit antes del codigo
+
+- **Uso de la respuesta:** Ejecutar preparación de `speckit-plan`, revisar constitución, especificación y módulos existentes. Elaborar `plan.md` y `research.md` parciales con propuesta de arreglos, cola e índices propios, preparación versionada y mediciones. Detectar B1: el cierre incremental puede reunir llaves de ramas sin regreso y dar una victoria falsa. Dejar la fase 1 pendiente de aclaración; no generar tareas, implementar código ni realizar commit. Mantener los criterios de llaves acordados sin atribuir al profesor una respuesta más específica que «exacto».
+
+### 2026-11-01 — Alcance acumulativo y cierre del plan
+
+- **Herramienta/modelo:** Codex; variante del modelo no registrada.
+- **Prompt textual:**
+
+> Registra el supuesto y su limitación en la especificación con altas probabilidades de quedar como opción definitiva en un futuro y completa el plan con ese alcance
+
+- **Uso de la respuesta:** Registrar el modelo acumulativo como supuesto provisional autorizado y opción preferida del equipo, sin probabilidad numérica inventada ni aprobación atribuida al profesor. Incorporar AC-21 y alcance explícito del resultado. Completar plan, investigación, modelo de datos, contrato para D y guía de validación; revisar la lista documental. No generar tareas, ejecutar pruebas del verificador inexistente ni implementar o confirmar código.
+
+### 2026-11-01 — Tareas del verificador de resolubilidad
+
+- **Herramienta/modelo:** Codex; variante del modelo no registrada.
+- **Prompt textual:**
+
+> Continuemos con `speckit-tasks`
+
+- **Uso de la respuesta:** Generar `tasks.md` desde especificación, plan, investigación, modelo de datos y contrato. Organizar 34 tareas por fases e historias, con requisitos, escenarios, dependencias, pruebas y responsables B/D. Conservar alcance acumulativo provisional y commit de especificación previo al código. Verificar formato y cobertura documental; no ejecutar tareas, pruebas funcionales, implementación ni commit.
+
+### 2026-11-01 — Análisis de coherencia documental
+
+- **Herramienta/modelo:** Codex; variante del modelo no registrada.
+- **Prompt textual:**
+
+> Continua con`speckit-analyze` para revisar la coherencia entre especificación, plan y tareas antes del commit
+
+- **Uso de la respuesta:** Revisión de solo lectura con cuatro hallazgos C1, I1, U1 y A1. Este registro se incorpora en la edición posterior autorizada, no durante el análisis.
+
+### 2026-11-01 — Autorización de recomendaciones
+
+- **Herramienta/modelo:** Codex; variante del modelo no registrada.
+- **Prompt textual:**
+
+> Para cada uno de los hallazgos aplica las respectivas recomendaciones y utiliza las mismas como el prompt a formular para dicha implementación
+
+- **Uso de la respuesta:** Aplicar recomendaciones a documentación de especificación, diseño, tareas y validación. Las siguientes entradas son recomendaciones del asistente aprobadas como prompts por el usuario; no se presentan como mensajes textuales originalmente escritos por él. No se implementa código ni se realiza commit.
+
+### 2026-11-01 — C1 — Conformidad pendiente
+
+- **Herramienta/modelo:** Codex; variante del modelo no registrada.
+- **Prompt propuesto aprobado:**
+
+> Conservar tu supuesto autorizado, pero identificar la conformidad con ese requisito como pendiente de confirmación, no como superada.
+
+- **Uso de la respuesta:** Se mantuvo AC-21 y se corrigieron estado, control constitucional y checklist. No se declara resuelta la conformidad académica.
+
+### 2026-11-01 — I1 — Evidencia de ciclos
+
+- **Herramienta/modelo:** Codex; variante del modelo no registrada.
+- **Prompt propuesto aprobado:**
+
+> Precisar cuándo se informa un ciclo como causa de bloqueo y cuándo es solo una relación circular encontrada. Agregar un caso que combine desconexión, una llave y una puerta de regreso que la requiera.
+
+- **Uso de la respuesta:** Se documentaron clasificación de evidencia, prueba suficiente conservadora y AC-22, con tareas y contrato asociados. No se afirma que detectar una SCC certifique bloqueo ni que la prueba suficiente sea completa.
+
+### 2026-11-01 — U1 — Publicación versionada
+
+- **Herramienta/modelo:** Codex; variante del modelo no registrada.
+- **Prompt propuesto aprobado:**
+
+> Establecer que los datos descargados no se publican como reutilizables hasta completar la validación de versión. Probar también la siguiente ejecución, no solo la que detectó el cambio.
+
+- **Uso de la respuesta:** Se especificó lote privado en memoria hasta validar conjunto y versión final, publicación posterior y actual.json al final, sin prometer transacción multiarquivo. AC-23 comprueba segunda ejecución offline.
+
+### 2026-11-01 — A1 — Evidencia de escalamiento
+
+- **Herramienta/modelo:** Codex; variante del modelo no registrada.
+- **Prompt propuesto aprobado:**
+
+> Separar las cotas de normalización, recorrido y diagnóstico, y concretar la evidencia de escalamiento exigida sin excluir trabajo del tiempo total.
+
+- **Uso de la respuesta:** Se agregó protocolo N/2N/4N, conteos, razones temporales y costo total con factores logarítmicos; no se relajó FR-015 ni se afirmó cumplimiento de 200 ms.
+
+### 2026-11-01 — Cierre del diseño del diagnóstico de ciclos
+
+- **Herramienta/modelo:** Codex; variante del modelo no registrada.
+- **Prompt textual:**
+
+> Muy bien, cierra con el diagnostico de ciclos
+
+- **Uso de la respuesta:** Completar el diseño documental: certificado global del cierre para justificar pendientes, componentes para mostrar ciclos concretos y alternativas por referencias. Sustituir la certificación incompleta por componente; distinguir bloqueo autónomo, bloqueos externos y desconexión. Agregar AC-24/25 y actualizar tareas, modelo, contrato y guía. Sin código ni commit; no atribuir confirmación al profesor.
+
+### 2026-11-02 — Confirmación del profesor y cierre de C1
+
+- **Herramienta/modelo:** Codex; variante del modelo no registrada.
+- **Prompt textual:**
+
+> El profesor respondio afirmativamente
+
+- **Contexto de la confirmación:** El usuario había comunicado la consulta «Podemos acumular llaves entre salas alcanzables sin exigir una trayectoria única ?». La respuesta afirmativa se registra según lo informado por el usuario; no se inventa una cita textual adicional del profesor.
+- **Uso de la respuesta:** Completar la autorización previa de resolver y aprobar C1 al recibirse la evidencia faltante. Registrar aclaración fechada y actualizar estados de especificación, plan, tareas, investigación, contrato, guía y checklist. Mantener limitación de trayectoria y pendientes de código, pruebas y rendimiento. Sin commit ni implementación.
+
+### 2026-11-02 — Implementación del verificador
+
+- **Herramienta/modelo:** Codex.
+- **Prompt textual:** «Continua con el speckit-implement».
+- **Uso de la respuesta:** Implementación del verificador de resolubilidad siguiendo la especificación, el plan y las tareas previamente aprobados. Las tareas completadas y las pruebas ejecutadas se registran según los resultados reales.
 
 
 ## 2026-11-02 — preparación de línea de tiempo

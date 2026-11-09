@@ -21,6 +21,29 @@ class TestClienteApi(unittest.TestCase):
         self.cliente = ClienteApi(transporte=self.transporte, esperar=self.esperar)
         self.transporte.get.return_value = respuesta(200, {"version": "v1"})
 
+    def test_FR009_AC12_llaves_reintentos_version_y_presupuesto(self):
+        listado = {"llaves": [{"id": "K", "sala": 1}, {"id": "K", "sala": 2, "enemigo": None}]}
+        self.cliente.configurar_presupuesto(3)
+        self.transporte.get.side_effect = [respuesta(429, {"reintentar_en": 1}),
+                                          respuesta(200, listado), respuesta(200, {"version": "v1"})]
+        self.assertEqual(self.cliente.obtener_llaves("a/b"), listado)
+        self.assertTrue(self.transporte.get.call_args.args[0].endswith('/criptas/a%2Fb/llaves'))
+        self.cliente.obtener_version_cripta("a/b")
+        with self.assertRaises(PresupuestoAgotado):
+            self.cliente.obtener_llaves("a/b")
+        self.assertEqual(self.cliente.solicitudes_realizadas, 3)
+        self.esperar.assert_called_once_with(1)
+        self.assertTrue(all(c.kwargs['headers']['X-Cripta-Client-Id'] == self.cliente.cliente_id
+                            for c in self.transporte.get.call_args_list))
+
+    def test_FR008_AC14_llaves_invalidas(self):
+        for listado in ({}, {"llaves": None}, {"llaves": [{"id": "K"}]},
+                        {"llaves": [{"id": "K", "sala": True}]},
+                        {"llaves": [{"id": "K", "sala": 1, "enemigo": 0}]}):
+            self.transporte.get.return_value = respuesta(200, listado)
+            with self.subTest(listado=listado), self.assertRaises(DatosInvalidos):
+                self.cliente.obtener_llaves("prueba")
+
     def test_id_compartido_por_ejecucion(self):
         otro = ClienteApi(transporte=Mock())
         self.assertEqual(self.cliente.cliente_id, otro.cliente_id)
