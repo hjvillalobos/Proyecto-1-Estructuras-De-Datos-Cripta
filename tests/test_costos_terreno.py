@@ -44,6 +44,19 @@ class PruebasCostosTerreno(unittest.TestCase):
                 self.assertEqual(motor.reloj, 10)
             turno = enemigo.evento_pendiente
             self.assertEqual(turno.tiempo, 20 if reloj == 20 else 100)
+            # Captura la reprogramación del movimiento antes de que otro
+            # turno empatado pueda sustituirla al cerrar la frontera.
+            reprogramaciones = []
+            ejecutar_ciclo = motor.ejecutar_ciclo
+
+            def observar_turno(*args, **kwargs):
+                evento = ejecutar_ciclo(*args, **kwargs)
+                if evento is turno:
+                    reprogramaciones.append((enemigo.tiempo_siguiente,
+                                             enemigo.evento_pendiente.tiempo))
+                return evento
+
+            motor.ejecutar_ciclo = observar_turno
             self.assertTrue(motor.ejecutar("mover", "E").ok)
             for _ in range(2):
                 if not turno.en_cola:
@@ -54,9 +67,8 @@ class PruebasCostosTerreno(unittest.TestCase):
             self.assertEqual(enemigo.sala_actual, 101)
             self.assertGreaterEqual(motor.reloj, turno.tiempo)
             intervalo_esperado = esperado - reloj
-            self.assertEqual(enemigo.tiempo_siguiente, turno.tiempo + intervalo_esperado)
-            self.assertEqual(enemigo.evento_pendiente.tiempo,
-                             turno.tiempo + intervalo_esperado)
+            proximo = turno.tiempo + intervalo_esperado
+            self.assertEqual(reprogramaciones, [(proximo, proximo)])
 
     def test_formula_de_intervalo_con_costos_validos(self):
         for costo, velocidad, intervalo in ((100, 100, 100), (250, 100, 250),
@@ -227,20 +239,20 @@ class PruebasCostosTerreno(unittest.TestCase):
                 self.assertIsNone(motor.jugador.evento_pendiente)
 
                 if costo == 100:
-                    # El turno del jugador ganó el empate. El ataque de
-                    # destino sigue pendiente en t=100 y se procesa al esperar
-                    # legalmente desde esa decisión, sin recibir un turno gratis.
+                    # El paso individual dejó pendiente el ataque de t=100.
+                    # Esperar procesa ese ataque y el de la frontera en t=200.
                     self.assertIs(destino.evento_pendiente, inicial_destino)
                     self.assertTrue(inicial_destino.en_cola)
                     self.assertFalse(inicial_destino.cancelado)
-                    dano = max(1, destino.ataque + azar_esperado.randint(0, 4)
-                               - motor.jugador.defensa)
+                    dano = sum(max(1, destino.ataque + azar_esperado.randint(0, 4)
+                                   - motor.jugador.defensa) for _ in range(2))
                     self.assertTrue(motor.ejecutar("esperar").ok)
                     self.assertEqual(motor.reloj, 200)
                     self.assertEqual(motor.acciones_jugador, 1)
                     self.assertEqual(motor.jugador.vida, vida - dano)
                     self.assertEqual(motor.azar.getstate(), azar_esperado.getstate())
-                    self.assertEqual(destino.evento_pendiente.tiempo, 200)
+                    self.assertFalse(inicial_destino.en_cola)
+                    self.assertEqual(destino.evento_pendiente.tiempo, 300)
                     self.assertIsNone(motor.jugador.evento_pendiente)
 
 

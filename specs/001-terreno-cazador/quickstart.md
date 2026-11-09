@@ -423,3 +423,208 @@ US1 está funcionalmente verificada localmente para los escenarios válidos ejec
 T011 tiene evidencia suficiente para cerrar sus pruebas válidas y se consolida su checkbox; T012 y T005–T010 ya están completadas. T013/T014 tienen implementación local comprobada, pero conservan cierre integrado bloqueado por E-B-COSTOS. T015/T016 y la ejecución/verificación de T017 están cumplidas localmente, sin necesidad de ajuste; sus checkboxes conservan pendiente el cierre formal de sus prerrequisitos, sin convertir una cadena documental en un fallo funcional ni repetir pruebas sin motivo. T018 sigue bloqueada por evidencia Q1/Q2 y prerrequisitos; no se ejecuta. No se autoriza ni inicia US2.
 
 Solo se actualizan tasks.md, quickstart.md y prompts-registro-local.md (P29). Se verifican huellas SHA-256 de los Python antes/después para acreditar que código y pruebas no cambian. Rama feature/motor-eventos conservada; no operaciones Git de escritura, integración o publicación. Constitución, PROMPTS_LLM.md y documentación compartida intactas.
+
+## Inicio de US2: pruebas iniciales T019 — 2026-11-06
+
+HEAD 15adfcf en feature/motor-eventos, publicado; main permanece sin integrar. Autorización exclusiva para preparar/ejecutar pruebas iniciales del algoritmo sobre grafos sintéticos válidos, sin Dijkstra ni decisión de cazador. Se releen constitución, Parte II §3.2, spec/plan/tasks, contratos y estructuras. Checklist 13/16; ninguna pregunta externa se da por resuelta.
+
+**Orden exacto:** T019 y T020 dependen de T006/T010, ya completadas. Esta etapa cubre solo T019 de rutas; T020 trata la política del cazador y queda pendiente. T021 implementará el algoritmo tras disponer de las pruebas T019 y el soporte T010; T022 necesitará además T020. No se ejecuta ninguna de esas implementaciones. Las pruebas rojas constituyen preparación TDD, no aceptación completa de T019.
+
+**Sin bloqueo externo para preparar T019:** se suministran explícitamente límites enteros positivos y costos positivos/simétricos. No se prueba ausencia/null de rango, validación de datos inconsistentes, HTTP, conocimiento de C, puertas de ambos extremos cambiando durante partida ni integración de B/D. Q1/Q2 siguen abiertas para sus políticas y suministros; Q3 no impide pruebas funcionales sintéticas ni se resuelve por ellas. E-B-COSTOS/E-B-RANGO/E-C-RUTA/E-C-DESPACHO y demás acuerdos conservan sus estados. No se necesita incorporar main ni alterar la frontera temporal del motor.
+
+### Contrato interno propuesto para preparar T021
+
+La suite propone llamar buscar_ruta(grafo, espacio, frontera, origen_indice, destino_indice, limite) en modelo/rutas.py. GrafoTerreno, EspacioBusqueda y HeapRutas son los existentes; origen/destino se resuelven mediante indice antes de la consulta. Resultado interno de prueba: tupla (primer_indice, direccion, costo_paso, costo_total), o None cuando no se demuestra una ruta dentro del límite. Ese None no certifica desconexión frente a exceso de rango ni implica costo/rango null. No hay caso origen=destino ni modo sin límite en esta etapa. Firmas/estados compartidos de C permanecen pendientes de T023/T024; esto no los aprueba ni implementa.
+
+T021 podrá usar el grafo ya preparado, arreglos con generaciones y heap indexado propios: iniciar consulta, filtrar arcos por el estado real de la puerta referenciada, mantener etiquetas (distancia, primerID), propagar ese primer ID y mejorar por menor distancia o menor primerID en empate. Con costos positivos, cerrar el destino solo con etiqueta definitiva permite respetar el desempate; podar candidatos por encima del límite y devolver costo del primer arco separado del total. El espacio/frontera se prepara una vez y la implementación deberá gestionar iniciar/finalizar sin barrer V por consulta. Este resumen sigue el Plan, no es código escrito ni demuestra complejidad/rendimiento empíricos. No usar dict/set, heapq, bisect, collections ni bibliotecas de grafos como sustitutos.
+
+### Casos preparados
+
+| Método de test_rutas_cazador | Resultado esperado, todavía no comprobado por algoritmo |
+| --- | --- |
+| test_t1_sin_ruta_abierta_por_puerta_cerrada | None ante única conexión cerrada. |
+| test_destino_aislado_es_inalcanzable | None con destino desconectado. |
+| test_t2_costo_101_supera_limite_100 | None, sin inventar distancia fuera del rango. |
+| test_t3_tres_pasos_300_superan_dos_pasos_500 | Primer ID 3, dirección N, paso 100, total 300. |
+| test_a4_costo_igual_al_limite_admite_ruta | Mismo resultado con límite exactamente 300. |
+| test_puerta_cerrada_excluye_ruta_barata_pero_no_alternativa | Primera salida abierta hacia ID 7, paso 250, total 500. |
+| test_t4_menor_primer_id_pese_a_orden_de_enumeracion | ID 3, paso 100, total 300; dos enumeraciones opuestas. |
+| test_empate_elige_menor_id_aunque_su_primer_arco_cueste_mas | ID 3, paso 200, total 300; no elegir por costo del primer arco. |
+| test_convergencia_propaga_mejora_del_primer_id | ID 3, paso 4, total 6 tras converger rutas empatadas. |
+| test_ciclo_positivo_no_desvia_el_camino_minimo | ID 3, paso 4, total 5, sin recorrer un ciclo para abaratar. |
+
+Se reutiliza crear_salas, sin modificar fixture ni producir datos reales. Todos los grafos son recíprocos de igual costo, con grado máximo cuatro, IDs dispersos y estados de puerta explícitos. No se implementa una referencia de búsqueda: comparación generativa/selección lineal pertenece a T026, no autorizada todavía. Tampoco se prueba aquí ataque/espera de T1/T2: corresponde a T020/T022, no a la búsqueda pura.
+
+### Resultados realmente ejecutados
+
+```powershell
+python -B -m unittest tests.test_rutas_cazador -v
+python -B -m unittest tests.test_costos_terreno tests.test_velocidad_terreno tests.test_grafo_terreno tests.test_heap_rutas tests.test_juego tests.test_enemigos tests.test_regresiones_juego tests.test_integridad_operaciones.TestIntegridadOperaciones.test_precarga_fallida_no_rompe_movimiento_ni_replay
+```
+
+Intérprete original Python 3.12.14 del runtime auxiliar de Codex; comandos mostrados de forma portable desde raíz. La nueva suite, sin necesitar temporales, ejecuta diez métodos y reporta once errores en 0.008 s, FAILED (errors=11)/salida 1. Todos son AttributeError en la llamada a rutas.buscar_ruta, todavía ausente: uno por cada caso y dos por el subtest de enumeración. Se construyen grafos/espacio/frontera reales antes de fallar; no se alcanza ninguna comparación de resultado de búsqueda. No se usa skip, expectedFailure, mock ni función sustituta para fingir algoritmo. Esta ausencia esperada de T021 no significa once defectos distintos ni once pruebas aprobadas.
+
+Regresiones existentes, con acceso autorizado a temporales: 99/99 en 1.905 s, OK/salida 0, cero fallos/errores/skips. Conservan la evidencia de US1 y fundamentos; no demuestran corrección de Dijkstra ausente. No se ejecuta benchmark ni se afirma cumplimiento Q3.
+
+T019 queda preparada pero pendiente de aceptación satisfactoria tras implementar T021; la siguiente tarea exacta del algoritmo es T021, previa autorización. No se marcan T019/T020/T021 completadas. Archivos de esta etapa: nuevo tests/test_rutas_cazador.py y actualizaciones de tasks.md, quickstart.md y prompts-registro-local.md (P30). Producción y pruebas/fixture previos permanecen intactos; ningún archivo de B/C/D ni evento/interfaz cambia. No se realizan operaciones Git de escritura, integración o publicación ni se incorpora main. PROMPTS_LLM.md permanece pendiente de traslado autorizado. No existe .specify/extensions.yml para hooks antes/después.
+
+## Implementación limitada de T021 — 2026-11-06
+
+Autorización posterior exclusiva para buscar_ruta en modelo/rutas.py y documentación propia. Se revisaron constitución 1.1.0, Parte II §3.2 (incluido desempate/conocimiento), spec/plan/tasks, contratos y las once comprobaciones de T019. Checklist 13/16; Q1–Q3 y entregas externas no se resuelven. La firma interna autorizada encaja con GrafoTerreno, EspacioBusqueda y HeapRutas actuales; no se modifica ninguna de esas interfaces ni la prueba T019.
+
+### Implementación e invariantes
+
+La única modificación de producción es la nueva función buscar_ruta y la cabecera del módulo, actualizada porque ya contiene búsqueda. Usa origen/destino como índices distintos del mismo grafo preparado; espacio y frontera asociados y frontera vacía antes de iniciar. No define llegada origen=destino ni modo sin límite, y no valida en nombre de B índices/datos/rangos inválidos. El contrato compartido con C permanece propuesto para T023/T024; None solo indica que no se obtuvo un paso admisible dentro del límite, sin certificar una distancia exterior.
+
+frontera.iniciar aumenta la generación existente, sin reinicializar V entradas. La semilla de origen es distancia 0/primerID None. Cada extracción fija la mejor etiqueta del nodo, que se cierra; las relajaciones leen arco.puerta.get("cerrada", False) desde el descriptor real, omiten cerradas/nodos cerrados y no insertan costos superiores al límite. Igualdad con el límite sí se admite. En vecinos inmediatos, primerID es el ID externo del destino del arco; luego se propaga. insertar_o_disminuir conserva la mejor etiqueta (distancia, primerID) y HeapRutas añade ID de sala al orden total, sin azar ni ordenamientos nuevos.
+
+Con costos positivos, todos los predecesores de una ruta óptima tienen distancia menor que su destino; por eso se procesan antes de cerrar ese destino, incluida una mejora de primerID por convergencia. Al cerrarlo se examinan solo las salidas del origen (grado acotado), se recupera el arco abierto al primer vecino elegido y su costo mínimo, y se devuelve (primer_indice, direccion, costo_paso, costo_total). No se copian caminos completos ni se reserva un arreglo nuevo por sala para reconstruirlos. Los grafos de T019 no tienen arcos paralelos; no se afirma haber probado un desempate entre direcciones equivalentes hacia el mismo vecino.
+
+finally llama frontera.finalizar aun al retornar temprano; limpia solo los pendientes de la frontera y sus posiciones, imputados a esta consulta. No cambia el motor, agenda, azar, posición de actores, conocimiento o puertas. No hay nuevas importaciones ni estructuras prohibidas. Preparación del grafo sigue O(V log V + E log V), espacio O(V+E), fuera de consulta; el análisis de la consulta mantiene O((Vr+Er)log(Vr+1)) y limpieza O(F) con auxiliares O(V) reutilizados. Esto es análisis del diseño/código, no medición de localidad ni certificación temporal.
+
+### Ejecuciones reales sin modificar expectativas
+
+```powershell
+python -B -m unittest tests.test_rutas_cazador tests.test_grafo_terreno tests.test_heap_rutas -v
+python -B -m unittest tests.test_costos_terreno tests.test_velocidad_terreno tests.test_grafo_terreno tests.test_heap_rutas tests.test_juego tests.test_enemigos tests.test_regresiones_juego tests.test_integridad_operaciones.TestIntegridadOperaciones.test_precarga_fallida_no_rompe_movimiento_ni_replay
+```
+
+Comandos portables; intérprete original Python 3.12.14 del runtime auxiliar de Codex, -B. Primera ejecución sin temporales: 23/23 métodos aprobados en 0.011 s (10 de rutas con 11 casos, 5 de grafo, 8 de heap), OK/salida 0. Segunda, con acceso autorizado a temporales: 99/99 en 1.851 s, OK/salida 0. Cero fallos/errores/skips; los once AttributeError anteriores de T019 desaparecen sin modificar esa suite. Las 13 pruebas de estructuras están incluidas en ambos comandos; son 109 métodos únicos, no 122 distintos.
+
+Control complementario realmente ejecutado, sin crear/modificar archivos de prueba: el grafo de alternativas de T019 se consulta tres veces sobre el mismo EspacioBusqueda/HeapRutas. 90→80 con límite 300 devuelve primer ID 3/N/paso100/total300; con límite 100 devuelve None; 80→90 con límite 300 devuelve primer ID 50/S/paso100/total300. Después de cada consulta se comprueba frontera vacía y mismos objetos de los cinco arreglos auxiliares; generación final 3. Resultado satisfactorio, salida 0. Es un control puntual de reutilización, no la referencia independiente/generativa de T026 ni pruebas de cambios de puertas/invalidez de US3.
+
+La duración de unittest no prueba <20 ms: no se ejecuta benchmark y Q3 sigue pendiente. Tampoco se certifican aún localidad T039, equivalencia exhaustiva T026 o suministro/acceso efectivo de B.
+
+### Estado y archivos
+
+T019 y T021 verificadas/completadas para los escenarios válidos de núcleo autorizados. T020 no está preparada y no se implementa T022 ni modelo/cazador.py. No se conecta al motor o compañeros, no se incorpora main ni se cambia la frontera temporal. Permanecen pendientes Q1–Q3, E-B-COSTOS/E-B-RANGO/E-C-RUTA/E-C-DESPACHO y demás acuerdos. Archivos modificados en esta etapa: modelo/rutas.py y documentación propia tasks.md, quickstart.md, prompts-registro-local.md (P31). La suite T019 sin seguimiento procede de la etapa anterior y permanece intacta. No se realizan operaciones Git de escritura; constitución, PROMPTS_LLM.md, interfaz y restantes archivos de producción/pruebas se conservan.
+
+## Preparación TDD de decisión del cazador — T020 — 2026-11-06
+
+Autorización posterior exclusiva para tests/test_decision_cazador.py y documentación propia. Se revisan constitución, Parte II §3.2, spec/plan/tasks, contratos y buscar_ruta real. T020 depende de T006/T010, ambas completas; T021 también está verificada y se utiliza sin editar. A3 exige atacar antes de buscar al compartir sala; A5 exige basarse en esqueleto/puertas reales sin dependencia del conocimiento o contenido descargado. Rangos enteros positivos explícitos y costos válidos permiten preparar esos escenarios sin cerrar Q1–Q3. Checklist conserva sus pendientes y ningún contrato E-* se acredita.
+
+### Propuesta interna y controles
+
+La suite propone decidir_cazador(origen_indice, destino_indice, rango, consultar_ruta) en el futuro modelo/cazador.py. Devuelve (accion, direccion_o_None, costo_base): atacar/esperar con 100, o mover con dirección y costo del primer arco, sin ejecutar la acción. No cambia decidir_accion de C ni constituye contrato aprobado con B/C/D. La consulta inyectada solo recibe índices y límite; una clausura local instrumentada registra llamadas y delega en buscar_ruta real con GrafoTerreno/EspacioBusqueda/HeapRutas existentes. Se espera cero llamadas al coincidir y una al buscar. Esa sonda no fabrica caminos, no implementa la política y no es un nuevo mock de servicio.
+
+| Método preparado | Regla / resultado esperado aún no comprobado |
+| --- | --- |
+| test_a3_compartir_sala_ataca_antes_de_consultar_rutas | Atacar, costo 100, cero consultas; rango positivo explícito 1. |
+| test_ruta_admisible_devuelve_primer_paso_optimo_y_su_costo | Camino de dos pasos/200 frente a directo/500: mover N con costo de paso 100, no total 200. |
+| test_t1_destino_desconectado_espera_con_costo_100 | Esperar, sin dirección, costo 100. |
+| test_t2_costo_101_supera_rango_100_y_espera | Esperar con costo 100. |
+| test_a4_distancia_igual_al_rango_permite_perseguir | Distancia/rango 200: mover N, paso 100. |
+| test_unica_puerta_cerrada_impide_movimiento | Esperar 100 sin abrirla. |
+| test_atajo_cerrado_no_impide_usar_alternativa_abierta | Ignorar atajo cerrado de costo 50 y seguir alternativa abierta de costo 200, pagando paso 100. |
+| test_consulta_no_modifica_posiciones_azar_agenda_ni_puertas | Conservar exportación de estado, RNG, posiciones, identidad/tiempos/secuencias/cancelación/en_cola de eventos y puertas reales. |
+| test_a5_misma_decision_sin_descargas_adicionales_de_contenido | Dos subcasos antes/después de descargar contenido: misma decisión y contadores/llamadas sin incremento durante consulta. |
+
+Se reutiliza crear_salas sin modificarlo ni añadir un fixture. Para observar estado real, motor_terreno ejecuta primero un movimiento completo legal del jugador, separándolo del enemigo en t=250; entonces se consulta la política con sus posiciones reales. No se mueve/teletransporta al enemigo ni se cambia su comportamiento, velocidad o evento: se prueba la futura función pura sobre esos índices, no un turno de un cazador conectado al motor. Los auxiliares de rutas pueden cambiar sus generaciones; las observaciones protegidas son las del juego/puertas/agenda/azar, no esos derivados.
+
+Para A5 se reutiliza ServidorFalso ya existente (ningún doble externo nuevo): una llamada explícita de preparación obtiene el esqueleto y, solo antes del segundo subcaso, otra obtiene el contenido de cuatro salas. La política no recibe ese servidor, contenido ni conocimiento; solo la consulta sobre el mismo grafo. Se comparan sus contadores y lista de llamadas antes/después de cada decisión, esperando cero descargas adicionales. No se afirma una prueba de integración con la red real, precarga/conocimiento de C o datos HTTP de B, ni una intercepción global de cualquier HTTP posible. El origen/rango del catálogo y conexión al motor siguen reservados a acuerdos/T025; no se añade campo rango a tipos.py. El valor None en la tupla indica ausencia de dirección, no una política para rango null.
+
+### Ejecuciones reales y límites actuales
+
+```powershell
+python -B -m unittest tests.test_decision_cazador -v
+python -B -m unittest tests.test_rutas_cazador tests.test_costos_terreno tests.test_velocidad_terreno tests.test_grafo_terreno tests.test_heap_rutas tests.test_juego tests.test_enemigos tests.test_regresiones_juego tests.test_integridad_operaciones.TestIntegridadOperaciones.test_precarga_fallida_no_rompe_movimiento_ni_replay
+```
+
+Comandos portables; intérprete original Python 3.12.14, -B y acceso autorizado a temporales. Nueva suite: nueve métodos/diez casos, diez errores en 0.082 s, FAILED (errors=10)/salida 1 por ModuleNotFoundError: modelo.cazador todavía no existe. La importación se hace por caso para que todos se enumeren; no hay skip/expectedFailure ni implementación provisional que falsee resultados. Las preparaciones se ejecutan pero no se alcanzan las comprobaciones de decisiones/ausencia de efectos posteriores a la llamada: no se acredita aceptación ni independencia de descargas por preparar un assert.
+
+Rutas y regresiones existentes: 109/109 métodos en 2.026 s, OK/salida 0, cero fallos/errores/skips. Son diez métodos de T019 (once casos) y las 99 pruebas anteriores; incluyen las 13 de grafo/heap, sin contarlas dos veces. No se ejecuta benchmark ni se afirma rendimiento Q3.
+
+T020 queda preparada, casilla pendiente hasta verificación satisfactoria tras T022. La siguiente tarea exacta es T022, implementar la decisión en modelo/cazador.py usando la búsqueda T021, previa autorización. No se crea ese módulo ni se ejecuta otra tarea; los comportamientos existentes de C permanecen intactos. Archivos nuevos/modificados de esta etapa: tests/test_decision_cazador.py, tasks.md, quickstart.md y prompts-registro-local.md (P32). Producción, pruebas/fixtures existentes, constitución y documentación compartida no cambian. No se incorpora main ni se realizan operaciones Git de escritura. Q1–Q3 y entregas externas siguen abiertas; PROMPTS_LLM.md espera traslado autorizado. No existe .specify/extensions.yml al revisar hooks antes/después.
+
+## Frontera temporal AD-01
+
+2026-11-06: preparación TDD de FR-020, sin tocar producción. Se reutiliza `motor_terreno` con motor/agenda reales. La sonda de prueba registra los eventos retornados por `ejecutar_ciclo` sin sustituir el despacho ni sus resultados. Los casos sintéticos preparan contador, vida inicial herida o efecto vigente en t=0 cuando corresponde; no cambian el reloj ni ejecutan acciones antes de un turno. No se prueba aún `historia` ni el registro de D.
+
+```powershell
+python -B -X utf8 -m unittest tests.test_frontera_temporal -v
+python -B -X utf8 -m unittest tests.test_costos_terreno tests.test_velocidad_terreno tests.test_grafo_terreno tests.test_heap_rutas tests.test_juego tests.test_enemigos tests.test_regresiones_juego tests.test_integridad_operaciones.TestIntegridadOperaciones.test_precarga_fallida_no_rompe_movimiento_ni_replay -v
+```
+
+| Caso nuevo | Resultado histórico antes de AD-02 |
+| --- | --- |
+| A14: jugador 10, enemigo 11 | Falla: vida 30 al devolver en t=100; esperada 28. |
+| A14: enemigo 10, jugador 11 | Pasa: ataque, turno, daño y azar en orden. |
+| A15: ataque letal empatado | Falla: `terminado` es falso al devolver. |
+| A16: futuro t+1 | Pasa: cierre de puerta en t=101 pendiente e intacto. |
+| A16: cierre cancelado en t | Pasa: sin cierre ni adelanto de reloj. |
+| A16/A17: cancelado posterior al turno | Pasa: restaurar velocidad sustituye turno enemigo t=100 por t=101; el nuevo queda pendiente sin ataque ni tirada. Protege contra ejecutar t+1 al descartar cancelados. |
+| A17: fin de efecto en t | Pasa: ataque, restauración y turno en secuencia; enemigo reprogramado a t=150. |
+| A17: reprogramar al jugador | Pasa: restauración en t=50, frontera vigente en t=75. |
+| A18: dos decisiones sucesivas | Falla: vida 28 en t=200; esperada 26 por dos ataques. |
+| A18: repetir con misma semilla | Falla: las dos ejecuciones coinciden, pero conservan un evento vigente en la frontera. |
+| Control de API: un evento por `ejecutar_ciclo` | Pasa: el paso individual sigue dejando los demás en cola. |
+
+Corrida histórica de AD-01: 11 pruebas en 0.581 s, 7 aprobadas, 4 fallos de aserción, 0 errores u omisiones, salida 1. Las 99 regresiones pasaron en 2.028 s, incluida T016 con su expectativa anterior. Los cuatro fallos reproducían el corte en `turno_jugador`. Las duraciones de unittest corresponden a la ejecución de las suites.
+
+## Validación local AD-03
+
+FR-020 aplica el orden por tiempo y secuencia de Parte I §2.3 y permite observar el estado previo a la decisión descrito para `historia <t>` en Parte II §3.6 y Apéndice B. La especificación quedó confirmada en `26be407`. En AD-02, el bucle del motor conserva el instante del turno vigente como límite y continúa el despacho en la misma transacción. La cola comprueba el límite en cada raíz antes de extraerla. `ejecutar_ciclo()` sin límite sigue procesando un evento vigente por llamada.
+
+Los cuatro casos reconciliados se contrastaron con las trazas. Errante y rastreador programan t=21 al moverse en t=20. El ataque empatado en t=21 programa t=31. La sonda de costos llama una vez al método real, devuelve el mismo evento y registra ambos tiempos del movimiento en una lista local al caso. El fixture crea un motor nuevo por caso. T016 verifica ambos ataques con el daño derivado de dos tiradas, el estado final del RNG y el turno pendiente en t=300. La regresión de regeneración comprueba vida 18 tras los pulsos en t=50 y t=100, y mantiene la comprobación de vida 10 y agenda original al retroceder.
+
+Corrida de AD-03 con el intérprete auxiliar y `unittest`, API real deshabilitada y sin paquete oficial opcional:
+
+| Grupo | Resultado |
+| --- | --- |
+| `tests.test_frontera_temporal` | 11/11, incluidos ambos órdenes del empate, derrota, cancelaciones, efectos, reprogramación y RNG. |
+| Las 99 regresiones del comando de AD-01 | 99/99, incluidos T016, T7, retroceso y el caso de precarga y replay. |
+| `tests.test_rutas_cazador` | 10/10. |
+| Descubrimiento adicional en `tests/`, excluidos los grupos ya ejecutados y T020 | 360 entradas de unittest. 350 aprobadas, 2 fallos, 5 errores y 3 omisiones. |
+| `tests.test_cliente_api` y los dos casos de `TestOffline` que requieren `requests`, con el Python de `.venv` | 12/12. Sustituyen el error de importación del módulo y dos errores de precarga de la corrida anterior. |
+
+Las tres omisiones corresponden a la API real y a dos pruebas del paquete oficial opcional. T020 queda excluida de la corrida de funcionalidades disponibles porque depende de T022 y de `modelo.cazador`.
+
+Los cuatro resultados de interfaz restantes se reprodujeron con `modelo/juego.py` y `modelo/eventos.py` de `26be407` cargados en memoria y el mismo intérprete auxiliar:
+
+- `test_redibujar_menu_crea_animacion_nueva_y_destruirlo_la_cancela`: misma instancia de animación tras redibujar.
+- `test_reposo_preparado_conserva_pose_de_agarre_y_daga_contraria`: diferencia de píxeles.
+- `test_refresco_de_inventario_no_borra_la_animacion_de_dano`: el fixture de `VistaGrafica` carece de `escena`.
+- `test_menu_reproduce_intro_una_vez_al_mostrarse`: el fixture de `MenuInicio` carece de `canvas` y `_precarga_selector`.
+
+Las sondas en memoria comprobaron que un evento insertado en t durante el despacho se procesa por secuencia, que los eventos vigentes y cancelados de t+1 permanecen en cola y que los mensajes se publican con el estado final del turno. Una excepción después del ataque empatado restauró reloj, vida, posición, RNG, contador, agenda e historial y dejó la publicación vacía.
+
+AD-03 cierra la validación local de FR-020. La validación con la línea de tiempo de D, su formato serializable y E-D-CAMBIOS quedan pendientes. Q1–Q3 y T020/T022 conservan su estado.
+
+## Cierre local de T020 y T022
+
+T020 verifica el contrato interno de `decidir_cazador(origen_indice, destino_indice, rango, consultar_ruta)`. T022 lo implementa para datos válidos en `modelo/cazador.py` según Parte II §3.2. En la misma sala devuelve atacar con costo 100 y cero consultas. En salas distintas delega el rango inclusivo a T021. Si no hay paso admisible devuelve esperar con costo 100. Si lo hay, devuelve la dirección y el costo de la primera salida. T021 resuelve el desempate por menor ID de la primera vecina sobre el esqueleto y las puertas reales.
+
+La corrida de cierre reemplaza el resultado inicial de preparación TDD de T020. Los casos verifican puertas, costo, rango, estado del motor y ausencia de descargas adicionales durante la decisión.
+
+| Suite | Resultado |
+| --- | --- |
+| `tests.test_decision_cazador` | 9/9 métodos, incluidos los dos subcasos de A5. |
+| `tests.test_rutas_cazador` | 10/10 métodos. |
+| `tests.test_frontera_temporal` | 11/11. |
+| Regresiones anteriores del comando de AD-01 | 99/99. |
+
+Total: 129 métodos aprobados, con cero fallos, errores u omisiones. Se marcan T020 y T022 para el alcance local con entradas válidas. Q1–Q3 y los contratos externos siguen pendientes.
+
+La corrida usa `buscar_ruta` de T021 en el árbol de trabajo. Esa función todavía falta en `HEAD` (`299079d`). La suite de decisión importa `buscar_ruta` directamente, así que el commit de T020/T022 debe quedar después de confirmar T019/T021.
+
+## Validación local de T026
+
+Los dos casos de `tests.test_rutas_cazador` comparan el costo mínimo total y el ID de la primera sala vecina con una enumeración independiente de caminos simples, sin usar el heap de producción. La cuadrícula uniforme tiene seis rutas óptimas empatadas y conserva el mismo resultado al variar el orden de las conexiones y de las salas.
+
+En dos cuadrículas ponderadas se compararon 144 pares ordenados de salas distintas. Se verificaron puertas cerradas, destinos inalcanzables y límites inclusivos de costo. Para las rutas con costo mayor que 1 también se comprobó el rechazo con un límite una unidad menor.
+
+Resultados de la ejecución de T026: 12/12 rutas, 9/9 decisión, 11/11 FR-020 y 99/99 regresiones. Total: 131 pruebas aprobadas.
+
+## Validación local de T039
+
+Con rango 4 y cinco salas alcanzables fijas, la prueba P2 amplía el mapa a 6, 69 y 8.197 salas. Prepara grafo, índices y arreglos antes de instrumentar cada consulta. La enumeración independiente de caminos simples confirma primer vecino 3, dirección N, costo del paso 2 y total 4. La consulta al destino exterior devuelve `None`.
+
+En cada tamaño se observaron 4 extracciones, 4 accesos a adyacencias, 75 lecturas y 37 escrituras de auxiliares y 1 descarte final para el destino local. Para el destino exterior se observaron 5, 5, 81, 38 y 0, respectivamente. La revisión repitió los conteos y comprobó que la consulta sin sondas devuelve el mismo resultado. El pico de `tracemalloc` expresa bytes trazados de la consulta instrumentada y se registra por separado de los conteos de operaciones.
+
+La reejecución de `tests.test_localidad_rutas`, rutas, decisión, FR-020 y las 99 regresiones del comando de AD-01 pasó 132/132 pruebas. T046 sigue pendiente de la referencia oficial Q3, la conexión de D y la medición del ciclo completo.
+
+## Cierre documental local de T051
+
+El [registro local](prompts-registro-local.md#corte-documental-en-p77) consolida 77 solicitudes íntegras hasta P77, con una fila por ID en orden de envío. Se verificaron 73 cuerpos en el registro y cuatro en los tres anexos. Se conservaron P01–P75 y los anexos, y se cotejaron P76 y P77 con el registro original de la sesión de Codex.
+
+Los dos mensajes incompletos entre P48 y P33 conservan sus fragmentos literales y sus finales siguen pendientes de recuperación. La autorización de este cierre es posterior al corte y queda para el mantenimiento incremental. El traslado a `PROMPTS_LLM.md` sigue pendiente de autorización.

@@ -10,6 +10,8 @@
 
 **Input**: Persona A solicita terreno ponderado, cazador y decisiones de ruta válidas, conservando las reglas de Parte I salvo cambios explícitos de Parte II. Texto íntegro de la solicitud: [registro pendiente](prompt-registro-pendiente.md).
 
+**Adenda 2026-11-06.** FR-020 y A14–A18 documentan la decisión técnica de Persona A para compatibilidad con `historia <t>`, pendiente de validación de integración con Persona D. Esta etapa autoriza documentación y preparación de pruebas. La enmienda debe confirmarse en Git antes de modificar producción, conforme a la constitución IV. Q1–Q3 y los contratos externos siguen pendientes.
+
 ## Clarifications
 
 ### Session 2026-11-02
@@ -79,6 +81,18 @@ Como jugador, quiero que cada persecución responda al estado vigente, aunque el
 8. **A12**, **Given** una acción reversible con movimiento, efectos y puertas, **When** se usa un pergamino, **Then** se restituyen el estado del motor, eventos, secuencias y azar anteriores, respetando la exclusión de pergaminos y el máximo de cinco acciones; si se repite la misma acción, conserva el resultado determinista correspondiente. La infraestructura de caché no se revierte. (FR-014, FR-018)
 9. **A13**, **Given** un jugador en una sala y rastros vecinos de antigüedad conocida, **When** ejecuta una acción válida, **Then** se refresca el rastro pertinente según FR-019; un rastreador solo considera vecinas abiertas con rastro de menos de 400 unidades, desempata por menor ID y espera si no hay rastro fresco; un guardián sin jugador en su sala espera. (FR-011, FR-019)
 
+### Frontera temporal del jugador
+
+Parte I §2.3 (p. 4) fija el orden total por tiempo y secuencia. Parte II §3.6 (p. 6) define el estado de `historia <t>` después de todos los eventos ≤ t y antes de la decisión que corresponda en t. El Apéndice B (p. 13) incluye expresamente el empate. Persona A adopta FR-020 para que la siguiente decisión observe ese estado con el orden de eventos de Parte I. La validación con la línea de tiempo de Persona D está pendiente.
+
+- **A14 — Ambos órdenes:** en t=100, jugador secuencia 10 y enemigo secuencia 11 se ejecutan en ese orden; se devuelve control después del ataque, con el daño ya aplicado. Con enemigo secuencia 10 y jugador secuencia 11, se ejecuta primero el ataque y luego el turno del jugador; la decisión también observa el daño. FR-006, FR-014, FR-020.
+- **A15 — Derrota:** un ataque letal de secuencia 11 tras el turno 10 en t=100 deja la partida terminada antes de ofrecer otra decisión; rige la terminación inmediata de FR-017. FR-017, FR-020.
+- **A16 — Cancelación y horizonte:** un evento cancelado en t no produce efecto. El primer evento vigente en t+1 queda pendiente, aunque haya cancelados entre él y el turno del jugador. FR-006, FR-017, FR-020.
+- **A17 — Efectos:** los eventos de efectos en t respetan su secuencia. Si reprograman un turno todavía pendiente, se respeta FR-005 y se usa la ocurrencia nueva; un turno desplazado a t+1 no se ejecuta como parte de t. FR-005, FR-006, FR-020.
+- **A18 — Continuidad:** en partidas activas idénticas, se observan los mismos efectos, consumo de azar y agenda al devolver el control. Dos decisiones consecutivas no difieren ni duplican un ataque que corresponda a la frontera anterior. FR-014, FR-018, FR-020.
+
+La primera acción en t=0 y los costos conservan sus reglas. Esta adenda no implementa `historia`, su registro serializable ni la reconstrucción de D.
+
 ### User Story 4 - Conservar la fluidez con muchos cazadores (Priority: P2)
 
 Como jugador, quiero que el procesamiento entre mis decisiones siga siendo ágil con decenas de cazadores, sin sacrificar decisiones correctas.
@@ -126,6 +140,7 @@ Como jugador, quiero que el procesamiento entre mis decisiones siga siendo ágil
 - **FR-017**: DEBEN conservarse combate y efectos de P1 §§2.6, 2.10: daño mínimo 1, vida limitada a vida máxima, muerte inmediata sin acciones futuras; veneno cada 80 durante 400 salvo cancelación, regeneración cada 200, antorcha por duración declarada, trampa inmediata tras entrada y rearme 300 salvo valor declarado, cierre según salida. Cancelar impide activaciones futuras. Guardianes, errantes y rastreadores no adquieren reglas de cazador.
 - **FR-018**: Los cambios del motor DEBEN ser reversibles y reconstruibles para retroceso e historia, incluidos reloj, actores, puertas, efectos, eventos, secuencias y azar. Se conserva el retroceso de hasta cinco acciones, sin consumir tiempo, sin recuperar pergaminos ni revertir caché; historia y persistencia completas corresponden a otra capacidad. Fuentes: P1 §2.11; P2 §3.6.
 - **FR-019**: DEBE conservarse el rastro actualizado en la sala inicial, destino del movimiento y en cada acción del jugador según P1 §2.9 y Apéndice B. La coordinación del rastro pertenece a C; esta capacidad conserva la conexión temporal.
+- **FR-020**: Cuando se procese el turno vigente del jugador en t y la partida siga activa, el motor DEBE completar los eventos automáticos vigentes del mismo t por (tiempo, secuencia), incluidos los que se encolen en t durante el procesamiento, antes de solicitar otra acción. Los cancelados no actúan, ningún evento posterior a t se ejecuta anticipadamente y la partida terminada no ofrece otra decisión. P1 §2.3 establece el orden. P2 §3.6 y el Apéndice B definen el estado histórico. La frontera operativa es una decisión técnica de Persona A pendiente de validación de integración con D.
 
 ### Non-Functional Requirements
 

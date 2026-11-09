@@ -1,6 +1,8 @@
-# Contratos de integración propuestos — no acordados
+# Contratos de integración y frontera temporal A–D
 
 **Fecha:** 2026-11-02. Documentación de Plan, no interfaces implementadas. [Modelo](../data-model.md), [requisitos](../spec.md). Nombres descriptivos revisables; ningún componente de B/C/D se considera disponible por aparecer aquí.
+
+**Adenda 2026-11-06.** Persona A adopta la frontera temporal para compatibilidad con `historia <t>`. La validación de integración con Persona D y los entregables de la tabla siguen pendientes.
 
 **Actualización documental:** 2026-11-05, I1. Cada fila siguiente es un entregable independiente. Registrar responsable, alcance exacto, fuente/evidencia y fecha antes de cambiar su estado; una propuesta o una solicitud enviada no equivale a aceptación. La tarea T003 consolida este registro, pero sus consumidores solo esperan sus filas concretas. No se requiere completar todas las filas para acreditar una sola. Estado actual: todas pendientes, sin contratos aprobados.
 
@@ -67,7 +69,8 @@ Validación de contrato propuesta: origen=destino; ruta dentro del límite y exa
 Propuesta de sobre conceptual de cambio: identidad estable de entidad, campo u operación, valor anterior/nuevo, instante virtual y orden semántico. Debe cubrir posición, vida, efectos, puertas, eventos creados/cancelados/extraídos, secuencias y estado de azar donde corresponda. No entregar referencias Python/callbacks como si fueran persistibles.
 
 - A instrumenta su motor; C entrega inventario/conocimiento. D define agregación, serialización, checkpoints y reconstrucción, sin deducir reglas del motor.
-- A informa límites entre acciones del jugador y eventos; acordar numeración de acciones y eventos simultáneos con D. Orden de eventos sigue tiempo/secuencia; historia en t incluye todos los eventos ≤t y, si hay decisión del jugador, muestra estado anterior a decidir según P2 §3.6. No cambiar el motor unilateralmente para resolver tensiones de integración.
+- **Decisión técnica de Persona A.** El estado de decisión en t debe reflejar el cierre de los eventos automáticos de t en orden tiempo/secuencia y dejar pendientes los de t+1. Si el jugador 10 precede al enemigo 11 en t=100, el daño se refleja antes de la siguiente decisión. En el orden inverso también se refleja. La derrota termina la partida antes de otra decisión. Queda pendiente validar que esta frontera corresponda al estado anterior a la acción en la línea de tiempo de D, conforme a P2 §3.6 y el Apéndice B. [FR-020 y A14–A18](../spec.md#frontera-temporal-del-jugador).
+- **E-D-CAMBIOS sigue pendiente.** Queda por acordar la numeración de acciones, los puntos de captura, el formato serializable, el rollback/retroceso y el tratamiento de empates en la reconstrucción.
 - C/D coordinan recorte tras pergamino; A invalida todo derivado de rutas al restaurar. Época del cache no es secuencia semántica ni se rebobina para identificar estados viejos como nuevos.
 - D versiona formato de guardado; preservar o rechazar/migrar explícitamente formatos anteriores. No añadir campos a snapshots.py ni alterar persistencia desde A sin acuerdo.
 - D recibe costo de salidas y tipo cazador para presentación; si necesita recurso gráfico debe consultarlo. A no genera ni reemplaza arte.
