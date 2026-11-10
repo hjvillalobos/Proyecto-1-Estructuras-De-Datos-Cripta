@@ -36,6 +36,8 @@ Requiere Git y el objeto de D `02da6b6f159b28279e3fe7dc5177c97c16898f42` disponi
 En una ejecución directa de discovery sobre la rama de C, la clase de pruebas de integración informa una omisión explícita si no existe modelo.linea_tiempo. Esa omisión no acredita integración: usar siempre el comando anterior para comprobarla. La copia conserva fuentes para inspección, no se versiona.
 
 `campos_iniciales(mapa)` crea una base única. `convertir_cambios(lote)` produce tipos de D; requiere que esos tipos estén presentes y no registra acciones. Las claves propuestas conservan grado de conocimiento y recuerdos; no incluyen la proyección de nombres/salidas que espera el resumen visual. No conectar directamente a la interfaz ni al binario sin confirmar ese contrato con D.
-# I4: verificación prevista de rutas conocidas
+# I4: verificación de rutas conocidas
 
 Ejecutar `python -B -m utilidades.verificar_conocimiento_rutas` desde la raíz; añadir `--bench` para diagnóstico sintético. Requiere el objeto Git de A 9730482d4c6e33e5ba39e6eeb6f76d1f19b4220c. Copia únicamente rutas.py de A junto con los componentes de C a .cache. No conecta movimiento, no modifica ramas ni usa red. Las pruebas directas sin rutas.py informan omisión explícita; usar el verificador para acreditar este incremento.
+
+Resultado comprobado: 23 pruebas sin omisiones (16 de conocimiento y siete nuevas de rutas, una con 60 grafos de semilla 927). Con A integrado, `PlanificadorConocido(mapa).consultar(origen, destino)` devuelve un paso propuesto o el motivo de no producirlo; no mueve al jugador. Conservar el planificador mientras viva el mismo mapa, incluso al revertir sus deltas. Reconstruirlo si se sustituye el mapa completo. No modificar el conocimiento durante una consulta.

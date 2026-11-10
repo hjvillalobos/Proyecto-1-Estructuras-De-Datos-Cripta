@@ -2,7 +2,7 @@
 
 **Feature Branch**: `codex/002-niebla-viaje`
 **Created**: 2026-11-08
-**Status**: I1 e I2 implementados y probados; I3 comprobado contra historia real de D en copia aislada. Capacidad completa pendiente de Q1, conexión al motor y revisión cruzada.
+**Status**: I1 e I2 implementados y probados; I3 comprobado contra historia real de D e I4 contra rutas reales de A en copias aisladas. Capacidad completa pendiente de Q1, viaje ejecutable, conexión al motor y revisión cruzada.
 
 **Actualización de alcance I1:** el usuario autorizó implementar lo independiente de sus compañeros. Se cierra la aclaración del incremento de conocimiento básico descrito abajo; la capacidad completa continúa pendiente. La autorización posterior de I2 amplía ese alcance únicamente con las operaciones independientes indicadas en su apartado.
 **Input**: Persona C según asignación confirmada por el usuario. Preparar su capacidad conforme a Parte II §§3.3–3.4, 5.3, 5.6, 6.1 y Apéndice B.

@@ -44,7 +44,7 @@ I1 administra conocimiento sin modificar el motor: exploración por entrada fís
 | `tests/test_conocimiento_historia.py` | Adaptación a tipos reales de D y reconstrucción. |
 | `utilidades/bench_conocimiento.py` | Implementado: consultas, revelación, inversión, memoria y proyección; no mide cálculo de paso. |
 
-Existen conocimiento, detención, sus pruebas, la demostración y el benchmark local. Los archivos de viaje completo y prueba de historia siguen propuestos; historial e inventario existentes no se modificaron. `modelo/juego.py` y `modelo/rutas.py` se coordinan con A; controlador, snapshots y persistencia con D. No se crean versiones paralelas de sus tipos en C para aparentar integración.
+Existen conocimiento, detención, adaptadores de historia y rutas, sus pruebas aisladas, la demostración y benchmarks locales. El viaje ejecutable sigue pendiente; historial e inventario existentes no se modificaron. `modelo/juego.py` y `modelo/rutas.py` se coordinan con A; controlador, snapshots y persistencia con D. No se crean versiones paralelas de sus tipos en C para aparentar integración.
 
 ## Diseño candidato
 
@@ -66,7 +66,7 @@ D ya admite escalares y tuplas inmutables mediante ValorHistorico y CambioHistor
 
 ### Rutas y viaje
 
-Preferencia: reutilizar la búsqueda propia de A mediante fuente filtrada y consulta sin límite. La implementación publicada usa `arco.puerta.get("cerrada", False)` y compara contra un límite numérico: no basta pasarle el mapa real ni sustituir ausencia de límite por un número enorme. A/C deben acordar la extensión; si no resulta viable, documentar una alternativa antes de programar otro buscador.
+Se reutiliza la búsqueda propia de A mediante fuente filtrada y consulta sin límite. Desde 33d97ac admite limite=None; I4 comprueba la fuente filtrada contra 9730482, conservando su lectura `arco.puerta.get("cerrada", False)` mediante una fachada sin diccionario. No se pasa el mapa real ni se sustituye ausencia de límite por un número enorme. La compatibilidad comprobada no equivale a integración del movimiento o aceptación del contrato completo por A.
 
 C propone un paso; el controlador ejecuta un movimiento ordinario; el motor cierra el intervalo; C recibe hechos del paso y decide si continúa. Se debe poder procesar pergamino entre pasos. Se registra daño ocurrido, incluso si una curación posterior restaura la vida. D mantiene registro individual de movimientos y comentario de viaje. No se afirma que el callback booleano actual satisfaga estas necesidades.
 

@@ -47,9 +47,9 @@ Orden: documentación confirmada antes de T014/T015; T014 antes de T015; T016 pe
 
 ## I4: búsqueda por conocimiento con A
 
-- [ ] T018 Escribir C21–C25 en tests/test_conocimiento_rutas.py, con oráculo independiente reproducible (FR-003/004/007/008/010/012/017).
-- [ ] T019 Implementar modelo/conocimiento_rutas.py con fuente filtrada y buscador real de A (FR-007/008/010/012/017).
-- [ ] T020 Preparar utilidades/verificar_conocimiento_rutas.py y utilidades/bench_rutas_conocidas.py; comprobar fuente real sin modificar A ni certificar PR-001 con carga sintética (FR-008/017, PR-001 parcial).
-- [ ] T021 Ejecutar pruebas, regresión de C y diagnóstico; registrar alcance y resultados en baseline.md y quickstart.md (SC-001/002/003 parciales).
+- [x] T018 Escribir C21–C25 en tests/test_conocimiento_rutas.py, con oráculo independiente reproducible (FR-003/004/007/008/010/012/017).
+- [x] T019 Implementar modelo/conocimiento_rutas.py con fuente filtrada y buscador real de A (FR-007/008/010/012/017).
+- [x] T020 Preparar utilidades/verificar_conocimiento_rutas.py y utilidades/bench_rutas_conocidas.py; comprobar fuente real sin modificar A ni certificar PR-001 con carga sintética (FR-008/017, PR-001 parcial).
+- [x] T021 Ejecutar pruebas, regresión de C y diagnóstico; registrar alcance y resultados en baseline.md y quickstart.md (SC-001/002/003 parciales).
 
 Orden: especificación confirmada antes de T018/T019; pruebas antes de implementación; T020 permite verificar T019; T021 después. La revisión clarify de I4 no encuentra reglas pendientes dentro de su alcance; Q1 y los acuerdos del viaje completo permanecen abiertos. No se modifica la lista general de calidad.

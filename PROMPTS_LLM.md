@@ -888,3 +888,20 @@ Prompts textuales inmediatos:
 > entonces hagamos eso
 
 Uso: actualizar propuesta con garantía de validación atómica reportada por A/D y comprobada en código; registrar soporte real de limite=None de A; especificar FR-019 y C18–C20, plan y tareas, revisar consistencia y confirmar documentos en 00110f4 antes del código. Crear conversión independiente al formato histórico real de D, pruebas y verificador aislado fijado a commit. Ninguna modificación en motor, interfaz o persistencia ajenos. Comprobación de 19 pruebas aisladas sin omisiones y 148 seleccionadas de regresión. La proyección visual y nombres de campos siguen pendientes de aceptación; no se declara partida integrada. Publicar únicamente los commits de C en su rama para mantener visible el avance, sin fusionar main ni puntajes.
+### Persona C — rutas conocidas I4 — 2026-11-09
+
+Herramienta: Codex desktop; identificador exacto de modelo no registrado.
+
+Prompts textuales de seguimiento:
+
+> del 1 al 100 en cuanto estamos de lo que cubre mi parte del proyecto?
+
+> gracias! Eso que sigue se puede hacer ya o hay que esperar a algun cambio de los compañeros?
+>
+> Vi que Sebas acaba de subir algo, puedes revisar de nuevo el repo por favor
+
+> Okay, sigamos con la otra parte
+
+> del 1 al 100 cuanto llevamos de mi parte?
+
+Uso: revisar referencias remotas y cambios H3 de A sin fusionar; estimar avance completo en torno al 45 %, distinguiendo módulos aislados de integración. Delimitar I4 con escenarios existentes, aclaraciones, plan, tareas y análisis; confirmar documentación e2a1f61 antes del código. Aplicar habilidades de análisis e implementación al incremento. Preparar fuente de rutas filtrada reutilizando el buscador propio de A, pruebas y diagnóstico aislados. Documentar resultados y límite de rendimiento observado; publicar solo en rama C. Sin cambios a main, motor, interfaz ni puntajes. Este registro no resuelve la conciliación histórica pendiente de prompts.

@@ -85,3 +85,22 @@ C18 comprobó exploración al cierre y consulta antes de la segunda acción. C19
 Regresión del checkout de C: **148 pruebas, 8.783 s, OK**. No incluye las cinco de integración, que se ejecutaron en la copia aislada. Una ejecución directa de esas pruebas sin D informa una omisión explícita y remite al verificador; no se contabiliza como integración exitosa. Revisión AST del adaptador sin dict/set, sorted o list.sort; ordenamiento propio. No se midió rendimiento de historia en este ensayo.
 
 Pendiente: aprobar claves y proyección con D; incluir deltas en lote del motor y rollback completo con A. El adaptador no aporta reloj, agenda, azar, inventario ni binario. La garantía comprobada cubre los errores de validación esperados de D, no cualquier fallo de ejecución. Q1 y ruta sobre conocimiento siguen pendientes; ausencia de límite ya está soportada en A 33d97ac.
+# I4 — rutas conocidas con A (2026-11-09)
+
+Documentación confirmada en e2a1f61 antes del código. Revisión clarify del alcance independiente: entradas, rechazo sin filtrar existencia, llegada, puerta no observada y consulta tras reversión definidos; Q1 excluida. Análisis previo: cinco escenarios C21–C25 cubiertos por T018–T021, sin tareas ajenas ni conflictos críticos dentro de I4. La lista general conserva 7 casillas cumplidas y 4 pendientes, con autorización del usuario para continuar el incremento delimitado. Sin hooks de extensiones.
+
+Se reutilizó rutas.py de A 9730482d4c6e33e5ba39e6eeb6f76d1f19b4220c, sin cambios. El adaptador lee arreglos privados del componente de C; la búsqueda recibe únicamente arcos admisibles. No consulta puertas reales ni construye diccionarios. Aún no se conecta a su motor ni a la interfaz de D.
+
+Comando: `python -B -m utilidades.verificar_conocimiento_rutas --bench`. Resultado: **23 pruebas en 0.185 s, OK, sin omisiones**. Incluye siete pruebas nuevas, con 60 grafos comparados contra caminos simples exhaustivos (semilla 927), y 16 de conocimiento. La primera corrida detectó que el verificador no copiaba bench_conocimiento, requerido por una prueba de localidad existente; se añadió la dependencia y se repitió el conjunto sin debilitar pruebas.
+
+Regresión seleccionada: comando inicial con las tres suites de conocimiento/secuencias/detención, **148 pruebas en 7.264 s, OK**. Las 16 pruebas de conocimiento aparecen también en la copia aislada: no sumar ambas cifras como casos únicos. No se ejecutó la suite completa ni una partida integrada.
+
+Diagnóstico: Python 3.12.10, Windows-11-10.0.26300-SP0; cadena bidireccional fija, sin puertas ni azar, IDs separados por 7, todo explorado. Sin red/renderizado. Una consulta de calentamiento y 30 medidas de origen a extremo. Preparación corresponde solo al adaptador sobre conocimiento ya construido; la primera carga incluye importación de A.
+
+| V | E | Preparación ms | Consulta media ms | Máximo ms |
+| --- | --- | --- | --- | --- |
+| 100 | 198 | 3.568 | 0.117 | 0.144 |
+| 1000 | 1998 | 2.384 | 1.445 | 2.414 |
+| 5000 | 9998 | 11.811 | 5.783 | 6.372 |
+
+La carga de 5000 salas supera 5 ms. No es la cripta de referencia: PR-001 sigue sin acreditar, y deben medirse esa cripta y el cálculo integrado antes de cerrar rendimiento. No se incorporó todavía este diagnóstico a --bench compartido ni DECISIONES.md. La fuente es compatible técnicamente con A, pero el acuerdo de movimiento, observación, señales del paso y presentación sigue pendiente.
