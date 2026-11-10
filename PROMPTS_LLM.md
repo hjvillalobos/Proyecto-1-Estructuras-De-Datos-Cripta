@@ -929,3 +929,16 @@ Herramienta: Codex desktop; identificador exacto del modelo no registrado.
 > hay nuevos cambios en el github, revisa eso antes de continuar y seguimos con eso que dices
 
 Uso: fetch y revisión de los dos nuevos commits de B; confirmar A/D sin cambios. Identificar que el resultado de movimiento y callback del controlador todavía no aportan los hechos generales necesarios. Especificar y confirmar fee27ca antes de añadir prueba acotada C31/C32 con motor e historia reales y un verificador reproducible. Repetir 11 pruebas A/C/D y 14 de B en copias separadas. Documentar alcance, fallo inicial del exportador por main.py ausente y corrección. Publicar solo en rama C; no modificar módulos de compañeros ni main.
+### Persona C — inventario histórico I7 — 2026-11-10
+
+Herramienta: Codex desktop; modelo exacto no registrado.
+
+> cuanto hemos avanzado?
+
+> se puede seguir con otra cosa?
+
+> hagamoslo de la mejor forma para que no hayan conflictos o nada raro que me puedan reclamar
+>
+> en caso de documentar algo, es mejor no extenderse tanto y escribir humano, no robotizado, solo digo, verdad, para que no pase
+
+Uso: revisar inventario/retroceso y tipos de D; especificar FR-020 antes del código (2254020). Añadir captura incremental en un módulo separado, pruebas y verificador con historia real. Mantener documentación breve y distinguir compatibilidad probada de integración pendiente. Publicar en rama C, sin modificar módulos compartidos ni main.

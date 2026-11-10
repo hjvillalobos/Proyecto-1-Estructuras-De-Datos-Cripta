@@ -1,5 +1,11 @@
 # Comprobar el incremento I1
 
+## I7: inventario e historia
+
+Ejecutar `python -B -m utilidades.verificar_inventario_historia`: 40 pruebas con D 02da6b6, sin omisiones. La copia queda en .cache y no modifica ramas.
+
+`campos_iniciales(inventario)` entrega la base una sola vez. Antes de una operación: `captura = CapturaInventario(inventario, nodo_objetivo)`; después: `captura.terminar()`. Para recoger, pasar a terminar el nodo que devuelve recoger. El cursor es el objetivo predeterminado. No reutilizar capturas ni agrupar varias operaciones. Los deltas se agregan al lote del motor; el adaptador no registra acciones ni restaura el inventario vivo. Los IDs deben ser únicos y estables.
+
 ## I6: ensayo con motor real (2026-11-10)
 
 Ejecutar `python -B -m utilidades.verificar_viaje_motor --verificar-b`. Requiere objetos Git A 9730482d4c6e33e5ba39e6eeb6f76d1f19b4220c, D 02da6b6f159b28279e3fe7dc5177c97c16898f42 y B 694dcf64cb601bdcc252c67bf6d325314efaa9a3. No descarga dependencias ni hace fetch. Exporta solo fuentes Python a carpetas únicas ignoradas, sin copiar .idea ni cambiar ramas. Ejecuta 11 pruebas del conjunto A/C/D y, con la opción indicada, 14 de B en otra copia. Ambas deben terminar sin omisiones.

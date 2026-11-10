@@ -1,5 +1,9 @@
 # Comprobación inicial de C
 
+## I7 — inventario histórico (2026-11-10)
+
+Especificación previa: 2254020. FR-020 y C33–C36 delimitan el adaptador; revisión de coherencia sin conflictos dentro del alcance local. No cambia inventario, historial, motor ni tipos de D. `python -B -m utilidades.verificar_inventario_historia`: **40 pruebas en 0.202 s, OK, sin omisiones** (seis nuevas y 34 de inventario, retroceso e historia existentes). Comprueban recogida, equipo, retiro, selección, encendido, capacidad, rechazo atómico, consumo de pergamino y datos independientes del estado vivo. Base O(n); captura local acotada a nueve nodos más uno nuevo, sin recorrer el inventario por acción. No se midió rendimiento ni se acredita integración: faltan la captura dentro del turno y la proyección visual acordada con D.
+
 ## I6 — revisión remota y motor real (2026-11-10)
 
 Fetch: B avanzó de f24561b a 694dcf6, con entrega de costos/rango (1b0ae60) y llaves en descarga offline (694dcf6). A permaneció en 9730482 y D en 02da6b6. Se revisaron diffs de red, main y contratos; no se fusionaron ramas ni configuraciones .idea. Las entregas B siguen sujetas a revisión de A, no se aprueban en su nombre.

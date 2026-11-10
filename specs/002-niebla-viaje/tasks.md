@@ -2,9 +2,9 @@
 
 ## I7: inventario histórico
 
-- [ ] T029 Escribir C33–C36 contra inventario e historia reales (FR-020, FR-014/016 parciales).
-- [ ] T030 Implementar adaptador local sin cambiar módulos compartidos (FR-020).
-- [ ] T031 Ejecutar pruebas y regresión; documentar contrato breve y publicar C (FR-017/020).
+- [x] T029 Escribir C33–C36 contra inventario e historia reales (FR-020, FR-014/016 parciales).
+- [x] T030 Implementar adaptador local sin cambiar módulos compartidos (FR-020).
+- [x] T031 Ejecutar pruebas y regresión; documentar contrato breve y publicar C (FR-017/020).
 
 Especificación antes del código; T029 precede a T030 y T031 verifica ambos. Integración al motor pendiente.
 

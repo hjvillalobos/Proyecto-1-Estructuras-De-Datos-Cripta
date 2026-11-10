@@ -48,6 +48,8 @@ Si coinciden llegada, daño y enemigos, todas las causas deben quedar disponible
 
 ## C → A/D: conocimiento e inventario reconstruibles
 
+I7 entrega un adaptador local probado: `CapturaInventario` registra los enlaces afectados y los metadatos de una operación. Propone `inventario_estado` y `inventario_nodo:<instancia>`; no sustituye las claves visuales `inventario:<orden>` de D. Hay que acordar esa proyección y conectar la captura en los puntos de mutación de A. Los pergaminos se registran históricamente; al recortar, el motor entrega correcciones respecto de la frontera restaurada. El adaptador no calcula automáticamente esas correcciones para una partida completa.
+
 Sobre candidato de cambio: ámbito, identidad estable, operación/campo, valor anterior, valor posterior, tiempo y orden del motor. Representación concreta y tipos admitidos se acuerdan con D. No contiene referencias a nodos vivos ni funciones de Python.
 
 | Ámbito | Información mínima propuesta | Verificación |
