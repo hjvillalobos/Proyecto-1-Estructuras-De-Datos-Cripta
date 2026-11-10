@@ -122,6 +122,17 @@ Los identificadores FR son locales a esta capacidad y se citarán con el prefijo
 
 ## Clarifications pendientes
 
+### I7: datos históricos del inventario
+
+**FR-020:** conservar identidad, tipo, orden, selección, equipamiento y estado encendido de los objetos al reconstruir inventario. Registrar solo cambios de la operación; no copiar todo el inventario por acción ni sustituir el retroceso existente.
+
+Alcance aclarado: adaptador local, sin modificar inventario, motor ni historia de D. El registro histórico incluye pergaminos; la excepción de retroceso la aplica el motor mediante las correcciones de D. Capturar antes y terminar después de una sola operación de recoger, quitar, mover/equipar o seleccionar. No agrupar mutaciones independientes bajo una captura ni usarla como restauración del estado vivo.
+
+- C33: recoger, quitar y equipar desde el medio reconstruyen orden, identidad, selección y equipo antes/después (FR-020/016 parcial).
+- C34: rechazo por capacidad no produce cambios; el lote incoherente es rechazado por D sin alterar historia (FR-020/017).
+- C35: consumir un pergamino se representa como corrección al recortar, sin devolverlo ni modificar las reglas existentes de retroceso (FR-020/014 parcial).
+- C36: capturar una operación local no recorre el inventario completo y los valores registrados no cambian al mutar después los objetos vivos (FR-020).
+
 ### I6: primera comprobación con motor real
 
 Alcance del 2026-11-10, tras revisar los cambios remotos: comprobar el control de viaje con un movimiento ordinario real en el caso acotado H3 del guardián de A. No se modifica el motor ni se publica una fachada completa de viaje a partir de señales incompletas. FR-009/011/017 y FR-016 parcial.

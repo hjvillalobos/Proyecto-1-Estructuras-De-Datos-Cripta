@@ -1,5 +1,13 @@
 # Tareas de I1: conocimiento independiente
 
+## I7: inventario histórico
+
+- [ ] T029 Escribir C33–C36 contra inventario e historia reales (FR-020, FR-014/016 parciales).
+- [ ] T030 Implementar adaptador local sin cambiar módulos compartidos (FR-020).
+- [ ] T031 Ejecutar pruebas y regresión; documentar contrato breve y publicar C (FR-017/020).
+
+Especificación antes del código; T029 precede a T030 y T031 verifica ambos. Integración al motor pendiente.
+
 ## I6: primera prueba con motor real y revisión de novedades
 
 - [x] T026 Escribir C31/C32 con productor H3 y LineaTiempo reales en tests/test_viaje_motor.py (FR-009/011/016 parcial/017).

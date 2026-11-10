@@ -92,6 +92,14 @@ Para viaje: mapa completo de referencia, alternativas de costo distinto, empates
 
 ## Riesgos y alternativas
 
+### I7: inventario histórico
+
+Nuevo modelo/inventario_historia.py. Base inicial O(n); captura por operación O(1): nodo objetivo (cursor por defecto), extremos y vecinos inmediatos, más metadatos. terminar(nuevo=None) compara los mismos nodos y el nuevo de recoger, generando tipos históricos reales de D. No guarda callbacks en el lote ni cambia Inventario. Capturas temporales contienen referencias solo hasta terminar; sus valores anteriores son tuplas independientes. Captura de un solo uso.
+
+Claves propuestas inventario_estado y inventario_nodo:<instancia>, distintas de inventario:<orden> que D usa para presentación. Metadatos: capacidad, tamaño, primero, último, cursor, arma, armadura. Nodo presente: tipo, ubicación, sala, encendida, anterior, siguiente. Ausencia indica nodo retirado. Identidades deben ser únicas y no cambiar; recoger devuelve el nodo nuevo que se entrega a terminar. Captura solo operaciones locales del contrato, no mutaciones arbitrarias concurrentes.
+
+Descartado comparar dos snapshots completos por acción. No renumerar posiciones al equipar: cambiar enlaces evita deltas proporcionales al tamaño. Pruebas contra Inventario real y LineaTiempo real en copia aislada. Corrección de pergamino se prueba con la API recortar; la coordinación general del motor y la proyección visual siguen pendientes.
+
 ### I6: ensayo reproducible de motor y entrega B
 
 Crear tests/test_viaje_motor.py y utilidades/verificar_viaje_motor.py. Exportar fuentes Python de A 9730482 a carpeta ignorada; superponer únicamente tipos históricos/LineaTiempo de D 02da6b6 y módulos nuevos de C. Ejecutar motor_terreno de A con su productor registrar_h3, traducir a tipos reales de D y conservar la base de campos_iniciales de C. El adaptador permanece en la prueba: interpreta exclusivamente el caso conocido del guardián, no se usa como implementación general. Los hechos de entrada se contrastan con el fixture ya cargado; no se consulta contenido desconocido en producción.
