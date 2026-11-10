@@ -122,6 +122,15 @@ Los identificadores FR son locales a esta capacidad y se citarán con el prefijo
 
 ## Clarifications pendientes
 
+### I6: primera comprobación con motor real
+
+Alcance del 2026-11-10, tras revisar los cambios remotos: comprobar el control de viaje con un movimiento ordinario real en el caso acotado H3 del guardián de A. No se modifica el motor ni se publica una fachada completa de viaje a partir de señales incompletas. FR-009/011/017 y FR-016 parcial.
+
+- C31: con camino previamente explorado y un guardián en la primera sala de paso, el movimiento procesa eventos empatados, entrega su lote histórico y detiene el viaje antes del segundo paso. Historia conserva la vida anterior al ataque en t=99 y la posterior en t=100, junto con el conocimiento inicial de C. Consultar otra propuesta después de detenerse no cambia reloj ni contador.
+- C32: si la historia rechaza el lote, el motor revierte su movimiento y el control se cancela sin aceptar un resultado ni ejecutar otro paso. La historia permanece intacta. El escenario usa el rechazo de validación esperado, no promete recuperación ante cualquier excepción.
+
+Los datos del escenario son sintéticos y están separados de producción. Sus señales de daño se comprueban mediante el delta del ataque identificado en H3; esto no define un detector general que pueda omitir daño y curación dentro de un mismo evento. La entrega general de daño, enemigos al entrar y cambios de conocimiento sigue pendiente de acuerdo A/C/D.
+
 ### I5: control local del viaje por pasos
 
 Autorizado por el usuario con «adelante»: iniciar, proponer un paso, recibir hechos y cancelar sin conectar motor/controlador todavía. FR-009–012/015/017/018 se verifican solo en esta coordinación local.

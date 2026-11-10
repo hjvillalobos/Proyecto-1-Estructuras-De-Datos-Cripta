@@ -1,5 +1,13 @@
 # Tareas de I1: conocimiento independiente
 
+## I6: primera prueba con motor real y revisión de novedades
+
+- [ ] T026 Escribir C31/C32 con productor H3 y LineaTiempo reales en tests/test_viaje_motor.py (FR-009/011/016 parcial/017).
+- [ ] T027 Crear utilidades/verificar_viaje_motor.py con revisiones fijas y ejecutar pruebas propias/nuevas de B en copias separadas (SC-002/004 parciales).
+- [ ] T028 Documentar resultados, limitaciones y contrato pendiente; publicar solo C (SC-002/004 parciales).
+
+Documentación antes de T026; T027 permite comprobarla; T028 después. No implica nuevas reglas del juego ni integración de la interfaz.
+
 ## I5: control local del viaje
 
 - [x] T022 Escribir C26–C30 en tests/test_viaje.py antes de implementar (FR-007/009/010/011/012/015/017/018).

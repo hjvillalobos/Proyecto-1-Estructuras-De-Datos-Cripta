@@ -92,6 +92,12 @@ Para viaje: mapa completo de referencia, alternativas de costo distinto, empates
 
 ## Riesgos y alternativas
 
+### I6: ensayo reproducible de motor y entrega B
+
+Crear tests/test_viaje_motor.py y utilidades/verificar_viaje_motor.py. Exportar fuentes Python de A 9730482 a carpeta ignorada; superponer únicamente tipos históricos/LineaTiempo de D 02da6b6 y módulos nuevos de C. Ejecutar motor_terreno de A con su productor registrar_h3, traducir a tipos reales de D y conservar la base de campos_iniciales de C. El adaptador permanece en la prueba: interpreta exclusivamente el caso conocido del guardián, no se usa como implementación general. Los hechos de entrada se contrastan con el fixture ya cargado; no se consulta contenido desconocido en producción.
+
+Ante rechazo esperado, cancelar ControlViaje y contrastar estado exportado, reloj, azar y agenda de A y exportación de D antes/después. No activar integrar_historia ni guardado. Sin cambios a archivos compartidos. El verificador ofrece --verificar-b para exportar por separado fuentes de B 694dcf6 y repetir sus pruebas de entrega de terreno y preparación de verificación. Esto revisa los cambios recibidos, no fusiona B/A/D en una rama de entrega.
+
 ### I5: control sin bucle de ejecución
 
 Crear modelo/viaje.py: ControlViaje recibe un planificador con consultar(origen,destino), reutiliza ConsultaRuta y evaluar_detencion. Estados inactivo, listo, pendiente, detenido. iniciar valida mediante consulta antes de cambiar estado y exige no tener propuesta pendiente; proponer consulta otra vez el conocimiento y reserva un PasoViaje inmutable (numero, origen, ruta). registrar_resultado exige el número vigente y ResultadoPaso (posicion, aceptado, recibio_dano, hubo_entrada, enemigos_al_entrar, terminado). Posición tras aceptación debe ser siguiente y hubo_entrada=True; rechazo conserva origen y no entrada. Todos los campos se validan antes de mutar. No se deduce posición desde mensajes ni daño desde vida.
