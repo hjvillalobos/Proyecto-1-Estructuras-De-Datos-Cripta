@@ -966,3 +966,15 @@ Pregunta: «Para conectar el viaje al juego hay que modificar puntos compartidos
 > Todavía no; preparar propuesta
 
 Uso: revisar los puntos reales de captura de entrada y daño, así como el callback del controlador. Preparar una propuesta breve en dos pasos, con campos, archivos y pruebas de aceptación. No implementar ni atribuir acuerdos de A/D; publicar la propuesta en C para revisión.
+
+### Persona C — reutilización de rutas — 2026-11-10
+
+Herramienta: Codex desktop; modelo exacto no registrado.
+
+> VEO QUE HAY NUEVOS CAMBIOS EN EL REPO, PUEDES REVISAR SI ES ALGO QUE NOS FUNCIONE?
+
+> ENTONCES DE MOMENTO NO PODEMOS CONTINUAR O SI?
+
+> OKAY, ADLANTE CON ESO Y LUEGO QUE HABLEMOS CON MIS COMPAÑEROS HACEMOS ESO OTRO
+
+Uso: revisar novedades de B y comprobar sus escenarios de inicio. Especificar I8 antes del código (3afd9eb), probar equivalencia e invalidación y optimizar únicamente los componentes de C. Comparar contra la versión previa, documentando también primera búsqueda y recálculos que superan 5 ms. Mantener pendiente la conexión compartida hasta coordinar con A/D. Publicar en la rama de C.

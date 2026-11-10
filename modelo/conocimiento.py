@@ -85,6 +85,7 @@ class ConocimientoMapa:
         self._puertas, self._ids_puertas = _preparar(puertas, PuertaConocible)
         self._estados = [DESCONOCIDA] * len(self._salas)
         self._recuerdos = [None] * len(self._puertas)
+        self._revision = 0
         for puerta in self._puertas:
             _indice(self._ids, puerta.extremo_a)
             _indice(self._ids, puerta.extremo_b)
@@ -118,6 +119,11 @@ class ConocimientoMapa:
             self._salidas.append(tuple(preparadas))
         self.entrar(sala_inicial)
 
+    @property
+    def revision(self):
+        """Marca local de invalidación; no es tiempo ni estado de partida."""
+        return self._revision
+
     def estado_sala(self, sala_id):
         try:
             posicion = _indice(self._ids, sala_id)
@@ -145,6 +151,7 @@ class ConocimientoMapa:
         if anterior != nuevo:
             cambios.append(CambioConocimiento("sala", self._ids[posicion], anterior, nuevo))
             self._estados[posicion] = nuevo
+            self._revision += 1
 
     def observar_puerta(self, sala_id, puerta_id, cerrada):
         if type(cerrada) is not bool:
@@ -159,6 +166,7 @@ class ConocimientoMapa:
         if anterior is cerrada:
             return ()
         self._recuerdos[posicion] = cerrada
+        self._revision += 1
         return (CambioConocimiento("puerta", puerta_id, anterior, cerrada),)
 
     def mapa_conocido(self):
@@ -213,7 +221,11 @@ class ConocimientoMapa:
                     raise ValueError("El lote no corresponde al estado actual.")
                 aplicados.append((valores, posicion, anterior))
                 valores[posicion] = nuevo
+                if anterior != nuevo:
+                    self._revision += 1
         except Exception:
             for valores, posicion, anterior in reversed(aplicados):
+                if valores[posicion] != anterior:
+                    self._revision += 1
                 valores[posicion] = anterior
             raise

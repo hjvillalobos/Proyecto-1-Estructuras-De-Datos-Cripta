@@ -5,6 +5,7 @@ import sys
 import tempfile
 
 REVISION_A = '9730482d4c6e33e5ba39e6eeb6f76d1f19b4220c'
+REVISION_C_ANTERIOR = 'ad531fd'
 
 
 def main():
@@ -25,6 +26,8 @@ def main():
         destino.write_bytes((raiz / archivo).read_bytes())
     (copia / 'modelo/rutas.py').write_bytes(subprocess.check_output(
         ['git', 'show', revision + ':modelo/rutas.py'], cwd=raiz))
+    (copia / 'modelo/conocimiento_rutas_anterior.py').write_bytes(subprocess.check_output(
+        ['git', 'show', REVISION_C_ANTERIOR + ':modelo/conocimiento_rutas.py'], cwd=raiz))
     print(f'A: {revision}; C: archivos de trabajo. Copia: {copia}', flush=True)
     resultado = subprocess.run([sys.executable, '-B', '-m', 'unittest',
                                 'tests.test_conocimiento', 'tests.test_conocimiento_rutas',

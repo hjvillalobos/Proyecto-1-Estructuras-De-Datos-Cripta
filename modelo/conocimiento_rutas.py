@@ -25,13 +25,16 @@ class _PasoAbierto:
 
 
 class _AdyacenciasConocidas:
-    def __init__(self, mapa, tipo_arco):
+    def __init__(self, mapa, tipo_arco, inversa=False):
         self._mapa = mapa
         abierta = _PasoAbierto()
-        self._arcos = tuple(
-            tuple((tipo_arco(origen, destino, salida.direccion, salida.costo, abierta), puerta)
-                  for salida, destino, puerta in salidas)
-            for origen, salidas in enumerate(mapa._salidas))
+        arcos = [[] for _ in mapa._ids]
+        for origen, salidas in enumerate(mapa._salidas):
+            for salida, destino, puerta in salidas:
+                desde, hasta = (destino, origen) if inversa else (origen, destino)
+                arcos[desde].append((tipo_arco(desde, hasta, salida.direccion,
+                                              salida.costo, abierta), puerta))
+        self._arcos = tuple(tuple(fila) for fila in arcos)
 
     def __getitem__(self, origen):
         mapa = self._mapa
@@ -44,13 +47,13 @@ class _AdyacenciasConocidas:
 
 
 class _FuenteConocida:
-    def __init__(self, mapa, tipo_arco):
+    def __init__(self, mapa, tipo_arco, inversa=False):
         self.ids = mapa._ids
-        self.adyacencias = _AdyacenciasConocidas(mapa, tipo_arco)
+        self.adyacencias = _AdyacenciasConocidas(mapa, tipo_arco, inversa)
 
 
 class PlanificadorConocido:
-    """Una instancia por mapa; consultas secuenciales, sin caché de rutas.
+    """Una instancia por mapa; distancias cerradas para un destino/revisión.
 
     Preparación O(V+E). Filtra durante la expansión, no después de buscar.
     La interfaz compartida y el movimiento del motor se integran por separado.
@@ -63,9 +66,11 @@ class PlanificadorConocido:
 
         self._mapa = mapa
         self._fuente = _FuenteConocida(mapa, ArcoTerreno)
+        self._inversa = _FuenteConocida(mapa, ArcoTerreno, inversa=True)
         self._espacio = EspacioBusqueda(self._fuente.ids)
         self._frontera = HeapRutas(self._espacio)
         self._buscar = buscar_ruta
+        self._cache = None
 
     def consultar(self, origen, destino):
         """FR-007/008/010/012: no modifica mapa, reloj, historial ni posición."""
@@ -76,9 +81,28 @@ class PlanificadorConocido:
         if origen == destino:
             return ConsultaRuta('llegada', costo_total=0)
         fuente = self._fuente
-        paso = self._buscar(fuente, self._espacio, self._frontera,
-                            _indice(fuente.ids, origen), _indice(fuente.ids, destino), None)
-        if paso is None:
+        indice_origen = _indice(fuente.ids, origen)
+        clave = (destino, self._mapa.revision)
+        if self._cache != clave or not self._espacio.esta_cerrado(indice_origen):
+            self._cache = None  # Una excepción no publica etiquetas parciales.
+            self._buscar(self._inversa, self._espacio, self._frontera,
+                         _indice(fuente.ids, destino), indice_origen, None)
+            self._cache = clave
+        if not self._espacio.esta_cerrado(indice_origen):
             return ConsultaRuta('sin_ruta')
-        siguiente, direccion, costo, total = paso
-        return ConsultaRuta('paso', fuente.ids[siguiente], direccion, costo, total)
+        # Costos positivos: todo sucesor óptimo tiene menor distancia al destino
+        # y quedó cerrado antes que el origen, incluso si A detuvo la búsqueda.
+        mejor = None
+        elegido = None
+        for arco in fuente.adyacencias[indice_origen]:
+            if not self._espacio.esta_cerrado(arco.destino):
+                continue
+            restante, _ = self._espacio.etiqueta(arco.destino)
+            candidato = (arco.costo + restante, fuente.ids[arco.destino], arco.costo)
+            if mejor is None or candidato < mejor:
+                mejor, elegido = candidato, arco
+        distancia, _ = self._espacio.etiqueta(indice_origen)
+        if elegido is None or mejor[0] != distancia:
+            raise RuntimeError('Las distancias no corresponden al conocimiento vigente.')
+        return ConsultaRuta('paso', fuente.ids[elegido.destino], elegido.direccion,
+                            elegido.costo, distancia)

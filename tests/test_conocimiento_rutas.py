@@ -105,7 +105,7 @@ class TestRutasConocidas(unittest.TestCase):
         self.assertEqual(m.mapa_conocido(), antes)
 
     def test_oraculo_exhaustivo_semilla_fija(self):
-        """C22–C25: comparar 60 grafos con todos sus caminos simples."""
+        """C22–C25/C37: 60 grafos, varios orígenes y caminos simples."""
         azar = Random(927)
         ids = (10, 40, 100, 600, 9000, 20000)
         for caso in range(60):
@@ -141,13 +141,83 @@ class TestRutasConocidas(unittest.TestCase):
                         recorrer(vecino, visitados + (vecino,), costo + peso,
                                  vecino if primero is None else primero)
 
-            recorrer(ids[0], (ids[0],), 0, None)
-            r = self.planificador(m).consultar(ids[0], ids[-1])
-            with self.subTest(caso=caso):
-                if candidatos:
-                    self.assertEqual((r.costo_total, r.siguiente), min(candidatos))
-                else:
-                    self.assertEqual(r.estado, 'sin_ruta')
+            planificador = self.planificador(m)
+            for origen in exploradas:
+                if origen == ids[-1]:
+                    continue
+                candidatos.clear()
+                recorrer(origen, (origen,), 0, None)
+                r = planificador.consultar(origen, ids[-1])
+                with self.subTest(caso=caso, origen=origen):
+                    if candidatos:
+                        self.assertEqual((r.costo_total, r.siguiente), min(candidatos))
+                    else:
+                        self.assertEqual(r.estado, 'sin_ruta')
+
+    def test_reutiliza_distancias_en_pasos_sucesivos(self):
+        """C37: una búsqueda para tres orígenes ya resueltos al mismo destino."""
+        m = crear((10, 20, 30, 40), ((10, 20, 1, None), (20, 30, 2, None), (30, 40, 3, None)))
+        for sala in (20, 30, 40):
+            m.entrar(sala)
+        p = self.planificador(m)
+        with patch.object(p, '_buscar', wraps=p._buscar) as buscar:
+            for origen, vecino, costo in ((10, 20, 6), (20, 30, 5), (30, 40, 3)):
+                r = p.consultar(origen, 40)
+                self.assertEqual((r.siguiente, r.costo_total), (vecino, costo))
+            self.assertEqual(buscar.call_count, 1)
+
+    def test_grafo_dirigido_y_origen_fuera_de_region_cerrada(self):
+        """C37/C39: transponer arcos, no asumir salidas recíprocas."""
+        salas = (SalaConocible(10, 'a', (SalidaConocible('E', 20, 1),)),
+                 SalaConocible(20, 'b', (SalidaConocible('N', 40, 1),)),
+                 SalaConocible(30, 'c', (SalidaConocible('E', 40, 5),)),
+                 SalaConocible(40, 'd', ()))
+        m = ConocimientoMapa(salas, (), 10)
+        for sala in (20, 30, 40):
+            m.entrar(sala)
+        p = self.planificador(m)
+        with patch.object(p, '_buscar', wraps=p._buscar) as buscar:
+            self.assertEqual(p.consultar(20, 40).costo_total, 1)
+            self.assertEqual(p.consultar(10, 40).costo_total, 2)
+            self.assertEqual(p.consultar(30, 40).costo_total, 5)
+            self.assertEqual(buscar.call_count, 3)
+            self.assertEqual(p.consultar(10, 40).siguiente, 20)
+            self.assertEqual(buscar.call_count, 3)
+            self.assertEqual(p.consultar(40, 10).estado, 'sin_ruta')
+
+    def test_aplicar_revertir_y_lote_fallido_invalidan_cache(self):
+        """C38: no volver a una revisión que permita usar etiquetas viejas."""
+        from modelo.conocimiento import CambioConocimiento
+        m = crear((10, 20), ((10, 20, 1, 7),))
+        m.entrar(20)
+        m.observar_puerta(10, 7, False)
+        p = self.planificador(m)
+        self.assertEqual(p.consultar(10, 20).estado, 'paso')
+        revision = m.revision
+        self.assertEqual(m.observar_puerta(10, 7, False), ())
+        self.assertEqual(m.revision, revision)
+        cerrar = (CambioConocimiento('puerta', 7, False, True),)
+        m.aplicar(cerrar)
+        self.assertEqual(p.consultar(10, 20).estado, 'sin_ruta')
+        m.revertir(cerrar)
+        self.assertGreater(m.revision, revision)
+        self.assertEqual(p.consultar(10, 20).estado, 'paso')
+        with self.assertRaises(ValueError):
+            m.aplicar(cerrar + (CambioConocimiento('puerta', 7, False, True),))
+        self.assertFalse(m.recuerdo_puerta(7))
+        self.assertEqual(p.consultar(10, 20).estado, 'paso')
+
+    def test_fallo_de_busqueda_no_publica_cache_parcial(self):
+        """C39: el destino anterior tampoco reutiliza una generación dañada."""
+        m = crear((10, 20, 30), ((10, 20, 1, None), (20, 30, 1, None)))
+        m.entrar(20)
+        m.entrar(30)
+        p = self.planificador(m)
+        self.assertEqual(p.consultar(10, 30).costo_total, 2)
+        with patch.object(p, '_buscar', side_effect=RuntimeError('fallo')):
+            with self.assertRaises(RuntimeError):
+                p.consultar(10, 20)
+        self.assertEqual(p.consultar(10, 30).costo_total, 2)
 
     def test_viaje_recalcula_con_observacion_y_cancelacion_tras_reversion(self):
         """I5 C27/C29: control de C con buscador real; movimiento suministrado."""

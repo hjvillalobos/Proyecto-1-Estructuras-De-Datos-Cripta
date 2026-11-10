@@ -1,5 +1,20 @@
 # Comprobación inicial de C
 
+## I8 — reutilización de rutas (2026-11-10)
+
+Especificación previa: 3afd9eb. C37–C39 comprueban pasos sucesivos, arcos dirigidos, invalidación al aplicar/revertir y recuperación tras errores. El oráculo de 60 grafos ahora consulta varios orígenes con el mismo planificador. Pasaron 36 pruebas de rutas/conocimiento/viaje, 19 de historia, 11 del ensayo con motor y 31 locales (hay pruebas compartidas entre estos conjuntos). Sin omisiones. No se repitió la suite completa del juego.
+
+Medición reproducible: `python -B -m utilidades.verificar_conocimiento_rutas --bench`. Python 3.12.10, Windows 11; cadena fija de 5000 salas y 9998 arcos, una puerta intermedia, sin azar, red ni renderizado. Comparación con C en ad531fd y buscador de A en 9730482. Tiempos en ms; primera búsqueda: 10 muestras; pasos y cambios alternados de puerta: 30. Corrida sin otras pruebas lanzadas en paralelo.
+
+| Operación | Anterior: media / máximo | Actual: media / máximo |
+|---|---:|---:|
+| Preparación del adaptador | 13.679 / 20.112 | 28.143 / 44.257 |
+| Primera búsqueda | 6.215 / 6.464 | 6.503 / 7.489 |
+| Pasos sucesivos al mismo destino | 5.714 / 6.156 | 0.010 / 0.020 |
+| Consulta tras cambiar puerta | 4.725 / 6.977 | 5.069 / 8.422 |
+
+La mejora corresponde a pasos que reutilizan distancias definitivas. La preparación conserva O(V+E), pero almacena también los arcos inversos y aumenta su costo. Cambiar el conocimiento invalida la búsqueda; cambiar el destino o consultar un origen no resuelto exige recalcular. No se acredita PR-001: la primera búsqueda y los cambios de puerta aún superan 5 ms en esta carga sintética. Falta medir el mapa de referencia y el viaje integrado. No se modificaron contratos ni módulos de A/D.
+
 ## I7 — inventario histórico (2026-11-10)
 
 Especificación previa: 2254020. FR-020 y C33–C36 delimitan el adaptador; revisión de coherencia sin conflictos dentro del alcance local. No cambia inventario, historial, motor ni tipos de D. `python -B -m utilidades.verificar_inventario_historia`: **40 pruebas en 0.202 s, OK, sin omisiones** (seis nuevas y 34 de inventario, retroceso e historia existentes). Comprueban recogida, equipo, retiro, selección, encendido, capacidad, rechazo atómico, consumo de pergamino y datos independientes del estado vivo. Base O(n); captura local acotada a nueve nodos más uno nuevo, sin recorrer el inventario por acción. No se midió rendimiento ni se acredita integración: faltan la captura dentro del turno y la proyección visual acordada con D.

@@ -2,9 +2,9 @@
 
 ## I8: rendimiento de rutas
 
-- [ ] T032 Escribir C37–C39 de equivalencia e invalidación (FR-008/010/014/017).
-- [ ] T033 Implementar revisión de conocimiento y reutilización en módulos de C, sin modificar A (mismos requisitos).
-- [ ] T034 Comparar primera búsqueda, pasos sucesivos y cambios de puerta; ejecutar regresión y publicar resultados (PR-001 parcial).
+- [x] T032 Escribir C37–C39 de equivalencia e invalidación (FR-008/010/014/017).
+- [x] T033 Implementar revisión de conocimiento y reutilización en módulos de C, sin modificar A (mismos requisitos).
+- [x] T034 Comparar primera búsqueda, pasos sucesivos y cambios de puerta; ejecutar regresión y publicar resultados (PR-001 parcial).
 
 Especificación antes del código; pruebas antes de optimización; mediciones después de comprobar equivalencia. Sin cambios en contratos compartidos ni cierre de PR-001 por medias sintéticas.
 
