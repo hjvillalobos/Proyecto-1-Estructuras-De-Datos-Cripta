@@ -122,6 +122,20 @@ Los identificadores FR son locales a esta capacidad y se citarán con el prefijo
 
 ## Clarifications pendientes
 
+### I5: control local del viaje por pasos
+
+Autorizado por el usuario con «adelante»: iniciar, proponer un paso, recibir hechos y cancelar sin conectar motor/controlador todavía. FR-009–012/015/017/018 se verifican solo en esta coordinación local.
+
+Aclaración: no se ejecutan movimientos ni retrocesos desde este componente. Cada propuesta espera un único resultado antes de permitir la siguiente. El resultado llega después del cierre del intervalo del motor y de actualizar el conocimiento. La cancelación invalida cualquier propuesta pendiente y solo una nueva orden explícita inicia otro viaje. El controlador debe cancelar antes de aplicar un pergamino entre pasos; C no consume el objeto ni revierte acciones. Los resultados tardíos, duplicados o incompatibles se rechazan sin modificar el control. Si un movimiento se rechaza sin entrada, se podrá volver a consultar desde el origen con observaciones actualizadas; no existe reintento automático. No se infiere daño de la vida final. Fin de partida impide continuar.
+
+- C26: iniciar hacia destino no explorado rechaza; iniciar en el destino termina sin proponer movimiento. Proponer dos pasos sin resultado intermedio se rechaza (FR-007/009/012).
+- C27: un resultado válido permite consultar el siguiente paso con conocimiento vigente. Una puerta recién observada cerrada causa ruta alternativa o detención sin ruta; no se abre por poseer llave (FR-010/012).
+- C28: daño, entrada con enemigos, llegada o fin de partida detienen. Daño se conserva aunque haya curación posterior; causas coincidentes permanecen visibles (FR-011/018).
+- C29: cancelar antes o después de un paso impide continuar; una respuesta anterior no reactiva un viaje cancelado ni uno reiniciado. La reversión externa no reinicia el viaje (FR-015 local/017).
+- C30: resultados duplicados, de otro paso o con posición incompatible se rechazan sin alterar el estado. Consultar/proponer/cancelar no modifica mapa ni ejecuta acciones del motor (FR-009/017).
+
+N3/N6 completos, replay, persistencia, antorcha y medición integrada permanecen pendientes. Estas reglas de coordinación no definen una nueva acción temporal del juego.
+
 ### Incremento I4: consulta de un paso sobre conocimiento
 
 Autorizado el 2026-11-09: «Okay, sigamos con la otra parte», después de proponer rutas conocidas con el buscador de A. Incluye FR-007/008, la consulta de FR-010/012 y determinismo de FR-017; no ejecuta movimiento, antorcha, eventos ni un viaje completo.

@@ -92,6 +92,14 @@ Para viaje: mapa completo de referencia, alternativas de costo distinto, empates
 
 ## Riesgos y alternativas
 
+### I5: control sin bucle de ejecución
+
+Crear modelo/viaje.py: ControlViaje recibe un planificador con consultar(origen,destino), reutiliza ConsultaRuta y evaluar_detencion. Estados inactivo, listo, pendiente, detenido. iniciar valida mediante consulta antes de cambiar estado y exige no tener propuesta pendiente; proponer consulta otra vez el conocimiento y reserva un PasoViaje inmutable (numero, origen, ruta). registrar_resultado exige el número vigente y ResultadoPaso (posicion, aceptado, recibio_dano, hubo_entrada, enemigos_al_entrar, terminado). Posición tras aceptación debe ser siguiente y hubo_entrada=True; rechazo conserva origen y no entrada. Todos los campos se validan antes de mutar. No se deduce posición desde mensajes ni daño desde vida.
+
+El número de propuesta aumenta por instancia, nunca se reinicia entre viajes. Cancelar descarta pendiente; respuestas tardías fallan aunque se haya iniciado otro viaje. Una nueva orden explícita puede reemplazar un viaje listo/detenido, nunca un paso pendiente. Se conservan causas de evaluar_detencion y se agrega fin_partida si corresponde. Falta de ruta se decide al proponer, no mediante una segunda búsqueda al recibir resultado. No se calcula una ruta tras daño/enemigos. Memoria propia O(1), transiciones O(1) salvo iniciar/proponer, que incluyen la consulta de I4. Sin dict/set, cola, hilos, callbacks de movimiento, reloj ni copias del mapa.
+
+Pruebas locales con planificador de prueba controlado para protocolo/errores; prueba adicional con conocimiento y buscador real de A en el verificador aislado de I4. No sustituir esas pruebas por un doble que finja integración. Mantener la propuesta de contrato de A/D explícita; no tocar sus consumidores.
+
 ### Incremento I4: fuente dinámica para el buscador existente
 
 Crear `modelo/conocimiento_rutas.py` con `PlanificadorConocido(mapa)` y `consultar(origen, destino)`. Reutiliza `EspacioBusqueda`, `HeapRutas`, `ArcoTerreno` y `buscar_ruta` de A (9730482); no duplica Dijkstra ni modifica rutas.py. Importación diferida al construir el planificador. La base de C aún no contiene rutas.py; el ensayo copia ese archivo exacto de A a una carpeta ignorada.
