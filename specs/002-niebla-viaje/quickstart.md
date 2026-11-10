@@ -1,5 +1,13 @@
 # Comprobar el incremento I1
 
+## I5: control de viaje (2026-11-10)
+
+Ejecutar `python -B -m unittest tests.test_viaje -v` para las ocho pruebas del protocolo local. Ejecutar `python -B -m utilidades.verificar_conocimiento_rutas` para las 32 pruebas con rutas reales de A (sustituye el total de 23 indicado en la entrada histórica de I4). Hay casos compartidos; no sumar cifras como pruebas únicas.
+
+Uso propuesto para el controlador: construir ControlViaje(planificador); iniciar(origen,destino); proponer() devuelve PasoViaje o None. Ejecutar un movimiento ordinario por separado; actualizar conocimiento y, tras cerrar eventos, entregar registrar_resultado(paso.numero, ResultadoPaso(...)). Consultar causas antes de ofrecer otro paso. No ejecutar en un bucle bloqueante de interfaz. Cancelar antes de aplicar pergamino/restauración; iniciar otra vez solo por orden expresa. Una propuesta cancelada no debe ejecutarse: el controlador debe comprobar que sigue pendiente antes de mover. El componente no puede deshacer un movimiento que un consumidor ejecute indebidamente tras cancelar.
+
+El resultado exige posición, aceptación, daño ocurrido, entrada, enemigos al entrar y fin de partida. No son datos deducibles todos del booleano del callback actual de D. El contrato sigue pendiente de acuerdo; no hay conexión automática al juego, guardado o replay.
+
 Desde la raíz del repositorio, después de implementar las tareas:
 
 ```powershell

@@ -15,6 +15,7 @@ def main():
     cache.mkdir(exist_ok=True)
     copia = Path(tempfile.mkdtemp(prefix='integracion-rutas-', dir=cache))
     archivos_c = ('modelo/__init__.py', 'modelo/conocimiento.py', 'modelo/conocimiento_rutas.py',
+                  'modelo/viaje.py', 'modelo/detencion_viaje.py', 'tests/test_viaje.py',
                   'utilidades/__init__.py', 'utilidades/ordenamiento.py',
                   'utilidades/bench_rutas_conocidas.py', 'utilidades/bench_conocimiento.py', 'tests/__init__.py',
                   'tests/test_conocimiento_rutas.py', 'tests/test_conocimiento.py')
@@ -26,7 +27,8 @@ def main():
         ['git', 'show', revision + ':modelo/rutas.py'], cwd=raiz))
     print(f'A: {revision}; C: archivos de trabajo. Copia: {copia}', flush=True)
     resultado = subprocess.run([sys.executable, '-B', '-m', 'unittest',
-                                'tests.test_conocimiento', 'tests.test_conocimiento_rutas', '-v'], cwd=copia)
+                                'tests.test_conocimiento', 'tests.test_conocimiento_rutas',
+                                'tests.test_viaje', '-v'], cwd=copia)
     if resultado.returncode or '--bench' not in sys.argv[1:]:
         return resultado.returncode
     return subprocess.run([sys.executable, '-B', '-m', 'utilidades.bench_rutas_conocidas'], cwd=copia).returncode

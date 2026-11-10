@@ -149,6 +149,38 @@ class TestRutasConocidas(unittest.TestCase):
                 else:
                     self.assertEqual(r.estado, 'sin_ruta')
 
+    def test_viaje_recalcula_con_observacion_y_cancelacion_tras_reversion(self):
+        """I5 C27/C29: control de C con buscador real; movimiento suministrado."""
+        from modelo.viaje import ControlViaje, ResultadoPaso
+        m = crear((10, 20, 30), ((10, 20, 1, 7), (20, 30, 1, None), (10, 30, 8, None)))
+        m.entrar(20)
+        m.entrar(30)
+        m.observar_puerta(10, 7, False)
+        viaje = ControlViaje(self.planificador(m))
+        viaje.iniciar(10, 30)
+        antes = m.mapa_conocido()
+        primero = viaje.proponer()
+        self.assertEqual(primero.ruta.siguiente, 20)
+        self.assertEqual(m.mapa_conocido(), antes)
+        cierre = m.observar_puerta(10, 7, True)
+        viaje.registrar_resultado(primero.numero, ResultadoPaso(10, False, False, False, False, False))
+        alternativo = viaje.proponer()
+        self.assertEqual((alternativo.ruta.siguiente, alternativo.ruta.costo_total), (30, 8))
+        viaje.cancelar()
+        m.revertir(cierre)
+        self.assertIsNone(viaje.proponer())
+        with self.assertRaises(ValueError):
+            viaje.registrar_resultado(alternativo.numero, ResultadoPaso(30, True, False, True, False, False))
+        viaje.iniciar(10, 30)
+        paso = viaje.proponer()
+        self.assertEqual(paso.ruta.siguiente, 20)
+        viaje.registrar_resultado(paso.numero, ResultadoPaso(20, True, False, True, False, False))
+        final = viaje.proponer()
+        self.assertEqual(final.ruta.siguiente, 30)
+        viaje.registrar_resultado(final.numero, ResultadoPaso(30, True, False, True, False, False))
+        self.assertEqual(viaje.causas, ('llegada',))
+        self.assertIsNone(viaje.proponer())
+
 
 if __name__ == '__main__':
     unittest.main()

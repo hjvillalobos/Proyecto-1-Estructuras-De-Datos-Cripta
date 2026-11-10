@@ -1,5 +1,15 @@
 # Comprobación inicial de C
 
+## I5 — control local de viaje (2026-11-10)
+
+Especificación confirmada antes del código en 2af6094. Aclaraciones de alcance: resultados únicos, cancelación persistente hasta nueva orden, rechazo sin reintento automático y hechos explícitos. Análisis de consistencia previo: C26–C30 cubiertos por T022–T025, sin conflictos críticos dentro del incremento; lista general 7/11 cumplidas, 4 pendientes por antorcha/revisión cruzada. Continúa la autorización del usuario para trabajo independiente. Sin extensions.yml ni hooks.
+
+Primera ejecución de las pruebas falló por ausencia de modelo.viaje; después de implementar, ocho pruebas locales pasaron. El verificador aislado con A 9730482 ejecutó **32 pruebas en 0.559 s, OK, sin omisiones**: conocimiento, rutas y control. Incluye rechazo de movimiento, observación de puerta cerrada, selección de alternativa, cancelación, reversión externa y nueva orden expresa. Los resultados del movimiento se suministran en las pruebas; no se ejecuta el motor ni se acredita N3/N6 integrado.
+
+Regresión seleccionada: comando de I4 más tests.test_viaje, **156 pruebas en 21.237 s, OK**, con CRIPTA_SIN_AUDIO=1. Son 148 anteriores y ocho nuevas; algunas aparecen en la prueba aislada, por lo que no se suman como casos únicos. Sin suite completa ni prueba gráfica. No se repitió benchmark: no se modificó búsqueda y sigue pendiente el límite de rendimiento documentado en I4.
+
+La validación rechaza resultados duplicados, antiguos o incoherentes antes de mutar el control; un fallo de consulta conserva su estado. No se modifica reloj, mapa, inventario ni historial. No hay estructuras prohibidas ni dependencias nuevas. El controlador futuro debe evitar ejecutar propuestas canceladas y proporcionar los hechos del paso; el control no garantiza revertir acciones ajenas. Quedan pendientes contrato compartido, antorcha, guardado/replay y partida integrada.
+
 Fecha: 2026-11-08. Base: 544090a, igual a origin/main tras fetch y avance directo. No contiene las implementaciones aún no integradas de las ramas de A/B/D.
 
 Comando ejecutado con `CRIPTA_SIN_AUDIO=1`:

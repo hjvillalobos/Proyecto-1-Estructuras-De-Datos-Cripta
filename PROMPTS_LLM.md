@@ -905,3 +905,20 @@ Prompts textuales de seguimiento:
 > del 1 al 100 cuanto llevamos de mi parte?
 
 Uso: revisar referencias remotas y cambios H3 de A sin fusionar; estimar avance completo en torno al 45 %, distinguiendo módulos aislados de integración. Delimitar I4 con escenarios existentes, aclaraciones, plan, tareas y análisis; confirmar documentación e2a1f61 antes del código. Aplicar habilidades de análisis e implementación al incremento. Preparar fuente de rutas filtrada reutilizando el buscador propio de A, pruebas y diagnóstico aislados. Documentar resultados y límite de rendimiento observado; publicar solo en rama C. Sin cambios a main, motor, interfaz ni puntajes. Este registro no resuelve la conciliación histórica pendiente de prompts.
+### Persona C — control local de viaje I5 — 2026-11-10
+
+Herramienta: Codex desktop; identificador exacto del modelo no registrado. Inicio de la solicitud en la sesión del 2026-11-09; continuación el 2026-11-10 según fecha del cliente.
+
+Prompts textuales, en orden:
+
+> okay, que sigue?
+
+> adelante
+
+> adelante
+
+> y subelo a la rama al final, para que no vuelvan a decir que no he hecho nada
+
+> puedes continuar con la tarea esa por favor, implementarla de la mejor manera
+
+Uso: delimitar I5, especificar estados y escenarios, revisar coherencia y confirmar documentación en 2af6094 antes del código. Implementar control local de viaje con una propuesta pendiente, resultados validados y cancelación; comprobar con buscador real de A sin modificar motor/controlador. Ejecutar pruebas y documentar límites; publicar solo en codex/002-niebla-viaje. No declarar integración completa ni modificar main o puntajes locales. Se aplicó el flujo de implementación de spec-kit al alcance independiente autorizado.

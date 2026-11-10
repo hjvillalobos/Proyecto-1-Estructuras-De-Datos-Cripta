@@ -2,10 +2,10 @@
 
 ## I5: control local del viaje
 
-- [ ] T022 Escribir C26–C30 en tests/test_viaje.py antes de implementar (FR-007/009/010/011/012/015/017/018).
-- [ ] T023 Implementar modelo/viaje.py y validación atómica del protocolo, sin motor ni vista (mismos requisitos de T022).
-- [ ] T024 Probar secuencia con conocimiento y rutas reales de A en tests/test_conocimiento_rutas.py y ampliar verificador (FR-008/010/015 local).
-- [ ] T025 Ejecutar regresión, documentar evidencia/contrato y publicar en rama C (SC-002/004 parciales).
+- [x] T022 Escribir C26–C30 en tests/test_viaje.py antes de implementar (FR-007/009/010/011/012/015/017/018).
+- [x] T023 Implementar modelo/viaje.py y validación atómica del protocolo, sin motor ni vista (mismos requisitos de T022).
+- [x] T024 Probar secuencia con conocimiento y rutas reales de A en tests/test_conocimiento_rutas.py y ampliar verificador (FR-008/010/015 local).
+- [x] T025 Ejecutar regresión, documentar evidencia/contrato y publicar en rama C (SC-002/004 parciales).
 
 Dependencias: especificación confirmada antes de T022/T023; T022 antes de T023; T024 después; T025 cierra el incremento. Q1 y revisión cruzada siguen fuera de alcance.
 
