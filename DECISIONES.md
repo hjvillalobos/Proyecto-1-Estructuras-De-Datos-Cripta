@@ -910,3 +910,30 @@ entrada. El resultado identifica la versión y registra todas las
 muestras y el máximo en milisegundos. Un paquete incompleto termina
 con error. [Plan de D](specs/004-linea-tiempo/plan.md) ·
 [Evidencia de aceptación](specs/004-linea-tiempo/aceptacion.md#benchmark-de-un-paquete-offline).
+
+**Medición de referencia (2026-11-09).** El listado del servicio identificó
+`cripta-06` como la mayor, con 300 salas. El paquete de la versión
+`f9ed9afa683d` se preparó con 11 solicitudes de un presupuesto de 63.
+El benchmark se ejecutó después sin red ni renderizado, en Windows 11,
+AMD Ryzen 7 7730U y Python 3.12.14.
+
+```powershell
+python main.py --bench --subsistemas resolubilidad --paquete .cache/resolubilidad/d-referencia --cripta cripta-06 --version-cripta f9ed9afa683d --repeticiones 10
+```
+
+| Fase | Media ms | Mínimo ms | Máximo ms | Desv. estándar ms |
+|---|---:|---:|---:|---:|
+| Lectura y validación del paquete | 23.917 | 18.310 | 36.503 | 5.436 |
+| Análisis incremental | 9.279 | 7.971 | 16.140 | 2.332 |
+| Análisis repetitivo | 9.942 | 8.840 | 11.555 | 0.864 |
+
+- Preparación (ms) `21.782, 22.409, 19.039, 23.681, 36.503, 29.989, 26.879, 21.501, 19.074, 18.310`
+- Incremental (ms) `8.019, 9.508, 8.575, 8.560, 8.067, 8.222, 8.974, 8.756, 16.140, 7.971`
+- Repetitivo (ms) `8.840, 9.360, 9.689, 9.915, 10.707, 8.890, 11.128, 11.555, 9.662, 9.678`
+
+Los dos algoritmos dictaminaron `resoluble` para `N=1068`.
+El máximo incremental de 16.140 ms cumple el límite de 200 ms
+en la versión y el equipo medidos. Incluye normalización, recorrido,
+diagnóstico cuando corresponde y construcción del reporte. La
+preparación se muestra aparte. Queda pendiente la revisión cruzada
+con B y la medición del ciclo integrado con cazadores.

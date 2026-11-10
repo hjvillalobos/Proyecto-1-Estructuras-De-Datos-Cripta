@@ -1033,3 +1033,17 @@ paquete seleccionado y del rechazo de datos incompletos. Antes del
 ajuste ambos casos ejecutaban la carga sintética. Se reutilizaron los
 módulos de B sin modificar sus algoritmos. La evidencia de prueba
 no acredita el límite oficial de 200 ms.
+
+## 2026-11-09 — Verificación conjunta de D
+
+Herramienta: Codex desktop. Prompt textual:
+
+> dale haz todo eso pero solo en mi rama linea de tiempo, sigue el enunciado, que no hayan bugs y que se siga correctamente mi parte
+
+Uso. Actualizar `004-linea-tiempo` al PR #23 y preparar la prueba que
+compara historia, guardado, carga y replay de una misma partida. El caso
+con el productor de prueba pasó. Se comprobó la frontera del motor real
+por separado y se mantuvo la omisión de la prueba conjunta mientras
+falten captura y restauración. Se consultó el listado del servicio,
+se preparó la mayor cripta con B y se midió el análisis offline.
+Se registraron comandos, muestras y límites sin modificar el motor.

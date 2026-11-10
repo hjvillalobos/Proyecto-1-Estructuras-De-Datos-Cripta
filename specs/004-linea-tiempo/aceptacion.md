@@ -167,11 +167,41 @@ python -m unittest tests.test_bench_historia tests.test_bench_resolubilidad -v
 python main.py --bench --subsistemas resolubilidad --paquete .cache/cripta --cripta ID
 ```
 
-La prueba acredita la conexión de la CLI. La aceptación del límite de
-200 ms queda pendiente de repetir la medición con la mayor cripta
-publicada y revisar el máximo del análisis incremental.
+La prueba acredita la conexión de la CLI. La medición de referencia se
+registra en la actualización del 2026-11-09.
 
 La regresión seleccionada pasó 171 de 172 pruebas, incluidas las de
 resolubilidad, descarga, R4 y la vista. Solo se omitió H3 con el motor
 real. La CLI también se comprobó en CP1252 con un paquete de siete
 salas, cero solicitudes y diez muestras por fase y estrategia.
+
+### Historia, guardado y replay de la misma partida (2026-11-09)
+
+La prueba de FR-002, FR-011 y FR-013 ejecuta el movimiento y los comandos
+de historia, guardado y carga en el controlador. Tras avanzar una
+acción, `historia #2` coincide con el resumen por tiempo. Al cargar, la
+consulta recupera el mismo resumen y el estado guardado coincide con el
+original. El replay hasta el instante consultado vuelve a mostrarlo
+sin vista y después de eliminar el binario, usando la carga registrada
+en el log.
+
+Con el productor de prueba, el recorrido pasa a t=250. Con el paquete
+local del motor real se confirmó que el primer movimiento cierra t=100
+y reduce la vida de 30 a 28. La prueba conjunta con el motor real se
+omite hasta que exponga captura y restauración. El recorrido y las
+comprobaciones están en [`tests/test_historia_motor.py`](../../tests/test_historia_motor.py).
+
+```powershell
+python -m unittest tests.test_historia_motor -v
+```
+
+En la regresión seleccionada pasaron 195 de 197 pruebas. Las dos
+omisiones fueron las pruebas que requieren el productor real de A.
+
+### Resolubilidad de referencia (2026-11-09)
+
+La mayor cripta del listado del servicio fue `cripta-06`, de 300 salas,
+versión `f9ed9afa683d`. El benchmark offline midió diez muestras por
+estrategia y cero solicitudes. El máximo incremental fue **16.140 ms**
+frente al límite de **200 ms** de AC-20. El máximo de lectura y validación,
+medido aparte, fue 36.503 ms. [Comando, equipo y muestras](../../DECISIONES.md#parte-ii--integración-y-mediciones-de-la-persona-d).

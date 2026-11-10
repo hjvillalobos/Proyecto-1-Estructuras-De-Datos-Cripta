@@ -85,3 +85,11 @@ paquete offline y reporta la preparación separada del análisis. Se
 verificó la selección de versión y el rechazo de paquetes incompletos.
 Quedan la revisión de B y la medición oficial.
 [Evidencia de aceptación](aceptacion.md#benchmark-de-un-paquete-offline).
+
+Avance del 2026-11-09. El recorrido conjunto de historia, guardado, carga
+y replay pasó con el productor de prueba. La versión con el motor real
+queda preparada para cuando A entregue la captura y la restauración.
+Se midió AC-20 en la mayor cripta publicada, con un máximo incremental
+de 16.140 ms. T021 conserva los pendientes de integración de A/C y las
+mediciones de Parte I con la carga nueva.
+[Pruebas y medición de referencia](aceptacion.md#resolubilidad-de-referencia-2026-11-09).
