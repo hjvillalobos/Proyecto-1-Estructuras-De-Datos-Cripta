@@ -38,9 +38,9 @@ T009 y T010 son independientes, pero cada prueba precede a su implementación. T
 
 ## I3: conversión a historia real de D
 
-- [ ] T014 [US3] Escribir C18–C20 y validaciones de conversión en `tests/test_conocimiento_historia.py` (FR-019, FR-014/016 parciales).
-- [ ] T015 [US3] Implementar base y conversión en `modelo/conocimiento_historia.py`, con tipos reales de D e índices/ordenamiento propios (FR-019).
-- [ ] T016 Preparar ejecución aislada reproducible en `utilidades/verificar_conocimiento_historia.py` y documentarla en quickstart.md (FR-019, SC-004 parcial).
-- [ ] T017 Verificar rechazo atómico, reconstrucción y regresión local; registrar evidencia en baseline.md y actualizar propuesta de integración (FR-019).
+- [x] T014 [US3] Escribir C18–C20 y validaciones de conversión en `tests/test_conocimiento_historia.py` (FR-019, FR-014/016 parciales).
+- [x] T015 [US3] Implementar base y conversión en `modelo/conocimiento_historia.py`, con tipos reales de D e índices/ordenamiento propios (FR-019).
+- [x] T016 Preparar ejecución aislada reproducible en `utilidades/verificar_conocimiento_historia.py` y documentarla en quickstart.md (FR-019, SC-004 parcial).
+- [x] T017 Verificar rechazo atómico, reconstrucción y regresión local; registrar evidencia en baseline.md y actualizar propuesta de integración (FR-019).
 
 Orden: documentación confirmada antes de T014/T015; T014 antes de T015; T016 permite comprobar ambas sin fusionar ramas; T017 después. No se modifica ningún archivo de A/D ni se añade captura automática al motor.

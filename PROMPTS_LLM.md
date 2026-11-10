@@ -876,3 +876,15 @@ Prompts textuales:
 Uso: revisar código, trazabilidad, historial y restricciones; repetir 148 pruebas seleccionadas (17.395 s, OK); verificar puntajes y ausencia de cambios en módulos preexistentes del juego. Corregir estados documentales obsoletos, separar resultados locales de pendientes integrados y ajustar complejidad de aplicación/inversión y preparación al código real. Reexpresar FR-018 y aclaraciones de I1/I2 como comportamiento, manteniendo detalles técnicos en plan/data-model. Sin cambios funcionales, nuevos resultados de rendimiento ni publicación.
 
 Registro histórico: estas entradas conservan los prompts aquí disponibles y no certifican exhaustividad de todo el período desde P1. La conciliación de mensajes anteriores sigue pendiente; no se inventan fechas ni se sustituye texto original por resúmenes para cerrar ese requisito.
+
+### Persona C — adaptador de historia I3 — 2026-11-09
+
+Herramienta: Codex desktop; identificador exacto de modelo no registrado.
+
+Prompts textuales inmediatos:
+
+> okay, entonces que podemos hacer de momento?
+
+> entonces hagamos eso
+
+Uso: actualizar propuesta con garantía de validación atómica reportada por A/D y comprobada en código; registrar soporte real de limite=None de A; especificar FR-019 y C18–C20, plan y tareas, revisar consistencia y confirmar documentos en 00110f4 antes del código. Crear conversión independiente al formato histórico real de D, pruebas y verificador aislado fijado a commit. Ninguna modificación en motor, interfaz o persistencia ajenos. Comprobación de 19 pruebas aisladas sin omisiones y 148 seleccionadas de regresión. La proyección visual y nombres de campos siguen pendientes de aceptación; no se declara partida integrada. Publicar únicamente los commits de C en su rama para mantener visible el avance, sin fusionar main ni puntajes.

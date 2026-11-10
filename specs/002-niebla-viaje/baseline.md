@@ -73,3 +73,15 @@ Se repitieron las 148 pruebas seleccionadas: 17.395 s, OK. Se verificó la secue
 Se corrigieron encabezados y frases obsoletas del plan/especificación/lista de calidad para distinguir I1/I2 terminados de la capacidad completa pendiente. La aplicación/inversión cuesta O(D log(V+P)), no O(D); memoria auxiliar O(D). La preparación incluye también índices de puertas y ordenamiento de salidas. Son correcciones de documentación al comportamiento existente, sin cambios de reglas o código. Los detalles de función pura y responsabilidades del adaptador permanecen en documentos técnicos; la especificación expresa resultados observables.
 
 Continúan pendientes la revisión cruzada, integración, Q1 y conciliación histórica completa de prompts. No se cambian casillas generales a cumplidas ni se presenta esta revisión local como aprobación del equipo.
+
+## I3 — compatibilidad con historia de D (2026-11-09)
+
+Especificación confirmada antes del código en `00110f4`. FR-019 tiene escenarios C18–C20 y tareas T014–T017; revisión de consistencia previa sin conflictos con el alcance independiente. Claves internas propuestas, no contratos aprobados de UI o persistencia. Se reutilizaron tipos y LineaTiempo reales de D; no se cambiaron sus módulos.
+
+Verificador: `python -B -m utilidades.verificar_conocimiento_historia`. D fijado a `02da6b6f159b28279e3fe7dc5177c97c16898f42`; C desde archivos de trabajo. Resultado: **19 pruebas en 0.093 s, OK, sin omisiones**: 14 de D y cinco nuevas del adaptador. El intento previo a implementar no pudo copiar el adaptador porque aún no existía. La prueba comprueba estados dinámicos de mapa (grados de salas y recuerdos), no renderizado ni una partida integrada.
+
+C18 comprobó exploración al cierre y consulta antes de la segunda acción. C19 comprobó rechazo tras cambios válidos, estado/reloj/contador histórico intactos y reversión local exacta sin recortar historia. C20 comprobó observaciones a t=50/t=150, consultas antes y después, recorte de acción aceptada y reversión local coherente. También se comprobó ausencia frente a puerta abierta y eliminación de duplicados en base inicial.
+
+Regresión del checkout de C: **148 pruebas, 8.783 s, OK**. No incluye las cinco de integración, que se ejecutaron en la copia aislada. Una ejecución directa de esas pruebas sin D informa una omisión explícita y remite al verificador; no se contabiliza como integración exitosa. Revisión AST del adaptador sin dict/set, sorted o list.sort; ordenamiento propio. No se midió rendimiento de historia en este ensayo.
+
+Pendiente: aprobar claves y proyección con D; incluir deltas en lote del motor y rollback completo con A. El adaptador no aporta reloj, agenda, azar, inventario ni binario. La garantía comprobada cubre los errores de validación esperados de D, no cualquier fallo de ejecución. Q1 y ruta sobre conocimiento siguen pendientes; ausencia de límite ya está soportada en A 33d97ac.

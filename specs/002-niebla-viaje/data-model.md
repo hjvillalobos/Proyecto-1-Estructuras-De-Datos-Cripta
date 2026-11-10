@@ -17,3 +17,9 @@ Aplicación de lotes: validar tipo/ámbito/valores, comparar anterior esperado, 
 ## Datos locales de I2
 
 `HechosPaso(llegada, recibio_dano, hubo_entrada, enemigos_al_entrar, ruta_disponible, cancelado)` exige seis booleanos explícitos; no acepta 0/1 como sustitutos. Es inmutable. `evaluar_detencion` produce `DecisionDetencion(causas)`, también inmutable; `continuar` es verdadero solo cuando la tupla de causas está vacía. Las causas son etiquetas internas para un futuro adaptador, no mensajes que se insertan en la vista. El registro no incluye vida final porque no permite deducir con fiabilidad si ocurrió daño.
+
+## Adaptación propuesta I3
+
+Sala desconocida se codifica como ValorHistorico(False); avistada/explorada como ValorHistorico(True, 1/2). Puerta no observada es ausencia; abierta/cerrada es ValorHistorico(True, False/True). Por eso False no puede confundirse con ausencia. Las claves llevan prefijos `conocimiento:sala:` y `conocimiento:puerta:` con ID no negativo. La base contiene cada puerta observada una sola vez, aunque aparezca desde ambos extremos.
+
+Estos campos guardan estado dinámico, no nombres/salidas del esqueleto ni texto del mapa. Su restauración completa necesitará el esqueleto compatible y el adaptador de presentación acordado. La conversión acepta solo tuplas de CambioConocimiento y valida ámbitos, IDs y valores. Una entrada inválida no devuelve un lote parcial; no se modifica mapa ni historia al convertir.
