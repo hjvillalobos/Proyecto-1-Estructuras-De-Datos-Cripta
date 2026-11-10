@@ -964,3 +964,14 @@ los enunciados. Se incorporaron consumidores y pruebas de D, con
 productores simulados donde todavía faltan contratos reales. Se registraron
 decisiones, mediciones, errores, regresiones y dependencias en sus archivos.
 No se enviaron prompts a otros agentes ni se atribuyen acuerdos a compañeros.
+
+### 2026-11-09 — Entrega de costos y rango de B a A
+
+- **Herramienta/modelo:** Codex (GPT-6).
+- **Prompt textual:**
+
+> Implementa el siguiente paso:
+>
+> Cerrar E-BCOSTOS y despues E-B-RANGO. Para el primero, la prueba de entrega más clara es descargar una salida con costo explícito y otra con costo omitido, volver a abrir la cripta offline y comprobar que A obtiene el costo publicado y 100, respectivamente. Para el segundo, aplicar la misma comprobación a una ficha de cazador y verificar que A recibe su rango por tipo de enemigo sin hacer HTTP durante la búsqueda
+
+- **Uso de la respuesta:** Verificar la entrega de costos y rango con datos válidos, incorporar la consulta de fichas preparadas por tipo y probar la reapertura offline. B registró la evidencia en el contrato A–B. La revisión de A queda pendiente.

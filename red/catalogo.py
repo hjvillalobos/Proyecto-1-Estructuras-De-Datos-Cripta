@@ -6,7 +6,7 @@ from threading import RLock
 from datos.almacen import AlmacenLocal
 from modelo.tipos import FichaCatalogo
 from red.cache import CacheSinEspacioError
-from red.errores import DatosInvalidos, VersionIncompatible
+from red.errores import DatosInvalidos, DatosNoDisponibles, VersionIncompatible
 from red.validacion import identificador, registros, texto, unicos
 
 
@@ -169,6 +169,14 @@ class GestorCatalogo:
                     raise DatosInvalidos(f"La ficha {clave} no tiene una referencia que liberar.")
                 actuales.remove(clave)
             self.cache.ajustar_referencias(actuales)
+
+    def ficha_preparada(self, tipo_catalogo):
+        with self._candado:
+            ficha = self.cache.buscar(identificador(tipo_catalogo))
+            if ficha is None:
+                raise DatosNoDisponibles(f"La ficha {tipo_catalogo} no está preparada en memoria.")
+            self.aciertos += 1
+            return ficha
 
     def obtener_fichas(self, ids_solicitados):
         with self._candado:
