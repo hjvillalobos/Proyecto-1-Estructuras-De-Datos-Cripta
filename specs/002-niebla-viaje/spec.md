@@ -122,6 +122,14 @@ Los identificadores FR son locales a esta capacidad y se citarán con el prefijo
 
 ## Clarifications pendientes
 
+### I8: reutilización segura de rutas
+
+Optimización autorizada el 2026-11-10; conserva FR-008/010/014/017 y busca mejorar PR-001 sin cambiar reglas. Una ruta reutilizada debe coincidir con recalcular desde cero, incluidos costo y desempate. Todo cambio de conocimiento, aplicación o reversión invalida información previa. Las consultas no cambian la partida. Primera búsqueda, reutilización y cambios frecuentes se miden por separado; una media favorable de consultas reutilizadas no acredita el límite completo.
+
+- C37: varios pasos hacia el mismo destino, con conocimiento estable, coinciden con búsqueda independiente, también en grafos dirigidos y con empates.
+- C38: abrir/cerrar, explorar, aplicar y revertir cambios nunca reutiliza distancias obsoletas. Un lote rechazado conserva el estado y la corrección de consultas posteriores.
+- C39: cambiar de destino, consultar un origen fuera de la región calculada o sufrir un fallo de búsqueda no reutiliza resultados incompletos.
+
 ### I7: datos históricos del inventario
 
 **FR-020:** conservar identidad, tipo, orden, selección, equipamiento y estado encendido de los objetos al reconstruir inventario. Registrar solo cambios de la operación; no copiar todo el inventario por acción ni sustituir el retroceso existente.

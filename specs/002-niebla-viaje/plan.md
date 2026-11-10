@@ -92,6 +92,14 @@ Para viaje: mapa completo de referencia, alternativas de costo distinto, empates
 
 ## Riesgos y alternativas
 
+### I8: distancias reutilizables hacia un destino
+
+Sustituye la decisión inicial de I4 de recalcular siempre. Mantener el buscador de A intacto. C prepara una segunda adyacencia transpuesta, conservando dirección, costo y puerta de cada arco; no supone simetría. Ejecutar buscar_ruta desde el destino en ese grafo y usar solo etiquetas cerradas de EspacioBusqueda. Para proponer el paso original, revisar sus salidas conocidas y minimizar costo del arco + distancia restante; desempatar por ID de vecina y costo del primer arco, como A. Todos los costos son positivos: los sucesores óptimos tienen menor distancia y ya están cerrados cuando se cierra el origen consultado.
+
+ConocimientoMapa añade una revisión monotónica de invalidación, sin efecto sobre el estado de partida. Aumenta con cada escritura efectiva, incluso al aplicar/revertir; no se restaura a un número anterior tras rollback. Repetir una observación idéntica no la cambia. Cada planificador conserva un solo destino/revisión; reutiliza únicamente si el origen está cerrado en la generación vigente. Si no, recalcula con A. Invalidar la referencia antes de buscar para no aceptar datos de una excepción. No se persiste la caché ni se comparte entre mapas.
+
+Preparación y espacio O(V+E); consulta reutilizada O(log V + grado), consulta nueva conserva costo de Dijkstra. Sin dict/set ni otro buscador. Medir frente al módulo de C anterior exportado de Git: primera búsqueda, pasos sucesivos y puerta cambiante. No atribuir la mejora de reutilización a búsquedas nuevas. Tests C37–C39 y oráculo previo; el límite oficial sigue pendiente del mapa de referencia integrado.
+
 ### I7: inventario histórico
 
 Nuevo modelo/inventario_historia.py. Base inicial O(n); captura por operación O(1): nodo objetivo (cursor por defecto), extremos y vecinos inmediatos, más metadatos. terminar(nuevo=None) compara los mismos nodos y el nuevo de recoger, generando tipos históricos reales de D. No guarda callbacks en el lote ni cambia Inventario. Capturas temporales contienen referencias solo hasta terminar; sus valores anteriores son tuplas independientes. Captura de un solo uso.
