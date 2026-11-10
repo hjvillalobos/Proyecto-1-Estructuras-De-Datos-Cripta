@@ -875,3 +875,9 @@ incluye decodificar la historia en ambos formatos. En esta muestra el
 binario ocupa cerca de la mitad y conserva la lectura directa de una sala.
 La carga completa resultó similar y el JSON fue algo más rápido en esta
 ejecución.
+
+## Revisión de FR-015 del 2026-11-10
+
+Las [series de escalamiento](specs/001-verificador-resolubilidad/mediciones.json) comparan diez muestras por tamaño. Al pasar de 32 a 64 y a 128 salas, el trabajo incremental por unidad de N se mantuvo en torno a 1,50 en cadenas, 9,19–9,24 en ciclos y 1,20 con ubicaciones alternativas. Los tiempos medios en ms fueron 0,365 / 0,786 / 1,779, 0,628 / 1,170 / 2,308 y 0,514 / 1,270 / 2,602 respectivamente. Esto respalda un crecimiento cercano al lineal en el recorrido para esas cargas. El tiempo total aumentó entre 1,84 y 2,47 veces al duplicar aproximadamente N. La normalización ordena e indexa en O(N log N), con un total O(N log N + tamaño del reporte). La evidencia de estas tres escalas respalda la observación empírica y deja abierta su aceptación académica para FR-015.
+
+Se repitió la medición por la función de B con la copia offline de `cripta-06`, versión `f9ed9afa683d`, 300 salas. En diez muestras el incremental promedió 3,412 ms con máximo de 4,060 ms. La referencia repetitiva promedió 3,875 ms con máximo de 4,922 ms. Se observaron cero solicitudes HTTP. Las diez ejecuciones incrementales quedaron bajo 200 ms. El comando general aún requiere el ajuste de D para publicar esa serie y ejecutar con los valores predeterminados. [Reproducción](specs/001-verificador-resolubilidad/quickstart.md).

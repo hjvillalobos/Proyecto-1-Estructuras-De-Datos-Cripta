@@ -337,8 +337,7 @@ python -m unittest tests.test_resolubilidad tests.test_verificacion_datos tests.
 ```
 
 `utilidades/bench_resolubilidad.py` entrega `medir_resolubilidad`, `medir_datos` y
-`medir_preparacion_offline`. Las opciones de `main.py` y el subsistema de `bench.py`
-siguen pendientes de D; las funciones ya pueden utilizarse desde Python.
+`medir_preparacion_offline`. El inicio en consola admite `--forzar` para criptas no resolubles y bloquea las verificaciones incompletas. El modo `--verificar ID` termina antes de iniciar la partida. El benchmark general de resolubilidad mide las familias sintéticas con `--repeticiones 10`. Para medir un paquete real se usa `medir_datos` sobre la cripta preparada.
 La revisión ejecutada aprobó 175 pruebas y omitió una prueba opcional existente.
 Los comandos, los pendientes y las muestras están en la
 [guía de validación](specs/001-verificador-resolubilidad/quickstart.md),

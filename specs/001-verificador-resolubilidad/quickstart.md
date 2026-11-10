@@ -1,6 +1,6 @@
 # Guía de validación del verificador
 
-Implementación de B realizada el 2026-11-02, después del commit de preparación `17dc4bc`. Están disponibles el análisis, la preparación HTTP/offline y las funciones de medición. La integración de D con el inicio del juego y el comando general de benchmark continúa pendiente.
+Implementación de B realizada el 2026-11-02, después del commit de preparación `17dc4bc`. Están disponibles el análisis, la preparación HTTP/offline y las funciones de medición. La revisión del 2026-11-10 valida el inicio real y documenta los pendientes del benchmark general.
 
 ## Entorno
 
@@ -61,13 +61,13 @@ finally:
 
 El ID es un ejemplo de uso, no una condición incrustada en el algoritmo. El catálogo publicado puede cambiar. Las carpetas de caché son locales y no acompañan el repositorio.
 
-## Medición prevista tras integración con D
+## Medición sintética desde el comando general
 
 ```powershell
 python bench.py --subsistemas resolubilidad --tamanos 32 256 1024 --repeticiones 10 --semilla 20261101
 ```
 
-La opción del subsistema todavía no existe. Comparar incremental y repetitivo con cadenas, ciclos y ubicaciones alternativas; comprobar igualdad de dictámenes y validez de órdenes antes de medir. Incluir normalización, diagnóstico y reporte en el total. Red y lectura de disco se miden aparte.
+Indicar al menos diez repeticiones. El comando general usa cinco por defecto. Comparar incremental y repetitivo con cadenas, ciclos y ubicaciones alternativas; comprobar igualdad de dictámenes y validez de órdenes antes de medir. Incluir normalización, diagnóstico y reporte en el total. Red y lectura de disco se miden aparte.
 
 Medir además la mayor cripta publicada con datos locales completos, registrando ID, versión, tamaños y equipo. Informar todas las muestras, promedio, dispersión y máximo; no declarar aprobado el límite de 200 ms por cumplir solo el promedio.
 
@@ -79,7 +79,7 @@ Probar `--verificar <cripta>` sin vista, inicio bloqueado ante resultado negativ
 
 AC-22: preparar región desconectada con llave K y puerta de regreso que requiere K; esperar desconexión sin causa circular certificada. AC-23: simular cambio V1→V2 durante descarga, luego iniciar un cliente offline nuevo; no debe consumir respuestas rechazadas guardadas bajo V1. Repetir con fallo de consulta final y agotamiento de presupuesto.
 
-Ejecutar familias N, 2N y 4N y comparar tiempos/conteos por fase según el protocolo de plan.md. El límite de 200 ms usa el total, incluyendo normalización y diagnóstico. C1 aprobado el 2026-11-02 por aclaración del profesor comunicada por el usuario. La especificación quedó confirmada en `17dc4bc` antes del código. Las pruebas de B y las mediciones ya se ejecutaron; la aceptación conjunta con D sigue pendiente.
+Ejecutar familias N, 2N y 4N y comparar tiempos/conteos por fase según el protocolo de plan.md. El límite de 200 ms usa el total, incluyendo normalización y diagnóstico. C1 aprobado el 2026-11-02 por aclaración del profesor comunicada por el usuario. La especificación quedó confirmada en `17dc4bc` antes del código. Las pruebas de B y las mediciones ya se ejecutaron; la matriz de inicio real se ejecutó el 2026-11-10.
 
 ## Cierre del diagnóstico de ciclos
 
@@ -104,6 +104,15 @@ Los datos observados cumplen 200 ms para esa versión y equipo; no certifican ot
 mapas ni el ciclo de juego de 20 ms. La evaluación académica del crecimiento
 aproximadamente lineal se conserva pendiente.
 
-Pendientes compartidos: T025, T026 y T030, más la revisión cruzada B↔D.
-No usar `--verificar`, `--forzar` ni el subsistema `resolubilidad` del comando general
-como si esta rama ya los hubiera conectado.
+## Reproducción de T026 y T030 (2026-11-10)
+
+`python -m unittest -v tests.test_verificacion_entrega.TestInicioVerificado` prueba los seis inicios y las tres verificaciones exclusivas. En el caso resoluble se inicia en ambos modos, en el negativo solo con forzar, y en el incompleto se bloquea en ambos. Cada proceso tiene su propia carpeta de partida.
+
+Con el paquete local de referencia, ejecutar:
+
+```powershell
+python main.py --bench --subsistemas resolubilidad --paquete .cache/resolubilidad/real --cripta cripta-06
+python main.py --bench --subsistemas resolubilidad --tamanos 8 16 32 --repeticiones 10 --paquete .cache/resolubilidad/real --cripta cripta-06
+```
+
+El primer comando falla por el valor predeterminado de 5 repeticiones. El segundo produce 18 series sintéticas y ninguna serie de la cripta indicada. Para repetir la medición real de B, usar `preparar_verificacion` con `ClienteOffline` y pasar los datos a `medir_datos(datos, 10)`. El resultado de la revisión está en [las tareas](tasks.md) y [las decisiones](../../DECISIONES.md).

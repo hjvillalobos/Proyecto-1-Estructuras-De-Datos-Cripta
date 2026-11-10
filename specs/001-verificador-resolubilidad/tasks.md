@@ -66,7 +66,7 @@ Objetivo: usar el resultado antes de jugar sin absorber la interfaz de D. Depend
 
 - [X] T024 [US4] B: agregar pruebas de contrato del resultado en `tests/test_verificacion_datos.py`: tres estados, identidad/versión, alcance/limitación, diagnóstico y errores sin dictamen parcial; validar que D no necesita ejecutar lógica de B para mostrarlo. (FR-012–014; AC-15–18, AC-21)
 - [ ] T025 [US4] D con revisión B: conectar en `main.py` el coordinador para `--verificar`, `--forzar` e inicio normal según `specs/001-verificador-resolubilidad/contracts/verificador.md`; mostrar alcance acumulativo. No instanciar vista/motor en verificación exclusiva; error de datos bloquea incluso con forzar. (FR-012–014; AC-15–18, AC-21)
-- [ ] T026 [US4] B+D: incorporar en `tests/test_verificacion_entrega.py` pruebas de inicio y salida exclusiva para todos los estados, R4, forzar y ausencia de importaciones/instancias de vista; ejecutar con la integración real de T025. Si D no integró, mantener tarea pendiente, no marcarla satisfecha con un doble. (FR-012–014; AC-15–18, AC-21)
+- [X] T026 [US4] B+D: incorporar en `tests/test_verificacion_entrega.py` pruebas de inicio y salida exclusiva para todos los estados, R4, forzar y ausencia de importaciones/instancias de vista; ejecutar con la integración real de T025. Si D no integró, mantener tarea pendiente, no marcarla satisfecha con un doble. (FR-012–014; AC-15–18, AC-21)
 
 ## Fase 7 — US5: Rendimiento con evidencia (P2)
 
@@ -82,7 +82,7 @@ Objetivo: comparar incremental y repetitivo y medir total. Depende de US1–US3;
 
 Depende de historias completadas; no sustituye la revisión de D ni la evidencia faltante.
 
-- [ ] T032 Revisar `modelo/resolubilidad.py`, `red/verificacion.py` y `utilidades/bench_resolubilidad.py` contra la constitución: índices propios, sin recorridos completos por llave en producción, sin comentarios nuevos ni datos de criptas reales incrustados. Ejecutar pruebas de todas las historias y regresiones de red/caché/inicio; corregir solo regresiones atribuibles al cambio. (FR-001–015)
+- [X] T032 Revisar `modelo/resolubilidad.py`, `red/verificacion.py` y `utilidades/bench_resolubilidad.py` contra la constitución: índices propios, sin recorridos completos por llave en producción, sin comentarios nuevos ni datos de criptas reales incrustados. Ejecutar pruebas de todas las historias y regresiones de red/caché/inicio; corregir solo regresiones atribuibles al cambio. (FR-001–015)
 - [X] T033 Con aprobación documental, actualizar `README.md` y `specs/001-verificador-resolubilidad/quickstart.md` con comandos realmente disponibles y resultado de validación; enlazar `DECISIONES.md` sin inventar resultados, mantener alcance confirmado y limitación. (FR-013–015; AC-15–21)
 - [ ] T034 Con aprobación documental, completar trazabilidad y estado real en `specs/001-verificador-resolubilidad/tasks.md` y `PROMPTS_LLM.md`; solicitar revisión cruzada B↔D, verificar commit previo de especificación y no marcar como completas tareas de D o mediciones pendientes. (FR-001–015; constitución IV) Registrar también recomendaciones aprobadas y conservar explícitos los controles pendientes; conservar la procedencia de la confirmación: respuesta afirmativa comunicada por el usuario el 2026-11-02.
 
@@ -141,3 +141,17 @@ Primero base + US1 como MVP verificable con datos sintéticos. Añadir diagnóst
 - T032: auditoría de B y regresiones completadas sin fallos; cierre transversal pendiente de la integración y pruebas de D.
 - T034: prompt y trazabilidad registrados con autorización. Falta revisión cruzada B↔D; conservar esta casilla pendiente hasta completarla.
 - `.idea/` se conserva sin modificaciones. No hay hooks de implementación en `.specify/extensions.yml`.
+
+## Revisión de B del 2026-11-10
+
+Rama `codex/verificador-resolubilidad`, base `694dcf6`. Especificación previa comprobada en `17dc4bc`. El registro del 2 de noviembre describe el estado de aquella fecha.
+
+| Tarea | Resultado |
+|---|---|
+| T025 | Inicio y verificación exclusiva integrados. Queda un detalle de presentación para D. Con `no_completada`, el informe retorna la causa antes de mostrar la limitación que el contrato pide mostrar siempre. |
+| T026 | Aprobada. Seis inicios y tres verificaciones exclusivas en procesos nuevos, con paquetes offline, motor y controlador reales. Se comprobaron dictamen, código de salida, cierre de la sesión y creación de la bitácora de partida. En verificación exclusiva se comprobó además que no se importaran vista ni motor. [Prueba reproducible](../../tests/test_verificacion_entrega.py). |
+| T030 | Pendiente de D. Con las repeticiones predeterminadas el comando termina con error. Con diez repeticiones acepta paquete y cripta pero solo emite las familias sintéticas. |
+| T031 | Revisión de rendimiento de B realizada. Evidencia real y evaluación de FR-015 en [DECISIONES.md](../../DECISIONES.md) y [mediciones.json](mediciones.json). Cierre de la tarea condicionado a repetir T030 tras el ajuste de D. |
+| T032 | Revisión de B completada sobre esta base. Se ejecutaron 162 pruebas seleccionadas de las cinco historias y regresiones, con 161 aprobadas y una opcional omitida. La revisión de los tres módulos de cálculo, preparación y medición no encontró índices hash ni ordenamientos automáticos. |
+| T033 | Guía y README actualizados con las opciones disponibles y los límites reproducidos. |
+| T034 | Prompt y resultados registrados. La aceptación comunicada para costos, rango y descarga offline corresponde a las entregas anteriores. Queda la revisión cruzada con D de los hallazgos de esta fecha. |
