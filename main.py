@@ -127,13 +127,16 @@ def main(argv=None):
         if args.replay:
             return ejecutar_replay(args, sesion.precarga)
         if args.descargar_todo:
+            from red.verificacion import preparar_verificacion
+
             ids = ([args.cripta] if args.cripta is not None
                    else [cripta["id"] for cripta in listado["criptas"]])
             for indice, cripta_id in enumerate(ids):
                 if indice:
                     sesion.renovar()
+                datos = preparar_verificacion(sesion.cliente, sesion.almacen, cripta_id, args.version_cripta)
                 preparada = sesion.precarga.preparar_cripta(
-                    cripta_id, args.version_cripta, args.version_catalogo)
+                    cripta_id, datos.version, args.version_catalogo)
                 sesion.precarga.cargar_contenido([sala.id for sala in preparada.salas])
                 print(f"{cripta_id}: {len(preparada.salas)} salas descargadas")
             print(f"Respuestas completas guardadas en {args.datos_dir}")

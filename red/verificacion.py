@@ -35,6 +35,7 @@ def _convertir(generales, paginas, llaves):
 def preparar_verificacion(cliente, almacen, cripta_id, version_cripta=None):
     identificador(cripta_id)
     offline = isinstance(cliente, ClienteOffline)
+    solo_local = offline and cliente.almacen.carpeta.resolve() == almacen.carpeta.resolve()
     if version_cripta is None and offline:
         version_cripta = cliente.version_cripta
     if version_cripta is not None:
@@ -47,13 +48,13 @@ def preparar_verificacion(cliente, almacen, cripta_id, version_cripta=None):
         if version_cripta is not None and generales['version'] != version_cripta:
             raise VersionIncompatible('Los metadatos locales tienen otra versión.')
         cliente.configurar_presupuesto(generales['presupuesto_solicitudes'])
-        if not offline and version_cripta is None:
+        if not solo_local and version_cripta is None:
             version_red = _version(cliente, cripta_id)
             if version_red != generales['version']:
                 generales = None
                 nuevo = True
     if generales is None:
-        if offline:
+        if solo_local:
             raise DatosNoDisponibles(f'Faltan metadatos locales de {cripta_id}, versión {version_cripta or "actual"}.')
         generales = cliente.obtener_datos_generales(cripta_id)
         validar_generales(generales, cripta_id)
@@ -64,7 +65,7 @@ def preparar_verificacion(cliente, almacen, cripta_id, version_cripta=None):
 
     def confirmar_red():
         nonlocal version_red
-        if offline:
+        if solo_local:
             raise DatosNoDisponibles(f'Faltan datos locales de {cripta_id}, versión {version}.')
         if version_red is None:
             version_red = _version(cliente, cripta_id)

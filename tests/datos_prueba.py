@@ -121,6 +121,7 @@ def crear_paquete(carpeta, salas=23):
     almacen.guardar_lista(servidor.listar_criptas())
     generales = servidor.obtener_datos_generales("prueba")
     almacen.guardar_generales(generales)
+    almacen.guardar_llaves("prueba", servidor.version, {"llaves": [{"id": "obj_0", "sala": 100}]})
     for pagina in range(1, generales["paginas"] + 1):
         almacen.guardar_pagina("prueba", servidor.version, servidor.obtener_esqueleto("prueba", pagina))
     for inicio in range(0, salas, 10):
