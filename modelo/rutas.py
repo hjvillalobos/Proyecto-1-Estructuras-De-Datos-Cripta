@@ -214,12 +214,14 @@ class HeapRutas:
 
 
 def buscar_ruta(grafo, espacio, frontera, origen_indice, destino_indice, limite):
-    """Dijkstra limitado: (primer índice, dirección, costo del paso, total).
+    """Dijkstra: (primer índice, dirección, costo del paso, total).
 
     Entrada interna válida: índices distintos del mismo grafo/espacio,
-    frontera asociada vacía, costos positivos y límite explícito. Retorna
-    None si no encuentra paso admisible; no certifica distancia fuera del
-    límite ni define llegada, datos inválidos o contratos compartidos.
+    frontera asociada vacía y costos positivos. Un límite entero válido
+    es inclusivo y None explícito permite buscar sin tope de costo.
+    Retorna None si no encuentra paso admisible; no certifica distancia
+    fuera de un límite finito ni define llegada, datos inválidos o
+    contratos compartidos.
     """
     frontera.iniciar()
     try:
@@ -244,7 +246,7 @@ def buscar_ruta(grafo, espacio, frontera, origen_indice, destino_indice, limite)
                         or espacio.esta_cerrado(arco.destino)):
                     continue
                 candidata = distancia + arco.costo
-                if candidata > limite:
+                if limite is not None and candidata > limite:
                     continue
                 primero = grafo.ids[arco.destino] if actual == origen_indice else primer_id
                 frontera.insertar_o_disminuir(arco.destino, candidata, primero)
