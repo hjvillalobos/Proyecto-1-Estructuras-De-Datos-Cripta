@@ -942,3 +942,16 @@ Herramienta: Codex desktop; modelo exacto no registrado.
 > en caso de documentar algo, es mejor no extenderse tanto y escribir humano, no robotizado, solo digo, verdad, para que no pase
 
 Uso: revisar inventario/retroceso y tipos de D; especificar FR-020 antes del código (2254020). Añadir captura incremental en un módulo separado, pruebas y verificador con historia real. Mantener documentación breve y distinguir compatibilidad probada de integración pendiente. Publicar en rama C, sin modificar módulos compartidos ni main.
+### Persona C — revisión de integración — 2026-11-10
+
+Herramienta: Codex desktop; modelo exacto no registrado.
+
+> se puede hacer algo mas?
+
+> adelante, de la mejor forma por favor
+
+> del 1 al 100, por donde vamos aproximadamente?
+>
+> PODRIAS CONTINUAR, YA SE PUEDE
+
+Uso: actualizar referencias y ensayar unión A/B/C/D en copia local separada. Resolver solapamientos solo allí, ejecutar suite completa, investigar seis casos de prueba y ajustar su preparación sin quitar aserciones. Primera corrida: 672 pruebas, 5 fallos, 3 errores, 5 omisiones; repetición: 672, OK con 5 omisiones. Publicar informe breve y parche de pruebas para revisión, sin aplicar cambios compartidos ni fusionar main. Estimación aproximada de C: 65 %, pendiente de integración funcional.

@@ -1,0 +1,81 @@
+diff --git a/tests/test_animacion.py b/tests/test_animacion.py
+index 4665b74..2bf1090 100644
+--- a/tests/test_animacion.py
++++ b/tests/test_animacion.py
+@@ -20,6 +20,8 @@ class TestAnimacion(unittest.TestCase):
+         vista.root.withdraw()
+         menu = MenuInicio(vista, Mock(), Mock())
+         menu.dibujar()
++        menu.canvas.winfo_width = Mock(return_value=800)
++        menu.canvas.winfo_height = Mock(return_value=600)
+         anterior = menu.animacion
+         menu.dibujar()
+         self.assertIsNot(menu.animacion, anterior)
+diff --git a/tests/test_bench_historia.py b/tests/test_bench_historia.py
+index 41355a1..f0417e2 100644
+--- a/tests/test_bench_historia.py
++++ b/tests/test_bench_historia.py
+@@ -76,7 +76,8 @@ class BenchHistoriaTest(unittest.TestCase):
+     def test_fr017_ac20_bench_rechaza_paquete_sin_llaves(self):
+         with TemporaryDirectory() as tmp, contextlib.redirect_stdout(io.StringIO()) as salida, \
+                 contextlib.redirect_stderr(io.StringIO()) as errores:
+-            crear_paquete(tmp, salas=2)
++            with patch.object(AlmacenLocal, "guardar_llaves"):
++                crear_paquete(tmp, salas=2)
+             with self.assertRaises(SystemExit) as fallo:
+                 main_cli(["--bench", "--subsistemas", "resolubilidad", "--paquete", tmp,
+                           "--cripta", "prueba"])
+diff --git a/tests/test_modos_historia.py b/tests/test_modos_historia.py
+index 1762944..29ebfe8 100644
+--- a/tests/test_modos_historia.py
++++ b/tests/test_modos_historia.py
+@@ -192,7 +192,8 @@ class ModosHistoriaTest(unittest.TestCase):
+         with TemporaryDirectory() as tmp:
+             raiz = Path(tmp)
+             paquete = raiz / "paquete"
+-            crear_paquete(paquete, salas=2)
++            with patch("datos.almacen.AlmacenLocal.guardar_llaves"):
++                crear_paquete(paquete, salas=2)
+             comando = [sys.executable, "-B", "-X", "utf8", str(Path(main.__file__).resolve()),
+                        "--offline", str(paquete), "--datos-dir", str(paquete)]
+             for argumentos in (["--verificar", "prueba"], ["--cripta", "prueba", "--forzar"]):
+diff --git a/tests/test_presentacion_juego.py b/tests/test_presentacion_juego.py
+index 7394892..694ae28 100644
+--- a/tests/test_presentacion_juego.py
++++ b/tests/test_presentacion_juego.py
+@@ -104,6 +104,7 @@ class TestEscena(unittest.TestCase):
+         v._actualizar_log = Mock()
+         v._mostrar_detalle = Mock()
+         v._animar_vida = Mock()
++        v.escena = Mock()
+         v.root = Mock()
+         v.mostrar_estado(datos.motor.estado_vista(), [])
+         datos.motor.jugador.vida -= 4
+diff --git a/tests/test_replay_reinicio.py b/tests/test_replay_reinicio.py
+index 1ae433d..0eb9272 100644
+--- a/tests/test_replay_reinicio.py
++++ b/tests/test_replay_reinicio.py
+@@ -109,7 +109,9 @@ class TestReplayReinicio(unittest.TestCase):
+                 patch("controlador.aplicacion.verificar", return_value=reporte_prueba()), \
+                 patch("controlador.controlador.ControladorJuego", side_effect=controlador), \
+                 redirect_stdout(io.StringIO()):
+-            self.assertEqual(main.main(["--gui", "--offline", ".cache/cripta", "--cripta", "cripta-01",
++            from tests.datos_prueba import crear_paquete
++            crear_paquete(carpeta, salas=4)
++            self.assertEqual(main.main(["--gui", "--offline", carpeta, "--cripta", "prueba",
+                                         "--datos-dir", carpeta, "--semilla", "42"]), 0)
+         self.assertEqual(len(motores), 2)
+         self.assertIsNot(motores[0].gestor_precarga, motores[1].gestor_precarga)
+diff --git a/tests/test_sonidos.py b/tests/test_sonidos.py
+index 87afb04..083aa76 100644
+--- a/tests/test_sonidos.py
++++ b/tests/test_sonidos.py
+@@ -85,6 +85,8 @@ class TestSonidos(unittest.TestCase):
+         menu.animacion, menu.panel, menu.fin = Mock(), Mock(), Mock()
+         menu.botones = [Mock()]
+         menu.resultado = ("jugar", None)
++        menu.dibujar = Mock()
++        menu._precarga_selector = None
+         self.assertEqual(menu.mostrar(), ("jugar", None))
+         menu.vista.sonidos.reproducir.assert_called_once_with("inicio")
+         menu.vista.root.wait_variable.assert_called_once_with(menu.fin)
