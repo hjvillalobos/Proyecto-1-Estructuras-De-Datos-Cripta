@@ -955,3 +955,14 @@ Herramienta: Codex desktop; modelo exacto no registrado.
 > PODRIAS CONTINUAR, YA SE PUEDE
 
 Uso: actualizar referencias y ensayar unión A/B/C/D en copia local separada. Resolver solapamientos solo allí, ejecutar suite completa, investigar seis casos de prueba y ajustar su preparación sin quitar aserciones. Primera corrida: 672 pruebas, 5 fallos, 3 errores, 5 omisiones; repetición: 672, OK con 5 omisiones. Publicar informe breve y parche de pruebas para revisión, sin aplicar cambios compartidos ni fusionar main. Estimación aproximada de C: 65 %, pendiente de integración funcional.
+### Persona C — propuesta de conexión del viaje — 2026-11-10
+
+Herramienta: Codex desktop; modelo exacto no registrado.
+
+> OKAY, ADELANTE CON LO QUE SIGUE, IMPLEMENTADO DE LA MEJOR FORMA POR FAVOR
+
+Pregunta: «Para conectar el viaje al juego hay que modificar puntos compartidos de A y D. El acuerdo del equipo pide coordinar esos contratos antes de implementarlos: ¿Sebas y Belén ya aceptaron que preparemos esos cambios en tu rama para su revisión, sin tocar main?»
+
+> Todavía no; preparar propuesta
+
+Uso: revisar los puntos reales de captura de entrada y daño, así como el callback del controlador. Preparar una propuesta breve en dos pasos, con campos, archivos y pruebas de aceptación. No implementar ni atribuir acuerdos de A/D; publicar la propuesta en C para revisión.

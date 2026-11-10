@@ -30,6 +30,8 @@ Consulta candidata: `consultar_ruta(fuente_conocida, origen, destino, SIN_LIMITE
 
 ## C → D: mapa y control del viaje
 
+La [propuesta breve de conexión](conexion-viaje.md) separa la entrega de hechos del motor y la ejecución por pasos. El usuario confirmó el 2026-11-10 que aún no hay acuerdo de A/D; se prepara para revisión, sin implementar cambios compartidos.
+
 I5 (2026-11-10) implementa localmente ControlViaje con iniciar(origen,destino), proponer(), registrar_resultado(numero,resultado) y cancelar(). Propuesta pendiente de aceptación por A/D: un único movimiento en curso, hechos explícitos del intervalo cerrado y cancelación antes del pergamino. El controlador no debe ejecutar propuestas invalidadas. El modelo no llama mover, no abre puertas ni consume objetos; el registro de movimientos/replay y la reversión ordinaria siguen a cargo de sus componentes actuales. Se comprobó con rutas reales de A y resultados de movimiento suministrados por pruebas; no es una partida integrada.
 
 Propuesta de núcleo: `consultar_mapa()` devuelve registros de salas exploradas y avistadas con solo información permitida. D formatea esos registros para consola/interfaz. Para compatibilidad con el consumidor actual de D, un adaptador puede ofrecer `mapa_conocido()` como líneas; ese formato de presentación no sustituye el estado reconstruible.
