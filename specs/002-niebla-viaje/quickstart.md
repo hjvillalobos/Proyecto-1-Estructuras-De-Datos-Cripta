@@ -1,5 +1,11 @@
 # Comprobar el incremento I1
 
+## I6: ensayo con motor real (2026-11-10)
+
+Ejecutar `python -B -m utilidades.verificar_viaje_motor --verificar-b`. Requiere objetos Git A 9730482d4c6e33e5ba39e6eeb6f76d1f19b4220c, D 02da6b6f159b28279e3fe7dc5177c97c16898f42 y B 694dcf64cb601bdcc252c67bf6d325314efaa9a3. No descarga dependencias ni hace fetch. Exporta solo fuentes Python a carpetas únicas ignoradas, sin copiar .idea ni cambiar ramas. Ejecuta 11 pruebas del conjunto A/C/D y, con la opción indicada, 14 de B en otra copia. Ambas deben terminar sin omisiones.
+
+C31 usa un camino previamente explorado y el ataque identificado del guardián H3. Conserva la base de conocimiento, sin generar cambios de exploración durante ese viaje. C32 prueba rollback del motor y cancelación ante rechazo de historia. El adaptador está en tests: no sirve como captura general de daño, no integra guardado ni interfaz. Ejecutar el juego normal todavía no habilita viaje automático.
+
 ## I5: control de viaje (2026-11-10)
 
 Ejecutar `python -B -m unittest tests.test_viaje -v` para las ocho pruebas del protocolo local. Ejecutar `python -B -m utilidades.verificar_conocimiento_rutas` para las 32 pruebas con rutas reales de A (sustituye el total de 23 indicado en la entrada histórica de I4). Hay casos compartidos; no sumar cifras como pruebas únicas.

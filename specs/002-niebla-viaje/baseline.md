@@ -1,5 +1,17 @@
 # Comprobación inicial de C
 
+## I6 — revisión remota y motor real (2026-11-10)
+
+Fetch: B avanzó de f24561b a 694dcf6, con entrega de costos/rango (1b0ae60) y llaves en descarga offline (694dcf6). A permaneció en 9730482 y D en 02da6b6. Se revisaron diffs de red, main y contratos; no se fusionaron ramas ni configuraciones .idea. Las entregas B siguen sujetas a revisión de A, no se aprueban en su nombre.
+
+Especificación previa fee27ca. C31/C32, plan y T026–T028 consistentes dentro del ensayo delimitado; no se altera ninguna regla ni se pretende resolver los contratos generales pendientes. Sin extensiones/hook nuevos.
+
+`python -B -m utilidades.verificar_viaje_motor --verificar-b`: **11 pruebas A/C/D, OK, sin omisiones**, incluyendo dos nuevas de C y las nueve del productor H3 de A con historia real de D. Primera ejecución de ese conjunto: 3.034 s. Segunda ejecución también satisfactoria tras corregir el exportador. Revisión de B: **14 pruebas en 1.115 s, OK, sin omisiones**. Inicialmente faltaba main.py en la copia de prueba, lo que impedía importar test_verificacion_datos; se corrigió la exportación y se repitieron ambas suites, sin modificar pruebas ajenas.
+
+Evidencia: movimiento real a t=100; delta de ataque de secuencia 11; historia anterior/posterior coherente; detención por daño/enemigos sin segundo movimiento. Rechazo de validación conserva historia y revierte estado exportado/agenda/azar de A; C cancela su propuesta. Conocimiento previamente explorado permanece igual. No acredita captura dinámica de conocimiento, detección general de daño/curación, antorcha, inventario, pergamino ni interfaz.
+
+No cambió código de producción ni se repitió la regresión de 156 pruebas de I5: esta entrega añade pruebas y ejecutores de desarrollo. Sigue pendiente conectar hechos generales de movimiento a ResultadoPaso, compatibilidad con controlador de D y medición integrada.
+
 ## I5 — control local de viaje (2026-11-10)
 
 Especificación confirmada antes del código en 2af6094. Aclaraciones de alcance: resultados únicos, cancelación persistente hasta nueva orden, rechazo sin reintento automático y hechos explícitos. Análisis de consistencia previo: C26–C30 cubiertos por T022–T025, sin conflictos críticos dentro del incremento; lista general 7/11 cumplidas, 4 pendientes por antorcha/revisión cruzada. Continúa la autorización del usuario para trabajo independiente. Sin extensions.yml ni hooks.

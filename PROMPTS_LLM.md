@@ -922,3 +922,10 @@ Prompts textuales, en orden:
 > puedes continuar con la tarea esa por favor, implementarla de la mejor manera
 
 Uso: delimitar I5, especificar estados y escenarios, revisar coherencia y confirmar documentación en 2af6094 antes del código. Implementar control local de viaje con una propuesta pendiente, resultados validados y cancelación; comprobar con buscador real de A sin modificar motor/controlador. Ejecutar pruebas y documentar límites; publicar solo en codex/002-niebla-viaje. No declarar integración completa ni modificar main o puntajes locales. Se aplicó el flujo de implementación de spec-kit al alcance independiente autorizado.
+### Persona C — revisión GitHub y ensayo motor I6 — 2026-11-10
+
+Herramienta: Codex desktop; identificador exacto del modelo no registrado.
+
+> hay nuevos cambios en el github, revisa eso antes de continuar y seguimos con eso que dices
+
+Uso: fetch y revisión de los dos nuevos commits de B; confirmar A/D sin cambios. Identificar que el resultado de movimiento y callback del controlador todavía no aportan los hechos generales necesarios. Especificar y confirmar fee27ca antes de añadir prueba acotada C31/C32 con motor e historia reales y un verificador reproducible. Repetir 11 pruebas A/C/D y 14 de B en copias separadas. Documentar alcance, fallo inicial del exportador por main.py ausente y corrección. Publicar solo en rama C; no modificar módulos de compañeros ni main.
