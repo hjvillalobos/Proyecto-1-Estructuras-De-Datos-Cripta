@@ -61,3 +61,8 @@ Resueltas para preparar el diseño: comparación de índices, restricciones de v
 La habilidad de planificación requiere detener el cierre del plan ante aclaraciones no resueltas. Se conserva un borrador útil y no se pasa a tareas ejecutables ni a implementación por el solo hecho de que exista `plan.md`.
 
 Investigación delegada de solo lectura, exigida por la habilidad speckit-plan: revisión de historial, inventario, rastro, tipos y snapshots de D. No se modificaron módulos, no se ejecutaron pruebas ni se aprobó en nombre de otros integrantes.
+# Decisión I4 (2026-11-09)
+
+Se contrastó rutas.py de A en 9730482: buscar_ruta admite limite=None, utiliza ids, adyacencias indexadas y puerta.get("cerrada", False). Se reutilizará sin modificarlo con un adaptador privado de C y puertas ya filtradas por memoria. El núcleo no exige diccionarios ni GrafoTerreno concreto. Se descarta construir GrafoTerreno desde JSON ficticio y reconstruirlo en cada consulta: añade copias, usa estado potencialmente real y pierde localidad. Se descarta otro Dijkstra para no duplicar responsabilidad de A.
+
+La fuente almacena el esqueleto pero solo entrega arcos explorados; los estados se leen en cada expansión. Esto resuelve también reversión sin mantener caché de rutas. Preparación una vez; cálculo medido por separado. La integración del movimiento y el protocolo compartido no quedan aprobados por esta compatibilidad técnica.

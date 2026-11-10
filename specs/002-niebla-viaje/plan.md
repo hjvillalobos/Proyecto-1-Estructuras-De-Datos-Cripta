@@ -92,6 +92,18 @@ Para viaje: mapa completo de referencia, alternativas de costo distinto, empates
 
 ## Riesgos y alternativas
 
+### Incremento I4: fuente dinámica para el buscador existente
+
+Crear `modelo/conocimiento_rutas.py` con `PlanificadorConocido(mapa)` y `consultar(origen, destino)`. Reutiliza `EspacioBusqueda`, `HeapRutas`, `ArcoTerreno` y `buscar_ruta` de A (9730482); no duplica Dijkstra ni modifica rutas.py. Importación diferida al construir el planificador. La base de C aún no contiene rutas.py; el ensayo copia ese archivo exacto de A a una carpeta ignorada.
+
+Una fuente privada conserva los índices densos estables del esqueleto de ConocimientoMapa. Es almacenamiento interno, no conocimiento expuesto. Al iterar una adyacencia, solo entrega arcos si origen/destino están explorados y la puerta está recordada abierta o no existe. Los arcos se preparan una vez; una fachada de puerta sin diccionario responde get("cerrada", False) con False para esos arcos ya filtrados. No contiene referencias al estado real del motor. Los índices privados de C se leen desde su adaptador, bajo pruebas de compatibilidad; no se publican como API para A/D.
+
+El planificador consulta grados antes de iniciar búsqueda, traduce IDs por búsqueda binaria propia y devuelve `ConsultaRuta(estado, siguiente, direccion, costo_paso, costo_total)`, inmutable. Estados: destino_no_explorado, origen_no_explorado, llegada, sin_ruta, paso. Sin paso, sus datos son None; llegada tiene costo_total=0. No conserva rutas calculadas, por lo que una restauración no necesita invalidar una caché. Las llamadas son secuenciales y el mapa no se muta durante una consulta.
+
+Preparación adicional O(V+E) tiempo/memoria, reservada una vez por mapa. Consulta O(log V + (Vr+Er) log(Vr+1) + grado(origen)), con Vr/Er de la región examinada; el filtrado examina las salidas de salas alcanzadas y no recorre todo el mapa antes de cada paso. Arreglos y heap propios de A; sin dict/set ni ordenamiento de biblioteca. No crea una lista de todas las rutas ni una copia del conocimiento por consulta.
+
+Verificación: `tests/test_conocimiento_rutas.py` con C21–C25 y oráculo exhaustivo de caminos simples en grafos pequeños de semilla fija. `utilidades/verificar_conocimiento_rutas.py` prepara copia aislada con A versionado y ejecuta pruebas y mediciones sintéticas opcionales. `utilidades/bench_rutas_conocidas.py` mide preparación y consulta completa local en cadenas de tamaños crecientes; no certifica 5 ms ni sustituye --bench integrado. No cambia archivos compartidos del motor/vista ni reclama contrato aprobado.
+
 ### Incremento I3: adaptador histórico independiente
 
 Crear `modelo/conocimiento_historia.py`. Sus funciones importan los tipos reales de D al invocarse; no recrean esos tipos ni alteran snapshots.py. La rama base aún no los incluye, por lo que su verificación se ejecuta contra archivos exactos de D en una carpeta temporal ignorada.

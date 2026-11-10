@@ -122,6 +122,20 @@ Los identificadores FR son locales a esta capacidad y se citarán con el prefijo
 
 ## Clarifications pendientes
 
+### Incremento I4: consulta de un paso sobre conocimiento
+
+Autorizado el 2026-11-09: «Okay, sigamos con la otra parte», después de proponer rutas conocidas con el buscador de A. Incluye FR-007/008, la consulta de FR-010/012 y determinismo de FR-017; no ejecuta movimiento, antorcha, eventos ni un viaje completo.
+
+Aclaración del alcance: origen y destino deben estar explorados. Destino inexistente o no explorado se rechaza sin revelar si existe. Origen inválido también se rechaza. Destino igual al origen produce llegada sin paso. Una puerta sin observación no es una puerta recordada abierta; queda excluida. Una salida sin puerta puede usarse si ambos extremos están explorados. Se consulta siempre el conocimiento vigente, también tras una reversión. No se decide Q1 ni se interpreta información de la API.
+
+- C21 (N1, FR-007/012): destino avistado, desconocido o inexistente devuelve el mismo rechazo; origen igual a destino explorado devuelve llegada sin movimiento.
+- C22 (C05, FR-003/008): un atajo por una sala no explorada queda excluido. Entre rutas conocidas se minimiza costo total, incluso con más pasos; los empates eligen la primera vecina de menor ID.
+- C23 (N2 parcial, FR-004/008/010): puerta no observada o recordada cerrada no permite ruta; observarla abierta permite paso. Una observación posterior y su reversión cambian/restauran la consulta sin reconstruir la partida ni consultar el estado real.
+- C24 (FR-008/017): ciclos, destinos desconectados, IDs dispersos y puertas paralelas conservan resultado válido y determinista. Costos grandes no introducen un límite artificial.
+- C25 (FR-005/017): consultas repetidas y alternadas no cambian conocimiento ni crean acciones. Al revertir exploración deja de estar disponible una ruta que la necesitaba.
+
+La comprobación de PR-001 permanece pendiente del mapa de referencia y del cálculo integrado. Se medirán cargas sintéticas como diagnóstico, separando preparación de consultas. Estos escenarios no acreditan N2 completo, N3 ni N6.
+
 ### Incremento I3: compatibilidad de conocimiento con historia
 
 Autorizado el 2026-11-09: preparar y comprobar la conversión de cambios de conocimiento con la historia real de D, en un entorno aislado. No conectar el motor ni modificar los tipos de D.
