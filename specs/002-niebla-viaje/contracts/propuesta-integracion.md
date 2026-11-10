@@ -73,6 +73,12 @@ La base inicial completa se entrega al iniciar historia; los cambios posteriores
 
 ## Aceptaciones pendientes y siguiente entrega
 
+### Actualización del 2026-11-09
+
+A en 33d97ac ya permite `limite=None` en buscar_ruta. La limitación numérica descrita en la revisión del 8 de noviembre queda superada; la fuente filtrada sigue pendiente. D en 02da6b6 valida el lote completo antes de aplicarlo. Sus 14 pruebas se ejecutaron en copia aislada y pasaron. Los mensajes A/D aportados por el usuario acuerdan cerrar eventos empatados antes de registrar, y revertir el estado vivo del motor ante ErrorHistoria de validación sin recortar historia no modificada. Esta garantía no cubre cualquier excepción o fallo de infraestructura.
+
+I3 propone claves `conocimiento:sala:<id>` y `conocimiento:puerta:<id>` para el estado interno histórico. No reemplazan `mapa:<id>` del resumen de D ni se presentan como nombres ya aceptados. Antes de conectar, D confirma claves/proyección y A incorpora los deltas en su lote, con rollback de conocimiento junto a reloj, agenda y azar. El adaptador convierte datos; no registra una segunda acción de C.
+
 ### Contraste con código disponible tras actualizar referencias
 
 Revisión del 2026-11-08: D avanzó a `97ee910`, con paquetes offline y conexión del benchmark de resolubilidad. Su contrato de interfaces no cambió en ese incremento; T003, T010 y la aceptación conjunta siguen pendientes. Las ramas de A/B y main no recibieron novedades en esta consulta.

@@ -92,6 +92,16 @@ Para viaje: mapa completo de referencia, alternativas de costo distinto, empates
 
 ## Riesgos y alternativas
 
+### Incremento I3: adaptador histórico independiente
+
+Crear `modelo/conocimiento_historia.py`. Sus funciones importan los tipos reales de D al invocarse; no recrean esos tipos ni alteran snapshots.py. La rama base aún no los incluye, por lo que su verificación se ejecuta contra archivos exactos de D en una carpeta temporal ignorada.
+
+Claves propuestas: `conocimiento:sala:<id>` contiene grado 1/2; desconocida equivale a campo ausente. `conocimiento:puerta:<id>` contiene bool; sin observar equivale a campo ausente. No son las líneas `mapa:<id>` del resumen de D. No habilitar el marcador global `conocimiento` hasta contar con esa proyección de presentación acordada. Son estados reconstruibles internos, no la fachada gráfica ni un formato binario nuevo.
+
+`campos_iniciales(mapa)` usa una proyección inicial única, ordena candidatos de puerta con el algoritmo propio y elimina duplicados por recorrido. Incluye solo salas conocidas y puertas observadas. Costo O(V+E+E log E) como cota; se ejecuta al iniciar historia, no por acción. `convertir_cambios(cambios)` traduce cada delta a CambioHistorico/ValorHistorico con presencia explícita, O(D) de tiempo y memoria (sin búsquedas en el mapa). Conserva orden y no registra nada. El motor es el único que agrega estos cambios a su lote temporal; C no llama registrar_accion en producción.
+
+Prueba aislada: D en 02da6b6, exportado mediante git show sin modificar archivos del checkout; C desde los archivos de trabajo. Utilizar LineaTiempo real, no dobles. El ensayo contiene acciones/tiempos sintéticos explícitos y no certifica H3 real del motor. Publicación posterior del adaptador no significa aprobación de sus claves por el equipo.
+
 ### Ampliación I2 (2026-11-09)
 
 Implementar `modelo/detencion_viaje.py` como función pura sobre un registro inmutable de hechos booleanos: llegada, daño, entrada, enemigos, ruta disponible y cancelación. Devolver registro inmutable con tupla de causas y propiedad continuar. Orden fijo: cancelación, daño, enemigos, llegada, sin ruta; se retienen todas las causas. Son etiquetas internas, no prioridades nuevas del juego. Costo O(1); no necesita índice, reloj, azar ni búsquedas. Alternativa descartada en este incremento: máquina de estados de viaje, pues requeriría acordar el ciclo del controlador. No se altera la función de rutas de A ni la fachada de D.

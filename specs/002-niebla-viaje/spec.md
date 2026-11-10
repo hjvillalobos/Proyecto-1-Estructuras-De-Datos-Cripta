@@ -122,6 +122,17 @@ Los identificadores FR son locales a esta capacidad y se citarán con el prefijo
 
 ## Clarifications pendientes
 
+### Incremento I3: compatibilidad de conocimiento con historia
+
+Autorizado el 2026-11-09: preparar y comprobar la conversión de cambios de conocimiento con la historia real de D, en un entorno aislado. No conectar el motor ni modificar los tipos de D.
+
+- **FR-019**: Entregar el conocimiento inicial y sus cambios incrementales para que la historia conserve los estados anteriores y posteriores de salas y puertas. Distinguir una puerta nunca observada de una observada abierta. La conversión no modifica el conocimiento vivo ni registra acciones por sí misma.
+- C18: una entrada revela una sala y avista su vecina; historia conserva el conocimiento inicial antes de la primera decisión y el actualizado después del paso. Tras registrar otra acción, la consulta anterior a esa segunda acción coincide con el cierre del primer paso.
+- C19: un lote con cambios válidos de conocimiento seguido de un cambio incoherente es rechazado por historia sin alterar sus estados, reloj o número de acciones. Al revertir el lote local de C se recupera el conocimiento vivo previo; no se recorta historia por ese rechazo.
+- C20: dos observaciones sucesivas de una puerta pueden reconstruirse en sus instantes respectivos; recortar una acción aceptada y revertir sus cambios locales conserva la frontera anterior.
+
+El ensayo valida solamente conocimiento e historia. La reversión de reloj, agenda, azar y demás estado del motor sigue siendo responsabilidad de A. No demuestra guardado, interfaz, antorcha o viaje integrado. Los nombres de campos del adaptador son propuesta de C pendiente de aceptación por D; no se alteran los consumidores existentes.
+
 ### Incremento I2: pruebas, demostración y decisión de detención
 
 Autorizado el 2026-11-09 para continuar trabajo independiente. No modifica la interfaz ni el estilo visual. Amplía C12/C13 con secuencias reproducibles, ciclos, componentes desconectados y puertas paralelas de identidad distinta. La demostración usa datos sintéticos separados del código del juego.
