@@ -957,6 +957,9 @@ class Motor:
                 notificador(mensaje)
         return resultado
 
+    def _antes_de_retroceder(self):
+        """Punto de extensión previo a aplicar los inversos del turno."""
+
     def _ejecutar_accion(self, accion, argumento=None, registrar_h3=None):
         from modelo.snapshots import ResultadoAccion
         from modelo.enemigos import decidir_accion
@@ -970,6 +973,7 @@ class Motor:
                 return ResultadoAccion(ok=False, mensaje="No hay nada que deshacer")
             # Toda operacion de datos potencialmente fallida precede a los deltas.
             self._sincronizar_referencias(self.historial.referencias_retroceso())
+            self._antes_de_retroceder()
             reloj_anterior = self.historial.usar_pergamino(
                 self.jugador.inventario, pergamino.tipo_catalogo)
             if reloj_anterior is None:
@@ -1259,8 +1263,25 @@ class _MotorConHistoriaDePrueba(Motor):
         if self._historia_h3 is not None:
             if registrar_h3 is not None:
                 raise ValueError("H3 ya tiene un receptor conectado.")
+            if accion == "retroceso":
+                resultado = super().ejecutar(accion, argumento)
+                if resultado.ok:
+                    self._comprobar_frontera_historica()
+                return resultado
             registrar_h3 = self._registrar_accion_h3
         return super().ejecutar(accion, argumento, registrar_h3=registrar_h3)
+
+    def _comprobar_frontera_historica(self):
+        from modelo.errores_historia import CambioHistoriaIncoherente
+
+        historia = self._historia_h3
+        if (self.reloj, self.acciones_jugador) != (historia.reloj, historia.cantidad_acciones):
+            raise CambioHistoriaIncoherente("El motor y la historia no coinciden en reloj u ordinal.")
+
+    def _antes_de_retroceder(self):
+        if self._historia_h3 is not None:
+            self._comprobar_frontera_historica()
+            self._historia_h3.recortar(self.acciones_jugador - 1)
 
     def _registrar_accion_h3(self, inicio, fin, ordinal, cambios, eventos):
         from modelo.errores_historia import CambioHistoriaIncoherente

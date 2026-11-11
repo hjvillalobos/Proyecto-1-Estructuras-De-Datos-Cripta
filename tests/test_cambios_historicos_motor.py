@@ -1,13 +1,13 @@
 """AD-H3: productor optativo y contrato con la línea de tiempo de D."""
 
 from contextlib import contextmanager
-from functools import partial
 from importlib.util import find_spec
 from random import Random
 import unittest
 from unittest.mock import patch
 
 from modelo.juego import crear_juego
+from modelo.tipos import ObjetoInstancia
 from tests.datos_terreno_cazador import motor_terreno
 
 
@@ -232,7 +232,12 @@ class PruebasH3ConD(unittest.TestCase):
 
 @contextmanager
 def motor_con_historia_offline():
-    fabrica = partial(crear_juego, historia_para_pruebas=True)
+    def fabrica(precarga, *args, **opciones):
+        precarga.cliente.almacen.guardar_ficha("cat1", {
+            "id": "pergamino-h3", "clase": "pergamino_retroceso", "nombre": "Pergamino",
+        })
+        return crear_juego(precarga, *args, historia_para_pruebas=True, **opciones)
+
     with patch("tests.datos_terreno_cazador.crear_juego", new=fabrica), motor_terreno() as motor:
         yield motor
 
@@ -320,8 +325,112 @@ class PruebasAdaptadorHistoricoOffline(unittest.TestCase):
             historia = partida.linea_tiempo
             previo = estado_motor(motor), historia.exportar()
             with self.assertRaisesRegex(ValueError, "solo admite mover y esperar"):
-                partida.ejecutar("retroceso")
+                partida.ejecutar("atacar", "e-100")
             self.assertEqual((estado_motor(motor), historia.exportar()), previo)
+
+    def dar_pergamino(self, motor):
+        inventario = motor.jugador.inventario
+        self.assertIsNotNone(inventario.recoger(
+            ObjetoInstancia("p-h3", "pergamino-h3", "inventario")))
+        return inventario
+
+    def test_pergamino_recorta_solo_la_ultima_accion_y_permite_otra_rama(self):
+        from controlador.partida_historica import integrar_historia
+        from controlador.resumen_historia import consultar
+        from modelo.errores_historia import ReferenciaHistoricaInvalida
+
+        with motor_con_historia_offline() as motor:
+            partida = integrar_historia(motor, 2)
+            historia = partida.linea_tiempo
+            inventario = self.dar_pergamino(motor)
+            self.assertTrue(partida.ejecutar("mover", "E").ok)
+            retenida = historia.exportar().acciones[0]
+            consultas = tuple(consultar(historia, referencia).estado.campos()
+                              for referencia in ("99", "100"))
+            estado, agenda, turnos = estado_motor(motor)
+
+            self.assertTrue(partida.ejecutar("esperar").ok)
+            descartada = historia.exportar().acciones[1]
+            self.assertTrue(descartada.eventos)
+            self.assertEqual((historia.reloj, historia.cantidad_acciones), (200, 2))
+            self.assertNotEqual(motor.azar.getstate(), estado.rng_estado)
+            with patch.object(historia, "registrar_accion", wraps=historia.registrar_accion) as registrar:
+                self.assertTrue(partida.ejecutar("retroceso").ok)
+            registrar.assert_not_called()
+
+            self.assertEqual(historia.exportar().acciones, (retenida,))
+            self.assertEqual((historia.reloj, historia.cantidad_acciones), (100, 1))
+            self.assertEqual((motor.reloj, motor.acciones_jugador), (100, 1))
+            self.assertEqual((motor.jugador.posicion_actual, motor.jugador.vida),
+                             (estado.jugador.sala_id, estado.jugador.vida))
+            self.assertEqual(estado_motor(motor)[1:], (agenda, turnos))
+            self.assertEqual(motor.cola.proxima_secuencia(), estado.siguiente_secuencia)
+            self.assertEqual(motor.azar.getstate(), estado.rng_estado)
+            self.assertEqual(inventario.contar("pergamino-h3"), 0)
+            self.assertEqual(tuple(consultar(historia, referencia).estado.campos()
+                                   for referencia in ("99", "100")), consultas)
+            for referencia in ("#2", "200"):
+                with self.subTest(referencia=referencia):
+                    with self.assertRaises(ReferenciaHistoricaInvalida):
+                        consultar(historia, referencia)
+
+            self.assertTrue(partida.ejecutar("mover", "O").ok)
+            self.assertEqual((motor.reloj, motor.acciones_jugador), (200, 2))
+            self.assertEqual((historia.reloj, historia.cantidad_acciones), (200, 2))
+            primera, nueva = historia.exportar().acciones
+            self.assertEqual(primera, retenida)
+            self.assertEqual((nueva.inicio, nueva.fin), (100, 200))
+            self.assertNotEqual(nueva.eventos, descartada.eventos)
+            self.assertEqual(consultar(historia, "#2").estado.campos(), consultas[1])
+            self.assertEqual(consultar(historia, "200").estado.obtener("sala")[0], 100)
+
+    def test_recorte_incoherente_no_revierte_el_motor_ni_consume_pergamino(self):
+        from controlador.partida_historica import integrar_historia
+        from modelo.errores_historia import CambioHistoriaIncoherente
+        from modelo.snapshots import CambioHistorico, ValorHistorico
+
+        with motor_con_historia_offline() as motor:
+            partida = integrar_historia(motor, 2)
+            historia = partida.linea_tiempo
+            inventario = self.dar_pergamino(motor)
+            self.assertTrue(partida.ejecutar("mover", "E").ok)
+            self.assertTrue(partida.ejecutar("esperar").ok)
+            previo = estado_motor(motor), historia.exportar()
+            recortar = historia.recortar
+            mensajes = []
+            motor.establecer_notificador(mensajes.append)
+
+            def correccion_incoherente(conservadas):
+                correccion = CambioHistorico("sala", ValorHistorico(True, (999, "Otra")),
+                                             ValorHistorico(True, (100, "Entrada")))
+                return recortar(conservadas, (correccion,))
+
+            with patch.object(historia, "recortar", side_effect=correccion_incoherente) as intento:
+                with self.assertRaisesRegex(CambioHistoriaIncoherente, "valor anterior"):
+                    partida.ejecutar("retroceso")
+            intento.assert_called_once_with(1)
+            self.assertEqual((estado_motor(motor), historia.exportar()), previo)
+            self.assertEqual(mensajes, [])
+            self.assertEqual(inventario.contar("pergamino-h3"), 1)
+            self.assertTrue(partida.ejecutar("retroceso").ok)
+            self.assertEqual((historia.reloj, historia.cantidad_acciones), (100, 1))
+
+    def test_sin_pergamino_o_sin_turno_no_intenta_recortar(self):
+        from controlador.partida_historica import integrar_historia
+
+        for con_turno in (False, True):
+            with self.subTest(con_turno=con_turno), motor_con_historia_offline() as motor:
+                partida = integrar_historia(motor, 2)
+                historia = partida.linea_tiempo
+                if con_turno:
+                    self.assertTrue(partida.ejecutar("esperar").ok)
+                else:
+                    self.dar_pergamino(motor)
+                previo = estado_motor(motor), historia.exportar()
+                with patch.object(historia, "recortar", wraps=historia.recortar) as recortar:
+                    self.assertFalse(partida.ejecutar("retroceso").ok)
+                recortar.assert_not_called()
+                self.assertEqual((estado_motor(motor), historia.exportar()), previo)
 
 
 if __name__ == "__main__":
