@@ -235,7 +235,8 @@ class PruebasH3ConD(unittest.TestCase):
 
 
 @contextmanager
-def motor_con_historia_offline(*, con_mapa=False, con_trampa_venenosa=False):
+def motor_con_historia_offline(*, con_mapa=False, con_trampa_venenosa=False,
+                               comportamiento="guardian"):
     def fabrica(precarga, *args, **opciones):
         almacen = precarga.cliente.almacen
         almacen.guardar_ficha("cat1", {
@@ -252,7 +253,8 @@ def motor_con_historia_offline(*, con_mapa=False, con_trampa_venenosa=False):
         return crear_juego(precarga, *args, historia_para_pruebas=True,
                            conocimiento_para_pruebas=con_mapa, **opciones)
 
-    with patch("tests.datos_terreno_cazador.crear_juego", new=fabrica), motor_terreno() as motor:
+    with patch("tests.datos_terreno_cazador.crear_juego", new=fabrica), \
+            motor_terreno(comportamiento=comportamiento) as motor:
         yield motor
 
 
@@ -334,12 +336,16 @@ class PruebasAdaptadorHistoricoOffline(unittest.TestCase):
         with motor_terreno() as motor:
             self.assertIs(integrar_historia(motor, 2), motor)
             self.assertTrue(motor.ejecutar("mover", "E").ok)
+            enemigo = motor.enemigos_por_sala[101][0]
+            vida = enemigo.vida
+            self.assertTrue(motor.ejecutar("atacar", enemigo.id_instancia).ok)
+            self.assertLess(enemigo.vida, vida)
         with motor_con_historia_offline() as motor:
             partida = integrar_historia(motor, 2)
             historia = partida.linea_tiempo
             previo = estado_motor(motor), historia.exportar()
-            with self.assertRaisesRegex(ValueError, "solo admite mover y esperar"):
-                partida.ejecutar("atacar", "e-100")
+            with self.assertRaisesRegex(ValueError, "solo admite mover, esperar y atacar"):
+                partida.ejecutar("abrir", "E")
             self.assertEqual((estado_motor(motor), historia.exportar()), previo)
 
     def dar_pergamino(self, motor):
@@ -400,6 +406,103 @@ class PruebasAdaptadorHistoricoOffline(unittest.TestCase):
             self.assertEqual(inventario.contar("pergamino-h3"), 0)
             with self.assertRaises(ReferenciaHistoricaInvalida):
                 historia.consultar_t(400)
+
+    def test_enemigos_de_la_sala_cambian_con_la_entrada_y_los_eventos(self):
+        from controlador.partida_historica import integrar_historia
+        from controlador.resumen_historia import resumir
+
+        with motor_con_historia_offline(comportamiento="errante") as motor:
+            catalogo = motor.gestor_precarga.catalogo
+            proyectar = motor.proyeccion_h3
+
+            def proyectar_sin_consultas():
+                with patch("requests.sessions.Session.request", side_effect=AssertionError("HTTP en H3")), \
+                        patch.object(catalogo, "obtener_fichas", side_effect=AssertionError("Catálogo en H3")), \
+                        patch.object(catalogo.almacen, "leer_ficha", side_effect=AssertionError("Disco en H3")):
+                    return proyectar()
+
+            origen = motor.enemigos_por_sala[100][0]
+            turno_origen = origen.evento_pendiente
+            clave_origen, clave_destino = "enemigo:e-100", "enemigo:e-101"
+
+            def enemigos_en(tiempo):
+                return tuple((clave, valor) for clave, valor in
+                             historia.consultar_t(tiempo).estado.campos()
+                             if clave.startswith("enemigo:"))
+
+            enemigo = ("enemigo", 12, 12, "errante")
+            with patch.object(motor, "proyeccion_h3", side_effect=proyectar_sin_consultas):
+                partida = integrar_historia(motor, 2)
+                historia = partida.linea_tiempo
+                self.assertEqual(enemigos_en(0), ((clave_origen, enemigo),))
+                self.assertTrue(partida.ejecutar("mover", "E").ok)
+            self.assertEqual((motor.reloj, origen.sala_actual), (100, 101))
+            previo = estado_motor(motor), historia.exportar()
+            self.assertEqual(enemigos_en(99), ((clave_destino, enemigo),))
+            self.assertEqual(enemigos_en(100), ((clave_origen, enemigo), (clave_destino, enemigo)))
+            resumen = resumir(historia.consultar_t(100))
+            self.assertIn("enemigo [e-100] 12/12 (errante)", resumen)
+            self.assertIn("enemigo [e-101] 12/12 (errante)", resumen)
+            self.assertEqual((estado_motor(motor), historia.exportar()), previo)
+
+            accion = historia.exportar().acciones[0]
+            bajas, altas = (c for c in accion.cambios if c.clave.startswith("enemigo:"))
+            self.assertEqual((bajas.clave, bajas.anterior.presente, bajas.nuevo.presente),
+                             (clave_origen, True, False))
+            self.assertEqual((altas.clave, altas.anterior.presente, altas.nuevo.valor),
+                             (clave_destino, False, enemigo))
+            evento = next(e for e in accion.eventos if e.secuencia == turno_origen.secuencia)
+            self.assertEqual(evento.tiempo, turno_origen.tiempo)
+            alta, = evento.cambios
+            self.assertEqual((alta.clave, alta.anterior.presente, alta.nuevo.valor),
+                             (clave_origen, False, enemigo))
+
+    def test_vida_y_muerte_de_enemigo_sobreviven_al_v4_y_al_retroceso(self):
+        from controlador.partida_historica import integrar_historia
+        from datos.guardado_binario import ArchivoGuardado, cargar_estado_partida, guardar_estado
+
+        with motor_con_historia_offline() as motor, TemporaryDirectory() as carpeta:
+            partida = integrar_historia(motor, 2)
+            inventario = self.dar_pergamino(motor)
+            clave = "enemigo:e-100"
+            self.assertTrue(partida.ejecutar("atacar", "e-100").ok)
+            historia = partida.linea_tiempo
+            antes = historia.consultar_t(0).estado.obtener(clave)
+            herido = historia.consultar_t(1).estado.obtener(clave)
+            self.assertEqual(antes, ("enemigo", 12, 12, "guardian"))
+            self.assertGreater(herido[1], 0)
+            self.assertLess(herido[1], antes[1])
+            self.assertEqual(herido[1], motor.enemigos_por_sala[100][0].vida)
+            self.assertEqual(historia.consultar_t(100).estado.obtener(clave), herido)
+            ruta = Path(carpeta) / "enemigos.bin"
+            guardado = partida.exportar_estado()
+            guardar_estado(guardado, ruta)
+            with ArchivoGuardado(ruta) as archivo:
+                self.assertEqual(archivo.version, 4)
+            self.assertTrue(partida.ejecutar("esperar").ok)
+            partida.restaurar_estado(cargar_estado_partida(ruta))
+            self.assertEqual(partida.exportar_estado(), guardado)
+            self.assertIsNot(partida.linea_tiempo, historia)
+            historia = partida.linea_tiempo
+            self.assertEqual(historia.consultar_final().estado.obtener(clave), herido)
+            self.assertEqual(historia.consultar_accion(1).estado.obtener(clave), antes)
+
+            enemigo = motor.enemigos_por_sala[100][0]
+            for _ in range(2):
+                vida_previa = enemigo.vida
+                self.assertTrue(partida.ejecutar("atacar", "e-100").ok)
+                if enemigo.vida == 0:
+                    break
+            self.assertEqual(enemigo.vida, 0)
+            with self.assertRaises(KeyError):
+                historia.consultar_final().estado.obtener(clave)
+            baja, = (c for c in historia.exportar().acciones[-1].cambios if c.clave == clave)
+            self.assertEqual(baja.anterior.valor[1], vida_previa)
+            self.assertFalse(baja.nuevo.presente)
+            self.assertTrue(partida.ejecutar("retroceso").ok)
+            self.assertEqual(enemigo.vida, vida_previa)
+            self.assertEqual(historia.consultar_final().estado.obtener(clave)[1], vida_previa)
+            self.assertEqual(motor.jugador.inventario.contar("pergamino-h3"), 0)
 
     def test_pergamino_recorta_solo_la_ultima_accion_y_permite_otra_rama(self):
         from controlador.partida_historica import integrar_historia

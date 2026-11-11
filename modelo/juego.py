@@ -34,6 +34,8 @@ def calcular_dano(atacante, defensor, azar):
 
 
 class Motor:
+    _acciones_h3 = ("mover", "esperar")
+
     def __init__(self, jugador, salas_lista, semilla):
         self.jugador = jugador
         self._conocimiento = None
@@ -924,7 +926,10 @@ class Motor:
         )
 
     def _cambios_h3(self, anterior):
-        posterior = self.proyeccion_h3()
+        return self._comparar_campos_fijos_h3(anterior, self.proyeccion_h3())
+
+    @staticmethod
+    def _comparar_campos_fijos_h3(anterior, posterior):
         if len(anterior) != len(posterior):
             raise ValueError("Las proyecciones H3 tienen distinta longitud.")
         if any(clave != clave_nueva for (clave, _), (clave_nueva, _) in zip(anterior, posterior)):
@@ -939,8 +944,9 @@ class Motor:
         Un rechazo de validación del receptor debe dejar su historia intacta.
         El motor revierte su turno y propaga la excepción sin reintentar el lote.
         """
-        if registrar_h3 is not None and accion not in ("mover", "esperar"):
-            raise ValueError("El productor H3 de prueba solo admite mover y esperar.")
+        if registrar_h3 is not None and accion not in self._acciones_h3:
+            acciones = ", ".join(self._acciones_h3[:-1]) + " y " + self._acciones_h3[-1]
+            raise ValueError(f"El productor H3 de prueba solo admite {acciones}.")
         reloj = self.reloj
         notificador = self._notificador
         mensajes = []
@@ -1246,6 +1252,8 @@ class Motor:
 class _MotorConHistoriaDePrueba(Motor):
     """Productor de consultas H3 para una partida nueva de prueba."""
 
+    _acciones_h3 = ("mover", "esperar", "atacar")
+
     def __init__(self, jugador, salas_lista, semilla):
         super().__init__(jugador, salas_lista, semilla)
         self._historia_h3 = None
@@ -1256,7 +1264,42 @@ class _MotorConHistoriaDePrueba(Motor):
         return EstadoHistorico(self.proyeccion_h3())
 
     def proyeccion_h3(self):
-        return super().proyeccion_h3() + (("efectos", tuple(self._efectos_activos())),)
+        from utilidades.ordenamiento import ordenar
+
+        sala = self.jugador.posicion_actual
+        enemigos = ordenar(
+            [enemigo for enemigo in self.enemigos_por_sala[sala] if enemigo.vida > 0],
+            clave=lambda enemigo: enemigo.id_instancia, algoritmo="fusion",
+        )
+        return (super().proyeccion_h3() + (("efectos", tuple(self._efectos_activos())),)
+                + tuple((f"enemigo:{enemigo.id_instancia}",
+                         (enemigo.tipo_catalogo, enemigo.vida, enemigo.vida_max,
+                          enemigo.comportamiento))
+                        for enemigo in enemigos))
+
+    def _cambios_h3(self, anterior):
+        posterior = self.proyeccion_h3()
+        # Sala, jugador y efectos conservan sus claves; los enemigos pueden entrar o salir.
+        cambios = list(self._comparar_campos_fijos_h3(anterior[:3], posterior[:3]))
+        viejos, nuevos = anterior[3:], posterior[3:]
+        i = j = 0
+        while i < len(viejos) and j < len(nuevos):
+            clave_anterior, antes = viejos[i]
+            clave_nueva, despues = nuevos[j]
+            if clave_anterior < clave_nueva:
+                cambios.append((clave_anterior, antes, None))
+                i += 1
+            elif clave_nueva < clave_anterior:
+                cambios.append((clave_nueva, None, despues))
+                j += 1
+            else:
+                if antes != despues:
+                    cambios.append((clave_anterior, antes, despues))
+                i += 1
+                j += 1
+        cambios.extend((clave, antes, None) for clave, antes in viejos[i:])
+        cambios.extend((clave, None, despues) for clave, despues in nuevos[j:])
+        return tuple(cambios)
 
     def conectar_historia(self, historia):
         from modelo.errores_historia import CambioHistoriaIncoherente
@@ -1327,7 +1370,8 @@ class _MotorConHistoriaDePrueba(Motor):
             raise CambioHistoriaIncoherente("El reloj o el ordinal del lote H3 no coincide con la historia.")
 
         def convertir(deltas):
-            return tuple(CambioHistorico(clave, ValorHistorico(True, antes), ValorHistorico(True, despues))
+            return tuple(CambioHistorico(clave, ValorHistorico(antes is not None, antes),
+                                         ValorHistorico(despues is not None, despues))
                          for clave, antes, despues in deltas)
 
         historia.registrar_accion(
