@@ -18,8 +18,7 @@ class SesionDatos:
     def abrir(self):
         if self.args.offline is not None:
             from datos.offline import ClienteOffline
-            version = self.args.version_cripta if getattr(self.args, "descargar_todo", False) else None
-            self.cliente = ClienteOffline(self.args.offline, version_cripta=version)
+            self.cliente = ClienteOffline(self.args.offline, getattr(self.args, "version_cripta", None))
         else:
             from red.cliente_api import ClienteApi
             self.cliente = ClienteApi()

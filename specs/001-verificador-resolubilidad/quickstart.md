@@ -89,7 +89,7 @@ Probar `--verificar <cripta>` sin vista, inicio bloqueado ante resultado negativ
 
 AC-22: preparar región desconectada con llave K y puerta de regreso que requiere K; esperar desconexión sin causa circular certificada. AC-23: simular cambio V1→V2 durante descarga, luego iniciar un cliente offline nuevo; no debe consumir respuestas rechazadas guardadas bajo V1. Repetir con fallo de consulta final y agotamiento de presupuesto.
 
-Ejecutar familias N, 2N y 4N y comparar tiempos/conteos por fase según el protocolo de plan.md. El límite de 200 ms usa el total, incluyendo normalización y diagnóstico. C1 aprobado el 2026-11-02 por aclaración del profesor comunicada por el usuario. La especificación quedó confirmada en `17dc4bc` antes del código. Las pruebas de B y las mediciones ya se ejecutaron; la aceptación conjunta con D sigue pendiente.
+Ejecutar familias N, 2N y 4N y comparar tiempos/conteos por fase según el protocolo de plan.md. El límite de 200 ms usa el total, incluyendo normalización y diagnóstico. C1 aprobado el 2026-11-02 por aclaración del profesor comunicada por el usuario. La especificación quedó confirmada en `17dc4bc` antes del código. Las pruebas de B y las mediciones ya se ejecutaron; la matriz de inicio real se ejecutó el 2026-11-10.
 
 ## Cierre del diagnóstico de ciclos
 
@@ -114,5 +114,15 @@ Los datos observados cumplen 200 ms para esa versión y equipo; no certifican ot
 mapas ni el ciclo de juego de 20 ms. La evaluación académica del crecimiento
 aproximadamente lineal se conserva pendiente.
 
-Pendientes compartidos: revisión cruzada B↔D y medición de aceptación con
-el paquete de referencia. [Evidencia de integración de D](../004-linea-tiempo/aceptacion.md).
+## Reproducción de T026 y T030 (2026-11-10)
+
+`python -m unittest -v tests.test_verificacion_entrega.TestInicioVerificado` prueba los seis inicios y las tres verificaciones exclusivas. En el caso resoluble se inicia en ambos modos, en el negativo solo con forzar, y en el incompleto se bloquea en ambos. Cada proceso tiene su propia carpeta de partida.
+
+Con el paquete local de referencia, ejecutar:
+
+```powershell
+python main.py --bench --subsistemas resolubilidad --paquete .cache/resolubilidad/real --cripta cripta-06
+python main.py --bench --subsistemas resolubilidad --tamanos 8 16 32 --repeticiones 10 --paquete .cache/resolubilidad/real --cripta cripta-06
+```
+
+El primer comando mide las dos estrategias sobre la cripta real con diez repeticiones predeterminadas. [Evidencia de D](../004-linea-tiempo/aceptacion.md).

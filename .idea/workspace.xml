@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="88669b21-95b1-4620-805b-8de4401bd5bb" name="Changes" comment="">
+    <list default="true" id="88669b21-95b1-4620-805b-8de4401bd5bb" name="Changes" comment="fix: incluir las llaves en los paquetes de descarga offline">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DECISIONES.md" beforeDir="false" afterPath="$PROJECT_DIR$/DECISIONES.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/PROMPTS_LLM.md" beforeDir="false" afterPath="$PROJECT_DIR$/PROMPTS_LLM.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/specs/001-verificador-resolubilidad/quickstart.md" beforeDir="false" afterPath="$PROJECT_DIR$/specs/001-verificador-resolubilidad/quickstart.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/specs/001-verificador-resolubilidad/tasks.md" beforeDir="false" afterPath="$PROJECT_DIR$/specs/001-verificador-resolubilidad/tasks.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_verificacion_entrega.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_verificacion_entrega.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,19 +39,19 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "codex/verificador-resolubilidad",
-    "ignore.virus.scanning.warn.message": "true",
-    "nodejs_package_manager_path": "npm"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;codex/verificador-resolubilidad&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -61,9 +67,40 @@
       <option name="presentableId" value="Default" />
       <updated>1792363648624</updated>
     </task>
+    <task id="LOCAL-00001" summary="feat: implementar verificador de resolubilidad acumulativa&#10;&#10;- Agregar diagnóstico de llaves, puertas bloqueadas y ciclos.&#10;- Integrar consulta de llaves, persistencia versionada y modo offline.&#10;- Añadir pruebas, mediciones y documentación.&#10;- Mantener pendiente la integración con main y bench a cargo de D.">
+      <option name="closed" value="true" />
+      <created>1793636788947</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1793636788947</updated>
+    </task>
+    <task id="LOCAL-00002" summary="feat: agregar modulo de resolubilidad, pruebas y benchmarks">
+      <option name="closed" value="true" />
+      <created>1793636893730</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1793636893730</updated>
+    </task>
+    <task id="LOCAL-00003" summary="fix: incluir las llaves en los paquetes de descarga offline">
+      <option name="closed" value="true" />
+      <created>1794285274768</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1794285274768</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="feat: implementar verificador de resolubilidad acumulativa&#10;&#10;- Agregar diagnóstico de llaves, puertas bloqueadas y ciclos.&#10;- Integrar consulta de llaves, persistencia versionada y modo offline.&#10;- Añadir pruebas, mediciones y documentación.&#10;- Mantener pendiente la integración con main y bench a cargo de D." />
+    <MESSAGE value="feat: agregar modulo de resolubilidad, pruebas y benchmarks" />
+    <MESSAGE value="fix: incluir las llaves en los paquetes de descarga offline" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: incluir las llaves en los paquetes de descarga offline" />
   </component>
 </project>

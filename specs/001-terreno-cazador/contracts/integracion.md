@@ -4,12 +4,12 @@
 
 **Adenda 2026-11-06.** Persona A adopta la frontera temporal para compatibilidad con `historia <t>`. La validación de integración con Persona D y los entregables de la tabla siguen pendientes.
 
-**Actualización documental:** 2026-11-05, I1. Cada fila siguiente es un entregable independiente. Registrar responsable, alcance exacto, fuente/evidencia y fecha antes de cambiar su estado; una propuesta o una solicitud enviada no equivale a aceptación. La tarea T003 consolida este registro, pero sus consumidores solo esperan sus filas concretas. No se requiere completar todas las filas para acreditar una sola. Estado actual: todas pendientes, sin contratos aprobados.
+**Actualización documental:** 2026-11-05, I1. Cada fila siguiente es un entregable independiente. Registrar responsable, alcance exacto, fuente/evidencia y fecha antes de cambiar su estado; una propuesta o una solicitud enviada no equivale a aceptación. La tarea T003 consolida este registro, pero sus consumidores solo esperan sus filas concretas. No se requiere completar todas las filas para acreditar una sola. El estado de cada entrega figura en la tabla.
 
 | ID | Responsable del acuerdo/entrega | Evidencia verificable requerida | Consumidores principales | Estado |
 | --- | --- | --- | --- | --- |
-| E-B-COSTOS | B con A | B debe demostrar cómo llegan al motor de A los costos válidos de las salidas, con identidad y versión de cripta verificables y sin HTTP durante la búsqueda. El profesor confirmó, según el usuario, que el costo ausente vale 100 y se asume simétrico. [Aclaración y límites de Q2](../research.md#aclaración-del-profesor-sobre-q2). La aceptación es independiente de E-B-RANGO. | T013, T014, T025 | PENDIENTE |
-| E-B-RANGO | B con A | Suministro y acceso verificables al rango de cazadores, con identidad y versión, sin HTTP durante la búsqueda. B debe preservar tres estados: entero válido (límite inclusivo), `null` explícito (sin tope de costo) y campo ausente (tratamiento pendiente en Q1). También sigue pendiente el tratamiento de valores inválidos. Aceptación independiente de costos. | T025; no T013/T014 | PENDIENTE |
+| E-B-COSTOS | B con A | B debe demostrar cómo llegan al motor de A los costos válidos de las salidas, con identidad y versión de cripta verificables y sin HTTP durante la búsqueda. El profesor confirmó, según el usuario, que el costo ausente vale 100 y se asume simétrico. [Aclaración y límites de Q2](../research.md#aclaración-del-profesor-sobre-q2). La aceptación es independiente de E-B-RANGO. | T013, T014, T025 | Entrega confirmada para los datos válidos probados el 2026-11-09. |
+| E-B-RANGO | B con A | Suministro y acceso verificables al rango de cazadores, con identidad y versión, sin HTTP durante la búsqueda. B debe preservar tres estados: entero válido (límite inclusivo), `null` explícito (sin tope de costo) y campo ausente (tratamiento pendiente en Q1). También sigue pendiente el tratamiento de valores inválidos. Aceptación independiente de costos. | T025; no T013/T014 | Entrega confirmada para los datos válidos probados el 2026-11-09. |
 | E-BC-PUERTA | B/C/A | Identidad de puerta, lectura de ambos extremos y coherencia de cambios reales. | T029, T032 | PENDIENTE |
 | E-C-RUTA | C con A | Fuente filtrada, firmas/modos/estados de consulta y criterios de aceptación acordados. | T023, T024 y solo las extensiones filtradas que lo usen | PENDIENTE |
 | E-C-DESPACHO | C con A | Punto de conexión del cazador, firma y conservación de decisiones existentes. | T025 | PENDIENTE |
@@ -21,16 +21,23 @@
 
 Q1/Q2 y Q3 tienen registros de evidencia separados en research.md. A puede describir estos acuerdos con autorización documental; no puede aprobar por B/C/D, resolver preguntas oficiales ni implementar sus entregas.
 
-**Corrección I1/I5/C2 posterior al segundo Analyze, 2026-11-05:** hay diez entregables independientes. E-B-COSTOS y E-B-RANGO sustituyen el entregable agrupado anterior; ambos siguen pendientes. Una comunicación sobre el esquema no acredita suministro/acceso efectivo. T027 necesita T024 para su cierre completo; una ejecución parcial del núcleo no completa el contrato de C ni la tarea.
+**Corrección I1/I5/C2 posterior al segundo Analyze, 2026-11-05:** hay diez entregables independientes. E-B-COSTOS y E-B-RANGO sustituyen el entregable agrupado anterior; ambos estaban pendientes en esa fecha. Una comunicación sobre el esquema no acredita suministro/acceso efectivo. T027 necesita T024 para su cierre completo; una ejecución parcial del núcleo no completa el contrato de C ni la tarea.
 
 ## A–B: entrada de datos
+
+**Evidencia de B del 2026-11-09.** Las dos [pruebas de entrega](../../../tests/test_entrega_datos_terreno.py) usan el cliente HTTP con transporte simulado, el almacén en disco y una reapertura con un cliente offline nuevo. Se comprueban la cripta `prueba`, su versión `v1` y la versión de catálogo `cat1`.
+
+- **E-B-COSTOS.** El grafo de A recibe 250 en ambos sentidos del tramo con costo declarado y 100 en ambos sentidos del tramo con costo omitido. La página en disco conserva la omisión y el resultado se reproduce offline.
+- **E-B-RANGO.** A puede consultar `catalogo.ficha_preparada(tipo_catalogo).atributos["rango"]`. Para una ruta de costo 350, la decisión del cazador es mover con rango 350 y esperar con rango 349. La consulta y la búsqueda se verificaron sin leer fichas de disco ni realizar HTTP, también después de reabrir la cripta.
+
+Para reproducir ambas entregas desde la raíz del repositorio, ejecutar `python -m unittest -v tests.test_entrega_datos_terreno`. A revisa cada resultado de forma independiente. Q1 y Q2 siguen abiertas para los datos fuera de los casos verificados.
 
 - B provee esqueleto completo con versiones de cripta, IDs, conexiones y costos; fichas de enemigos y rango ya disponibles sin red dentro de rutas.
 - Para datos válidos: costo ausente equivale a 100, declarado entero ≥1, igual en ambos sentidos; un rango entero válido limita el costo en forma inclusiva y un `null` explícito indica búsqueda sin tope de costo, según la [aclaración del profesor](../research.md#aclaración-del-profesor-sobre-q1). Q1 y Q2 conservan los casos pendientes de ausencia, invalidez o inconsistencia que correspondan.
 - A recibe una vista de datos de juego; desconoce si origen fue HTTP u offline. B administra presupuesto, UUID, lotes, versiones, fichas retenidas y errores de adquisición.
 - Salida ponderada propuesta: origen/dirección/destino/costo/referencia de puerta. Identidad de puerta entre extremos y sincronización deben acordarse antes del cache de A. A no copia unilateralmente el costo de un extremo al otro.
 - Si cambia cripta/versión se reconstruye identidad del grafo; no reutilizar índices de una versión distinta.
-- Pendiente con B: campos garantizados, disponibilidad de rango sin descarga durante búsqueda y cómo representar/reportar datos fuera de contrato. Mocks solo con autorización posterior.
+- Pendiente con A y B: acordar cómo representar y reportar datos fuera de los casos válidos cubiertos por las pruebas.
 
 **Comunicación de B sobre OpenAPI 1.1.0:** el usuario transmite que B encontró Enemy.rango opcional y nullable, entero ≥1 cuando tiene valor, sin default ni obligación adicional para cazador; Exit dirigido con costo opcional y nullable, entero ≥1 cuando tiene valor, sin default ni garantía de simetría declarados. No disponemos de copia verificable ni fragmentos originales: esto no es verificación independiente ni contrato aprobado. El [contraste y procedencia](../research.md#comunicación-reportada-de-b-sobre-openapi-110) mantiene la autoridad de Parte II §§3.1–3.2: costo ausente 100, igual en ambos sentidos y ficha de cazador con rango. El rango ausente o inválido sigue pendiente en Q1. El costo `null` y las inconsistencias siguen pendientes en Q2. El rango `null` explícito se rige por la aclaración del profesor y debe distinguirse del campo ausente.
 

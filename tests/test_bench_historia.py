@@ -76,7 +76,7 @@ class BenchHistoriaTest(unittest.TestCase):
     def test_fr017_ac20_bench_rechaza_paquete_sin_llaves(self):
         with TemporaryDirectory() as tmp, contextlib.redirect_stdout(io.StringIO()) as salida, \
                 contextlib.redirect_stderr(io.StringIO()) as errores:
-            crear_paquete(tmp, salas=2)
+            crear_paquete(tmp, salas=2, incluir_llaves=False)
             with self.assertRaises(SystemExit) as fallo:
                 main_cli(["--bench", "--subsistemas", "resolubilidad", "--paquete", tmp,
                           "--cripta", "prueba"])

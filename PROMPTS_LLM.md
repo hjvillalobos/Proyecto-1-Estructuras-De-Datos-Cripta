@@ -1204,6 +1204,30 @@ productores simulados donde todavía faltan contratos reales. Se registraron
 decisiones, mediciones, errores, regresiones y dependencias en sus archivos.
 No se enviaron prompts a otros agentes ni se atribuyen acuerdos a compañeros.
 
+### 2026-11-09 — Entrega de costos y rango de B a A
+
+- **Herramienta/modelo:** Codex (GPT-6).
+- **Prompt textual:**
+
+> Implementa el siguiente paso:
+>
+> Cerrar E-BCOSTOS y despues E-B-RANGO. Para el primero, la prueba de entrega más clara es descargar una salida con costo explícito y otra con costo omitido, volver a abrir la cripta offline y comprobar que A obtiene el costo publicado y 100, respectivamente. Para el segundo, aplicar la misma comprobación a una ficha de cazador y verificar que A recibe su rango por tipo de enemigo sin hacer HTTP durante la búsqueda
+
+- **Uso de la respuesta:** Verificar la entrega de costos y rango con datos válidos, incorporar la consulta de fichas preparadas por tipo y probar la reapertura offline. B registró la evidencia en el contrato A–B. La revisión de A queda pendiente.
+
+### 2026-11-10 — Validación final del verificador
+
+- **Herramienta/modelo:** Codex (GPT-6).
+- **Prompt textual:**
+
+> Valida el inicio con (T026). La prueba que hicimos confirma que --verificar lee el paquete offline. Falta comprobar que hace el juego al iniciar una cripta resoluble debe arrancar normalmente, una no resoluble debe arrancar solo con --forzar, y una verificacion no completada debe bloquear el inicio incluso con --forzar.
+>
+> Despues cierra la revision de rendimiento (T030–T031). A D le corresponde ajustar el comando general del benchmark. De nuestro lado nos corresponde comprobar que funcione con las repeticiones predeterminadas y con un paquete real. Para FR-015, ya tenemos las mediciones de escalamiento y la prueba de la cripta de 300 salas. Queda valorar el crecimiento observado teniendo en cuenta que la normalizacion cuesta 0(N log N)
+>
+> Y por ulitmo actualiza el estado final (T032–T034). Después de las pruebas conjuntas, registrar qué pasó, enlazar la evidencia y ajustar las casillas pendientes a lo que realmente quedó integrado.
+
+- **Uso de la respuesta:** Ejecutar la matriz real de consola, reproducir dos pendientes del benchmark general, medir de nuevo la cripta preparada y actualizar [el estado de las tareas](specs/001-verificador-resolubilidad/tasks.md).
+
 ## 2026-11-08 — aceptación offline de D
 
 Herramienta: Codex desktop. Prompts textuales:
@@ -1287,6 +1311,11 @@ falten captura y restauración. Se consultó el listado del servicio,
 se preparó la mayor cripta con B y se midió el análisis offline.
 Se registraron comandos, muestras y límites sin modificar el motor.
 
+### 2026-11-10 — Cierre integrado de B y D
+
+- **Herramienta/modelo:** Codex (GPT-6).
+- **Prompt textual:** «Resuelve todos los pendientes y confirma su solución».
+- **Uso de la respuesta:** Integrar el commit de D, reconciliar la descarga y los paquetes de prueba y comprobar el informe incompleto, el inicio y la medición offline. [Registro del cierre](specs/001-verificador-resolubilidad/tasks.md).
 ## 2026-11-10 — Consumidores de D tras integrar C
 
 Herramienta: Codex desktop. Prompt textual:

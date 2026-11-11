@@ -1,4 +1,6 @@
 from copy import deepcopy
+from contextlib import redirect_stdout
+from io import StringIO
 from pathlib import Path
 import tempfile
 import unittest
@@ -6,6 +8,7 @@ from unittest.mock import patch
 
 from datos.almacen import AlmacenLocal
 from datos.offline import ClienteOffline
+from main import main
 from red.errores import DatosInvalidos, DatosNoDisponibles, ErrorRed
 from red.verificacion import preparar_verificacion, verificar_cripta
 from tests.datos_prueba import ServidorFalso
@@ -45,6 +48,18 @@ class TestVerificacionDatos(unittest.TestCase):
         self.temporal = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporal.cleanup)
         self.almacen = AlmacenLocal(self.temporal.name)
+
+    def test_FR010_AC11_descarga_completa_y_verificacion_offline(self):
+        cliente = ServidorVerificacion(salas=3)
+        carpeta = self.temporal.name
+        with patch('red.cliente_api.ClienteApi', return_value=cliente), redirect_stdout(StringIO()):
+            self.assertEqual(main(['--descargar-todo', '--datos-dir', carpeta]), 0)
+        self.assertEqual(self.almacen.leer_llaves('prueba', 'v1'), cliente.llaves)
+        self.assertEqual(sum(tipo == 'llaves' for tipo, _ in cliente.llamadas), 1)
+        salida = StringIO()
+        with patch('requests.sessions.Session.request', side_effect=AssertionError('HTTP inesperado')), redirect_stdout(salida):
+            self.assertEqual(main(['--verificar', 'prueba', '--offline', carpeta]), 0)
+        self.assertIn('Orden de llaves: obj_0', salida.getvalue())
 
     def test_FR010_AC11_vacio_ausente_corrupto(self):
         self.assertIsNone(self.almacen.leer_llaves('prueba', 'v1'))

@@ -201,7 +201,7 @@ class ModosHistoriaTest(unittest.TestCase):
         with TemporaryDirectory() as tmp:
             raiz = Path(tmp)
             paquete = raiz / "paquete"
-            crear_paquete(paquete, salas=2)
+            crear_paquete(paquete, salas=2, incluir_llaves=False)
             comando = [sys.executable, "-B", "-X", "utf8", str(Path(main.__file__).resolve()),
                        "--offline", str(paquete), "--datos-dir", str(paquete)]
             for argumentos in (["--verificar", "prueba"], ["--cripta", "prueba", "--forzar"]):
