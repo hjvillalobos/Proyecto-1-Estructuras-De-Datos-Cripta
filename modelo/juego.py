@@ -36,6 +36,7 @@ def calcular_dano(atacante, defensor, azar):
 class Motor:
     def __init__(self, jugador, salas_lista, semilla):
         self.jugador = jugador
+        self._conocimiento = None
 
         salas_total = 0
         for sala in salas_lista:
@@ -77,6 +78,13 @@ class Motor:
         self.puertas_abiertas_con_llave = []
         self.meta = None
         self._notificador = None
+
+    @property
+    def mapa_conocido(self):
+        """Expone la consulta solo en instancias habilitadas."""
+        if self._conocimiento is None:
+            raise AttributeError("El mapa conocido no está habilitado.")
+        return self._conocimiento.mapa_conocido
 
     def establecer_notificador(self, notificador):
         self._notificador = notificador
@@ -225,6 +233,11 @@ class Motor:
         pos_anterior = self.jugador.posicion_actual
         self.historial.registrar_inventario(lambda p=pos_anterior: setattr(self.jugador, "posicion_actual", p))
         self.jugador.posicion_actual = id_destino
+        conocimiento = self._conocimiento
+        if conocimiento is not None and id_destino != pos_anterior:
+            cambios = conocimiento.entrar(id_destino)
+            if cambios:
+                self.historial.registrar_cambio(lambda: conocimiento.revertir(cambios))
         self._sincronizar_referencias()
         self._avanzar_actor(self.jugador, costo_salida)
         self.historial.registrar_rastro(id_destino, self.registro_rastro.tiempo_de(id_destino))
@@ -1222,7 +1235,8 @@ class Motor:
 
 
 def crear_juego(gestor_precarga, cripta_id, semilla, notificar=None,
-                version_cripta=None, version_catalogo=None):
+                version_cripta=None, version_catalogo=None, *,
+                conocimiento_para_pruebas=False):
     from modelo.snapshots import MetaPartida
     from modelo.inventario import Inventario
 
@@ -1245,6 +1259,18 @@ def crear_juego(gestor_precarga, cripta_id, semilla, notificar=None,
     )
 
     motor = Motor(jugador=jugador, salas_lista=preparada.salas, semilla=semilla)
+    if conocimiento_para_pruebas:
+        from modelo.conocimiento import ConocimientoMapa, SalaConocible, SalidaConocible
+
+        salas = []
+        for sala in preparada.salas:
+            salidas = []
+            for direccion, salida in sala.salidas.items():
+                if any(campo not in ("sala", "costo") for campo in salida):
+                    raise ValueError("El mapa de prueba requiere salidas simples sin puertas.")
+                salidas.append(SalidaConocible(direccion, salida["sala"], salida.get("costo", 100)))
+            salas.append(SalaConocible(sala.id, sala.nombre, tuple(salidas)))
+        motor._conocimiento = ConocimientoMapa(salas, (), jugador.posicion_actual)
     motor.gestor_precarga = gestor_precarga
     motor.sala_salida = generales["sala_salida"]
     motor.llave_salida = generales["llave_salida"]
