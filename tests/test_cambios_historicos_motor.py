@@ -3,7 +3,9 @@
 from contextlib import contextmanager
 from dataclasses import replace
 from importlib.util import find_spec
+from pathlib import Path
 from random import Random
+from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import patch
 
@@ -559,6 +561,134 @@ class PruebasRestauracionHistoricaOffline(unittest.TestCase):
             self.assertEqual((estado_motor(motor), activa.exportar(), motor.mapa_conocido()), previo)
             self.assertIs(partida.linea_tiempo, activa)
             self.assertIs(motor._historia_h3, activa)
+
+
+class PruebasPersistenciaHistoricaOffline(unittest.TestCase):
+    def comprobar_rechazo(self, motor, partida, ruta, error, mensaje):
+        from datos.guardado_binario import cargar_estado_partida
+
+        activa = partida.linea_tiempo
+        previo = estado_motor(motor), activa.exportar()
+        with self.assertRaisesRegex(error, mensaje):
+            partida.restaurar_estado(cargar_estado_partida(ruta))
+        self.assertEqual((estado_motor(motor), activa.exportar()), previo)
+        self.assertIs(partida.linea_tiempo, activa)
+        self.assertIs(motor._historia_h3, activa)
+
+    def test_archivo_v4_restaura_el_motor_y_permite_continuar(self):
+        from controlador.partida_historica import integrar_historia
+        from controlador.resumen_historia import consultar, resumir
+        from datos.guardado_binario import ArchivoGuardado, cargar_estado_partida, guardar_estado
+        from modelo.errores_historia import ReferenciaHistoricaInvalida
+
+        with motor_con_historia_offline() as motor, TemporaryDirectory() as carpeta:
+            partida = integrar_historia(motor, 2)
+            anterior = partida.linea_tiempo
+            ruta = Path(carpeta) / "partida.bin"
+            self.assertTrue(partida.ejecutar("mover", "E").ok)
+            esperado = partida.exportar_estado()
+            consultas = tuple(resumir(consultar(anterior, ref)) for ref in ("99", "100"))
+            guardar_estado(esperado, ruta)
+            with ArchivoGuardado(ruta) as archivo:
+                self.assertEqual(archivo.version, 4)
+
+            self.assertTrue(partida.ejecutar("esperar").ok)
+            self.assertEqual((motor.reloj, motor.acciones_jugador), (200, 2))
+            futuro = anterior.exportar()
+            self.assertNotEqual(motor.azar.getstate(), esperado.rng_estado)
+
+            leido = cargar_estado_partida(ruta)
+            self.assertEqual(leido, esperado)
+            partida.restaurar_estado(leido)
+            restaurada = partida.linea_tiempo
+            self.assertIsNot(restaurada, anterior)
+            self.assertIs(motor._historia_h3, restaurada)
+            self.assertEqual((restaurada.reloj, restaurada.cantidad_acciones), (100, 1))
+            self.assertEqual(partida.exportar_estado(), esperado)
+            self.assertEqual(motor.historial.cantidad_turnos(), 0)
+            self.assertEqual(tuple(resumir(consultar(restaurada, ref))
+                                   for ref in ("99", "100")), consultas)
+            for ref in ("#2", "200"):
+                with self.subTest(ref=ref), self.assertRaises(ReferenciaHistoricaInvalida):
+                    consultar(restaurada, ref)
+
+            self.assertTrue(partida.ejecutar("mover", "O").ok)
+            self.assertEqual((motor.reloj, motor.acciones_jugador), (200, 2))
+            self.assertEqual((restaurada.reloj, restaurada.cantidad_acciones), (200, 2))
+            self.assertEqual(resumir(consultar(restaurada, "#2")), consultas[1])
+            self.assertEqual(consultar(restaurada, "200").estado.obtener("sala")[0], 100)
+            self.assertEqual(anterior.exportar(), futuro)
+
+    def test_archivo_corrupto_conserva_el_motor_y_el_receptor(self):
+        from controlador.partida_historica import integrar_historia
+        from datos.guardado_binario import GuardadoCorrupto, guardar_estado
+
+        with motor_con_historia_offline() as motor, TemporaryDirectory() as carpeta:
+            partida = integrar_historia(motor, 2)
+            self.assertTrue(partida.ejecutar("mover", "E").ok)
+            original = Path(carpeta) / "partida.bin"
+            guardar_estado(partida.exportar_estado(), original)
+            datos = original.read_bytes()
+            copia = Path(carpeta) / "truncada.bin"
+            copia.write_bytes(datos[:-1])
+
+            self.assertTrue(partida.ejecutar("esperar").ok)
+            self.comprobar_rechazo(motor, partida, copia, GuardadoCorrupto, "truncado")
+            self.assertEqual(original.read_bytes(), datos)
+
+    def test_archivo_v3_se_rechaza_como_incompatible_con_parte_ii(self):
+        from controlador.partida_historica import integrar_historia
+        from datos.guardado_binario import ArchivoGuardado, FormatoIncompatible, guardar_estado
+
+        with motor_con_historia_offline() as motor, TemporaryDirectory() as carpeta:
+            partida = integrar_historia(motor, 2)
+            self.assertTrue(partida.ejecutar("mover", "E").ok)
+            ruta = Path(carpeta) / "parte-i.bin"
+            guardar_estado(motor.exportar_estado(), ruta)
+            with ArchivoGuardado(ruta) as archivo:
+                self.assertEqual(archivo.version, 3)
+
+            self.assertTrue(partida.ejecutar("esperar").ok)
+            self.comprobar_rechazo(motor, partida, ruta, FormatoIncompatible, "Parte I")
+
+    def test_archivos_v4_validos_rechazan_historias_incoherentes_con_el_motor(self):
+        from controlador.partida_historica import integrar_historia
+        from datos.guardado_binario import (
+            ArchivoGuardado, GuardadoCorrupto, cargar_estado_partida, guardar_estado,
+        )
+        from datos.historia_binaria import codificar_historia
+        from modelo.errores_historia import CambioHistoriaIncoherente
+        from modelo.linea_tiempo import EstadoHistorico, LineaTiempo
+
+        with motor_con_historia_offline() as motor, TemporaryDirectory() as carpeta:
+            partida = integrar_historia(motor, 2)
+            self.assertTrue(partida.ejecutar("mover", "E").ok)
+            guardado = partida.exportar_estado()
+            final = partida.linea_tiempo.consultar_final().estado
+            jugador = final.obtener("jugador")
+            self.assertTrue(partida.ejecutar("esperar").ok)
+
+            for nombre, tiempos, reemplazo, error, mensaje in (
+                ("reloj", (101,), (), GuardadoCorrupto, "frontera"),
+                ("ordinal", (50, 100), (), GuardadoCorrupto, "frontera"),
+                ("sala", (100,), (("sala", (100, motor.salas[100].nombre)),),
+                 CambioHistoriaIncoherente, "no coinciden con la historia"),
+                ("vida", (100,), (("jugador", (jugador[0] + 1, *jugador[1:])),),
+                 CambioHistoriaIncoherente, "no coinciden con la historia"),
+            ):
+                with self.subTest(campo=nombre):
+                    campos = tuple((clave, next((nuevo for k, nuevo in reemplazo if k == clave), valor))
+                                   for clave, valor in final.campos())
+                    historia = LineaTiempo(EstadoHistorico(campos), 2)
+                    for tiempo in tiempos:
+                        historia.registrar_accion(tiempo)
+                    incompatible = replace(guardado, historia=codificar_historia(historia))
+                    ruta = Path(carpeta) / f"{nombre}.bin"
+                    guardar_estado(incompatible, ruta)
+                    with ArchivoGuardado(ruta) as archivo:
+                        self.assertEqual(archivo.version, 4)
+                    self.assertEqual(cargar_estado_partida(ruta), incompatible)
+                    self.comprobar_rechazo(motor, partida, ruta, error, mensaje)
 
 
 if __name__ == "__main__":
