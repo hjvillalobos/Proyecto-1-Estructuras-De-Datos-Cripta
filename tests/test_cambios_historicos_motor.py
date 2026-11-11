@@ -696,7 +696,7 @@ class PruebasRestauracionHistoricaOffline(unittest.TestCase):
             agenda_invalida = replace(guardado, eventos=[evento, *guardado.eventos[1:]])
             salas = [
                 replace(sala, enemigos=[replace(e, tipo="enemigo-inexistente") for e in sala.enemigos])
-                if sala.sala_id == 101 else sala for sala in guardado.salas
+                if sala.sala_id == 100 else sala for sala in guardado.salas
             ]
             ficha_ausente = replace(guardado, salas=salas)
             for estado, error, mensaje in (
@@ -855,6 +855,68 @@ class PruebasPersistenciaHistoricaOffline(unittest.TestCase):
                         self.assertEqual(archivo.version, 4)
                     self.assertEqual(cargar_estado_partida(ruta), incompatible)
                     self.comprobar_rechazo(motor, partida, ruta, error, mensaje)
+
+
+    def test_v4_rechaza_discrepancias_de_enemigos_antes_de_restaurar(self):
+        from controlador.partida_historica import integrar_historia
+        from datos.guardado_binario import cargar_estado_partida, guardar_estado
+        from datos.historia_binaria import codificar_historia
+        from modelo.errores_historia import CambioHistoriaIncoherente
+        from modelo.linea_tiempo import EstadoHistorico, LineaTiempo
+
+        with motor_con_historia_offline() as motor, TemporaryDirectory() as carpeta:
+            partida = integrar_historia(motor, 2)
+            self.assertTrue(partida.ejecutar("atacar", "e-100").ok)
+            guardado = partida.exportar_estado()
+            final = partida.linea_tiempo.consultar_final().estado
+            clave = "enemigo:e-100"
+            tipo, vida, maximo, comportamiento = final.obtener(clave)
+            otros = tuple((k, v) for k, v in final.campos() if not k.startswith("enemigo:"))
+            self.assertTrue(partida.ejecutar("mover", "E").ok)
+
+            for nombre, campos in (
+                ("ausente", ()),
+                ("vida", ((clave, (tipo, vida + 1, maximo, comportamiento)),)),
+                ("identidad", (("enemigo:e-distinto", (tipo, vida, maximo, comportamiento)),)),
+                ("tipo", ((clave, ("otro-tipo", vida, maximo, comportamiento)),)),
+            ):
+                with self.subTest(campo=nombre):
+                    historia = LineaTiempo(EstadoHistorico(otros + campos), 2)
+                    historia.registrar_accion(guardado.reloj)
+                    incompatible = replace(guardado, historia=codificar_historia(historia))
+                    ruta = Path(carpeta) / f"enemigo-{nombre}.bin"
+                    guardar_estado(incompatible, ruta)
+                    self.assertEqual(cargar_estado_partida(ruta), incompatible)
+                    with patch.object(motor, "restaurar_estado",
+                                      side_effect=AssertionError("Se inició la restauración")):
+                        self.comprobar_rechazo(motor, partida, ruta, CambioHistoriaIncoherente,
+                                               "Los enemigos de la sala no coinciden")
+
+    def test_v4_admite_frontera_sin_enemigos_vivos_en_la_sala(self):
+        from controlador.partida_historica import integrar_historia
+        from datos.guardado_binario import cargar_estado_partida, guardar_estado
+
+        with motor_con_historia_offline() as motor, TemporaryDirectory() as carpeta:
+            partida = integrar_historia(motor, 2)
+            enemigo = motor.enemigos_por_sala[100][0]
+            for _ in range(3):
+                self.assertTrue(partida.ejecutar("atacar", enemigo.id_instancia).ok)
+                if enemigo.vida == 0:
+                    break
+            self.assertEqual(enemigo.vida, 0)
+            historia = partida.linea_tiempo
+            self.assertFalse(any(clave.startswith("enemigo:")
+                                 for clave, _ in historia.consultar_final().estado.campos()))
+            guardado = partida.exportar_estado()
+            ruta = Path(carpeta) / "sin-enemigos-vivos.bin"
+            guardar_estado(guardado, ruta)
+            self.assertTrue(partida.ejecutar("mover", "E").ok)
+
+            partida.restaurar_estado(cargar_estado_partida(ruta))
+
+            self.assertEqual(partida.exportar_estado(), guardado)
+            self.assertIsNot(partida.linea_tiempo, historia)
+            self.assertIs(motor._historia_h3, partida.linea_tiempo)
 
 
 class PruebasReplayHistoricoOffline(unittest.TestCase):

@@ -1336,6 +1336,7 @@ class _MotorConHistoriaDePrueba(Motor):
     def restaurar_estado_con_historia(self, estado, historia):
         """Restaura la frontera H3 sin persistir el mapa ni la pila de retroceso."""
         from modelo.errores_historia import CambioHistoriaIncoherente
+        from utilidades.ordenamiento import ordenar
 
         if self._conocimiento is not None:
             raise CambioHistoriaIncoherente("La restauracion H3 no admite el mapa conocido activo.")
@@ -1357,6 +1358,20 @@ class _MotorConHistoriaDePrueba(Motor):
         sala = self.salas[sala_id] if type(sala_id) is int and 0 <= sala_id < len(self.salas) else None
         if sala is None or sala_historica != (sala_id, sala.nombre) or jugador_historico != estadisticas:
             raise CambioHistoriaIncoherente("La sala o las estadisticas no coinciden con la historia.")
+
+        # El guardado no incluye la vida máxima ni el comportamiento de la ficha.
+        enemigos_guardados = ordenar(
+            [(f"enemigo:{e.instancia}", (e.tipo, e.vida))
+             for bloque in estado.salas if bloque.sala_id == sala_id
+             for e in bloque.enemigos if e.vida > 0],
+            clave=lambda entrada: entrada[0], algoritmo="fusion",
+        )
+        enemigos_historicos = [
+            (clave, valor[:2] if type(valor) is tuple else valor)
+            for clave, valor in final.campos() if clave.startswith("enemigo:")
+        ]
+        if enemigos_guardados != enemigos_historicos:
+            raise CambioHistoriaIncoherente("Los enemigos de la sala no coinciden con la historia.")
 
         super().restaurar_estado(estado)
         self._historia_h3 = historia
