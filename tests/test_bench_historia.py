@@ -85,6 +85,31 @@ class BenchHistoriaTest(unittest.TestCase):
             self.assertNotIn("Resolubilidad cadena", salida.getvalue())
             self.assertNotIn("Preparación offline", salida.getvalue())
 
+    def test_fr015_ac19_ac20_cli_paquete_300_salas_con_repeticiones_predeterminadas_y_explicitas(self):
+        with TemporaryDirectory() as tmp:
+            preparar_verificacion(ServidorVerificacion(salas=300), AlmacenLocal(tmp), "prueba")
+            for argumentos in ([], ["--repeticiones", "10"]):
+                with self.subTest(argumentos=argumentos), \
+                        contextlib.redirect_stdout(io.StringIO()) as salida, \
+                        patch("requests.sessions.Session.request", side_effect=AssertionError("HTTP")), \
+                        patch("vista.consola.VistaConsola", side_effect=AssertionError("vista")), \
+                        patch("vista.grafica.VistaGrafica", side_effect=AssertionError("vista")):
+                    self.assertEqual(main_cli(["--bench", "--subsistemas", "resolubilidad",
+                                               "--paquete", tmp, "--cripta", "prueba",
+                                               *argumentos]), 0)
+                resultado = salida.getvalue()
+                self.assertIn("repeticiones=10", resultado)
+                self.assertIn("Paquete offline: prueba@v1 | salas=300", resultado)
+                self.assertIn("solicitudes=0", resultado)
+                self.assertIn("Resolubilidad paquete incremental", resultado)
+                self.assertIn("Resolubilidad paquete repetitivo", resultado)
+                self.assertNotIn("Resolubilidad cadena", resultado)
+                self.assertEqual(resultado.count("muestras=10"), 3)
+                muestras = [linea for linea in resultado.splitlines() if "Muestras (ms):" in linea]
+                self.assertEqual(len(muestras), 3)
+                for linea in muestras:
+                    self.assertEqual(len(linea.split(":", 1)[1].split(",")), 10)
+
     def test_nfr001_bench_disponible_por_cli_sin_vista(self):
         salida = io.StringIO()
         with contextlib.redirect_stdout(salida):

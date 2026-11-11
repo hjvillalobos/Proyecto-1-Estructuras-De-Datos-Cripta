@@ -21,6 +21,15 @@ from tests.test_verificacion_datos import ServidorVerificacion
 
 
 class ModosHistoriaTest(unittest.TestCase):
+    def test_fr013_ac18_ac21_no_completada_muestra_causa_y_alcance_sin_diagnostico(self):
+        from modelo.resolubilidad import LIMITACION, ResultadoVerificacion
+
+        for reporte in (ResultadoVerificacion("no_completada", "prueba", causa="Faltan llaves"),
+                        VerificacionNoDisponible("prueba")):
+            with self.subTest(tipo=type(reporte).__name__):
+                self.assertEqual(texto_reporte(reporte).splitlines(), [
+                    "Verificación de prueba: no completada", LIMITACION, reporte.causa])
+
     def test_fr008_fr020_argumentos_invalidos_antes_de_abrir_sesion(self):
         casos = (
             ["--checkpoint-cada", "0"], ["--checkpoint-cada", "a"], ["--hasta", "4"],
@@ -201,6 +210,7 @@ class ModosHistoriaTest(unittest.TestCase):
                                  capture_output=True, encoding="utf-8", timeout=20)
                     self.assertEqual(salida.returncode, 1, salida.stdout + salida.stderr)
                     self.assertIn("Verificación de prueba: no completada", salida.stdout)
+                    self.assertIn("Verificación por alcanzabilidad acumulada; no garantiza una trayectoria única si hay salidas sin regreso.", salida.stdout)
                     self.assertFalse((raiz / RUTA_REPLAY_PREDETERMINADA).exists())
             descarga = run([*comando, "--cripta", "prueba", "--descargar-todo"], cwd=raiz,
                            capture_output=True, encoding="utf-8", timeout=20)

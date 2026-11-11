@@ -7,6 +7,7 @@ class VerificacionNoDisponible:
     cripta_id: str
     estado: str = "no_completada"
     causa: str = "El módulo de verificación de resolubilidad todavía no está disponible en esta rama."
+    limitacion: str = "Verificación por alcanzabilidad acumulada; no garantiza una trayectoria única si hay salidas sin regreso."
 
 
 def verificar(sesion, cripta_id, version=None):
@@ -30,9 +31,9 @@ def _condicion(condicion):
 
 def texto_reporte(reporte):
     texto = [f"Verificación de {reporte.cripta_id}: {reporte.estado.replace('_', ' ')}"]
+    texto.append(reporte.limitacion)
     if reporte.estado == "no_completada":
         return "\n".join((*texto, reporte.causa))
-    texto.append(reporte.limitacion)
     if reporte.estado == "resoluble":
         texto.append("Orden de llaves: " + (" → ".join(reporte.orden_llaves) or "(ninguna)"))
     else:
