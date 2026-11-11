@@ -1,6 +1,6 @@
 # Guía de validación del verificador
 
-Implementación de B realizada el 2026-11-02, después del commit de preparación `17dc4bc`. Están disponibles el análisis, la preparación HTTP/offline y las funciones de medición. La revisión del 2026-11-10 valida el inicio real y documenta los pendientes del benchmark general.
+Implementación de B realizada el 2026-11-02, después del commit de preparación `17dc4bc`. Están disponibles el análisis, la preparación HTTP/offline y las funciones de medición. D conectó el inicio y el benchmark en `004-linea-tiempo`.
 
 ## Entorno
 
@@ -61,13 +61,23 @@ finally:
 
 El ID es un ejemplo de uso, no una condición incrustada en el algoritmo. El catálogo publicado puede cambiar. Las carpetas de caché son locales y no acompañan el repositorio.
 
-## Medición sintética desde el comando general
+## Medición desde la CLI
 
 ```powershell
 python bench.py --subsistemas resolubilidad --tamanos 32 256 1024 --repeticiones 10 --semilla 20261101
 ```
 
-Indicar al menos diez repeticiones. El comando general usa cinco por defecto. Comparar incremental y repetitivo con cadenas, ciclos y ubicaciones alternativas; comprobar igualdad de dictámenes y validez de órdenes antes de medir. Incluir normalización, diagnóstico y reporte en el total. Red y lectura de disco se miden aparte.
+Sin paquete se comparan ambos algoritmos con cadenas, ciclos y ubicaciones
+alternativas. Para medir una cripta preparada se usa el modo offline.
+
+```powershell
+python main.py --bench --subsistemas resolubilidad --paquete .cache/cripta --cripta ID --repeticiones 10
+```
+
+Se puede indicar `--version-cripta VERSION` para seleccionar una copia
+histórica. El comando separa lectura y validación del paquete del análisis,
+que incluye normalización, recorrido, diagnóstico y reporte. Muestra
+las muestras y la dispersión de cada estrategia sin hacer solicitudes.
 
 Medir además la mayor cripta publicada con datos locales completos, registrando ID, versión, tamaños y equipo. Informar todas las muestras, promedio, dispersión y máximo; no declarar aprobado el límite de 200 ms por cumplir solo el promedio.
 
@@ -115,4 +125,4 @@ python main.py --bench --subsistemas resolubilidad --paquete .cache/resolubilida
 python main.py --bench --subsistemas resolubilidad --tamanos 8 16 32 --repeticiones 10 --paquete .cache/resolubilidad/real --cripta cripta-06
 ```
 
-El primer comando falla por el valor predeterminado de 5 repeticiones. El segundo produce 18 series sintéticas y ninguna serie de la cripta indicada. Para repetir la medición real de B, usar `preparar_verificacion` con `ClienteOffline` y pasar los datos a `medir_datos(datos, 10)`. El resultado de la revisión está en [las tareas](tasks.md) y [las decisiones](../../DECISIONES.md).
+El primer comando mide las dos estrategias sobre la cripta real con diez repeticiones predeterminadas. [Evidencia de D](../004-linea-tiempo/aceptacion.md).

@@ -881,3 +881,65 @@ ejecución.
 Las [series de escalamiento](specs/001-verificador-resolubilidad/mediciones.json) comparan diez muestras por tamaño. Al pasar de 32 a 64 y a 128 salas, el trabajo incremental por unidad de N se mantuvo en torno a 1,50 en cadenas, 9,19–9,24 en ciclos y 1,20 con ubicaciones alternativas. Los tiempos medios en ms fueron 0,365 / 0,786 / 1,779, 0,628 / 1,170 / 2,308 y 0,514 / 1,270 / 2,602 respectivamente. Esto respalda un crecimiento cercano al lineal en el recorrido para esas cargas. El tiempo total aumentó entre 1,84 y 2,47 veces al duplicar aproximadamente N. La normalización ordena e indexa en O(N log N), con un total O(N log N + tamaño del reporte). La evidencia de estas tres escalas respalda la observación empírica y deja abierta su aceptación académica para FR-015.
 
 Se repitió la medición por la función de B con la copia offline de `cripta-06`, versión `f9ed9afa683d`, 300 salas. En diez muestras el incremental promedió 3,412 ms con máximo de 4,060 ms. La referencia repetitiva promedió 3,875 ms con máximo de 4,922 ms. Se observaron cero solicitudes HTTP. Las diez ejecuciones incrementales quedaron bajo 200 ms. El comando general aún requiere el ajuste de D para publicar esa serie y ejecutar con los valores predeterminados. [Reproducción](specs/001-verificador-resolubilidad/quickstart.md).
+
+**Conexión del benchmark de resolubilidad (Parte II §6.3).** El comando
+general conserva sus cargas cortas. La comparación incremental y
+repetitiva se selecciona con `--subsistemas resolubilidad`, que usa diez
+repeticiones por defecto. Así se respetan las condiciones del verificador
+sin cambiar las cargas de los demás subsistemas. La salida expresa la
+desviación estándar en milisegundos con una etiqueta compatible con
+CP1252. La corrida de integración produjo 18 filas para tres tamaños con
+diez muestras por fila. La carga valida la conexión de D con B y no
+sustituye la medición de la mayor cripta publicada.
+[Plan de D](specs/004-linea-tiempo/plan.md) y
+[evidencia de aceptación](specs/004-linea-tiempo/aceptacion.md).
+
+**Paquete offline para verificar (Parte II §§3.5, 4.2 y 4.3).** La CLI
+reutiliza la preparación de B para validar el esqueleto y las llaves
+antes de descargar el contenido. La precarga queda ligada a la versión
+validada. Al exportar desde otro paquete local, el cliente lee esa versión
+y D copia su archivo de llaves al destino. Así se usa la misma validación
+y el mismo presupuesto que en el verificador, y se evita publicar el
+lote de llaves si la API cambia de versión durante su adquisición.
+Con un paquete incompleto, la descarga devuelve un error y el inicio se
+bloquea aun con `--forzar`. Los ensayos usan datos de prueba, con
+transporte simulado para la adquisición y el cliente real para el tramo
+offline. [Especificación de D](specs/004-linea-tiempo/spec.md) ·
+[Plan de D](specs/004-linea-tiempo/plan.md) ·
+[Pruebas de aceptación](specs/004-linea-tiempo/aceptacion.md).
+
+**Medición de resolubilidad con un paquete local (Parte II §6.1).** D
+reutiliza la preparación y medición de B. Carga la cripta elegida,
+fija su versión y reporta por separado lectura y validación frente al
+análisis con datos ya preparados. Ambos algoritmos analizan la misma
+entrada. El resultado identifica la versión y registra todas las
+muestras y el máximo en milisegundos. Un paquete incompleto termina
+con error. [Plan de D](specs/004-linea-tiempo/plan.md) ·
+[Evidencia de aceptación](specs/004-linea-tiempo/aceptacion.md#benchmark-de-un-paquete-offline).
+
+**Medición de referencia (2026-11-09).** El listado del servicio identificó
+`cripta-06` como la mayor, con 300 salas. El paquete de la versión
+`f9ed9afa683d` se preparó con 11 solicitudes de un presupuesto de 63.
+El benchmark se ejecutó después sin red ni renderizado, en Windows 11,
+AMD Ryzen 7 7730U y Python 3.12.14.
+
+```powershell
+python main.py --bench --subsistemas resolubilidad --paquete .cache/resolubilidad/d-referencia --cripta cripta-06 --version-cripta f9ed9afa683d --repeticiones 10
+```
+
+| Fase | Media ms | Mínimo ms | Máximo ms | Desv. estándar ms |
+|---|---:|---:|---:|---:|
+| Lectura y validación del paquete | 23.917 | 18.310 | 36.503 | 5.436 |
+| Análisis incremental | 9.279 | 7.971 | 16.140 | 2.332 |
+| Análisis repetitivo | 9.942 | 8.840 | 11.555 | 0.864 |
+
+- Preparación (ms) `21.782, 22.409, 19.039, 23.681, 36.503, 29.989, 26.879, 21.501, 19.074, 18.310`
+- Incremental (ms) `8.019, 9.508, 8.575, 8.560, 8.067, 8.222, 8.974, 8.756, 16.140, 7.971`
+- Repetitivo (ms) `8.840, 9.360, 9.689, 9.915, 10.707, 8.890, 11.128, 11.555, 9.662, 9.678`
+
+Los dos algoritmos dictaminaron `resoluble` para `N=1068`.
+El máximo incremental de 16.140 ms cumple el límite de 200 ms
+en la versión y el equipo medidos. Incluye normalización, recorrido,
+diagnóstico cuando corresponde y construcción del reporte. La
+preparación se muestra aparte. Queda pendiente la revisión cruzada
+con B y la medición del ciclo integrado con cazadores.

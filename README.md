@@ -159,11 +159,21 @@ python main.py --cripta ID --cache-size 25
 
 Sustituir ID por una cripta del listado. Todas las solicitudes, incluidos reintentos y consultas de versión, consumen presupuesto.
 
-Para guardar el contenido completo disponible de una cripta:
+Para guardar un paquete con esqueleto, llaves, contenido y catálogo de una
+cripta, y comprobarlo sin conexión:
 
 ```powershell
 python main.py --cripta ID --descargar-todo --datos-dir .cache/cripta
+python main.py --offline .cache/cripta --verificar ID
 ```
+
+La descarga verifica la versión de las llaves antes de dar el paquete por
+completo. También puede copiarse un paquete local con
+`--offline ORIGEN --cripta ID --descargar-todo --datos-dir DESTINO`. Si se
+indica `--version-cripta`, la copia usa los datos de esa versión. Los
+paquetes antiguos sin `llaves.json` requieren completar ese archivo con
+los datos de la misma versión. Una verificación incompleta bloquea el
+inicio incluso con `--forzar`.
 
 Para descargar todas las criptas del listado y elegir cualquiera sin conexion:
 
@@ -337,28 +347,25 @@ python -m unittest tests.test_resolubilidad tests.test_verificacion_datos tests.
 ```
 
 `utilidades/bench_resolubilidad.py` entrega `medir_resolubilidad`, `medir_datos` y
-`medir_preparacion_offline`. El inicio en consola admite `--forzar` para criptas no resolubles y bloquea las verificaciones incompletas. El modo `--verificar ID` termina antes de iniciar la partida. El benchmark general de resolubilidad mide las familias sintéticas con `--repeticiones 10`. Para medir un paquete real se usa `medir_datos` sobre la cripta preparada.
+`medir_preparacion_offline`. La integración con D ofrece `--verificar`, `--forzar` y el benchmark de
+resolubilidad. Los comandos están en la sección de D.
 La revisión ejecutada aprobó 175 pruebas y omitió una prueba opcional existente.
 Los comandos, los pendientes y las muestras están en la
 [guía de validación](specs/001-verificador-resolubilidad/quickstart.md),
 [DECISIONES.md](DECISIONES.md) y la
 [evidencia de mediciones](specs/001-verificador-resolubilidad/mediciones.json).
-## Línea de tiempo: preparación para implementar
-
-La especificación, diseño, contratos, aceptación y tareas están en [specs/004-linea-tiempo](specs/004-linea-tiempo/spec.md). La constitución compartida sigue vigente sin cambios. Ver [guía](specs/004-linea-tiempo/quickstart.md) y [base de pruebas](specs/004-linea-tiempo/baseline.md). Esta entrega es documental: los comandos nuevos descritos allí están pendientes de implementación. El plan usa cambios serializables por evento y reconstrucción aislada; K=50 es inicial y se validará con mediciones antes de la entrega final.
-
-
-### Probar el núcleo de línea de tiempo
-
-En la rama de desarrollo, `python -m tests.demo_linea_tiempo` muestra consultas, eventos intermedios, recorte y nueva rama con datos sintéticos. `python -m unittest tests.test_linea_tiempo -v` ejecuta sus pruebas. Este núcleo no está conectado todavía a los comandos ni al guardado del juego. Ver specs/004-linea-tiempo/quickstart.md para el alcance y pendientes.
-
-
-El núcleo ahora exporta/importa la rama vigente y puede guardarse como fragmento binario independiente mediante `datos.historia_binaria`. La demostración anterior muestra también recarga y continuación. Pruebas: `python -m unittest tests.test_linea_tiempo tests.test_persistencia_historia -v`. Esto todavía no cambia el archivo de partida ni incorpora comandos nuevos al juego.
-
-
-Decisiones del núcleo histórico en [DECISIONES.md](DECISIONES.md), prompts textuales en [PROMPTS_LLM.md](PROMPTS_LLM.md) y [manejo de errores](specs/004-linea-tiempo/errores.md). Pruebas del contrato de errores: `python -m unittest tests.test_errores_historia -v`. La presentación de esos mensajes desde los comandos del juego está pendiente de integración.
 
 ## Parte II · Línea de tiempo (D)
+
+La implementación de D recibe cambios serializables por evento, reconstruye
+el pasado de forma aislada y usa `K=50` por defecto según las mediciones
+sintéticas. Para una demostración autónoma de consultas, recorte y recarga,
+ejecutar `python -m tests.demo_linea_tiempo`. El fragmento CRLH que usa el
+núcleo es distinto del archivo de partida CRPT.
+[Especificación](specs/004-linea-tiempo/spec.md) ·
+[Plan](specs/004-linea-tiempo/plan.md) ·
+[Decisiones y mediciones](DECISIONES.md) ·
+[Manejo de errores](specs/004-linea-tiempo/errores.md)
 
 ```powershell
 python main.py --cripta ID --checkpoint-cada 50
@@ -380,12 +387,37 @@ histórico con su K y rama vigente. La entrada de carga de Parte II informa la
 incompatibilidad de archivos v3. `--forzar` autoriza el inicio tras un
 dictamen de cripta no resoluble. Una verificación incompleta impide iniciar.
 
-El adaptador de D y sus pruebas están en esta rama. Los comandos que requieren
-datos reales se habilitan al integrar los productores de A/C y el módulo
-`red.verificacion` de B. Mientras falte el verificador, el inicio informa que
-la verificación está incompleta. Véanse el
-[contrato de integración](specs/004-linea-tiempo/contracts/interfaces.md) y la
-[matriz de aceptación](specs/004-linea-tiempo/aceptacion.md).
+Historia, mapa y viaje requieren los productores de A y C. En H3, D comprueba
+con datos de prueba que la consulta por tiempo y por número de acción incluyen
+el daño de los eventos empatados antes de la siguiente decisión. La prueba
+con el motor real se omite hasta que este entregue los cambios históricos.
+
+R4 se comprobó en `004-linea-tiempo` después de integrar el verificador de B.
+El caso offline coloca la llave de salida detrás de su propia puerta.
+`--verificar` muestra el ciclo, el inicio normal se bloquea y `--forzar`
+permite iniciar conservando el dictamen. La prueba construye sus propios
+datos y se ejecuta sin consultar la API.
+[Contrato de integración](specs/004-linea-tiempo/contracts/interfaces.md) ·
+[Matriz de aceptación y comandos de prueba](specs/004-linea-tiempo/aceptacion.md)
+
+Con el módulo de B integrado, este comando compara el verificador
+incremental con el repetitivo. La salida incluye la desviación estándar
+en milisegundos y es compatible con CP1252. Al seleccionar
+`resolubilidad`, se usan diez repeticiones si se omite `--repeticiones`.
+
+```powershell
+python main.py --bench --subsistemas resolubilidad --tamanos 8 16 32 --repeticiones 10 --semilla 20261108
+```
+
+Para medir una cripta de un paquete local, usar el mismo subsistema con
+la carpeta y el ID. La salida indica la versión, las salas, el promedio,
+el máximo, la dispersión y las muestras. La lectura y validación del
+paquete se muestran aparte del análisis. Se puede fijar una versión
+local con `--version-cripta VERSION`.
+
+```powershell
+python main.py --bench --subsistemas resolubilidad --paquete .cache/cripta --cripta ID
+```
 
 Para reproducir la comparación v4 y JSON de Parte I, usar
 `python main.py --bench --subsistemas guardado-historia --operaciones 5000 --salas 256 --repeticiones 5`.

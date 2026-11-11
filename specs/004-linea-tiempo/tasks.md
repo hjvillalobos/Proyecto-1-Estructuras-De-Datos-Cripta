@@ -69,3 +69,27 @@ Las pruebas de D y las dos cargas sintéticas de T019 tienen evidencia
 reproducible. T003 y T010 conservan sus entregas de productores y T021
 queda abierto para aceptación conjunta, límites con cripta de referencia
 y medición integrada de la carga nueva sobre estructuras de Parte I.
+
+Avance 2026-11-08. R4 y el benchmark de resolubilidad se verificaron con
+B integrado tras el PR #22. [Evidencia de aceptación](aceptacion.md).
+T021 sigue abierto para la aceptación de historia con A/C y las
+mediciones de Parte I con la carga nueva. T003 y T010 siguen pendientes.
+
+Avance de T021. La descarga incluye las llaves validadas de la versión
+solicitada. Se cubren la verificación del paquete exportado, el cambio de
+versión y el bloqueo con `--forzar` cuando faltan datos.
+[Evidencia de aceptación](aceptacion.md#paquete-offline-y-datos-incompletos).
+
+Avance de T021 y de la conexión de D para T030. El benchmark acepta un
+paquete offline y reporta la preparación separada del análisis. Se
+verificó la selección de versión y el rechazo de paquetes incompletos.
+Quedan la revisión de B y la medición oficial.
+[Evidencia de aceptación](aceptacion.md#benchmark-de-un-paquete-offline).
+
+Avance del 2026-11-09. El recorrido conjunto de historia, guardado, carga
+y replay pasó con el productor de prueba. La versión con el motor real
+queda preparada para cuando A entregue la captura y la restauración.
+Se midió AC-20 en la mayor cripta publicada, con un máximo incremental
+de 16.140 ms. T021 conserva los pendientes de integración de A/C y las
+mediciones de Parte I con la carga nueva.
+[Pruebas y medición de referencia](aceptacion.md#resolubilidad-de-referencia-2026-11-09).

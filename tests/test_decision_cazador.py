@@ -1,6 +1,6 @@
 """T020: FR-007/008/009/012/014, NFR-004; A3/A4/A5 y T1/T2.
 
-TDD para T022 ausente. Solo rangos positivos explícitos y datos válidos.
+Casos con rango entero válido o None explícito y datos válidos.
 No implementa política, motor ni servicios; reutiliza fixtures existentes.
 """
 
@@ -53,20 +53,26 @@ class PruebasDecisionCazador(unittest.TestCase):
         ])
 
     def test_a3_compartir_sala_ataca_antes_de_consultar_rutas(self):
-        self.comprobar_decision(crear_salas([90], []), 90, 90, 1,
-                                ("atacar", None, 100))
+        for rango in (1, None):
+            with self.subTest(rango=rango):
+                self.comprobar_decision(crear_salas([90], []), 90, 90, rango,
+                                        ("atacar", None, 100))
 
     def test_ruta_admisible_devuelve_primer_paso_optimo_y_su_costo(self):
         self.comprobar_decision(self.alternativas(), 90, 80, 250,
                                 ("mover", "N", 100))
 
     def test_t1_destino_desconectado_espera_con_costo_100(self):
-        self.comprobar_decision(crear_salas([90, 80], []), 90, 80, 100,
-                                ("esperar", None, 100))
+        salas = crear_salas([90, 7, 80], [(0, "N", 1, "S", 50, False)])
+        for rango in (100, None):
+            with self.subTest(rango=rango):
+                self.comprobar_decision(salas, 90, 80, rango,
+                                        ("esperar", None, 100))
 
     def test_t2_costo_101_supera_rango_100_y_espera(self):
         salas = crear_salas([90, 80], [(0, "E", 1, "O", 101, False)])
         self.comprobar_decision(salas, 90, 80, 100, ("esperar", None, 100))
+        self.comprobar_decision(salas, 90, 80, None, ("mover", "E", 101))
 
     def test_a4_distancia_igual_al_rango_permite_perseguir(self):
         self.comprobar_decision(self.alternativas(), 90, 80, 200,
@@ -74,11 +80,15 @@ class PruebasDecisionCazador(unittest.TestCase):
 
     def test_unica_puerta_cerrada_impide_movimiento(self):
         salas = crear_salas([90, 80], [(0, "E", 1, "O", 50, True)])
-        self.comprobar_decision(salas, 90, 80, 100, ("esperar", None, 100))
+        for rango in (100, None):
+            with self.subTest(rango=rango):
+                self.comprobar_decision(salas, 90, 80, rango, ("esperar", None, 100))
 
     def test_atajo_cerrado_no_impide_usar_alternativa_abierta(self):
-        self.comprobar_decision(self.alternativas(True), 90, 80, 200,
-                                ("mover", "N", 100))
+        for rango in (200, None):
+            with self.subTest(rango=rango):
+                self.comprobar_decision(self.alternativas(True), 90, 80, rango,
+                                        ("mover", "N", 100))
 
     def test_consulta_no_modifica_posiciones_azar_agenda_ni_puertas(self):
         with motor_terreno(250) as motor:

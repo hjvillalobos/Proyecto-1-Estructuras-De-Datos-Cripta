@@ -1,8 +1,8 @@
 
 import argparse
 import platform
-from importlib.util import find_spec
 
+from red.errores import ErrorCripta
 from utilidades.bench_cache import ESCENARIOS, comparar
 from utilidades.bench_persistencia import medir_recuperacion
 from utilidades.bench_juego import (
@@ -21,11 +21,40 @@ def entero_positivo(texto: str) -> int:
     return valor
 
 
+def _resumen_ms(medicion):
+    return (f"{medicion.promedio_ms:.3f} ms [{medicion.minimo_ms:.3f}, "
+            f"{medicion.maximo_ms:.3f}] desv. estándar={medicion.desviacion_ms:.3f} ms")
+
+
+def _imprimir_muestras(muestras):
+    print("  Muestras (ms): " + ", ".join(f"{muestra:.3f}" for muestra in muestras))
+
+
+def _medir_resolubilidad_offline(args):
+    from datos.offline import ClienteOffline
+    from red.verificacion import preparar_verificacion
+    from utilidades.bench_resolubilidad import medir_datos, medir_preparacion_offline
+
+    cliente = ClienteOffline(args.paquete, args.version_cripta)
+    datos = preparar_verificacion(cliente, cliente.almacen, args.cripta)
+    preparacion = medir_preparacion_offline(
+        args.paquete, args.cripta, datos.version, args.repeticiones)
+    filas = medir_datos(datos, args.repeticiones, familia="paquete")
+    print(f"Paquete offline: {datos.cripta_id}@{datos.version} | salas={len(datos.salas)}")
+    print(f"Preparación offline (lectura y validación): {_resumen_ms(preparacion)} "
+          f"muestras={len(preparacion.muestras_ms)} "
+          f"solicitudes={cliente.solicitudes_realizadas + preparacion.solicitudes}")
+    _imprimir_muestras(preparacion.muestras_ms)
+    print("Análisis de resolubilidad (normalización, recorrido, diagnóstico y reporte).")
+    return filas
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--capacidades", nargs="+", type=entero_positivo, default=[25, 250, 2500])
     parser.add_argument("--operaciones", type=entero_positivo, default=10000)
-    parser.add_argument("--repeticiones", type=entero_positivo, default=5)
+    parser.add_argument("--repeticiones", type=entero_positivo,
+                        help="Repeticiones por carga (5 por defecto, 10 con resolubilidad).")
     parser.add_argument("--semilla", type=int, default=20261001)
     parser.add_argument("--cambios-historia", type=entero_positivo, default=2,
                         help="Cambios por evento en el benchmark de historia.")
@@ -35,15 +64,18 @@ def main(argv=None):
     parser.add_argument("--tamanos", nargs="+", type=entero_positivo, default=[8, 16, 32, 256])
     parser.add_argument("--eventos", type=entero_positivo, default=256)
     parser.add_argument("--salas", type=entero_positivo, default=100)
-    parser.add_argument("--paquete", help="Paquete offline para medir ciclos de una cripta real.")
+    parser.add_argument("--paquete", help="Paquete offline para medir ciclo o resolubilidad.")
     parser.add_argument("--cripta", help="ID de la cripta de referencia del paquete.")
+    parser.add_argument("--version-cripta", help="Versión local para el benchmark de resolubilidad.")
     args = parser.parse_args(argv)
     if args.subsistemas is None:
         args.subsistemas = SUBSISTEMAS_BASE
-        if find_spec("utilidades.bench_resolubilidad"):
-            args.subsistemas += ("resolubilidad",)
+    if args.repeticiones is None:
+        args.repeticiones = 10 if "resolubilidad" in args.subsistemas else 5
     if bool(args.paquete) != bool(args.cripta):
         parser.error("--paquete y --cripta deben indicarse juntos")
+    if args.version_cripta is not None and (not args.paquete or "resolubilidad" not in args.subsistemas):
+        parser.error("--version-cripta requiere --subsistemas resolubilidad y un paquete offline")
 
     print(f"Python {platform.python_version()} | {platform.platform()}")
     print(f"Operaciones/carga={args.operaciones}, repeticiones={args.repeticiones}, "
@@ -105,13 +137,17 @@ def main(argv=None):
                 raise
             parser.exit(1, "La medición del verificador todavía no está disponible en esta rama.\n")
         try:
-            filas = medir_resolubilidad(args.tamanos, args.repeticiones, args.semilla)
+            filas = (_medir_resolubilidad_offline(args) if args.paquete
+                     else medir_resolubilidad(args.tamanos, args.repeticiones, args.semilla))
+        except ErrorCripta as error:
+            parser.exit(1, f"Error al medir el paquete {args.paquete}: {error}\n")
         except ValueError as error:
             parser.error(str(error))
         for fila in filas:
             print(f"Resolubilidad {fila.familia} {fila.estrategia} N={fila.n} "
-                  f"{fila.promedio_ms:.3f} ms [{fila.minimo_ms:.3f}, {fila.maximo_ms:.3f}] "
-                  f"σ={fila.desviacion_ms:.3f} muestras={len(fila.muestras)} {fila.estado}")
+                  f"{_resumen_ms(fila)} muestras={len(fila.muestras)} {fila.estado}")
+            if args.paquete:
+                _imprimir_muestras(muestra.total_ms for muestra in fila.muestras)
     if "ciclo" in args.subsistemas:
         medir_ciclo(args.operaciones, args.repeticiones, args.eventos, args.semilla,
                     args.paquete, args.cripta)

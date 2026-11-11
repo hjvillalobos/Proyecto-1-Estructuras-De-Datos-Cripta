@@ -1,7 +1,9 @@
 import io
 import unittest
 from contextlib import redirect_stdout, redirect_stderr
+from importlib.util import find_spec
 from pathlib import Path
+from subprocess import run
 from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 import sys
@@ -10,12 +12,24 @@ from unittest.mock import Mock, patch
 import main
 from controlador.aplicacion import ejecutar_juego
 from controlador.verificacion import VerificacionNoDisponible, texto_reporte, verificar
-from datos.bitacora_replay import BitacoraReplay
+from datos.almacen import AlmacenLocal
+from datos.bitacora_replay import BitacoraReplay, RUTA_REPLAY_PREDETERMINADA
 from tests.datos_integracion_d import ProductorPrueba, reporte_prueba
+from tests.datos_prueba import crear_paquete
 from tests.datos_terreno_cazador import motor_terreno
+from tests.test_verificacion_datos import ServidorVerificacion
 
 
 class ModosHistoriaTest(unittest.TestCase):
+    def test_fr013_ac18_ac21_no_completada_muestra_causa_y_alcance_sin_diagnostico(self):
+        from modelo.resolubilidad import LIMITACION, ResultadoVerificacion
+
+        for reporte in (ResultadoVerificacion("no_completada", "prueba", causa="Faltan llaves"),
+                        VerificacionNoDisponible("prueba")):
+            with self.subTest(tipo=type(reporte).__name__):
+                self.assertEqual(texto_reporte(reporte).splitlines(), [
+                    "Verificación de prueba: no completada", LIMITACION, reporte.causa])
+
     def test_fr008_fr020_argumentos_invalidos_antes_de_abrir_sesion(self):
         casos = (
             ["--checkpoint-cada", "0"], ["--checkpoint-cada", "a"], ["--hasta", "4"],
@@ -110,6 +124,99 @@ class ModosHistoriaTest(unittest.TestCase):
             self.assertEqual(crear.called, inicia)
             self.assertEqual(control.called, inicia)
             self.assertEqual(vista.return_value.mostrar_informe.called, inicia)
+
+    def test_fr015_fr016_r4_cli_offline_con_verificador_real(self):
+        if find_spec("red.verificacion") is None:
+            self.skipTest("Falta integrar el verificador de B.")
+        with TemporaryDirectory() as tmp:
+            raiz = Path(tmp)
+            paquete = raiz / "paquete"
+            almacen = crear_paquete(paquete, salas=2)
+            # La llave de salida está en la sala a la que solo ella permite entrar.
+            pagina = almacen.leer_pagina("prueba", "v1", 1)
+            for sala in pagina["salas"]:
+                for salida in sala["salidas"].values():
+                    salida.update(cerrada=True, llave="obj_0")
+            almacen.guardar_pagina("prueba", "v1", pagina)
+            contenido = almacen.leer_contenido("prueba", "v1", 101)
+            contenido["objetos"].append("obj_0")
+            almacen.guardar_contenido("prueba", "v1", contenido)
+            almacen.guardar_llaves("prueba", "v1", {"llaves": [{"id": "obj_0", "sala": 101}]})
+            comando = [sys.executable, "-B", "-X", "utf8", str(Path(main.__file__).resolve()),
+                       "--offline", str(paquete), "--datos-dir", str(paquete)]
+            bitacora = raiz / RUTA_REPLAY_PREDETERMINADA
+            casos = ((["--verificar", "prueba"], 1, False),
+                     (["--cripta", "prueba", "--semilla", "42"], 1, False),
+                     (["--cripta", "prueba", "--semilla", "42", "--forzar"], 0, True))
+            for argumentos, codigo, inicio in casos:
+                with self.subTest(argumentos=argumentos):
+                    salida = run([*comando, *argumentos], cwd=raiz, input="salir\n",
+                                 capture_output=True, encoding="utf-8", timeout=20)
+                    self.assertEqual(salida.returncode, codigo, salida.stdout + salida.stderr)
+                    self.assertIn("Verificación de prueba: no resoluble", salida.stdout)
+                    self.assertIn("Llave inaccesible obj_0: sala 101", salida.stdout)
+                    self.assertIn("Ciclo (", salida.stdout)
+                    self.assertEqual(bitacora.is_file(), inicio, salida.stdout)
+                    if inicio:
+                        self.assertLess(salida.stdout.index("Verificación de prueba"),
+                                        salida.stdout.index("Partida iniciada."))
+
+    def test_fr015_paquete_descargado_se_verifica_offline(self):
+        # B FR-008–011: el mismo paquete contiene esqueleto, contenido y llaves.
+        servidor = ServidorVerificacion(salas=7)
+        servidor.llaves = {"llaves": [{"id": "obj_0", "sala": 105}]}
+        with TemporaryDirectory() as tmp, redirect_stdout(io.StringIO()) as salida, \
+                patch("red.cliente_api.ClienteApi", return_value=servidor):
+            self.assertEqual(main.main(["--cripta", "prueba", "--descargar-todo",
+                                        "--datos-dir", tmp]), 0)
+            almacen = AlmacenLocal(tmp)
+            self.assertEqual(almacen.leer_llaves("prueba", "v1"), servidor.llaves)
+            self.assertIn("obj_0", almacen.leer_contenido("prueba", "v1", 105)["objetos"])
+            self.assertIn("Respuestas completas guardadas", salida.getvalue())
+            self.assertEqual([tipo for tipo, _ in servidor.llamadas].count("llaves"), 1)
+            solicitudes = servidor.solicitudes_realizadas
+            salida.seek(0)
+            salida.truncate()
+            self.assertEqual(main.main(["--offline", tmp, "--datos-dir", tmp,
+                                        "--verificar", "prueba"]), 0)
+            self.assertIn("Verificación de prueba: resoluble", salida.getvalue())
+            self.assertEqual(servidor.solicitudes_realizadas, solicitudes)
+
+    def test_fr015_descarga_rechaza_llaves_si_cambia_la_version(self):
+        servidor = ServidorVerificacion(salas=2)
+        servidor.version_final = "v2"
+        with TemporaryDirectory() as tmp, redirect_stdout(io.StringIO()) as salida, \
+                redirect_stderr(io.StringIO()) as errores, \
+                patch("red.cliente_api.ClienteApi", return_value=servidor):
+            self.assertEqual(main.main(["--cripta", "prueba", "--descargar-todo",
+                                        "--datos-dir", tmp]), 1)
+            almacen = AlmacenLocal(tmp)
+            self.assertIsNone(almacen.leer_llaves("prueba", "v1"))
+            self.assertIsNone(almacen.leer_generales("prueba", "v1"))
+            self.assertNotIn("Respuestas completas guardadas", salida.getvalue())
+            self.assertIn("cambió durante la adquisición", errores.getvalue())
+
+    def test_fr016_forzar_no_inicia_con_paquete_sin_llaves(self):
+        # B FR-012 y AC-18: falta de datos no equivale a cripta no resoluble.
+        with TemporaryDirectory() as tmp:
+            raiz = Path(tmp)
+            paquete = raiz / "paquete"
+            crear_paquete(paquete, salas=2, incluir_llaves=False)
+            comando = [sys.executable, "-B", "-X", "utf8", str(Path(main.__file__).resolve()),
+                       "--offline", str(paquete), "--datos-dir", str(paquete)]
+            for argumentos in (["--verificar", "prueba"], ["--cripta", "prueba", "--forzar"]):
+                with self.subTest(argumentos=argumentos):
+                    salida = run([*comando, *argumentos], cwd=raiz, input="salir\n",
+                                 capture_output=True, encoding="utf-8", timeout=20)
+                    self.assertEqual(salida.returncode, 1, salida.stdout + salida.stderr)
+                    self.assertIn("Verificación de prueba: no completada", salida.stdout)
+                    self.assertIn("Verificación por alcanzabilidad acumulada; no garantiza una trayectoria única si hay salidas sin regreso.", salida.stdout)
+                    self.assertFalse((raiz / RUTA_REPLAY_PREDETERMINADA).exists())
+            descarga = run([*comando, "--cripta", "prueba", "--descargar-todo"], cwd=raiz,
+                           capture_output=True, encoding="utf-8", timeout=20)
+            self.assertEqual(descarga.returncode, 1, descarga.stdout + descarga.stderr)
+            self.assertNotIn("Respuestas completas guardadas", descarga.stdout)
+            self.assertIn(str(paquete.resolve()), descarga.stderr)
 
     def test_fr013_detiene_el_replay_cuando_no_hay_revisiones_posteriores(self):
         with TemporaryDirectory() as tmp:

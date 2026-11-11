@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 from red.sesion import SesionDatos
-from red.errores import ErrorCripta
+from red.errores import DatosNoDisponibles, ErrorCripta
 from datos.bitacora_replay import ErrorReplay
 from modelo.errores_historia import ErrorHistoria
 
@@ -134,10 +134,22 @@ def main(argv=None):
             for indice, cripta_id in enumerate(ids):
                 if indice:
                     sesion.renovar()
-                datos = preparar_verificacion(sesion.cliente, sesion.almacen, cripta_id, args.version_cripta)
+                origen = sesion.cliente.almacen if args.offline is not None else sesion.almacen
+                try:
+                    datos = preparar_verificacion(
+                        sesion.cliente, origen, cripta_id, args.version_cripta)
+                except DatosNoDisponibles as error:
+                    if args.offline is None:
+                        raise
+                    raise DatosNoDisponibles(
+                        f"Offline: faltan datos para {cripta_id}. "
+                        f"Carpeta consultada: {origen.carpeta}. {error}") from error
                 preparada = sesion.precarga.preparar_cripta(
                     cripta_id, datos.version, args.version_catalogo)
                 sesion.precarga.cargar_contenido([sala.id for sala in preparada.salas])
+                if origen.carpeta != sesion.almacen.carpeta:
+                    sesion.almacen.guardar_llaves(
+                        cripta_id, datos.version, origen.leer_llaves(cripta_id, datos.version))
                 print(f"{cripta_id}: {len(preparada.salas)} salas descargadas")
             print(f"Respuestas completas guardadas en {args.datos_dir}")
             return 0

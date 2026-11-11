@@ -59,7 +59,8 @@ class PruebasRutasCazador(unittest.TestCase):
         buscar_ruta(grafo, espacio, frontera, origen, destino, limite) devuelve
         (primer_indice, direccion, costo_paso, costo_total) o None cuando no
         demuestra ruta dentro del límite. None no distingue desconexión de
-        agotamiento del límite ni define políticas de datos null de entrada.
+        agotamiento de un límite finito. El límite None explícito quita
+        el tope de costo.
         """
         grafo = rutas.GrafoTerreno(salas)
         espacio = rutas.EspacioBusqueda(grafo.ids)
@@ -96,6 +97,9 @@ class PruebasRutasCazador(unittest.TestCase):
     def test_t2_costo_101_supera_limite_100(self):
         salas = crear_salas([90, 80], [(0, "E", 1, "O", 101, False)])
         self.comprobar_consulta(salas, 90, 80, 100, None)
+        for limite in (101, None):
+            with self.subTest(limite=limite):
+                self.comprobar_consulta(salas, 90, 80, limite, (80, "E", 101, 101))
 
     def test_t3_tres_pasos_300_superan_dos_pasos_500(self):
         self.comprobar_consulta(self.salas_con_alternativas(), 90, 80, 600,
@@ -122,8 +126,10 @@ class PruebasRutasCazador(unittest.TestCase):
                 if invertir:
                     orden.reverse()
                 salas = crear_salas([90, 7, 3, 80], orden)
-                self.comprobar_consulta(salas, 90, 80, 300,
-                                        (3, "N", 100, 300))
+                for limite in (300, None):
+                    with self.subTest(limite=limite):
+                        self.comprobar_consulta(salas, 90, 80, limite,
+                                                (3, "N", 100, 300))
 
     def test_empate_elige_menor_id_aunque_su_primer_arco_cueste_mas(self):
         salas = crear_salas([90, 7, 3, 80], [

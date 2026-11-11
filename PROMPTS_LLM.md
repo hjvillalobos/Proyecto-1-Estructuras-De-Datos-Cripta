@@ -988,3 +988,92 @@ No se enviaron prompts a otros agentes ni se atribuyen acuerdos a compañeros.
 > Y por ulitmo actualiza el estado final (T032–T034). Después de las pruebas conjuntas, registrar qué pasó, enlazar la evidencia y ajustar las casillas pendientes a lo que realmente quedó integrado.
 
 - **Uso de la respuesta:** Ejecutar la matriz real de consola, reproducir dos pendientes del benchmark general, medir de nuevo la cripta preparada y actualizar [el estado de las tareas](specs/001-verificador-resolubilidad/tasks.md).
+
+## 2026-11-08 — aceptación offline de D
+
+Herramienta: Codex desktop. Prompts textuales:
+
+> no tenemos la aclaracion de la api aun entonces que puedo ir completando?
+
+> puedes hacer tu eso ? pero no toques nada de A basate en mi parte D plisssss y en el enunciado
+
+Uso: comprobar H3 y R4 según Parte II §§3.1, 3.5, 3.6 y el Apéndice B.
+Se amplió la cobertura de D y se comprobó el bloqueo y el inicio forzado
+con B en una copia temporal. La prueba conjunta de H3 queda preparada
+para cuando A entregue cambios serializables. La matriz distingue los
+resultados observados de las dependencias pendientes. El trabajo se limitó
+a pruebas y documentación de D.
+
+### Continuación de T021
+
+Herramienta: Codex desktop. Prompt textual:
+
+> dale haz todo lo que puedas, no se si me traigo los cambios de b o ya estan ?
+
+Uso: comprobar las referencias de Git, reproducir la falla de salida en
+CP1252 y corregir la presentación y selección del benchmark de D. Se verificaron R4,
+las filas del benchmark con B y la prueba gráfica en una copia de
+integración. La matriz registra los resultados y su alcance.
+
+### Sincronización después del PR #22
+
+Herramienta: Codex desktop. Prompts textuales:
+
+> listo ya me traje los cambios de resolubilidad que mas se puede hacer ?
+
+> haz todo lo que puedas
+
+Uso: sincronizar la rama local `004-linea-tiempo` con `a34d926`, conservar
+los cambios locales de D y resolver la unión de las dos secciones del
+README. Se repitieron R4, el benchmark en CP1252 y la regresión seleccionada
+en la rama sincronizada. La aceptación de historia con el motor real
+continúa pendiente de los productores.
+
+### Descarga de llaves y verificación offline
+
+Herramienta: Codex desktop. Prompts textuales:
+
+> y de momento no puedo hacer nada por mientras ?
+
+> hazlo y recuerda poner prompts pruebas y eso
+
+Uso: conectar `--descargar-todo` con la preparación por versión de B,
+comprobar que el resultado se pueda verificar offline y probar el bloqueo
+real de `--forzar` cuando faltan llaves. Las pruebas de descarga
+reprodujeron el fallo antes del ajuste. El caso de bloqueo por datos
+incompletos ya pasaba y quedó cubierto con el verificador real.
+Se actualizaron comandos, decisiones y aceptación. Los ensayos usaron
+datos de prueba y no se introdujeron reglas para costos ambiguos.
+
+### Medición offline y publicación de D
+
+Herramienta: Codex desktop. Prompt textual:
+
+> hazlo si y sube todo lo que haz hecho a mi rama, avanza todo lo que puedas de mi parte
+
+Uso: conectar el benchmark de resolubilidad de D con el paquete local y
+publicar los cambios de D en `004-linea-tiempo`. Se añadieron pruebas del
+paquete seleccionado y del rechazo de datos incompletos. Antes del
+ajuste ambos casos ejecutaban la carga sintética. Se reutilizaron los
+módulos de B sin modificar sus algoritmos. La evidencia de prueba
+no acredita el límite oficial de 200 ms.
+
+## 2026-11-09 — Verificación conjunta de D
+
+Herramienta: Codex desktop. Prompt textual:
+
+> dale haz todo eso pero solo en mi rama linea de tiempo, sigue el enunciado, que no hayan bugs y que se siga correctamente mi parte
+
+Uso. Actualizar `004-linea-tiempo` al PR #23 y preparar la prueba que
+compara historia, guardado, carga y replay de una misma partida. El caso
+con el productor de prueba pasó. Se comprobó la frontera del motor real
+por separado y se mantuvo la omisión de la prueba conjunta mientras
+falten captura y restauración. Se consultó el listado del servicio,
+se preparó la mayor cripta con B y se midió el análisis offline.
+Se registraron comandos, muestras y límites sin modificar el motor.
+
+### 2026-11-10 — Cierre integrado de B y D
+
+- **Herramienta/modelo:** Codex (GPT-6).
+- **Prompt textual:** «Resuelve todos los pendientes y confirma su solución».
+- **Uso de la respuesta:** Integrar el commit de D, reconciliar la descarga y los paquetes de prueba y comprobar el informe incompleto, el inicio y la medición offline. [Registro del cierre](specs/001-verificador-resolubilidad/tasks.md).

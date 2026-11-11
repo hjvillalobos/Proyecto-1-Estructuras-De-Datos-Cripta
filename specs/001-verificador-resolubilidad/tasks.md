@@ -65,7 +65,7 @@ Objetivo: preparar entradas compatibles y distinguir errores de información. Pr
 Objetivo: usar el resultado antes de jugar sin absorber la interfaz de D. Depende de US1–US3. Prueba independiente: matriz de tres estados, con/sin forzar, sin vista en verificación exclusiva.
 
 - [X] T024 [US4] B: agregar pruebas de contrato del resultado en `tests/test_verificacion_datos.py`: tres estados, identidad/versión, alcance/limitación, diagnóstico y errores sin dictamen parcial; validar que D no necesita ejecutar lógica de B para mostrarlo. (FR-012–014; AC-15–18, AC-21)
-- [ ] T025 [US4] D con revisión B: conectar en `main.py` el coordinador para `--verificar`, `--forzar` e inicio normal según `specs/001-verificador-resolubilidad/contracts/verificador.md`; mostrar alcance acumulativo. No instanciar vista/motor en verificación exclusiva; error de datos bloquea incluso con forzar. (FR-012–014; AC-15–18, AC-21)
+- [X] T025 [US4] D con revisión B: conectar en `main.py` el coordinador para `--verificar`, `--forzar` e inicio normal según `specs/001-verificador-resolubilidad/contracts/verificador.md`; mostrar alcance acumulativo. No instanciar vista/motor en verificación exclusiva; error de datos bloquea incluso con forzar. (FR-012–014; AC-15–18, AC-21)
 - [X] T026 [US4] B+D: incorporar en `tests/test_verificacion_entrega.py` pruebas de inicio y salida exclusiva para todos los estados, R4, forzar y ausencia de importaciones/instancias de vista; ejecutar con la integración real de T025. Si D no integró, mantener tarea pendiente, no marcarla satisfecha con un doble. (FR-012–014; AC-15–18, AC-21)
 
 ## Fase 7 — US5: Rendimiento con evidencia (P2)
@@ -75,8 +75,8 @@ Objetivo: comparar incremental y repetitivo y medir total. Depende de US1–US3;
 - [X] T027 [US5] Crear `tests/test_bench_resolubilidad.py` con comparación lógica, órdenes válidos, repetibilidad por semilla y conteos de trabajo en cadenas/ciclos/alternativas; sin afirmar tiempos por pruebas frágiles. Exigir que el total incluya normalización, diagnóstico y reporte. (FR-007, FR-015; AC-19–20) Probar contadores separados de normalización/recorrido/diagnóstico/reporte y familias N, 2N, 4N; incluir conteo de relaciones examinadas al certificar ciclos.
 - [X] T028 [US5] Implementar en `utilidades/bench_resolubilidad.py` generadores sintéticos reproducibles y referencia de recorrido repetido, aislados de producción; validar órdenes y dictámenes iguales antes de comparar. Generador local no altera azar del juego. (FR-014–015; AC-19)
 - [X] T029 [US5] Implementar medición en `utilidades/bench_resolubilidad.py` para al menos tres tamaños, diez repeticiones y cripta real preparada: muestras, promedio, mínimo, máximo, desviación, visitas y pendientes, tiempo total y desglose; disco/red separados. Ejecutar T027 y comprobar que el benchmark no hace HTTP. (FR-015; AC-19–20; SC-003–005) Aplicar protocolo del plan: N=V+E+K+L, razones entre tamaños, trabajo/N y comparaciones/(N log2(max(2,N))), longitud de IDs y tamaño del reporte. No excluir normalización del total ni afirmar linealidad estricta.
-- [ ] T030 [US5] D con revisión B: conectar subsistema `resolubilidad` en `bench.py` y entrada `--bench` de `main.py`, reutilizando parámetros tamaños/repeticiones/semilla y paquete/cripta. Validar comando de `specs/001-verificador-resolubilidad/quickstart.md` sin vista. (FR-014–015; AC-19–20)
-- [ ] T031 [US5] B: ejecutar mediciones sintéticas y mayor cripta publicada disponible; con aprobación documental, registrar evidencia en `DECISIONES.md` con versiones, equipo, tamaño, muestras, complejidad y límites. Si falta la cripta real o supera 200 ms, dejar AC-20 pendiente o fallido, sin declararlo aprobado por promedio. (FR-015; AC-19–20; SC-003–004) Documentar que total O(N log N + salida) no equivale a linealidad estricta; mantener evaluación de FR-015 pendiente si la evidencia o criterio académico no respalda crecimiento aproximadamente lineal.
+- [X] T030 [US5] D con revisión B: conectar subsistema `resolubilidad` en `bench.py` y entrada `--bench` de `main.py`, reutilizando parámetros tamaños/repeticiones/semilla y paquete/cripta. Validar comando de `specs/001-verificador-resolubilidad/quickstart.md` sin vista. (FR-014–015; AC-19–20)
+- [X] T031 [US5] B: ejecutar mediciones sintéticas y mayor cripta publicada disponible; con aprobación documental, registrar evidencia en `DECISIONES.md` con versiones, equipo, tamaño, muestras, complejidad y límites. Si falta la cripta real o supera 200 ms, dejar AC-20 pendiente o fallido, sin declararlo aprobado por promedio. (FR-015; AC-19–20; SC-003–004) Documentar que total O(N log N + salida) no equivale a linealidad estricta; mantener evaluación de FR-015 pendiente si la evidencia o criterio académico no respalda crecimiento aproximadamente lineal.
 
 ## Fase 8 — Cierre y revisión transversal
 
@@ -84,7 +84,7 @@ Depende de historias completadas; no sustituye la revisión de D ni la evidencia
 
 - [X] T032 Revisar `modelo/resolubilidad.py`, `red/verificacion.py` y `utilidades/bench_resolubilidad.py` contra la constitución: índices propios, sin recorridos completos por llave en producción, sin comentarios nuevos ni datos de criptas reales incrustados. Ejecutar pruebas de todas las historias y regresiones de red/caché/inicio; corregir solo regresiones atribuibles al cambio. (FR-001–015)
 - [X] T033 Con aprobación documental, actualizar `README.md` y `specs/001-verificador-resolubilidad/quickstart.md` con comandos realmente disponibles y resultado de validación; enlazar `DECISIONES.md` sin inventar resultados, mantener alcance confirmado y limitación. (FR-013–015; AC-15–21)
-- [ ] T034 Con aprobación documental, completar trazabilidad y estado real en `specs/001-verificador-resolubilidad/tasks.md` y `PROMPTS_LLM.md`; solicitar revisión cruzada B↔D, verificar commit previo de especificación y no marcar como completas tareas de D o mediciones pendientes. (FR-001–015; constitución IV) Registrar también recomendaciones aprobadas y conservar explícitos los controles pendientes; conservar la procedencia de la confirmación: respuesta afirmativa comunicada por el usuario el 2026-11-02.
+- [X] T034 Con aprobación documental, completar trazabilidad y estado real en `specs/001-verificador-resolubilidad/tasks.md` y `PROMPTS_LLM.md`; solicitar revisión cruzada B↔D, verificar commit previo de especificación y no marcar como completas tareas de D o mediciones pendientes. (FR-001–015; constitución IV) Registrar también recomendaciones aprobadas y conservar explícitos los controles pendientes; conservar la procedencia de la confirmación: respuesta afirmativa comunicada por el usuario el 2026-11-02.
 
 ## Dependencias y orden de ejecución
 
@@ -140,6 +140,11 @@ Primero base + US1 como MVP verificable con datos sintéticos. Añadir diagnóst
 - T031: mediciones y decisión documentadas; las muestras de la cripta real cumplen 200 ms en este equipo. Se mantiene abierta por la dependencia de T030 y la revisión del crecimiento aproximadamente lineal de FR-015. No se deduce cumplimiento asintótico de los tiempos.
 - T032: auditoría de B y regresiones completadas sin fallos; cierre transversal pendiente de la integración y pruebas de D.
 - T034: prompt y trazabilidad registrados con autorización. Falta revisión cruzada B↔D; conservar esta casilla pendiente hasta completarla.
+
+Avance de D del 2026-11-08. La conexión de T030 se implementó y verificó
+en `004-linea-tiempo` con paquetes de prueba. Se conservan pendientes la
+revisión de B y la medición de aceptación con la mayor cripta publicada.
+[Evidencia de D](../004-linea-tiempo/aceptacion.md#benchmark-de-un-paquete-offline).
 - `.idea/` se conserva sin modificaciones. No hay hooks de implementación en `.specify/extensions.yml`.
 
 ## Revisión de B del 2026-11-10
@@ -161,3 +166,11 @@ Rama `codex/verificador-resolubilidad`, base `694dcf6`. Especificación previa c
 En una copia temporal del commit de D, T025 mostró la causa y la leyenda de alcanzabilidad acumulada al verificar un paquete incompleto. El comando de T030 con `--paquete .cache/resolubilidad/real --cripta cripta-06` seleccionó diez repeticiones por defecto y publicó las diez muestras por estrategia. Para las 300 salas de la versión `f9ed9afa683d`, el incremental promedió 3,288 ms con máximo de 4,194 ms. La preparación offline registró cero solicitudes. Queda completada la revalidación de rendimiento de B para T031.
 
 Las casillas de integración reflejan la rama de B (`7662353`). La simulación de fusión con D encontró ocho archivos en conflicto, incluidos `main.py` y `red/sesion.py`. En una prueba aislada de los ajustes sobre B, dos pruebas negativas de D necesitaron retirar explícitamente `llaves.json` de su paquete de prueba. Tras adaptar esos datos temporalmente pasaron 22 de 23 pruebas. La restante exige que el error de descarga offline incluya la ruta del paquete. Para el cierre integrado de T025/T030/T034, reconciliar los cambios y repetir las pruebas en la rama resultante.
+
+### Cierre de la integración B y D del 2026-11-10
+
+Se integró el commit de D `6de00bf` en la rama de B y se resolvieron los ocho conflictos. T025, T026, T030, T031 y T034 quedan verificadas en el mismo árbol. Los registros anteriores describen las revisiones previas a la fusión.
+
+Las pruebas de paquetes incompletos preparan un paquete sin el archivo de llaves. La consola informa la causa, la carpeta consultada en la descarga offline y el alcance acumulativo en el informe. Se comprobaron la copia del paquete entre carpetas y los seis inicios con/sin forzar más los tres modos de verificación exclusiva. Resultados de las dos suites seleccionadas: 57 pruebas aprobadas en integración y 112 aprobadas con dos omitidas en regresión.
+
+El comando documentado en [la guía](quickstart.md) sobre `cripta-06@f9ed9afa683d` reconoció 300 salas y usó diez repeticiones predeterminadas, con cero solicitudes. El análisis incremental promedió 2,990 ms y alcanzó 4,389 ms. La referencia repetitiva promedió 3,354 ms y alcanzó 3,742 ms. La revisión de FR-015 mantiene la distinción entre la evidencia empírica y la cota total O(N log N + salida).

@@ -8,8 +8,8 @@
 
 | ID | Responsable del acuerdo/entrega | Evidencia verificable requerida | Consumidores principales | Estado |
 | --- | --- | --- | --- | --- |
-| E-B-COSTOS | B con A | Suministro y acceso verificables a costos de salidas, versiones, identidad y datos válidos para el motor, sin HTTP durante búsqueda. Aceptación independiente de rango; no cierra Q2. | T013, T014, T025 | Verificada por B para datos válidos (2026-11-09). Pendiente de revisión de A. |
-| E-B-RANGO | B con A | Suministro y acceso verificables al rango de cazadores, versiones, identidad y datos válidos, sin HTTP durante búsqueda. Aceptación independiente de costos; no cierra Q1. | T025; no T013/T014 | Verificada por B para datos válidos (2026-11-09). Pendiente de revisión de A. |
+| E-B-COSTOS | B con A | B debe demostrar cómo llegan al motor de A los costos válidos de las salidas, con identidad y versión de cripta verificables y sin HTTP durante la búsqueda. El profesor confirmó, según el usuario, que el costo ausente vale 100 y se asume simétrico. [Aclaración y límites de Q2](../research.md#aclaración-del-profesor-sobre-q2). La aceptación es independiente de E-B-RANGO. | T013, T014, T025 | Entrega confirmada para los datos válidos probados el 2026-11-09. |
+| E-B-RANGO | B con A | Suministro y acceso verificables al rango de cazadores, con identidad y versión, sin HTTP durante la búsqueda. B debe preservar tres estados: entero válido (límite inclusivo), `null` explícito (sin tope de costo) y campo ausente (tratamiento pendiente en Q1). También sigue pendiente el tratamiento de valores inválidos. Aceptación independiente de costos. | T025; no T013/T014 | Entrega confirmada para los datos válidos probados el 2026-11-09. |
 | E-BC-PUERTA | B/C/A | Identidad de puerta, lectura de ambos extremos y coherencia de cambios reales. | T029, T032 | PENDIENTE |
 | E-C-RUTA | C con A | Fuente filtrada, firmas/modos/estados de consulta y criterios de aceptación acordados. | T023, T024 y solo las extensiones filtradas que lo usen | PENDIENTE |
 | E-C-DESPACHO | C con A | Punto de conexión del cazador, firma y conservación de decisiones existentes. | T025 | PENDIENTE |
@@ -33,13 +33,13 @@ Q1/Q2 y Q3 tienen registros de evidencia separados en research.md. A puede descr
 Para reproducir ambas entregas desde la raíz del repositorio, ejecutar `python -m unittest -v tests.test_entrega_datos_terreno`. A revisa cada resultado de forma independiente. Q1 y Q2 siguen abiertas para los datos fuera de los casos verificados.
 
 - B provee esqueleto completo con versiones de cripta, IDs, conexiones y costos; fichas de enemigos y rango ya disponibles sin red dentro de rutas.
-- Para datos válidos: costo ausente equivale a 100, declarado entero ≥1, igual en ambos sentidos; rango es entero en unidades de costo. No inferir mínimo, default, rechazo o normalización: Q1/Q2 abiertas.
+- Para datos válidos: costo ausente equivale a 100, declarado entero ≥1, igual en ambos sentidos; un rango entero válido limita el costo en forma inclusiva y un `null` explícito indica búsqueda sin tope de costo, según la [aclaración del profesor](../research.md#aclaración-del-profesor-sobre-q1). Q1 y Q2 conservan los casos pendientes de ausencia, invalidez o inconsistencia que correspondan.
 - A recibe una vista de datos de juego; desconoce si origen fue HTTP u offline. B administra presupuesto, UUID, lotes, versiones, fichas retenidas y errores de adquisición.
 - Salida ponderada propuesta: origen/dirección/destino/costo/referencia de puerta. Identidad de puerta entre extremos y sincronización deben acordarse antes del cache de A. A no copia unilateralmente el costo de un extremo al otro.
 - Si cambia cripta/versión se reconstruye identidad del grafo; no reutilizar índices de una versión distinta.
 - Pendiente con A y B: acordar cómo representar y reportar datos fuera de los casos válidos cubiertos por las pruebas.
 
-**Comunicación de B sobre OpenAPI 1.1.0:** el usuario transmite que B encontró Enemy.rango opcional y nullable, entero ≥1 cuando tiene valor, sin default ni obligación adicional para cazador; Exit dirigido con costo opcional y nullable, entero ≥1 cuando tiene valor, sin default ni garantía de simetría declarados. No disponemos de copia verificable ni fragmentos originales: esto no es verificación independiente ni contrato aprobado. El [contraste y procedencia](../research.md#comunicación-reportada-de-b-sobre-openapi-110) mantiene la autoridad de Parte II §§3.1–3.2: costo ausente 100, igual en ambos sentidos y ficha de cazador con rango. Rango ausente/null, costo null e inconsistencias siguen pendientes Q1/Q2; no equiparar null con campo ausente ni normalizar/rechazar por iniciativa de A.
+**Comunicación de B sobre OpenAPI 1.1.0:** el usuario transmite que B encontró Enemy.rango opcional y nullable, entero ≥1 cuando tiene valor, sin default ni obligación adicional para cazador; Exit dirigido con costo opcional y nullable, entero ≥1 cuando tiene valor, sin default ni garantía de simetría declarados. No disponemos de copia verificable ni fragmentos originales: esto no es verificación independiente ni contrato aprobado. El [contraste y procedencia](../research.md#comunicación-reportada-de-b-sobre-openapi-110) mantiene la autoridad de Parte II §§3.1–3.2: costo ausente 100, igual en ambos sentidos y ficha de cazador con rango. El rango ausente o inválido sigue pendiente en Q1. El costo `null` y las inconsistencias siguen pendientes en Q2. El rango `null` explícito se rige por la aclaración del profesor y debe distinguirse del campo ausente.
 
 ## A–C: ruta y despacho
 
@@ -82,6 +82,24 @@ Propuesta de sobre conceptual de cambio: identidad estable de entidad, campo u o
 - D versiona formato de guardado; preservar o rechazar/migrar explícitamente formatos anteriores. No añadir campos a snapshots.py ni alterar persistencia desde A sin acuerdo.
 - D recibe costo de salidas y tipo cazador para presentación; si necesita recurso gráfico debe consultarlo. A no genera ni reemplaza arte.
 - D conecta funciones de medición de A a bench.py y revisa ejecución sin vista. El replay actual sin GUI instancia VistaConsola; no usarlo como certificación headless hasta revisión de D.
+
+### Primer caso H3 con motor real
+
+Parte II §3.6 y el Apéndice B exigen que la consulta por tiempo incluya todos los eventos hasta ese instante y preceda a la decisión que coincida con él. `historia #k` reconstruye el estado anterior a la acción `k`. La propuesta valida FR-006, FR-014, FR-018 y FR-020 en un caso acotado. No cambia reglas funcionales ni el estado pendiente de E-D-CAMBIOS y E-D-RESTAURA.
+
+**Datos y aceptación.** Usar `motor_terreno()` con guardián y salida al este sin campo `costo` (100 según Parte II §3.1). Capturar la vida inicial `V0` en sala 100, ejecutar `mover E` como acción #1 y, al cerrar `t=100`, guardar como `V1` la vida observada tras el ataque. Con el contador preparado por la prueba H3, se procesa el turno del jugador con secuencia 10 antes del ataque del guardián de destino con secuencia 11. Ejecutar `esperar` como acción #2 para que su ordinal exista. Contrastar:
+
+| Consulta | Reloj | Sala | Vida |
+| --- | --- | --- | --- |
+| `historia 99` | 99 | 101 | `V0`, sin daño del ataque de `t=100`. |
+| `historia 100` | 100 | 101 | `V1`, con el daño de secuencia 11 aplicado una vez. |
+| `historia #2` | 100 | 101 | `V1`, antes de aplicar `esperar` o sus eventos posteriores. |
+
+**Interfaz acotada.** `proyeccion_h3()` captura valores inmutables de `sala = (id, nombre)` y `jugador = (vida, vida_max, ataque, defensa, velocidad)` para construir la base antes de la primera acción. `ejecutar(..., registrar_h3=receptor)` habilita explícitamente el productor de prueba para `mover` y `esperar`. El receptor recibe reloj inicial, reloj final, ordinal, cambios inmediatos y eventos en el orden del motor. Cada cambio contiene clave y valores anterior/nuevo. Cada evento contiene su tiempo y secuencia reales y una tupla de cambios, vacía si no altera la proyección. El adaptador de prueba construye los tipos de D y llama a `registrar_accion`, que deriva el ordinal de las acciones aceptadas. `modelo/juego.py` conserva tipos propios de A.
+
+**Publicación y fallos.** D confirmó, según la comunicación del usuario, que `registrar_accion` valida todo el lote antes de aplicar cambios. Un `ErrorHistoria` de validación conserva el estado, reloj y ordinal de D, incluso si el lote comienza con un delta válido. A entrega el lote una sola vez, después de cerrar la frontera FR-020 y antes de `cerrar_turno()`. Si la validación falla, el rollback existente revierte el turno de A y su ordinal, descarta los mensajes y propaga el error sin recortar D. Las excepciones inesperadas también se propagan sin reintento. La garantía de D solo cubre rechazos de validación.
+
+**Límites.** El adaptador de prueba consulta la línea de tiempo real de D sin activar `integrar_historia()` ni su guardado/carga. La proyección de sala y jugador sirve a las tres consultas del caso. El mapa, el inventario, los efectos, el recorte por pergamino, la carga y el flujo histórico completo quedan fuera del caso. Los acuerdos de proyección completa y restauración siguen pendientes. El fixture no requiere entregas nuevas de B o C.
 
 ## Criterios de acuerdo pendientes
 
