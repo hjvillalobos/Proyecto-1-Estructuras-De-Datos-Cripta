@@ -1,6 +1,7 @@
 """AD-H3: productor optativo y contrato con la línea de tiempo de D."""
 
 from contextlib import contextmanager
+from dataclasses import replace
 from importlib.util import find_spec
 from random import Random
 import unittest
@@ -231,12 +232,13 @@ class PruebasH3ConD(unittest.TestCase):
 
 
 @contextmanager
-def motor_con_historia_offline():
+def motor_con_historia_offline(*, con_mapa=False):
     def fabrica(precarga, *args, **opciones):
         precarga.cliente.almacen.guardar_ficha("cat1", {
             "id": "pergamino-h3", "clase": "pergamino_retroceso", "nombre": "Pergamino",
         })
-        return crear_juego(precarga, *args, historia_para_pruebas=True, **opciones)
+        return crear_juego(precarga, *args, historia_para_pruebas=True,
+                           conocimiento_para_pruebas=con_mapa, **opciones)
 
     with patch("tests.datos_terreno_cazador.crear_juego", new=fabrica), motor_terreno() as motor:
         yield motor
@@ -431,6 +433,132 @@ class PruebasAdaptadorHistoricoOffline(unittest.TestCase):
                     self.assertFalse(partida.ejecutar("retroceso").ok)
                 recortar.assert_not_called()
                 self.assertEqual((estado_motor(motor), historia.exportar()), previo)
+
+
+class PruebasRestauracionHistoricaOffline(unittest.TestCase):
+    def test_restaura_en_memoria_y_registra_en_la_linea_restaurada(self):
+        from controlador.partida_historica import integrar_historia
+        from controlador.resumen_historia import consultar
+        from modelo.errores_historia import ReferenciaHistoricaInvalida
+
+        with motor_con_historia_offline() as motor:
+            partida = integrar_historia(motor, 2)
+            anterior = partida.linea_tiempo
+            self.assertTrue(partida.ejecutar("mover", "E").ok)
+            guardado = partida.exportar_estado()
+            consultas = tuple(consultar(anterior, ref).estado.campos() for ref in ("99", "100"))
+            jugador = motor.jugador
+            self.assertTrue(partida.ejecutar("esperar").ok)
+            futuro = anterior.exportar()
+
+            partida.restaurar_estado(guardado)
+            restaurada = partida.linea_tiempo
+            self.assertIsNot(restaurada, anterior)
+            self.assertIs(motor._historia_h3, restaurada)
+            self.assertIs(motor.jugador, jugador)
+            self.assertEqual((motor.reloj, motor.acciones_jugador), (100, 1))
+            self.assertEqual((restaurada.reloj, restaurada.cantidad_acciones), (100, 1))
+            self.assertEqual((jugador.posicion_actual, jugador.vida),
+                             (101, guardado.jugador.vida))
+            self.assertEqual(motor.exportar_estado().eventos, guardado.eventos)
+            self.assertEqual(motor.cola.proxima_secuencia(), guardado.siguiente_secuencia)
+            self.assertEqual(motor.azar.getstate(), guardado.rng_estado)
+            self.assertEqual(partida.exportar_estado(), guardado)
+            self.assertEqual(motor.historial.cantidad_turnos(), 0)
+            self.assertEqual(tuple(consultar(restaurada, ref).estado.campos()
+                                   for ref in ("99", "100")), consultas)
+            for ref in ("#2", "200"):
+                with self.subTest(ref=ref), self.assertRaises(ReferenciaHistoricaInvalida):
+                    consultar(restaurada, ref)
+
+            self.assertTrue(partida.ejecutar("mover", "O").ok)
+            self.assertEqual((restaurada.reloj, restaurada.cantidad_acciones), (200, 2))
+            self.assertEqual(consultar(restaurada, "200").estado.obtener("sala")[0], 100)
+            self.assertEqual(anterior.exportar(), futuro)
+            self.assertEqual(motor.historial.cantidad_turnos(), 1)
+
+    def test_rechaza_fronteras_de_historia_incompatibles_sin_mutar(self):
+        from controlador.partida_historica import integrar_historia
+        from datos.historia_binaria import codificar_historia, decodificar_historia
+        from modelo.errores_historia import CambioHistoriaIncoherente
+        from modelo.linea_tiempo import EstadoHistorico, LineaTiempo
+
+        with motor_con_historia_offline() as motor:
+            partida = integrar_historia(motor, 2)
+            activa = partida.linea_tiempo
+            self.assertTrue(partida.ejecutar("mover", "E").ok)
+            guardado = partida.exportar_estado()
+            candidata = decodificar_historia(guardado.historia)
+            self.assertTrue(partida.ejecutar("esperar").ok)
+            previo = estado_motor(motor), activa.exportar()
+            for estado in (replace(guardado, reloj=101), replace(guardado, acciones_jugador=2)):
+                with self.subTest(reloj=estado.reloj, ordinal=estado.acciones_jugador):
+                    with self.assertRaisesRegex(CambioHistoriaIncoherente, "reloj u ordinal"):
+                        motor.restaurar_estado_con_historia(estado, candidata)
+                    self.assertEqual((estado_motor(motor), activa.exportar()), previo)
+                    self.assertIs(motor._historia_h3, activa)
+
+            final = candidata.consultar_final().estado
+            jugador = final.obtener("jugador")
+            for clave, valor in (("sala", (100, motor.salas[100].nombre)),
+                                 ("jugador", (jugador[0] + 1, *jugador[1:]))):
+                with self.subTest(clave=clave):
+                    campos = tuple((k, valor if k == clave else v) for k, v in final.campos())
+                    incompatible = LineaTiempo(EstadoHistorico(campos), 2)
+                    incompatible.registrar_accion(100)
+                    estado = replace(guardado, historia=codificar_historia(incompatible))
+                    with self.assertRaisesRegex(CambioHistoriaIncoherente, "no coinciden con la historia"):
+                        partida.restaurar_estado(estado)
+                    self.assertEqual((estado_motor(motor), activa.exportar()), previo)
+                    self.assertIs(partida.linea_tiempo, activa)
+                    self.assertIs(motor._historia_h3, activa)
+
+    def test_estado_invalido_y_ficha_ausente_conservan_motor_y_receptor(self):
+        from controlador.partida_historica import integrar_historia
+        from red.errores import ErrorCripta
+
+        with motor_con_historia_offline() as motor:
+            partida = integrar_historia(motor, 2)
+            activa = partida.linea_tiempo
+            self.assertTrue(partida.ejecutar("mover", "E").ok)
+            guardado = partida.exportar_estado()
+            self.assertTrue(partida.ejecutar("esperar").ok)
+            previo = estado_motor(motor), activa.exportar()
+            evento = replace(guardado.eventos[0], secuencia=guardado.siguiente_secuencia)
+            agenda_invalida = replace(guardado, eventos=[evento, *guardado.eventos[1:]])
+            salas = [
+                replace(sala, enemigos=[replace(e, tipo="enemigo-inexistente") for e in sala.enemigos])
+                if sala.sala_id == 101 else sala for sala in guardado.salas
+            ]
+            ficha_ausente = replace(guardado, salas=salas)
+            for estado, error, mensaje in (
+                (agenda_invalida, ValueError, "tiempo o secuencia"),
+                (ficha_ausente, ErrorCripta, "enemigo-inexistente"),
+            ):
+                with self.subTest(mensaje=mensaje):
+                    with self.assertRaisesRegex(error, mensaje):
+                        partida.restaurar_estado(estado)
+                    self.assertEqual((estado_motor(motor), activa.exportar()), previo)
+                    self.assertIs(partida.linea_tiempo, activa)
+                    self.assertIs(motor._historia_h3, activa)
+            self.assertTrue(partida.ejecutar("mover", "O").ok)
+            self.assertEqual((activa.reloj, activa.cantidad_acciones), (300, 3))
+
+    def test_mapa_activo_rechaza_restauracion_sin_mutaciones(self):
+        from controlador.partida_historica import integrar_historia
+        from modelo.errores_historia import CambioHistoriaIncoherente
+
+        with motor_con_historia_offline(con_mapa=True) as motor:
+            partida = integrar_historia(motor, 2)
+            activa = partida.linea_tiempo
+            guardado = partida.exportar_estado()
+            self.assertTrue(partida.ejecutar("mover", "E").ok)
+            previo = estado_motor(motor), activa.exportar(), motor.mapa_conocido()
+            with self.assertRaisesRegex(CambioHistoriaIncoherente, "mapa conocido activo"):
+                partida.restaurar_estado(guardado)
+            self.assertEqual((estado_motor(motor), activa.exportar(), motor.mapa_conocido()), previo)
+            self.assertIs(partida.linea_tiempo, activa)
+            self.assertIs(motor._historia_h3, activa)
 
 
 if __name__ == "__main__":

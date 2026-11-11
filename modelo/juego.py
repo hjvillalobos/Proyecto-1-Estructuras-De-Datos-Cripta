@@ -1283,6 +1283,34 @@ class _MotorConHistoriaDePrueba(Motor):
             self._comprobar_frontera_historica()
             self._historia_h3.recortar(self.acciones_jugador - 1)
 
+    def restaurar_estado_con_historia(self, estado, historia):
+        """Restaura la frontera H3 sin persistir el mapa ni la pila de retroceso."""
+        from modelo.errores_historia import CambioHistoriaIncoherente
+
+        if self._conocimiento is not None:
+            raise CambioHistoriaIncoherente("La restauracion H3 no admite el mapa conocido activo.")
+        if (estado.reloj, estado.acciones_jugador) != (historia.reloj, historia.cantidad_acciones):
+            raise CambioHistoriaIncoherente("El estado y la historia no coinciden en reloj u ordinal.")
+
+        final = historia.consultar_final().estado
+        jugador = estado.jugador
+        estadisticas = (jugador.vida, jugador.vida_max, jugador.ataque,
+                        jugador.defensa, jugador.velocidad)
+        try:
+            sala_historica = final.obtener("sala")
+            jugador_historico = final.obtener("jugador")
+        except KeyError as error:
+            raise CambioHistoriaIncoherente("La frontera H3 requiere sala y jugador.") from error
+
+        # La restauracion base valida la existencia de la sala y el resto del estado.
+        sala_id = jugador.sala_id
+        sala = self.salas[sala_id] if type(sala_id) is int and 0 <= sala_id < len(self.salas) else None
+        if sala is None or sala_historica != (sala_id, sala.nombre) or jugador_historico != estadisticas:
+            raise CambioHistoriaIncoherente("La sala o las estadisticas no coinciden con la historia.")
+
+        super().restaurar_estado(estado)
+        self._historia_h3 = historia
+
     def _registrar_accion_h3(self, inicio, fin, ordinal, cambios, eventos):
         from modelo.errores_historia import CambioHistoriaIncoherente
         from modelo.snapshots import CambioHistorico, EventoHistorico, ValorHistorico
