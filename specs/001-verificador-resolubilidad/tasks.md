@@ -155,3 +155,9 @@ Rama `codex/verificador-resolubilidad`, base `694dcf6`. Especificación previa c
 | T032 | Revisión de B completada sobre esta base. Se ejecutaron 162 pruebas seleccionadas de las cinco historias y regresiones, con 161 aprobadas y una opcional omitida. La revisión de los tres módulos de cálculo, preparación y medición no encontró índices hash ni ordenamientos automáticos. |
 | T033 | Guía y README actualizados con las opciones disponibles y los límites reproducidos. |
 | T034 | Prompt y resultados registrados. La aceptación comunicada para costos, rango y descarga offline corresponde a las entregas anteriores. Queda la revisión cruzada con D de los hallazgos de esta fecha. |
+
+### Revalidación del commit de D `6de00bf` por B (2026-11-10)
+
+En una copia temporal del commit de D, T025 mostró la causa y la leyenda de alcanzabilidad acumulada al verificar un paquete incompleto. El comando de T030 con `--paquete .cache/resolubilidad/real --cripta cripta-06` seleccionó diez repeticiones por defecto y publicó las diez muestras por estrategia. Para las 300 salas de la versión `f9ed9afa683d`, el incremental promedió 3,288 ms con máximo de 4,194 ms. La preparación offline registró cero solicitudes. Queda completada la revalidación de rendimiento de B para T031.
+
+Las casillas de integración reflejan la rama de B (`7662353`). La simulación de fusión con D encontró ocho archivos en conflicto, incluidos `main.py` y `red/sesion.py`. En una prueba aislada de los ajustes sobre B, dos pruebas negativas de D necesitaron retirar explícitamente `llaves.json` de su paquete de prueba. Tras adaptar esos datos temporalmente pasaron 22 de 23 pruebas. La restante exige que el error de descarga offline incluya la ruta del paquete. Para el cierre integrado de T025/T030/T034, reconciliar los cambios y repetir las pruebas en la rama resultante.
