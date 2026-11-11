@@ -424,6 +424,24 @@ T011 tiene evidencia suficiente para cerrar sus pruebas válidas y se consolida 
 
 Solo se actualizan tasks.md, quickstart.md y prompts-registro-local.md (P29). Se verifican huellas SHA-256 de los Python antes/después para acreditar que código y pruebas no cambian. Rama feature/motor-eventos conservada; no operaciones Git de escritura, integración o publicación. Constitución, PROMPTS_LLM.md y documentación compartida intactas.
 
+## Revalidación y cierre de T015–T017
+
+HEAD verificado: `5c67c8ddba78650968215aee9c4b920210adbfdc` en `feature/motor-eventos`. Desde la raíz del proyecto, con Python 3.14.5 del entorno virtual y acceso a carpetas temporales, se ejecutó:
+
+```powershell
+.venv/Scripts/python.exe -B -m unittest -v tests.test_costos_terreno tests.test_velocidad_terreno tests.test_grafo_terreno tests.test_heap_rutas tests.test_juego tests.test_enemigos tests.test_regresiones_juego tests.test_integridad_operaciones.TestIntegridadOperaciones.test_precarga_fallida_no_rompe_movimiento_ni_replay tests.test_frontera_temporal tests.test_entrega_datos_terreno 2>&1 | ForEach-Object { $_.ToString() } | Select-Object -Last 13; exit $LASTEXITCODE
+```
+
+Resultado: **114 aprobadas, 0 fallidas, 0 errores y 0 omitidas**. Incluye las 11 pruebas de FR-020 y las tres de entrega de datos de terreno.
+
+| Tarea | Evidencia |
+| --- | --- |
+| T015 | Con T012 y T014 completadas, la agenda real verifica aceleración 250 → 150, ralentización 250 → 450 y expiración 125 → 200, con cancelación, secuencia nueva y una sola ejecución semántica. También se verifica el mínimo de un tick. |
+| T016 | Ataque y espera cuestan 100; usar, equipar y abrir, 50; recoger y soltar, 25. El movimiento cambia de sala de inmediato y no provoca ataques gratuitos. T6 verifica que un movimiento de costo 1 a velocidad 1000 en t=20 programa t=21. |
+| T017 | Pasaron las suites de costos, velocidad, juego y enemigos, junto con las regresiones de agenda y entrega offline. FR-020 conserva ambos órdenes de secuencia en el empate, resuelve el daño o la derrota antes de devolver la decisión, descarta cancelados y deja pendientes los eventos de t+1. |
+
+Las pruebas existentes cubren los criterios oficiales de T7 mediante cronologías separadas. El ejemplo 250 → 150 → 225 tiene cobertura parcial: la aceleración en t=50 se invoca desde un estado unitario preparado y se procesa la expiración en t=75. No se ejecutó una prueba integral de esa cadena con activación y expiración por eventos ordinarios.
+
 ## Inicio de US2: pruebas iniciales T019 — 2026-11-06
 
 HEAD 15adfcf en feature/motor-eventos, publicado; main permanece sin integrar. Autorización exclusiva para preparar/ejecutar pruebas iniciales del algoritmo sobre grafos sintéticos válidos, sin Dijkstra ni decisión de cazador. Se releen constitución, Parte II §3.2, spec/plan/tasks, contratos y estructuras. Checklist 13/16; ninguna pregunta externa se da por resuelta.
