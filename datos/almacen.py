@@ -4,7 +4,7 @@ from pathlib import Path
 import tempfile
 
 from red.errores import DatosInvalidos, DatosNoDisponibles
-from red.validacion import identificador
+from red.validacion import identificador, validar_llaves
 
 
 class AlmacenLocal:
@@ -14,12 +14,12 @@ class AlmacenLocal:
     def _nombre(self, valor):
         return identificador(str(valor)).encode("utf-8").hex()
 
-    def _leer(self, ruta):
+    def _leer(self, ruta, ausente=None):
         try:
             with ruta.open(encoding="utf-8") as archivo:
                 return json.load(archivo)
         except FileNotFoundError:
-            return None
+            return ausente
         except (OSError, ValueError) as error:
             raise DatosInvalidos(f"No se puede leer {ruta}: {error}") from error
 
@@ -66,6 +66,15 @@ class AlmacenLocal:
 
     def guardar_pagina(self, cripta, version, datos):
         self._guardar(self._cripta(cripta, version) / "paginas" / f"{int(datos['pagina'])}.json", datos)
+
+    def leer_llaves(self, cripta, version):
+        ausente = object()
+        datos = self._leer(self._cripta(cripta, version) / "llaves.json", ausente)
+        return None if datos is ausente else validar_llaves(datos)
+
+    def guardar_llaves(self, cripta, version, datos):
+        validar_llaves(datos)
+        self._guardar(self._cripta(cripta, version) / "llaves.json", datos)
 
     def leer_contenido(self, cripta, version, sala):
         return self._leer(self._cripta(cripta, version) / "contenido" / f"{int(sala)}.json")

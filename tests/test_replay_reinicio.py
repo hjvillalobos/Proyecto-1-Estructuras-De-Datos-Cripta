@@ -5,6 +5,7 @@ import tkinter as tk
 import unittest
 from contextlib import redirect_stdout
 from unittest.mock import Mock, mock_open, patch
+from tests.datos_integracion_d import reporte_prueba
 
 from datos.bitacora_replay import BitacoraReplay, ReplayCorrupto
 from controlador.controlador import ControladorJuego
@@ -105,6 +106,7 @@ class TestReplayReinicio(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as carpeta, \
                 patch("vista.grafica.VistaGrafica", return_value=vista), \
+                patch("controlador.aplicacion.verificar", return_value=reporte_prueba()), \
                 patch("controlador.controlador.ControladorJuego", side_effect=controlador), \
                 redirect_stdout(io.StringIO()):
             self.assertEqual(main.main(["--gui", "--offline", ".cache/cripta", "--cripta", "cripta-01",

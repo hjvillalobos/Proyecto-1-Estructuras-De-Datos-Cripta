@@ -4,6 +4,7 @@ import tkinter as tk
 import unittest
 from contextlib import redirect_stdout
 from unittest.mock import Mock, patch
+from tests.datos_integracion_d import reporte_prueba
 
 from controlador.replay import ReproductorReplay
 from datos.bitacora_replay import MetaReplay, AccionReplay
@@ -52,6 +53,7 @@ class TestFlujoReplayInicio(unittest.TestCase):
         vista.mostrar_menu.side_effect = [("jugar", None), ("salir", None)]
         with tempfile.TemporaryDirectory() as carpeta, redirect_stdout(io.StringIO()), \
                 patch("vista.grafica.VistaGrafica", return_value=vista), \
+                patch("controlador.aplicacion.verificar", return_value=reporte_prueba()), \
                 patch("modelo.juego.crear_juego", side_effect=ErrorRed("sin datos")):
             resultado = main.main(["--gui", "--offline", ".cache/cripta", "--datos-dir", carpeta,
                                    "--cripta", "cripta-01"])
@@ -69,6 +71,7 @@ class TestFlujoReplayInicio(unittest.TestCase):
         controlador = Mock()
         with tempfile.TemporaryDirectory() as carpeta, redirect_stdout(io.StringIO()), \
                 patch("vista.grafica.VistaGrafica", return_value=vista), \
+                patch("controlador.aplicacion.verificar", return_value=reporte_prueba()), \
                 patch("modelo.juego.crear_juego", side_effect=[ErrorRed("sin datos"), datos.motor]) as crear, \
                 patch("controlador.controlador.ControladorJuego", return_value=controlador):
             resultado = main.main(["--gui", "--offline", ".cache/cripta", "--datos-dir", carpeta,

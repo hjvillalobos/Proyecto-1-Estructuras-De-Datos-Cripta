@@ -52,3 +52,16 @@ def registros(respuesta, campo, clave, esperados):
     if len(ids) != len(esperados):
         raise DatosInvalidos(f"Faltan registros solicitados en {campo}.")
     return [next(fila for fila in filas if fila[clave] == valor) for valor in esperados]
+
+
+def validar_llaves(respuesta):
+    if not isinstance(respuesta, dict) or not isinstance(respuesta.get("llaves"), list):
+        raise DatosInvalidos("Se requiere el listado completo de llaves.")
+    for entrada in respuesta["llaves"]:
+        if not isinstance(entrada, dict):
+            raise DatosInvalidos("Ubicación de llave inválida.")
+        identificador(entrada.get("id"))
+        entero(entrada.get("sala"), None)
+        if entrada.get("enemigo") is not None:
+            identificador(entrada["enemigo"])
+    return respuesta

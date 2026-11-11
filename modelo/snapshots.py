@@ -6,6 +6,8 @@
 """
 from dataclasses import dataclass, field, asdict
 
+from modelo.errores_historia import EntradaHistoriaInvalida
+
 
 # Identidad de la partida (va al encabezado del log y del archivo de guardado)
 @dataclass
@@ -105,9 +107,16 @@ class EstadoGuardado:
     eventos: list[EventoGuardado] = field(default_factory=list)
     salas: list[SalaGuardada] = field(default_factory=list)
 
-    #Solo para comparar contra JSON en --bench (§4.10)
+    historia: bytes | None = None
+
+    # El log conserva su base de carga. JSON también se usa en --bench.
     def a_dict(self):
-        return asdict(self)
+        datos = asdict(self)
+        if self.historia is None:
+            del datos["historia"]
+        else:
+            datos["historia"] = self.historia.hex()
+        return datos
 
     @classmethod
     def desde_dict(cls, d):
@@ -130,7 +139,7 @@ class EstadoGuardado:
             rng_estado=(rng[0], tuple(rng[1]), rng[2]),
             jugador=jugador,
             eventos=[EventoGuardado(**e) for e in d["eventos"]],
-            salas=salas)
+            salas=salas, historia=bytes.fromhex(d["historia"]) if "historia" in d else None)
 
 
 # Estado para la vista (lo llena el modelo con estado_vista())
@@ -183,6 +192,7 @@ class SalidaVista:
     cerrada: bool = False
     llave: str | None = None
     apertura_pendiente: bool = False
+    costo: int = 100
 
 
 @dataclass
@@ -223,3 +233,79 @@ class ResumenPartida:
     acciones: int
     derrotados: int
     reloj_final: int
+
+
+# Contratos puros de historia. No contienen callbacks ni referencias al motor.
+def _validar_contenido_historico(valor):
+    if valor is None or type(valor) in (bool, int, str):
+        return
+    if type(valor) is float:
+        from math import isfinite
+        if isfinite(valor):
+            return
+    if type(valor) is tuple:
+        for elemento in valor:
+            _validar_contenido_historico(elemento)
+        return
+    raise EntradaHistoriaInvalida("El valor histórico debe ser escalar finito o tupla inmutable.")
+
+
+@dataclass(frozen=True)
+class ValorHistorico:
+    """Distingue ausencia de un campo existente cuyo valor es None."""
+    presente: bool
+    valor: object = None
+
+    def __post_init__(self):
+        if type(self.presente) is not bool:
+            raise EntradaHistoriaInvalida("La presencia debe ser booleana.")
+        if not self.presente and self.valor is not None:
+            raise EntradaHistoriaInvalida("Un campo ausente no tiene valor.")
+        _validar_contenido_historico(self.valor)
+
+
+@dataclass(frozen=True)
+class CambioHistorico:
+    clave: str
+    anterior: ValorHistorico
+    nuevo: ValorHistorico
+
+    def __post_init__(self):
+        if type(self.clave) is not str or not self.clave:
+            raise EntradaHistoriaInvalida("La clave histórica debe ser texto no vacío.")
+        if type(self.anterior) is not ValorHistorico or type(self.nuevo) is not ValorHistorico:
+            raise EntradaHistoriaInvalida("Los extremos deben ser valores históricos.")
+
+
+@dataclass(frozen=True)
+class EventoHistorico:
+    tiempo: int
+    secuencia: int
+    cambios: tuple[CambioHistorico, ...]
+
+    def __post_init__(self):
+        if type(self.tiempo) is not int or self.tiempo < 0:
+            raise EntradaHistoriaInvalida("El tiempo debe ser un entero no negativo.")
+        if type(self.secuencia) is not int or self.secuencia < 0:
+            raise EntradaHistoriaInvalida("La secuencia debe ser un entero no negativo.")
+        if type(self.cambios) is not tuple or any(
+                type(c) is not CambioHistorico for c in self.cambios):
+            raise EntradaHistoriaInvalida("Los cambios deben ser una tupla de registros históricos.")
+
+
+@dataclass(frozen=True)
+class AccionHistorica:
+    """Acción completa y correcciones persistentes de su frontera final."""
+    inicio: int
+    fin: int
+    cambios: tuple[CambioHistorico, ...]
+    eventos: tuple[EventoHistorico, ...]
+    correcciones: tuple[CambioHistorico, ...] = ()
+
+
+@dataclass(frozen=True)
+class HistoriaGuardada:
+    """Base y deltas de la rama vigente; los controles se regeneran al cargar."""
+    checkpoint_cada: int
+    estado_inicial: tuple[tuple[str, object], ...]
+    acciones: tuple[AccionHistorica, ...]

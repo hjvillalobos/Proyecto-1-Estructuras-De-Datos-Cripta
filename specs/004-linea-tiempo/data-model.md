@@ -26,3 +26,8 @@ Inicio → base; acción/eventos → anexar cambios; completar K acciones → co
 Decisiones de fronteras y retroceso: ver Assumptions de spec.md. Constituyen el contrato de esta capacidad; las otras capacidades deben adaptar sus productores antes de la integración real. No se requiere su implementación para probar el núcleo con cambios sintéticos.
 
 Decisión adoptada: reconstrucción aislada hacia adelante, registro tipado por evento, índice ordenado propio y correcciones de rama. Fundamento: cierres no serializables y fronteras detectadas en el motor. Alternativas y evidencia empírica pendiente no bloquean implementar el experimento; sí bloquean afirmar rendimiento.
+
+
+## Contratos implementados de exportación
+
+`AccionHistorica`: inicio, fin, cambios inmediatos, eventos y correcciones persistentes de frontera. `HistoriaGuardada`: checkpoint_cada, estado_inicial (parejas clave/valor inmutables) y acciones vigentes. Exportar no comparte estados mutables. Importar verifica tuplas, K, campos, continuidad de tiempos, cambios anteriores y orden de eventos antes de devolver una instancia nueva. Checkpoints/presente se regeneran en carga a partir de la base y los registros; no se serializan copias redundantes por acción.

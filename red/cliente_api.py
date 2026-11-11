@@ -5,7 +5,7 @@ from threading import RLock
 from urllib.parse import quote
 
 from red.errores import DatosInvalidos, ErrorRed, PresupuestoAgotado
-from red.validacion import entero, identificador, lote
+from red.validacion import entero, identificador, lote, validar_llaves
 
 
 CLIENTE_ID = str(uuid.uuid4())
@@ -102,6 +102,10 @@ class ClienteApi:
         ids = lote(salas_ids, salas=True)
         ruta = f"/criptas/{quote(identificador(cripta_id), safe='')}/contenido"
         return self._hacer_peticion_get(ruta, {"salas": ",".join(map(str, ids))})
+
+    def obtener_llaves(self, cripta_id):
+        ruta = f"/criptas/{quote(identificador(cripta_id), safe='')}/llaves"
+        return validar_llaves(self._hacer_peticion_get(ruta))
 
     def obtener_catalogo(self, ids):
         ids = lote(ids)

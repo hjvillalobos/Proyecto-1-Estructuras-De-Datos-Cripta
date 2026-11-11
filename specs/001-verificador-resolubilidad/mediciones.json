@@ -1,0 +1,2141 @@
+{
+  "fecha": "2026-11-02",
+  "sinteticas": {
+    "python": "3.15.0a5",
+    "equipo": "Windows-11-10.0.26300-SP0",
+    "procesador": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+    "semilla": 20261102,
+    "mediciones": [
+      {
+        "cripta_id": "sintetica-cadena",
+        "version": "sintetica-v1",
+        "familia": "cadena",
+        "estrategia": "incremental",
+        "salas": 32,
+        "n": 125,
+        "muestras": [
+          {
+            "total_ms": 0.3628999984357506,
+            "normalizacion_ms": 0.32479999936185777,
+            "recorrido_ms": 0.019799976143985987,
+            "diagnostico_ms": 0.002200016751885414,
+            "reporte_ms": 0.01610000617802143
+          },
+          {
+            "total_ms": 0.3493999829515815,
+            "normalizacion_ms": 0.312299991492182,
+            "recorrido_ms": 0.01789999078027904,
+            "diagnostico_ms": 0.002500019036233425,
+            "reporte_ms": 0.016699981642886996
+          },
+          {
+            "total_ms": 0.36339997313916683,
+            "normalizacion_ms": 0.3263999824412167,
+            "recorrido_ms": 0.017999991541728377,
+            "diagnostico_ms": 0.002300017513334751,
+            "reporte_ms": 0.016699981642886996
+          },
+          {
+            "total_ms": 0.3835999814327806,
+            "normalizacion_ms": 0.34619998768903315,
+            "recorrido_ms": 0.01819999306462705,
+            "diagnostico_ms": 0.002700020559132099,
+            "reporte_ms": 0.016499980119988322
+          },
+          {
+            "total_ms": 0.36299999919719994,
+            "normalizacion_ms": 0.32649998320266604,
+            "recorrido_ms": 0.01829999382607639,
+            "diagnostico_ms": 0.002400018274784088,
+            "reporte_ms": 0.01580000389367342
+          },
+          {
+            "total_ms": 0.3606000100262463,
+            "normalizacion_ms": 0.3242999955546111,
+            "recorrido_ms": 0.01780001912266016,
+            "diagnostico_ms": 0.0022999884095042944,
+            "reporte_ms": 0.016200006939470768
+          },
+          {
+            "total_ms": 0.3635000030044466,
+            "normalizacion_ms": 0.3277999931015074,
+            "recorrido_ms": 0.01810002140700817,
+            "diagnostico_ms": 0.0021999876480549574,
+            "reporte_ms": 0.015400000847876072
+          },
+          {
+            "total_ms": 0.36979999276809394,
+            "normalizacion_ms": 0.3328999737277627,
+            "recorrido_ms": 0.018400023691356182,
+            "diagnostico_ms": 0.0023999891709536314,
+            "reporte_ms": 0.01610000617802143
+          },
+          {
+            "total_ms": 0.370699999621138,
+            "normalizacion_ms": 0.33400001120753586,
+            "recorrido_ms": 0.017999991541728377,
+            "diagnostico_ms": 0.0024999899324029684,
+            "reporte_ms": 0.016200006939470768
+          },
+          {
+            "total_ms": 0.3637000045273453,
+            "normalizacion_ms": 0.32729998929426074,
+            "recorrido_ms": 0.017799990018829703,
+            "diagnostico_ms": 0.002400018274784088,
+            "reporte_ms": 0.016200006939470768
+          }
+        ],
+        "promedio_ms": 0.36505999451037496,
+        "minimo_ms": 0.3493999829515815,
+        "maximo_ms": 0.3835999814327806,
+        "desviacion_ms": 0.00824065386224826,
+        "metricas": {
+          "salas_procesadas": 32,
+          "salidas_examinadas": 31,
+          "llaves_obtenidas": 31,
+          "pendientes_activadas": 0,
+          "relaciones_diagnostico": 0,
+          "comparaciones_normalizacion": 1165,
+          "elementos_reporte": 93
+        },
+        "trabajo_por_n": 1.496,
+        "comparaciones_por_n_log_n": 1.3379685070813412,
+        "longitud_max_id": 3,
+        "longitud_total_ids": 137,
+        "tiempo_por_n_ms": 0.002920479956083,
+        "estado": "resoluble",
+        "razones_fases": null,
+        "razon_tiempo_anterior": null
+      },
+      {
+        "cripta_id": "sintetica-cadena",
+        "version": "sintetica-v1",
+        "familia": "cadena",
+        "estrategia": "repetitivo",
+        "salas": 32,
+        "n": 125,
+        "muestras": [
+          {
+            "total_ms": 0.5056000081822276,
+            "normalizacion_ms": 0.3301000106148422,
+            "recorrido_ms": 0.15499998698942363,
+            "diagnostico_ms": 0.0028999929782003164,
+            "reporte_ms": 0.017600017599761486
+          },
+          {
+            "total_ms": 0.5060999828856438,
+            "normalizacion_ms": 0.33239999902434647,
+            "recorrido_ms": 0.1542000100016594,
+            "diagnostico_ms": 0.0026999914553016424,
+            "reporte_ms": 0.016799982404336333
+          },
+          {
+            "total_ms": 0.5811000009998679,
+            "normalizacion_ms": 0.4062000080011785,
+            "recorrido_ms": 0.15549999079667032,
+            "diagnostico_ms": 0.0027999922167509794,
+            "reporte_ms": 0.016600009985268116
+          },
+          {
+            "total_ms": 0.519299996085465,
+            "normalizacion_ms": 0.34669999149627984,
+            "recorrido_ms": 0.15259999781847,
+            "diagnostico_ms": 0.002500019036233425,
+            "reporte_ms": 0.017499987734481692
+          },
+          {
+            "total_ms": 0.5157999985385686,
+            "normalizacion_ms": 0.3368999750819057,
+            "recorrido_ms": 0.15880001592449844,
+            "diagnostico_ms": 0.0026999914553016424,
+            "reporte_ms": 0.017400016076862812
+          },
+          {
+            "total_ms": 0.5739000043831766,
+            "normalizacion_ms": 0.4183999844826758,
+            "recorrido_ms": 0.13350002700462937,
+            "diagnostico_ms": 0.0036999990697950125,
+            "reporte_ms": 0.01829999382607639
+          },
+          {
+            "total_ms": 0.46480001765303314,
+            "normalizacion_ms": 0.288500013994053,
+            "recorrido_ms": 0.1531000016257167,
+            "diagnostico_ms": 0.0028999929782003164,
+            "reporte_ms": 0.02030000905506313
+          },
+          {
+            "total_ms": 0.5511000053957105,
+            "normalizacion_ms": 0.3623999946285039,
+            "recorrido_ms": 0.16319999122060835,
+            "diagnostico_ms": 0.0030999945010989904,
+            "reporte_ms": 0.022400025045499206
+          },
+          {
+            "total_ms": 0.4555000050459057,
+            "normalizacion_ms": 0.298099999781698,
+            "recorrido_ms": 0.1391999830957502,
+            "diagnostico_ms": 0.002500019036233425,
+            "reporte_ms": 0.015700003132224083
+          },
+          {
+            "total_ms": 0.44440000783652067,
+            "normalizacion_ms": 0.30010001501068473,
+            "recorrido_ms": 0.12749998131766915,
+            "diagnostico_ms": 0.002300017513334751,
+            "reporte_ms": 0.014499993994832039
+          }
+        ],
+        "promedio_ms": 0.511760002700612,
+        "minimo_ms": 0.44440000783652067,
+        "maximo_ms": 0.5811000009998679,
+        "desviacion_ms": 0.04501999761056611,
+        "metricas": {
+          "salas_procesadas": 528,
+          "salidas_examinadas": 527,
+          "llaves_obtenidas": 31,
+          "pendientes_activadas": 0,
+          "relaciones_diagnostico": 0,
+          "comparaciones_normalizacion": 1165,
+          "elementos_reporte": 93
+        },
+        "trabajo_por_n": 9.432,
+        "comparaciones_por_n_log_n": 1.3379685070813412,
+        "longitud_max_id": 3,
+        "longitud_total_ids": 137,
+        "tiempo_por_n_ms": 0.004094080021604896,
+        "estado": "resoluble",
+        "razones_fases": null,
+        "razon_tiempo_anterior": null
+      },
+      {
+        "cripta_id": "sintetica-cadena",
+        "version": "sintetica-v1",
+        "familia": "cadena",
+        "estrategia": "incremental",
+        "salas": 64,
+        "n": 253,
+        "muestras": [
+          {
+            "total_ms": 0.754999986384064,
+            "normalizacion_ms": 0.69039998925291,
+            "recorrido_ms": 0.033199990866705775,
+            "diagnostico_ms": 0.0036999990697950125,
+            "reporte_ms": 0.027700007194653153
+          },
+          {
+            "total_ms": 0.7812000112608075,
+            "normalizacion_ms": 0.7122000097297132,
+            "recorrido_ms": 0.038300000596791506,
+            "diagnostico_ms": 0.0034999975468963385,
+            "reporte_ms": 0.02720000338740647
+          },
+          {
+            "total_ms": 0.7687999750487506,
+            "normalizacion_ms": 0.7041999779175967,
+            "recorrido_ms": 0.03270001616328955,
+            "diagnostico_ms": 0.0044000043999403715,
+            "reporte_ms": 0.027499976567924023
+          },
+          {
+            "total_ms": 0.7647000020369887,
+            "normalizacion_ms": 0.7015999872237444,
+            "recorrido_ms": 0.03170000854879618,
+            "diagnostico_ms": 0.0036999990697950125,
+            "reporte_ms": 0.027700007194653153
+          },
+          {
+            "total_ms": 0.7429999823216349,
+            "normalizacion_ms": 0.6784999859519303,
+            "recorrido_ms": 0.033199990866705775,
+            "diagnostico_ms": 0.0035999983083456755,
+            "reporte_ms": 0.027700007194653153
+          },
+          {
+            "total_ms": 0.8661000174470246,
+            "normalizacion_ms": 0.797900022007525,
+            "recorrido_ms": 0.034199998481199145,
+            "diagnostico_ms": 0.0044000043999403715,
+            "reporte_ms": 0.0295999925583601
+          },
+          {
+            "total_ms": 0.7751000230200589,
+            "normalizacion_ms": 0.7107999990694225,
+            "recorrido_ms": 0.03260001540184021,
+            "diagnostico_ms": 0.0036999990697950125,
+            "reporte_ms": 0.028000009479001164
+          },
+          {
+            "total_ms": 0.8544000156689435,
+            "normalizacion_ms": 0.7862999918870628,
+            "recorrido_ms": 0.03400002606213093,
+            "diagnostico_ms": 0.004299974534660578,
+            "reporte_ms": 0.02980002318508923
+          },
+          {
+            "total_ms": 0.7762000022921711,
+            "normalizacion_ms": 0.7040999771561474,
+            "recorrido_ms": 0.03250001464039087,
+            "diagnostico_ms": 0.0035999983083456755,
+            "reporte_ms": 0.03600001218728721
+          },
+          {
+            "total_ms": 0.7718999986536801,
+            "normalizacion_ms": 0.7082000083755702,
+            "recorrido_ms": 0.032899988582357764,
+            "diagnostico_ms": 0.0035999983083456755,
+            "reporte_ms": 0.02720000338740647
+          }
+        ],
+        "promedio_ms": 0.7856400014134124,
+        "minimo_ms": 0.7429999823216349,
+        "maximo_ms": 0.8661000174470246,
+        "desviacion_ms": 0.03884522038536662,
+        "metricas": {
+          "salas_procesadas": 64,
+          "salidas_examinadas": 63,
+          "llaves_obtenidas": 63,
+          "pendientes_activadas": 0,
+          "relaciones_diagnostico": 0,
+          "comparaciones_normalizacion": 2870,
+          "elementos_reporte": 189
+        },
+        "trabajo_por_n": 1.4980237154150198,
+        "comparaciones_por_n_log_n": 1.4210049665762068,
+        "longitud_max_id": 3,
+        "longitud_total_ids": 297,
+        "tiempo_por_n_ms": 0.0031052964482743573,
+        "estado": "resoluble",
+        "razones_fases": {
+          "total_ms": 2.152084625068619,
+          "normalizacion_ms": 2.1916832146958023,
+          "recorrido_ms": 1.8392762836498089,
+          "diagnostico_ms": 1.610873112518266,
+          "reporte_ms": 1.7813469772010382
+        },
+        "razon_tiempo_anterior": 2.152084625068619
+      },
+      {
+        "cripta_id": "sintetica-cadena",
+        "version": "sintetica-v1",
+        "familia": "cadena",
+        "estrategia": "repetitivo",
+        "salas": 64,
+        "n": 253,
+        "muestras": [
+          {
+            "total_ms": 1.2956999999005347,
+            "normalizacion_ms": 0.6949999951757491,
+            "recorrido_ms": 0.5687999946530908,
+            "diagnostico_ms": 0.0036999990697950125,
+            "reporte_ms": 0.02820001100189984
+          },
+          {
+            "total_ms": 1.3282999861985445,
+            "normalizacion_ms": 0.7030999986454844,
+            "recorrido_ms": 0.5872999900020659,
+            "diagnostico_ms": 0.0045000051613897085,
+            "reporte_ms": 0.03339999238960445
+          },
+          {
+            "total_ms": 1.3248999894130975,
+            "normalizacion_ms": 0.7268999761436135,
+            "recorrido_ms": 0.5650000239256769,
+            "diagnostico_ms": 0.004399975296109915,
+            "reporte_ms": 0.028600014047697186
+          },
+          {
+            "total_ms": 1.3153000036254525,
+            "normalizacion_ms": 0.7110000005923212,
+            "recorrido_ms": 0.572100019780919,
+            "diagnostico_ms": 0.004299974534660578,
+            "reporte_ms": 0.027900008717551827
+          },
+          {
+            "total_ms": 1.3006000081077218,
+            "normalizacion_ms": 0.7016999879851937,
+            "recorrido_ms": 0.5683000199496746,
+            "diagnostico_ms": 0.0035999983083456755,
+            "reporte_ms": 0.027000001864507794
+          },
+          {
+            "total_ms": 1.284400001168251,
+            "normalizacion_ms": 0.6999000033829361,
+            "recorrido_ms": 0.5537999968510121,
+            "diagnostico_ms": 0.0035999983083456755,
+            "reporte_ms": 0.02710000262595713
+          },
+          {
+            "total_ms": 1.3015000149607658,
+            "normalizacion_ms": 0.6957000005058944,
+            "recorrido_ms": 0.5734000005759299,
+            "diagnostico_ms": 0.0037999998312443495,
+            "reporte_ms": 0.028600014047697186
+          },
+          {
+            "total_ms": 1.400300010573119,
+            "normalizacion_ms": 0.7944999961182475,
+            "recorrido_ms": 0.5694999999832362,
+            "diagnostico_ms": 0.0039000005926936865,
+            "reporte_ms": 0.032400013878941536
+          },
+          {
+            "total_ms": 1.2775000068359077,
+            "normalizacion_ms": 0.6769000028725713,
+            "recorrido_ms": 0.5677000153809786,
+            "diagnostico_ms": 0.0036999990697950125,
+            "reporte_ms": 0.029199989512562752
+          },
+          {
+            "total_ms": 1.3714000233449042,
+            "normalizacion_ms": 0.725300022168085,
+            "recorrido_ms": 0.5980999849271029,
+            "diagnostico_ms": 0.006200018106028438,
+            "reporte_ms": 0.041799998143687844
+          }
+        ],
+        "promedio_ms": 1.3199900044128299,
+        "minimo_ms": 1.2775000068359077,
+        "maximo_ms": 1.400300010573119,
+        "desviacion_ms": 0.036861566982864566,
+        "metricas": {
+          "salas_procesadas": 2080,
+          "salidas_examinadas": 2079,
+          "llaves_obtenidas": 63,
+          "pendientes_activadas": 0,
+          "relaciones_diagnostico": 0,
+          "comparaciones_normalizacion": 2870,
+          "elementos_reporte": 189
+        },
+        "trabajo_por_n": 17.434782608695652,
+        "comparaciones_por_n_log_n": 1.4210049665762068,
+        "longitud_max_id": 3,
+        "longitud_total_ids": 297,
+        "tiempo_por_n_ms": 0.005217351796098142,
+        "estado": "resoluble",
+        "razones_fases": {
+          "total_ms": 2.5793145174439234,
+          "normalizacion_ms": 2.0849172466305728,
+          "recorrido_ms": 3.83491900073988,
+          "diagnostico_ms": 1.4839840954356718,
+          "reporte_ms": 1.7176735149120534
+        },
+        "razon_tiempo_anterior": 2.5793145174439234
+      },
+      {
+        "cripta_id": "sintetica-cadena",
+        "version": "sintetica-v1",
+        "familia": "cadena",
+        "estrategia": "incremental",
+        "salas": 128,
+        "n": 509,
+        "muestras": [
+          {
+            "total_ms": 1.903099997434765,
+            "normalizacion_ms": 1.7497999942861497,
+            "recorrido_ms": 0.08769999840296805,
+            "diagnostico_ms": 0.007199996616691351,
+            "reporte_ms": 0.05840000812895596
+          },
+          {
+            "total_ms": 1.9614000048022717,
+            "normalizacion_ms": 1.8171000119764358,
+            "recorrido_ms": 0.0777999812271446,
+            "diagnostico_ms": 0.007399998139590025,
+            "reporte_ms": 0.05910001345910132
+          },
+          {
+            "total_ms": 1.712299999780953,
+            "normalizacion_ms": 1.6032000130508095,
+            "recorrido_ms": 0.05750000127591193,
+            "diagnostico_ms": 0.00589998671784997,
+            "reporte_ms": 0.04569999873638153
+          },
+          {
+            "total_ms": 1.4664999907836318,
+            "normalizacion_ms": 1.3584000116679817,
+            "recorrido_ms": 0.05679999594576657,
+            "diagnostico_ms": 0.00589998671784997,
+            "reporte_ms": 0.04539999645203352
+          },
+          {
+            "total_ms": 1.5539999876637012,
+            "normalizacion_ms": 1.4402999950107187,
+            "recorrido_ms": 0.060699996538460255,
+            "diagnostico_ms": 0.005700014298781753,
+            "reporte_ms": 0.047299981815740466
+          },
+          {
+            "total_ms": 1.738499995553866,
+            "normalizacion_ms": 1.6231999907176942,
+            "recorrido_ms": 0.0619000056758523,
+            "diagnostico_ms": 0.006100017344579101,
+            "reporte_ms": 0.047299981815740466
+          },
+          {
+            "total_ms": 1.4632999955210835,
+            "normalizacion_ms": 1.3432999840006232,
+            "recorrido_ms": 0.060399994254112244,
+            "diagnostico_ms": 0.00580001506023109,
+            "reporte_ms": 0.053800002206116915
+          },
+          {
+            "total_ms": 1.7278000013902783,
+            "normalizacion_ms": 1.5866000030655414,
+            "recorrido_ms": 0.07499998901039362,
+            "diagnostico_ms": 0.007299997378140688,
+            "reporte_ms": 0.058900011936202645
+          },
+          {
+            "total_ms": 2.158099989173934,
+            "normalizacion_ms": 1.999900006921962,
+            "recorrido_ms": 0.08229998638853431,
+            "diagnostico_ms": 0.008400005754083395,
+            "reporte_ms": 0.06749999010935426
+          },
+          {
+            "total_ms": 2.107300009811297,
+            "normalizacion_ms": 1.951000012923032,
+            "recorrido_ms": 0.08349999552592635,
+            "diagnostico_ms": 0.008100003469735384,
+            "reporte_ms": 0.06469999789260328
+          }
+        ],
+        "promedio_ms": 1.7792299971915781,
+        "minimo_ms": 1.4632999955210835,
+        "maximo_ms": 2.158099989173934,
+        "desviacion_ms": 0.2359716243001299,
+        "metricas": {
+          "salas_procesadas": 128,
+          "salidas_examinadas": 127,
+          "llaves_obtenidas": 127,
+          "pendientes_activadas": 0,
+          "relaciones_diagnostico": 0,
+          "comparaciones_normalizacion": 6756,
+          "elementos_reporte": 381
+        },
+        "trabajo_por_n": 1.49901768172888,
+        "comparaciones_por_n_log_n": 1.4761777490608319,
+        "longitud_max_id": 4,
+        "longitud_total_ids": 672,
+        "tiempo_por_n_ms": 0.0034955402695315877,
+        "estado": "resoluble",
+        "razones_fases": {
+          "total_ms": 2.264688653824448,
+          "normalizacion_ms": 2.2897334159987524,
+          "recorrido_ms": 2.0984188454608534,
+          "diagnostico_ms": 1.7610407537065833,
+          "reporte_ms": 1.9004850974080036
+        },
+        "razon_tiempo_anterior": 2.264688653824448
+      },
+      {
+        "cripta_id": "sintetica-cadena",
+        "version": "sintetica-v1",
+        "familia": "cadena",
+        "estrategia": "repetitivo",
+        "salas": 128,
+        "n": 509,
+        "muestras": [
+          {
+            "total_ms": 4.856999992625788,
+            "normalizacion_ms": 1.9552999874576926,
+            "recorrido_ms": 2.8273000207263976,
+            "diagnostico_ms": 0.009799987310543656,
+            "reporte_ms": 0.06459999713115394
+          },
+          {
+            "total_ms": 3.6441999836824834,
+            "normalizacion_ms": 1.6185999847948551,
+            "recorrido_ms": 1.9659000099636614,
+            "diagnostico_ms": 0.006799993570894003,
+            "reporte_ms": 0.05289999535307288
+          },
+          {
+            "total_ms": 4.649100010283291,
+            "normalizacion_ms": 1.4707999944221228,
+            "recorrido_ms": 3.0798999941907823,
+            "diagnostico_ms": 0.013100012438371778,
+            "reporte_ms": 0.08530000923201442
+          },
+          {
+            "total_ms": 3.6469000042416155,
+            "normalizacion_ms": 1.5427999896928668,
+            "recorrido_ms": 2.04610000946559,
+            "diagnostico_ms": 0.006999995093792677,
+            "reporte_ms": 0.051000009989365935
+          },
+          {
+            "total_ms": 3.80469998344779,
+            "normalizacion_ms": 1.4775999879930168,
+            "recorrido_ms": 2.261799992993474,
+            "diagnostico_ms": 0.008400005754083395,
+            "reporte_ms": 0.056899996707215905
+          },
+          {
+            "total_ms": 3.739099978702143,
+            "normalizacion_ms": 1.5409000043291599,
+            "recorrido_ms": 2.1367000008467585,
+            "diagnostico_ms": 0.007099995855242014,
+            "reporte_ms": 0.05439997767098248
+          },
+          {
+            "total_ms": 3.7219999940134585,
+            "normalizacion_ms": 1.441000000340864,
+            "recorrido_ms": 2.221400005510077,
+            "diagnostico_ms": 0.007399998139590025,
+            "reporte_ms": 0.05219999002292752
+          },
+          {
+            "total_ms": 3.6496999964583665,
+            "normalizacion_ms": 1.4897999935783446,
+            "recorrido_ms": 2.1032000076957047,
+            "diagnostico_ms": 0.006499991286545992,
+            "reporte_ms": 0.05020000389777124
+          },
+          {
+            "total_ms": 3.8791999977547675,
+            "normalizacion_ms": 1.5469999925699085,
+            "recorrido_ms": 2.2692999918945134,
+            "diagnostico_ms": 0.008100003469735384,
+            "reporte_ms": 0.054800009820610285
+          },
+          {
+            "total_ms": 3.676299995277077,
+            "normalizacion_ms": 1.4398999919649214,
+            "recorrido_ms": 2.1798000088892877,
+            "diagnostico_ms": 0.006299989763647318,
+            "reporte_ms": 0.050300004659220576
+          }
+        ],
+        "promedio_ms": 3.926819993648678,
+        "minimo_ms": 3.6441999836824834,
+        "maximo_ms": 4.856999992625788,
+        "desviacion_ms": 0.4217913326538444,
+        "metricas": {
+          "salas_procesadas": 8256,
+          "salidas_examinadas": 8255,
+          "llaves_obtenidas": 127,
+          "pendientes_activadas": 0,
+          "relaciones_diagnostico": 0,
+          "comparaciones_normalizacion": 6756,
+          "elementos_reporte": 381
+        },
+        "trabajo_por_n": 33.43614931237721,
+        "comparaciones_por_n_log_n": 1.4761777490608319,
+        "longitud_max_id": 4,
+        "longitud_total_ids": 672,
+        "tiempo_por_n_ms": 0.007714774054319603,
+        "estado": "resoluble",
+        "razones_fases": {
+          "total_ms": 2.97488615862318,
+          "normalizacion_ms": 2.1772370214406735,
+          "recorrido_ms": 4.03413694208354,
+          "diagnostico_ms": 1.9304564489112228,
+          "reporte_ms": 1.8823139627375354
+        },
+        "razon_tiempo_anterior": 2.97488615862318
+      },
+      {
+        "cripta_id": "sintetica-ciclo",
+        "version": "sintetica-v1",
+        "familia": "ciclo",
+        "estrategia": "incremental",
+        "salas": 32,
+        "n": 125,
+        "muestras": [
+          {
+            "total_ms": 0.529499986441806,
+            "normalizacion_ms": 0.31919998582452536,
+            "recorrido_ms": 0.0046000059228390455,
+            "diagnostico_ms": 0.1863999932538718,
+            "reporte_ms": 0.01930000144056976
+          },
+          {
+            "total_ms": 0.7784999907016754,
+            "normalizacion_ms": 0.4254999803379178,
+            "recorrido_ms": 0.005400012014433742,
+            "diagnostico_ms": 0.3209999995306134,
+            "reporte_ms": 0.026599998818710446
+          },
+          {
+            "total_ms": 0.753400003304705,
+            "normalizacion_ms": 0.4416999872773886,
+            "recorrido_ms": 0.005400012014433742,
+            "diagnostico_ms": 0.2747999969869852,
+            "reporte_ms": 0.0315000070258975
+          },
+          {
+            "total_ms": 0.6016999832354486,
+            "normalizacion_ms": 0.36189999082125723,
+            "recorrido_ms": 0.0050000089686363935,
+            "diagnostico_ms": 0.21299999207258224,
+            "reporte_ms": 0.021799991372972727
+          },
+          {
+            "total_ms": 0.5563000158872455,
+            "normalizacion_ms": 0.3355000226292759,
+            "recorrido_ms": 0.0046000059228390455,
+            "diagnostico_ms": 0.19539997447282076,
+            "reporte_ms": 0.020800012862309813
+          },
+          {
+            "total_ms": 0.5635000125039369,
+            "normalizacion_ms": 0.3409000055398792,
+            "recorrido_ms": 0.0041000021155923605,
+            "diagnostico_ms": 0.19839999731630087,
+            "reporte_ms": 0.020100007532164454
+          },
+          {
+            "total_ms": 0.8172000234480947,
+            "normalizacion_ms": 0.5151000223122537,
+            "recorrido_ms": 0.005299982149153948,
+            "diagnostico_ms": 0.2753000007942319,
+            "reporte_ms": 0.021500018192455173
+          },
+          {
+            "total_ms": 0.5611999949906021,
+            "normalizacion_ms": 0.3420999855734408,
+            "recorrido_ms": 0.0041000021155923605,
+            "diagnostico_ms": 0.19430002430453897,
+            "reporte_ms": 0.02069998299703002
+          },
+          {
+            "total_ms": 0.6467999774031341,
+            "normalizacion_ms": 0.3868999774567783,
+            "recorrido_ms": 0.008200004231184721,
+            "diagnostico_ms": 0.2319000195711851,
+            "reporte_ms": 0.019799976143985987
+          },
+          {
+            "total_ms": 0.47190001350827515,
+            "normalizacion_ms": 0.287900009425357,
+            "recorrido_ms": 0.0035999983083456755,
+            "diagnostico_ms": 0.16319999122060835,
+            "reporte_ms": 0.017200014553964138
+          }
+        ],
+        "promedio_ms": 0.6280000001424924,
+        "minimo_ms": 0.47190001350827515,
+        "maximo_ms": 0.8172000234480947,
+        "desviacion_ms": 0.11092791450606843,
+        "metricas": {
+          "salas_procesadas": 1,
+          "salidas_examinadas": 1,
+          "llaves_obtenidas": 0,
+          "pendientes_activadas": 0,
+          "relaciones_diagnostico": 619,
+          "comparaciones_normalizacion": 1164,
+          "elementos_reporte": 528
+        },
+        "trabajo_por_n": 9.192,
+        "comparaciones_por_n_log_n": 1.336820036259812,
+        "longitud_max_id": 3,
+        "longitud_total_ids": 137,
+        "tiempo_por_n_ms": 0.005024000001139939,
+        "estado": "no_resoluble",
+        "razones_fases": null,
+        "razon_tiempo_anterior": null
+      },
+      {
+        "cripta_id": "sintetica-ciclo",
+        "version": "sintetica-v1",
+        "familia": "ciclo",
+        "estrategia": "repetitivo",
+        "salas": 32,
+        "n": 125,
+        "muestras": [
+          {
+            "total_ms": 0.4735999973490834,
+            "normalizacion_ms": 0.2868000010494143,
+            "recorrido_ms": 0.00200001522898674,
+            "diagnostico_ms": 0.16729999333620071,
+            "reporte_ms": 0.017499987734481692
+          },
+          {
+            "total_ms": 0.47690002247691154,
+            "normalizacion_ms": 0.2938999969046563,
+            "recorrido_ms": 0.001600012183189392,
+            "diagnostico_ms": 0.1644000003580004,
+            "reporte_ms": 0.017000013031065464
+          },
+          {
+            "total_ms": 0.515200023073703,
+            "normalizacion_ms": 0.3279000229667872,
+            "recorrido_ms": 0.0015999830793589354,
+            "diagnostico_ms": 0.16799999866634607,
+            "reporte_ms": 0.017700018361210823
+          },
+          {
+            "total_ms": 0.47820000327192247,
+            "normalizacion_ms": 0.2930999908130616,
+            "recorrido_ms": 0.001900014467537403,
+            "diagnostico_ms": 0.16589998267591,
+            "reporte_ms": 0.017300015315413475
+          },
+          {
+            "total_ms": 0.49190002027899027,
+            "normalizacion_ms": 0.2963000151794404,
+            "recorrido_ms": 0.0014999823179095984,
+            "diagnostico_ms": 0.1755000266712159,
+            "reporte_ms": 0.0185999961104244
+          },
+          {
+            "total_ms": 0.49379997653886676,
+            "normalizacion_ms": 0.30169999809004366,
+            "recorrido_ms": 0.0013999815564602613,
+            "diagnostico_ms": 0.17240000306628644,
+            "reporte_ms": 0.01829999382607639
+          },
+          {
+            "total_ms": 0.506000011228025,
+            "normalizacion_ms": 0.31529998523183167,
+            "recorrido_ms": 0.001500011421740055,
+            "diagnostico_ms": 0.17179999849759042,
+            "reporte_ms": 0.017400016076862812
+          },
+          {
+            "total_ms": 0.5190999945625663,
+            "normalizacion_ms": 0.3171999996993691,
+            "recorrido_ms": 0.0017999846022576094,
+            "diagnostico_ms": 0.18110001110471785,
+            "reporte_ms": 0.018999999156221747
+          },
+          {
+            "total_ms": 0.5144999886397272,
+            "normalizacion_ms": 0.3139000036753714,
+            "recorrido_ms": 0.0015999830793589354,
+            "diagnostico_ms": 0.18060000729747117,
+            "reporte_ms": 0.018399994587525725
+          },
+          {
+            "total_ms": 0.5224000196903944,
+            "normalizacion_ms": 0.32220000866800547,
+            "recorrido_ms": 0.001800013706088066,
+            "diagnostico_ms": 0.17970000044442713,
+            "reporte_ms": 0.018699996871873736
+          }
+        ],
+        "promedio_ms": 0.49916000571101904,
+        "minimo_ms": 0.4735999973490834,
+        "maximo_ms": 0.5224000196903944,
+        "desviacion_ms": 0.017738839303555964,
+        "metricas": {
+          "salas_procesadas": 1,
+          "salidas_examinadas": 1,
+          "llaves_obtenidas": 0,
+          "pendientes_activadas": 0,
+          "relaciones_diagnostico": 619,
+          "comparaciones_normalizacion": 1164,
+          "elementos_reporte": 528
+        },
+        "trabajo_por_n": 9.192,
+        "comparaciones_por_n_log_n": 1.336820036259812,
+        "longitud_max_id": 3,
+        "longitud_total_ids": 137,
+        "tiempo_por_n_ms": 0.003993280045688152,
+        "estado": "no_resoluble",
+        "razones_fases": null,
+        "razon_tiempo_anterior": null
+      },
+      {
+        "cripta_id": "sintetica-ciclo",
+        "version": "sintetica-v1",
+        "familia": "ciclo",
+        "estrategia": "incremental",
+        "salas": 64,
+        "n": 253,
+        "muestras": [
+          {
+            "total_ms": 1.094399980502203,
+            "normalizacion_ms": 0.6704999832436442,
+            "recorrido_ms": 0.005600013537332416,
+            "diagnostico_ms": 0.3858999989461154,
+            "reporte_ms": 0.03239998477511108
+          },
+          {
+            "total_ms": 1.5279999934136868,
+            "normalizacion_ms": 0.8834000036586076,
+            "recorrido_ms": 0.012299977242946625,
+            "diagnostico_ms": 0.5790000141132623,
+            "reporte_ms": 0.05329999839887023
+          },
+          {
+            "total_ms": 1.1984999873675406,
+            "normalizacion_ms": 0.7721000001765788,
+            "recorrido_ms": 0.005299982149153948,
+            "diagnostico_ms": 0.3856999974232167,
+            "reporte_ms": 0.03540000761859119
+          },
+          {
+            "total_ms": 1.1947000166401267,
+            "normalizacion_ms": 0.7505000103265047,
+            "recorrido_ms": 0.005499983672052622,
+            "diagnostico_ms": 0.40320001426152885,
+            "reporte_ms": 0.035500008380040526
+          },
+          {
+            "total_ms": 1.29640000523068,
+            "normalizacion_ms": 0.8049000171013176,
+            "recorrido_ms": 0.007199996616691351,
+            "diagnostico_ms": 0.4493999877013266,
+            "reporte_ms": 0.034900003811344504
+          },
+          {
+            "total_ms": 1.2042000016663224,
+            "normalizacion_ms": 0.8218000002671033,
+            "recorrido_ms": 0.005399982910603285,
+            "diagnostico_ms": 0.34500000765547156,
+            "reporte_ms": 0.03200001083314419
+          },
+          {
+            "total_ms": 1.0965000255964696,
+            "normalizacion_ms": 0.731200008885935,
+            "recorrido_ms": 0.0049000082071870565,
+            "diagnostico_ms": 0.3301000106148422,
+            "reporte_ms": 0.03029999788850546
+          },
+          {
+            "total_ms": 0.9866000036709011,
+            "normalizacion_ms": 0.6252999883145094,
+            "recorrido_ms": 0.0041000021155923605,
+            "diagnostico_ms": 0.3277999931015074,
+            "reporte_ms": 0.029400020139291883
+          },
+          {
+            "total_ms": 0.9921000164467841,
+            "normalizacion_ms": 0.6280000088736415,
+            "recorrido_ms": 0.0041000021155923605,
+            "diagnostico_ms": 0.3300999815110117,
+            "reporte_ms": 0.029900023946538568
+          },
+          {
+            "total_ms": 1.104399998439476,
+            "normalizacion_ms": 0.7102999952621758,
+            "recorrido_ms": 0.007099995855242014,
+            "diagnostico_ms": 0.35489999572746456,
+            "reporte_ms": 0.032100011594593525
+          }
+        ],
+        "promedio_ms": 1.169580002897419,
+        "minimo_ms": 0.9866000036709011,
+        "maximo_ms": 1.5279999934136868,
+        "desviacion_ms": 0.1508098488291393,
+        "metricas": {
+          "salas_procesadas": 1,
+          "salidas_examinadas": 1,
+          "llaves_obtenidas": 0,
+          "pendientes_activadas": 0,
+          "relaciones_diagnostico": 1259,
+          "comparaciones_normalizacion": 2869,
+          "elementos_reporte": 1072
+        },
+        "trabajo_por_n": 9.221343873517787,
+        "comparaciones_por_n_log_n": 1.420509842894473,
+        "longitud_max_id": 3,
+        "longitud_total_ids": 297,
+        "tiempo_por_n_ms": 0.004622845861254621,
+        "estado": "no_resoluble",
+        "razones_fases": {
+          "total_ms": 1.8623885392229982,
+          "normalizacion_ms": 1.9692815717800853,
+          "recorrido_ms": 1.222662090290089,
+          "diagnostico_ms": 1.7265385894943501,
+          "reporte_ms": 1.5740996359566195
+        },
+        "razon_tiempo_anterior": 1.8623885392229982
+      },
+      {
+        "cripta_id": "sintetica-ciclo",
+        "version": "sintetica-v1",
+        "familia": "ciclo",
+        "estrategia": "repetitivo",
+        "salas": 64,
+        "n": 253,
+        "muestras": [
+          {
+            "total_ms": 1.119700027629733,
+            "normalizacion_ms": 0.6809000042267144,
+            "recorrido_ms": 0.00200001522898674,
+            "diagnostico_ms": 0.40499999886378646,
+            "reporte_ms": 0.031800009310245514
+          },
+          {
+            "total_ms": 0.9903000027406961,
+            "normalizacion_ms": 0.6377000245265663,
+            "recorrido_ms": 0.0019999861251562834,
+            "diagnostico_ms": 0.3215000033378601,
+            "reporte_ms": 0.029099988751113415
+          },
+          {
+            "total_ms": 1.010099978884682,
+            "normalizacion_ms": 0.6301999965216964,
+            "recorrido_ms": 0.0016999838408082724,
+            "diagnostico_ms": 0.34810000215657055,
+            "reporte_ms": 0.030099996365606785
+          },
+          {
+            "total_ms": 1.4543000143021345,
+            "normalizacion_ms": 0.8988000045064837,
+            "recorrido_ms": 0.0035999983083456755,
+            "diagnostico_ms": 0.5051000043749809,
+            "reporte_ms": 0.04680000711232424
+          },
+          {
+            "total_ms": 1.4425000117626041,
+            "normalizacion_ms": 0.9763000125531107,
+            "recorrido_ms": 0.0022999884095042944,
+            "diagnostico_ms": 0.4196000227238983,
+            "reporte_ms": 0.04429998807609081
+          },
+          {
+            "total_ms": 0.9875000105239451,
+            "normalizacion_ms": 0.6215999892447144,
+            "recorrido_ms": 0.001800013706088066,
+            "diagnostico_ms": 0.3336000081617385,
+            "reporte_ms": 0.030499999411404133
+          },
+          {
+            "total_ms": 1.039100025082007,
+            "normalizacion_ms": 0.6621000065933913,
+            "recorrido_ms": 0.001700012944638729,
+            "diagnostico_ms": 0.34279999090358615,
+            "reporte_ms": 0.03250001464039087
+          },
+          {
+            "total_ms": 1.077699998859316,
+            "normalizacion_ms": 0.684200000250712,
+            "recorrido_ms": 0.001900014467537403,
+            "diagnostico_ms": 0.35930000012740493,
+            "reporte_ms": 0.03229998401366174
+          },
+          {
+            "total_ms": 1.1142999865114689,
+            "normalizacion_ms": 0.707999977748841,
+            "recorrido_ms": 0.001800013706088066,
+            "diagnostico_ms": 0.3696999920066446,
+            "reporte_ms": 0.03480000304989517
+          },
+          {
+            "total_ms": 1.1628999782260507,
+            "normalizacion_ms": 0.7462999783456326,
+            "recorrido_ms": 0.001800013706088066,
+            "diagnostico_ms": 0.381199992261827,
+            "reporte_ms": 0.03359999391250312
+          }
+        ],
+        "promedio_ms": 1.1398400034522638,
+        "minimo_ms": 0.9875000105239451,
+        "maximo_ms": 1.4543000143021345,
+        "desviacion_ms": 0.1638566248975048,
+        "metricas": {
+          "salas_procesadas": 1,
+          "salidas_examinadas": 1,
+          "llaves_obtenidas": 0,
+          "pendientes_activadas": 0,
+          "relaciones_diagnostico": 1259,
+          "comparaciones_normalizacion": 2869,
+          "elementos_reporte": 1072
+        },
+        "trabajo_por_n": 9.221343873517787,
+        "comparaciones_por_n_log_n": 1.420509842894473,
+        "longitud_max_id": 3,
+        "longitud_total_ids": 297,
+        "tiempo_por_n_ms": 0.004505296456333059,
+        "estado": "no_resoluble",
+        "razones_fases": {
+          "total_ms": 2.2835162881862705,
+          "normalizacion_ms": 2.3616008675508144,
+          "recorrido_ms": 1.2335367118212222,
+          "diagnostico_ms": 2.192563830672848,
+          "reporte_ms": 1.9221785709779047
+        },
+        "razon_tiempo_anterior": 2.2835162881862705
+      },
+      {
+        "cripta_id": "sintetica-ciclo",
+        "version": "sintetica-v1",
+        "familia": "ciclo",
+        "estrategia": "incremental",
+        "salas": 128,
+        "n": 509,
+        "muestras": [
+          {
+            "total_ms": 2.4871999921742827,
+            "normalizacion_ms": 1.6712999786250293,
+            "recorrido_ms": 0.011600001016631722,
+            "diagnostico_ms": 0.7476000173483044,
+            "reporte_ms": 0.05669999518431723
+          },
+          {
+            "total_ms": 2.407299994956702,
+            "normalizacion_ms": 1.4531000051647425,
+            "recorrido_ms": 0.012100004823878407,
+            "diagnostico_ms": 0.8877999789547175,
+            "reporte_ms": 0.0543000060133636
+          },
+          {
+            "total_ms": 2.1237999899312854,
+            "normalizacion_ms": 1.38229998992756,
+            "recorrido_ms": 0.007399998139590025,
+            "diagnostico_ms": 0.677700008964166,
+            "reporte_ms": 0.05639999289996922
+          },
+          {
+            "total_ms": 2.128299995092675,
+            "normalizacion_ms": 1.4360000204760581,
+            "recorrido_ms": 0.007299997378140688,
+            "diagnostico_ms": 0.631399976555258,
+            "reporte_ms": 0.05360000068321824
+          },
+          {
+            "total_ms": 2.3185999889392406,
+            "normalizacion_ms": 1.4408999995794147,
+            "recorrido_ms": 0.007399998139590025,
+            "diagnostico_ms": 0.8101999992504716,
+            "reporte_ms": 0.06009999196976423
+          },
+          {
+            "total_ms": 2.331100025912747,
+            "normalizacion_ms": 1.5271000156644732,
+            "recorrido_ms": 0.007499998901039362,
+            "diagnostico_ms": 0.734600005671382,
+            "reporte_ms": 0.0619000056758523
+          },
+          {
+            "total_ms": 2.4730000004637986,
+            "normalizacion_ms": 1.6867000085767359,
+            "recorrido_ms": 0.007800001185387373,
+            "diagnostico_ms": 0.7236999808810651,
+            "reporte_ms": 0.054800009820610285
+          },
+          {
+            "total_ms": 2.160500007448718,
+            "normalizacion_ms": 1.4109000039752573,
+            "recorrido_ms": 0.006999995093792677,
+            "diagnostico_ms": 0.6852000078652054,
+            "reporte_ms": 0.05740000051446259
+          },
+          {
+            "total_ms": 2.3933999764267355,
+            "normalizacion_ms": 1.4657999854534864,
+            "recorrido_ms": 0.007599999662488699,
+            "diagnostico_ms": 0.8593999955337495,
+            "reporte_ms": 0.06059999577701092
+          },
+          {
+            "total_ms": 2.2557000047527254,
+            "normalizacion_ms": 1.4788999978918582,
+            "recorrido_ms": 0.007800001185387373,
+            "diagnostico_ms": 0.7141999958548695,
+            "reporte_ms": 0.054800009820610285
+          }
+        ],
+        "promedio_ms": 2.307889997609891,
+        "minimo_ms": 2.1237999899312854,
+        "maximo_ms": 2.4871999921742827,
+        "desviacion_ms": 0.12955709361371465,
+        "metricas": {
+          "salas_procesadas": 1,
+          "salidas_examinadas": 1,
+          "llaves_obtenidas": 0,
+          "pendientes_activadas": 0,
+          "relaciones_diagnostico": 2539,
+          "comparaciones_normalizacion": 6755,
+          "elementos_reporte": 2160
+        },
+        "trabajo_por_n": 9.235756385068763,
+        "comparaciones_por_n_log_n": 1.4759592502821075,
+        "longitud_max_id": 4,
+        "longitud_total_ids": 672,
+        "tiempo_por_n_ms": 0.004534165024773853,
+        "estado": "no_resoluble",
+        "razones_fases": {
+          "total_ms": 1.9732638997695913,
+          "normalizacion_ms": 2.0212219481985256,
+          "recorrido_ms": 1.3577247314636827,
+          "diagnostico_ms": 1.92022820406875,
+          "reporte_ms": 1.6529545103509118
+        },
+        "razon_tiempo_anterior": 1.9732638997695913
+      },
+      {
+        "cripta_id": "sintetica-ciclo",
+        "version": "sintetica-v1",
+        "familia": "ciclo",
+        "estrategia": "repetitivo",
+        "salas": 128,
+        "n": 509,
+        "muestras": [
+          {
+            "total_ms": 2.104200015310198,
+            "normalizacion_ms": 1.3704000157304108,
+            "recorrido_ms": 0.0023999891709536314,
+            "diagnostico_ms": 0.6705000123474747,
+            "reporte_ms": 0.06089999806135893
+          },
+          {
+            "total_ms": 2.4794000200927258,
+            "normalizacion_ms": 1.5119000163394958,
+            "recorrido_ms": 0.0022999884095042944,
+            "diagnostico_ms": 0.9021000005304813,
+            "reporte_ms": 0.06310001481324434
+          },
+          {
+            "total_ms": 2.5021999899763614,
+            "normalizacion_ms": 1.6398999723605812,
+            "recorrido_ms": 0.0042000028770416975,
+            "diagnostico_ms": 0.801900023361668,
+            "reporte_ms": 0.056199991377070546
+          },
+          {
+            "total_ms": 2.1821999980602413,
+            "normalizacion_ms": 1.3665000151377171,
+            "recorrido_ms": 0.0024999899324029684,
+            "diagnostico_ms": 0.7545000116806477,
+            "reporte_ms": 0.058699981309473515
+          },
+          {
+            "total_ms": 2.3742000048514456,
+            "normalizacion_ms": 1.4925999857950956,
+            "recorrido_ms": 0.002200016751885414,
+            "diagnostico_ms": 0.8029000018723309,
+            "reporte_ms": 0.07650000043213367
+          },
+          {
+            "total_ms": 2.3947000154294074,
+            "normalizacion_ms": 1.6160999948624521,
+            "recorrido_ms": 0.002200016751885414,
+            "diagnostico_ms": 0.7154000049922615,
+            "reporte_ms": 0.060999998822808266
+          },
+          {
+            "total_ms": 2.3747000086586922,
+            "normalizacion_ms": 1.5085000195540488,
+            "recorrido_ms": 0.0020999868866056204,
+            "diagnostico_ms": 0.804400013294071,
+            "reporte_ms": 0.059699988923966885
+          },
+          {
+            "total_ms": 2.6073000044561923,
+            "normalizacion_ms": 1.805299980333075,
+            "recorrido_ms": 0.002500019036233425,
+            "diagnostico_ms": 0.7402999908663332,
+            "reporte_ms": 0.059200014220550656
+          },
+          {
+            "total_ms": 2.5753999943844974,
+            "normalizacion_ms": 1.7151999927591532,
+            "recorrido_ms": 0.0034999975468963385,
+            "diagnostico_ms": 0.7965000113472342,
+            "reporte_ms": 0.06019999273121357
+          },
+          {
+            "total_ms": 2.4733000027481467,
+            "normalizacion_ms": 1.5101000026334077,
+            "recorrido_ms": 0.002200016751885414,
+            "diagnostico_ms": 0.8981999999377877,
+            "reporte_ms": 0.06279998342506588
+          }
+        ],
+        "promedio_ms": 2.406760005396791,
+        "minimo_ms": 2.104200015310198,
+        "maximo_ms": 2.6073000044561923,
+        "desviacion_ms": 0.15220770533326317,
+        "metricas": {
+          "salas_procesadas": 1,
+          "salidas_examinadas": 1,
+          "llaves_obtenidas": 0,
+          "pendientes_activadas": 0,
+          "relaciones_diagnostico": 2539,
+          "comparaciones_normalizacion": 6755,
+          "elementos_reporte": 2160
+        },
+        "trabajo_por_n": 9.235756385068763,
+        "comparaciones_por_n_log_n": 1.4759592502821075,
+        "longitud_max_id": 4,
+        "longitud_total_ids": 672,
+        "tiempo_por_n_ms": 0.004728408655003518,
+        "estado": "no_resoluble",
+        "razones_fases": {
+          "total_ms": 2.1114893301756146,
+          "normalizacion_ms": 2.1441189063440738,
+          "recorrido_ms": 1.2669889744734477,
+          "diagnostico_ms": 2.083177062033555,
+          "reporte_ms": 1.7880277373487756
+        },
+        "razon_tiempo_anterior": 2.1114893301756146
+      },
+      {
+        "cripta_id": "sintetica-alternativas",
+        "version": "sintetica-v1",
+        "familia": "alternativas",
+        "estrategia": "incremental",
+        "salas": 32,
+        "n": 156,
+        "muestras": [
+          {
+            "total_ms": 0.5130000063218176,
+            "normalizacion_ms": 0.47549998271279037,
+            "recorrido_ms": 0.01889999839477241,
+            "diagnostico_ms": 0.002600019797682762,
+            "reporte_ms": 0.016000005416572094
+          },
+          {
+            "total_ms": 0.531600002432242,
+            "normalizacion_ms": 0.46389998169615865,
+            "recorrido_ms": 0.018799997633323073,
+            "diagnostico_ms": 0.002300017513334751,
+            "reporte_ms": 0.046600005589425564
+          },
+          {
+            "total_ms": 0.5046000005677342,
+            "normalizacion_ms": 0.46859998838044703,
+            "recorrido_ms": 0.018499995348975062,
+            "diagnostico_ms": 0.002400018274784088,
+            "reporte_ms": 0.015099998563528061
+          },
+          {
+            "total_ms": 0.4991999885533005,
+            "normalizacion_ms": 0.46370000927709043,
+            "recorrido_ms": 0.01819999306462705,
+            "diagnostico_ms": 0.0022999884095042944,
+            "reporte_ms": 0.014999997802078724
+          },
+          {
+            "total_ms": 0.5283000064082444,
+            "normalizacion_ms": 0.49249999574385583,
+            "recorrido_ms": 0.017799990018829703,
+            "diagnostico_ms": 0.002300017513334751,
+            "reporte_ms": 0.015700003132224083
+          },
+          {
+            "total_ms": 0.5014000053051859,
+            "normalizacion_ms": 0.46469998778775334,
+            "recorrido_ms": 0.018400023691356182,
+            "diagnostico_ms": 0.0024999899324029684,
+            "reporte_ms": 0.01580000389367342
+          },
+          {
+            "total_ms": 0.5713000136893243,
+            "normalizacion_ms": 0.5320000054780394,
+            "recorrido_ms": 0.018999999156221747,
+            "diagnostico_ms": 0.0025999906938523054,
+            "reporte_ms": 0.017700018361210823
+          },
+          {
+            "total_ms": 0.5099999834783375,
+            "normalizacion_ms": 0.46549999387934804,
+            "recorrido_ms": 0.0219999928958714,
+            "diagnostico_ms": 0.003100023604929447,
+            "reporte_ms": 0.01939997309818864
+          },
+          {
+            "total_ms": 0.49050000961869955,
+            "normalizacion_ms": 0.4555000050459057,
+            "recorrido_ms": 0.01729998621158302,
+            "diagnostico_ms": 0.002300017513334751,
+            "reporte_ms": 0.015400000847876072
+          },
+          {
+            "total_ms": 0.48550000065006316,
+            "normalizacion_ms": 0.4504999960772693,
+            "recorrido_ms": 0.01750001683831215,
+            "diagnostico_ms": 0.0021999876480549574,
+            "reporte_ms": 0.015300000086426735
+          }
+        ],
+        "promedio_ms": 0.5135400017024949,
+        "minimo_ms": 0.48550000065006316,
+        "maximo_ms": 0.5713000136893243,
+        "desviacion_ms": 0.023755179810320097,
+        "metricas": {
+          "salas_procesadas": 32,
+          "salidas_examinadas": 31,
+          "llaves_obtenidas": 31,
+          "pendientes_activadas": 0,
+          "relaciones_diagnostico": 0,
+          "comparaciones_normalizacion": 1862,
+          "elementos_reporte": 93
+        },
+        "trabajo_por_n": 1.1987179487179487,
+        "comparaciones_por_n_log_n": 1.638330606509938,
+        "longitud_max_id": 3,
+        "longitud_total_ids": 137,
+        "tiempo_por_n_ms": 0.003291923087836506,
+        "estado": "resoluble",
+        "razones_fases": null,
+        "razon_tiempo_anterior": null
+      },
+      {
+        "cripta_id": "sintetica-alternativas",
+        "version": "sintetica-v1",
+        "familia": "alternativas",
+        "estrategia": "repetitivo",
+        "salas": 32,
+        "n": 156,
+        "muestras": [
+          {
+            "total_ms": 0.6199000054039061,
+            "normalizacion_ms": 0.45140000293031335,
+            "recorrido_ms": 0.14990000636316836,
+            "diagnostico_ms": 0.0023999891709536314,
+            "reporte_ms": 0.016200006939470768
+          },
+          {
+            "total_ms": 0.6212000153027475,
+            "normalizacion_ms": 0.4579000233206898,
+            "recorrido_ms": 0.145500001963228,
+            "diagnostico_ms": 0.0023999891709536314,
+            "reporte_ms": 0.015400000847876072
+          },
+          {
+            "total_ms": 0.6279000081121922,
+            "normalizacion_ms": 0.46140002086758614,
+            "recorrido_ms": 0.14869999722577631,
+            "diagnostico_ms": 0.0023999891709536314,
+            "reporte_ms": 0.015400000847876072
+          },
+          {
+            "total_ms": 0.6297999934758991,
+            "normalizacion_ms": 0.46339997788891196,
+            "recorrido_ms": 0.148899998748675,
+            "diagnostico_ms": 0.002200016751885414,
+            "reporte_ms": 0.015300000086426735
+          },
+          {
+            "total_ms": 0.6756999937351793,
+            "normalizacion_ms": 0.5098000110592693,
+            "recorrido_ms": 0.1480999926570803,
+            "diagnostico_ms": 0.0024999899324029684,
+            "reporte_ms": 0.015300000086426735
+          },
+          {
+            "total_ms": 0.8090999908745289,
+            "normalizacion_ms": 0.4636000085156411,
+            "recorrido_ms": 0.314499979140237,
+            "diagnostico_ms": 0.005400012014433742,
+            "reporte_ms": 0.025599991204217076
+          },
+          {
+            "total_ms": 0.8945000008679926,
+            "normalizacion_ms": 0.7029999978840351,
+            "recorrido_ms": 0.17189999925903976,
+            "diagnostico_ms": 0.0027999922167509794,
+            "reporte_ms": 0.01680001150816679
+          },
+          {
+            "total_ms": 0.5852000031154603,
+            "normalizacion_ms": 0.4288000054657459,
+            "recorrido_ms": 0.13830000534653664,
+            "diagnostico_ms": 0.0023999891709536314,
+            "reporte_ms": 0.015700003132224083
+          },
+          {
+            "total_ms": 0.675899995258078,
+            "normalizacion_ms": 0.5228999943938106,
+            "recorrido_ms": 0.13390000094659626,
+            "diagnostico_ms": 0.0028999929782003164,
+            "reporte_ms": 0.016200006939470768
+          },
+          {
+            "total_ms": 0.6113999988883734,
+            "normalizacion_ms": 0.4180000105407089,
+            "recorrido_ms": 0.17610000213608146,
+            "diagnostico_ms": 0.0023999891709536314,
+            "reporte_ms": 0.014899997040629387
+          }
+        ],
+        "promedio_ms": 0.6750600005034357,
+        "minimo_ms": 0.5852000031154603,
+        "maximo_ms": 0.8945000008679926,
+        "desviacion_ms": 0.09405595094467653,
+        "metricas": {
+          "salas_procesadas": 528,
+          "salidas_examinadas": 527,
+          "llaves_obtenidas": 31,
+          "pendientes_activadas": 0,
+          "relaciones_diagnostico": 0,
+          "comparaciones_normalizacion": 1862,
+          "elementos_reporte": 93
+        },
+        "trabajo_por_n": 7.5576923076923075,
+        "comparaciones_por_n_log_n": 1.638330606509938,
+        "longitud_max_id": 3,
+        "longitud_total_ids": 137,
+        "tiempo_por_n_ms": 0.004327307695534845,
+        "estado": "resoluble",
+        "razones_fases": null,
+        "razon_tiempo_anterior": null
+      },
+      {
+        "cripta_id": "sintetica-alternativas",
+        "version": "sintetica-v1",
+        "familia": "alternativas",
+        "estrategia": "incremental",
+        "salas": 64,
+        "n": 316,
+        "muestras": [
+          {
+            "total_ms": 1.219199999468401,
+            "normalizacion_ms": 1.146299997344613,
+            "recorrido_ms": 0.03660001675598323,
+            "diagnostico_ms": 0.0043000036384910345,
+            "reporte_ms": 0.03199998172931373
+          },
+          {
+            "total_ms": 1.1969999759458005,
+            "normalizacion_ms": 1.1260999890509993,
+            "recorrido_ms": 0.03610001294873655,
+            "diagnostico_ms": 0.0039000005926936865,
+            "reporte_ms": 0.030899973353371024
+          },
+          {
+            "total_ms": 1.5174000000115484,
+            "normalizacion_ms": 1.4484999992419034,
+            "recorrido_ms": 0.03480000304989517,
+            "diagnostico_ms": 0.0043000036384910345,
+            "reporte_ms": 0.029799994081258774
+          },
+          {
+            "total_ms": 1.1700000031851232,
+            "normalizacion_ms": 1.1044999992009252,
+            "recorrido_ms": 0.0329999893438071,
+            "diagnostico_ms": 0.0037999998312443495,
+            "reporte_ms": 0.028700014809146523
+          },
+          {
+            "total_ms": 1.4120000123512,
+            "normalizacion_ms": 1.3433000131044537,
+            "recorrido_ms": 0.036699988413602114,
+            "diagnostico_ms": 0.0040000013541430235,
+            "reporte_ms": 0.028000009479001164
+          },
+          {
+            "total_ms": 1.0294999810867012,
+            "normalizacion_ms": 0.9680999792180955,
+            "recorrido_ms": 0.03170000854879618,
+            "diagnostico_ms": 0.0036999990697950125,
+            "reporte_ms": 0.025999994250014424
+          },
+          {
+            "total_ms": 1.0636999795679003,
+            "normalizacion_ms": 1.0009999969042838,
+            "recorrido_ms": 0.03229998401366174,
+            "diagnostico_ms": 0.0034999975468963385,
+            "reporte_ms": 0.026900001103058457
+          },
+          {
+            "total_ms": 1.194500015117228,
+            "normalizacion_ms": 1.124400005210191,
+            "recorrido_ms": 0.03600001218728721,
+            "diagnostico_ms": 0.004099973011761904,
+            "reporte_ms": 0.030000024707987905
+          },
+          {
+            "total_ms": 1.1777000036090612,
+            "normalizacion_ms": 1.1075999937020242,
+            "recorrido_ms": 0.0363999861292541,
+            "diagnostico_ms": 0.0037999998312443495,
+            "reporte_ms": 0.029900023946538568
+          },
+          {
+            "total_ms": 1.7183999880217016,
+            "normalizacion_ms": 1.6164999979082495,
+            "recorrido_ms": 0.05099998088553548,
+            "diagnostico_ms": 0.006300018867477775,
+            "reporte_ms": 0.044599990360438824
+          }
+        ],
+        "promedio_ms": 1.2699399958364666,
+        "minimo_ms": 1.0294999810867012,
+        "maximo_ms": 1.7183999880217016,
+        "desviacion_ms": 0.20370626261209257,
+        "metricas": {
+          "salas_procesadas": 64,
+          "salidas_examinadas": 63,
+          "llaves_obtenidas": 63,
+          "pendientes_activadas": 0,
+          "relaciones_diagnostico": 0,
+          "comparaciones_normalizacion": 4536,
+          "elementos_reporte": 189
+        },
+        "trabajo_por_n": 1.1993670886075949,
+        "comparaciones_por_n_log_n": 1.7286620173464973,
+        "longitud_max_id": 3,
+        "longitud_total_ids": 297,
+        "tiempo_por_n_ms": 0.004018797455178692,
+        "estado": "resoluble",
+        "razones_fases": {
+          "total_ms": 2.472913486050442,
+          "normalizacion_ms": 2.532816352687557,
+          "recorrido_ms": 1.9560085593993743,
+          "diagnostico_ms": 1.6951169592026993,
+          "reporte_ms": 1.5979166508768285
+        },
+        "razon_tiempo_anterior": 2.472913486050442
+      },
+      {
+        "cripta_id": "sintetica-alternativas",
+        "version": "sintetica-v1",
+        "familia": "alternativas",
+        "estrategia": "repetitivo",
+        "salas": 64,
+        "n": 316,
+        "muestras": [
+          {
+            "total_ms": 1.88460000208579,
+            "normalizacion_ms": 1.1940999829676002,
+            "recorrido_ms": 0.655200012261048,
+            "diagnostico_ms": 0.0041000021155923605,
+            "reporte_ms": 0.031200004741549492
+          },
+          {
+            "total_ms": 1.8922000017482787,
+            "normalizacion_ms": 1.1664000048767775,
+            "recorrido_ms": 0.6851000071037561,
+            "diagnostico_ms": 0.005499983672052622,
+            "reporte_ms": 0.035200006095692515
+          },
+          {
+            "total_ms": 1.8630999838933349,
+            "normalizacion_ms": 1.160199986770749,
+            "recorrido_ms": 0.667200016323477,
+            "diagnostico_ms": 0.004199973773211241,
+            "reporte_ms": 0.0315000070258975
+          },
+          {
+            "total_ms": 1.943699986441061,
+            "normalizacion_ms": 1.2560999894049019,
+            "recorrido_ms": 0.6513000116683543,
+            "diagnostico_ms": 0.004499976057559252,
+            "reporte_ms": 0.031800009310245514
+          },
+          {
+            "total_ms": 1.7844999965745956,
+            "normalizacion_ms": 1.1159999994561076,
+            "recorrido_ms": 0.6348000024445355,
+            "diagnostico_ms": 0.0037999998312443495,
+            "reporte_ms": 0.02989999484270811
+          },
+          {
+            "total_ms": 1.860599993960932,
+            "normalizacion_ms": 1.2125000066589564,
+            "recorrido_ms": 0.608200003625825,
+            "diagnostico_ms": 0.005399982910603285,
+            "reporte_ms": 0.034500000765547156
+          },
+          {
+            "total_ms": 1.7597000114619732,
+            "normalizacion_ms": 1.1101000127382576,
+            "recorrido_ms": 0.6157000025268644,
+            "diagnostico_ms": 0.0042000028770416975,
+            "reporte_ms": 0.029699993319809437
+          },
+          {
+            "total_ms": 1.7819999775383621,
+            "normalizacion_ms": 1.1062999838031828,
+            "recorrido_ms": 0.6402000144589692,
+            "diagnostico_ms": 0.0047000066842883825,
+            "reporte_ms": 0.030799972591921687
+          },
+          {
+            "total_ms": 1.7831000150181353,
+            "normalizacion_ms": 1.1209000076632947,
+            "recorrido_ms": 0.6281000096350908,
+            "diagnostico_ms": 0.004299974534660578,
+            "reporte_ms": 0.02980002318508923
+          },
+          {
+            "total_ms": 1.7239000007975847,
+            "normalizacion_ms": 1.136700011556968,
+            "recorrido_ms": 0.5512000061571598,
+            "diagnostico_ms": 0.0045000051613897085,
+            "reporte_ms": 0.031499977922067046
+          }
+        ],
+        "promedio_ms": 1.8277399969520047,
+        "minimo_ms": 1.7239000007975847,
+        "maximo_ms": 1.943699986441061,
+        "desviacion_ms": 0.06673210551665378,
+        "metricas": {
+          "salas_procesadas": 2080,
+          "salidas_examinadas": 2079,
+          "llaves_obtenidas": 63,
+          "pendientes_activadas": 0,
+          "relaciones_diagnostico": 0,
+          "comparaciones_normalizacion": 4536,
+          "elementos_reporte": 189
+        },
+        "trabajo_por_n": 13.958860759493671,
+        "comparaciones_por_n_log_n": 1.7286620173464973,
+        "longitud_max_id": 3,
+        "longitud_total_ids": 297,
+        "tiempo_por_n_ms": 0.005783987332126597,
+        "estado": "resoluble",
+        "razones_fases": {
+          "total_ms": 2.7075222877802583,
+          "normalizacion_ms": 2.3727101062373293,
+          "recorrido_ms": 3.7814775913094483,
+          "diagnostico_ms": 1.6258988964603187,
+          "reporte_ms": 1.8938846193776004
+        },
+        "razon_tiempo_anterior": 2.7075222877802583
+      },
+      {
+        "cripta_id": "sintetica-alternativas",
+        "version": "sintetica-v1",
+        "familia": "alternativas",
+        "estrategia": "incremental",
+        "salas": 128,
+        "n": 636,
+        "muestras": [
+          {
+            "total_ms": 2.7569999801926315,
+            "normalizacion_ms": 2.6132999919354916,
+            "recorrido_ms": 0.07599999662488699,
+            "diagnostico_ms": 0.007299997378140688,
+            "reporte_ms": 0.060399994254112244
+          },
+          {
+            "total_ms": 2.619800012325868,
+            "normalizacion_ms": 2.47869998565875,
+            "recorrido_ms": 0.0610999995842576,
+            "diagnostico_ms": 0.006300018867477775,
+            "reporte_ms": 0.0737000082153827
+          },
+          {
+            "total_ms": 2.8319999983068556,
+            "normalizacion_ms": 2.7097999991383404,
+            "recorrido_ms": 0.0653000024612993,
+            "diagnostico_ms": 0.006099988240748644,
+            "reporte_ms": 0.05080000846646726
+          },
+          {
+            "total_ms": 2.2981000074651092,
+            "normalizacion_ms": 2.1720000077039003,
+            "recorrido_ms": 0.06859999848529696,
+            "diagnostico_ms": 0.006399990525096655,
+            "reporte_ms": 0.05110001075081527
+          },
+          {
+            "total_ms": 2.5523999938741326,
+            "normalizacion_ms": 2.418699994450435,
+            "recorrido_ms": 0.07310000364668667,
+            "diagnostico_ms": 0.006699992809444666,
+            "reporte_ms": 0.05390000296756625
+          },
+          {
+            "total_ms": 2.532599988626316,
+            "normalizacion_ms": 2.4033999943640083,
+            "recorrido_ms": 0.06849999772384763,
+            "diagnostico_ms": 0.006499991286545992,
+            "reporte_ms": 0.05420000525191426
+          },
+          {
+            "total_ms": 2.6175999955739826,
+            "normalizacion_ms": 2.482999989297241,
+            "recorrido_ms": 0.07420001202262938,
+            "diagnostico_ms": 0.006699992809444666,
+            "reporte_ms": 0.05370000144466758
+          },
+          {
+            "total_ms": 2.714900008868426,
+            "normalizacion_ms": 2.5763000012375414,
+            "recorrido_ms": 0.072900002123788,
+            "diagnostico_ms": 0.007299997378140688,
+            "reporte_ms": 0.05840000812895596
+          },
+          {
+            "total_ms": 2.53499997779727,
+            "normalizacion_ms": 2.4111999955493957,
+            "recorrido_ms": 0.06639998173341155,
+            "diagnostico_ms": 0.006300018867477775,
+            "reporte_ms": 0.051099981646984816
+          },
+          {
+            "total_ms": 2.5576000043656677,
+            "normalizacion_ms": 2.4329999869223684,
+            "recorrido_ms": 0.06550000398419797,
+            "diagnostico_ms": 0.006399990525096655,
+            "reporte_ms": 0.052700022934004664
+          }
+        ],
+        "promedio_ms": 2.601699996739626,
+        "minimo_ms": 2.2981000074651092,
+        "maximo_ms": 2.8319999983068556,
+        "desviacion_ms": 0.14011523671644802,
+        "metricas": {
+          "salas_procesadas": 128,
+          "salidas_examinadas": 127,
+          "llaves_obtenidas": 127,
+          "pendientes_activadas": 0,
+          "relaciones_diagnostico": 0,
+          "comparaciones_normalizacion": 10641,
+          "elementos_reporte": 381
+        },
+        "trabajo_por_n": 1.199685534591195,
+        "comparaciones_por_n_log_n": 1.7965577529327854,
+        "longitud_max_id": 4,
+        "longitud_total_ids": 672,
+        "tiempo_por_n_ms": 0.004090723265313877,
+        "estado": "resoluble",
+        "razones_fases": {
+          "total_ms": 2.0486794693208905,
+          "normalizacion_ms": 2.0606358931656445,
+          "recorrido_ms": 1.8968733735859178,
+          "diagnostico_ms": 1.5827334012190108,
+          "reporte_ms": 1.825293447805867
+        },
+        "razon_tiempo_anterior": 2.0486794693208905
+      },
+      {
+        "cripta_id": "sintetica-alternativas",
+        "version": "sintetica-v1",
+        "familia": "alternativas",
+        "estrategia": "repetitivo",
+        "salas": 128,
+        "n": 636,
+        "muestras": [
+          {
+            "total_ms": 4.455499991308898,
+            "normalizacion_ms": 2.2333000088110566,
+            "recorrido_ms": 2.160500007448718,
+            "diagnostico_ms": 0.007800001185387373,
+            "reporte_ms": 0.053899973863735795
+          },
+          {
+            "total_ms": 4.605499998433515,
+            "normalizacion_ms": 2.2632000036537647,
+            "recorrido_ms": 2.2835999843664467,
+            "diagnostico_ms": 0.006999995093792677,
+            "reporte_ms": 0.051700015319511294
+          },
+          {
+            "total_ms": 4.711199988378212,
+            "normalizacion_ms": 2.3116999946068972,
+            "recorrido_ms": 2.3384999949485064,
+            "diagnostico_ms": 0.007599999662488699,
+            "reporte_ms": 0.05339999916031957
+          },
+          {
+            "total_ms": 4.7667000035289675,
+            "normalizacion_ms": 2.322099986486137,
+            "recorrido_ms": 2.381700003752485,
+            "diagnostico_ms": 0.007499998901039362,
+            "reporte_ms": 0.05540001438930631
+          },
+          {
+            "total_ms": 4.881000000750646,
+            "normalizacion_ms": 2.68169998889789,
+            "recorrido_ms": 2.1367000008467585,
+            "diagnostico_ms": 0.008200004231184721,
+            "reporte_ms": 0.05440000677481294
+          },
+          {
+            "total_ms": 4.725700011476874,
+            "normalizacion_ms": 2.2305000165943056,
+            "recorrido_ms": 2.429199987091124,
+            "diagnostico_ms": 0.008000002708286047,
+            "reporte_ms": 0.05800000508315861
+          },
+          {
+            "total_ms": 5.0166999862995,
+            "normalizacion_ms": 2.445099991746247,
+            "recorrido_ms": 2.508700010366738,
+            "diagnostico_ms": 0.007199996616691351,
+            "reporte_ms": 0.05569998756982386
+          },
+          {
+            "total_ms": 5.23449998581782,
+            "normalizacion_ms": 2.573199977632612,
+            "recorrido_ms": 2.5889000098686665,
+            "diagnostico_ms": 0.009100011084228754,
+            "reporte_ms": 0.06329998723231256
+          },
+          {
+            "total_ms": 4.968799999915063,
+            "normalizacion_ms": 2.5763000012375414,
+            "recorrido_ms": 2.3204999743029475,
+            "diagnostico_ms": 0.009700015652924776,
+            "reporte_ms": 0.06230000872164965
+          },
+          {
+            "total_ms": 4.848699987633154,
+            "normalizacion_ms": 2.322099986486137,
+            "recorrido_ms": 2.4603999918326735,
+            "diagnostico_ms": 0.008000002708286047,
+            "reporte_ms": 0.058200006606057286
+          }
+        ],
+        "promedio_ms": 4.821429995354265,
+        "minimo_ms": 4.455499991308898,
+        "maximo_ms": 5.23449998581782,
+        "desviacion_ms": 0.2096683405615925,
+        "metricas": {
+          "salas_procesadas": 8256,
+          "salidas_examinadas": 8255,
+          "llaves_obtenidas": 127,
+          "pendientes_activadas": 0,
+          "relaciones_diagnostico": 0,
+          "comparaciones_normalizacion": 10641,
+          "elementos_reporte": 381
+        },
+        "trabajo_por_n": 26.75943396226415,
+        "comparaciones_por_n_log_n": 1.7965577529327854,
+        "longitud_max_id": 4,
+        "longitud_total_ids": 672,
+        "tiempo_por_n_ms": 0.007580864772569599,
+        "estado": "resoluble",
+        "razones_fases": {
+          "total_ms": 2.6379189618844197,
+          "normalizacion_ms": 2.069140620359961,
+          "recorrido_ms": 3.7255325301665194,
+          "diagnostico_ms": 1.7721281318071391,
+          "reporte_ms": 1.7926559765901642
+        },
+        "razon_tiempo_anterior": 2.6379189618844197
+      }
+    ]
+  },
+  "real": {
+    "mayor_publicada": {
+      "id": "cripta-06",
+      "nombre": "Cripta de referencia",
+      "salas": 300,
+      "dificultad": 5
+    },
+    "adquisicion_ms": 4894.3750000034925,
+    "solicitudes": 11,
+    "mediciones": [
+      {
+        "cripta_id": "cripta-06",
+        "version": "f9ed9afa683d",
+        "familia": "preparada",
+        "estrategia": "incremental",
+        "salas": 300,
+        "n": 1068,
+        "muestras": [
+          {
+            "total_ms": 3.585800004657358,
+            "normalizacion_ms": 3.3914000086952,
+            "recorrido_ms": 0.14479999663308263,
+            "diagnostico_ms": 0.01580000389367342,
+            "reporte_ms": 0.0337999954354018
+          },
+          {
+            "total_ms": 2.5397000135853887,
+            "normalizacion_ms": 2.3237999994307756,
+            "recorrido_ms": 0.16399999731220305,
+            "diagnostico_ms": 0.017200014553964138,
+            "reporte_ms": 0.03470000228844583
+          },
+          {
+            "total_ms": 2.596400008769706,
+            "normalizacion_ms": 2.39430001238361,
+            "recorrido_ms": 0.1509999856352806,
+            "diagnostico_ms": 0.01650000922381878,
+            "reporte_ms": 0.03460000152699649
+          },
+          {
+            "total_ms": 2.679100027307868,
+            "normalizacion_ms": 2.4720000219531357,
+            "recorrido_ms": 0.15539999003522098,
+            "diagnostico_ms": 0.017399986973032355,
+            "reporte_ms": 0.03430002834647894
+          },
+          {
+            "total_ms": 2.6726000069174916,
+            "normalizacion_ms": 2.4671999854035676,
+            "recorrido_ms": 0.15390000771731138,
+            "diagnostico_ms": 0.017200014553964138,
+            "reporte_ms": 0.03429999924264848
+          },
+          {
+            "total_ms": 2.715599985094741,
+            "normalizacion_ms": 2.5010000099428,
+            "recorrido_ms": 0.1611999759916216,
+            "diagnostico_ms": 0.017700018361210823,
+            "reporte_ms": 0.035699980799108744
+          },
+          {
+            "total_ms": 2.618799975607544,
+            "normalizacion_ms": 2.4102999886963516,
+            "recorrido_ms": 0.15730000450275838,
+            "diagnostico_ms": 0.01729998621158302,
+            "reporte_ms": 0.033899996196851134
+          },
+          {
+            "total_ms": 2.707800013013184,
+            "normalizacion_ms": 2.5003000046126544,
+            "recorrido_ms": 0.15750000602565706,
+            "diagnostico_ms": 0.016600009985268116,
+            "reporte_ms": 0.03339999238960445
+          },
+          {
+            "total_ms": 2.5215000205207616,
+            "normalizacion_ms": 2.3204000026453286,
+            "recorrido_ms": 0.14859999646432698,
+            "diagnostico_ms": 0.017300015315413475,
+            "reporte_ms": 0.035200006095692515
+          },
+          {
+            "total_ms": 2.577100007329136,
+            "normalizacion_ms": 2.3748999810777605,
+            "recorrido_ms": 0.15100001473911107,
+            "diagnostico_ms": 0.01759998849593103,
+            "reporte_ms": 0.03360002301633358
+          }
+        ],
+        "promedio_ms": 2.721440006280318,
+        "minimo_ms": 2.5215000205207616,
+        "maximo_ms": 3.585800004657358,
+        "desviacion_ms": 0.29521616087822056,
+        "metricas": {
+          "salas_procesadas": 300,
+          "salidas_examinadas": 760,
+          "llaves_obtenidas": 4,
+          "pendientes_activadas": 5,
+          "relaciones_diagnostico": 0,
+          "comparaciones_normalizacion": 8806,
+          "elementos_reporte": 307
+        },
+        "trabajo_por_n": 1.2883895131086143,
+        "comparaciones_por_n_log_n": 0.8195574548764716,
+        "longitud_max_id": 16,
+        "longitud_total_ids": 854,
+        "tiempo_por_n_ms": 0.002548164799887938,
+        "estado": "resoluble",
+        "razones_fases": null,
+        "razon_tiempo_anterior": null
+      },
+      {
+        "cripta_id": "cripta-06",
+        "version": "f9ed9afa683d",
+        "familia": "preparada",
+        "estrategia": "repetitivo",
+        "salas": 300,
+        "n": 1068,
+        "muestras": [
+          {
+            "total_ms": 2.930899994680658,
+            "normalizacion_ms": 2.528799988795072,
+            "recorrido_ms": 0.35260000731796026,
+            "diagnostico_ms": 0.015900004655122757,
+            "reporte_ms": 0.03359999391250312
+          },
+          {
+            "total_ms": 2.7741999947465956,
+            "normalizacion_ms": 2.3197999980766326,
+            "recorrido_ms": 0.40199997602030635,
+            "diagnostico_ms": 0.017600017599761486,
+            "reporte_ms": 0.03480000304989517
+          },
+          {
+            "total_ms": 3.3790000015869737,
+            "normalizacion_ms": 2.969399996800348,
+            "recorrido_ms": 0.35760001628659666,
+            "diagnostico_ms": 0.016799982404336333,
+            "reporte_ms": 0.035200006095692515
+          },
+          {
+            "total_ms": 2.6530999748501927,
+            "normalizacion_ms": 2.223399991635233,
+            "recorrido_ms": 0.37999998312443495,
+            "diagnostico_ms": 0.015900004655122757,
+            "reporte_ms": 0.0337999954354018
+          },
+          {
+            "total_ms": 2.9107999871484935,
+            "normalizacion_ms": 2.468499995302409,
+            "recorrido_ms": 0.38889999268576503,
+            "diagnostico_ms": 0.0171000137925148,
+            "reporte_ms": 0.036299985367804766
+          },
+          {
+            "total_ms": 3.121599991573021,
+            "normalizacion_ms": 2.6393999869469553,
+            "recorrido_ms": 0.4233999934513122,
+            "diagnostico_ms": 0.01960000372491777,
+            "reporte_ms": 0.03920000744983554
+          },
+          {
+            "total_ms": 2.9297999863047153,
+            "normalizacion_ms": 2.3022999812383205,
+            "recorrido_ms": 0.5480000108946115,
+            "diagnostico_ms": 0.026900001103058457,
+            "reporte_ms": 0.05259999306872487
+          },
+          {
+            "total_ms": 3.34100000327453,
+            "normalizacion_ms": 2.8904000064358115,
+            "recorrido_ms": 0.3960999893024564,
+            "diagnostico_ms": 0.017999991541728377,
+            "reporte_ms": 0.036500015994533896
+          },
+          {
+            "total_ms": 3.0543000029865652,
+            "normalizacion_ms": 2.490099985152483,
+            "recorrido_ms": 0.48030001926235855,
+            "diagnostico_ms": 0.02759997732937336,
+            "reporte_ms": 0.05630002124235034
+          },
+          {
+            "total_ms": 3.5497999924700707,
+            "normalizacion_ms": 3.0814000056125224,
+            "recorrido_ms": 0.40920000174082816,
+            "diagnostico_ms": 0.018699996871873736,
+            "reporte_ms": 0.04049998824484646
+          }
+        ],
+        "promedio_ms": 3.0644499929621816,
+        "minimo_ms": 2.6530999748501927,
+        "maximo_ms": 3.5497999924700707,
+        "desviacion_ms": 0.2697005436173474,
+        "metricas": {
+          "salas_procesadas": 1049,
+          "salidas_examinadas": 2662,
+          "llaves_obtenidas": 4,
+          "pendientes_activadas": 0,
+          "relaciones_diagnostico": 0,
+          "comparaciones_normalizacion": 8806,
+          "elementos_reporte": 307
+        },
+        "trabajo_por_n": 3.7659176029962547,
+        "comparaciones_por_n_log_n": 0.8195574548764716,
+        "longitud_max_id": 16,
+        "longitud_total_ids": 854,
+        "tiempo_por_n_ms": 0.002869335199402792,
+        "estado": "resoluble",
+        "razones_fases": null,
+        "razon_tiempo_anterior": null
+      }
+    ],
+    "python": "3.15.0a5",
+    "equipo": "Windows-11-10.0.26300-SP0",
+    "procesador": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+    "semilla": 20261102,
+    "preparacion_offline": {
+      "cripta_id": "cripta-06",
+      "version": "f9ed9afa683d",
+      "muestras_ms": [
+        7.3093000100925565,
+        6.726199993863702,
+        6.395599979441613,
+        6.1175000155344605,
+        6.20639999397099,
+        6.353300006594509,
+        6.091399991419166,
+        6.250200007343665,
+        6.297200015978888,
+        7.446799980243668
+      ],
+      "promedio_ms": 6.519389999448322,
+      "minimo_ms": 6.091399991419166,
+      "maximo_ms": 7.446799980243668,
+      "desviacion_ms": 0.4619754015355756,
+      "solicitudes": 0,
+      "alcance": "Lectura local y validación; sin análisis de resolubilidad ni HTTP."
+    }
+  }
+}
