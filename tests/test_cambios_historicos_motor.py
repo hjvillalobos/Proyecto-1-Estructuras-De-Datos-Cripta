@@ -1,8 +1,9 @@
 """AD-H3: productor optativo y contrato con la línea de tiempo de D."""
 
-from contextlib import contextmanager
+from contextlib import contextmanager, redirect_stderr
 from dataclasses import replace
 from importlib.util import find_spec
+from io import StringIO
 from pathlib import Path
 from random import Random
 from tempfile import TemporaryDirectory
@@ -689,6 +690,149 @@ class PruebasPersistenciaHistoricaOffline(unittest.TestCase):
                         self.assertEqual(archivo.version, 4)
                     self.assertEqual(cargar_estado_partida(ruta), incompatible)
                     self.comprobar_rechazo(motor, partida, ruta, error, mensaje)
+
+
+class PruebasReplayHistoricoOffline(unittest.TestCase):
+    def reproducir_offline(self, motor, ruta, hasta):
+        from controlador.replay_sin_vista import reproducir
+        from datos.offline import ClienteOffline
+        from red.cache import CacheCatalogoOrdenado
+        from red.catalogo import GestorCatalogo
+        from red.precarga import GestorPrecarga
+
+        carpeta = motor.gestor_precarga.cliente.almacen.carpeta
+        cliente = ClienteOffline(carpeta, motor.meta.cripta_version)
+        catalogo = GestorCatalogo(cliente, CacheCatalogoOrdenado(25), cliente.almacen)
+        precarga = GestorPrecarga(cliente, catalogo)
+
+        def fabrica(fuente, cripta_id, semilla, *, version_cripta, version_catalogo):
+            self.assertEqual((cripta_id, semilla, version_cripta, version_catalogo),
+                             (motor.meta.cripta_id, motor.meta.semilla,
+                              motor.meta.cripta_version, motor.meta.catalogo_version))
+            return crear_juego(fuente, cripta_id, semilla, version_cripta=version_cripta,
+                               version_catalogo=version_catalogo, historia_para_pruebas=True)
+
+        with patch("vista.consola.VistaConsola", side_effect=AssertionError("vista de consola")), \
+                patch("vista.grafica.VistaGrafica", side_effect=AssertionError("vista gráfica")), \
+                patch("requests.sessions.Session.request", side_effect=AssertionError("HTTP en replay")):
+            try:
+                return reproducir(ruta, precarga, fabrica, checkpoint_cada=2, hasta=hasta)
+            finally:
+                try:
+                    precarga.cerrar()
+                finally:
+                    cliente.cerrar()
+
+    def test_replay_sin_vista_con_carga_v4_y_continuacion(self):
+        from controlador.partida_historica import integrar_historia
+        from controlador.resumen_historia import consultar, resumir
+        from datos.bitacora_replay import BitacoraReplay
+        from datos.guardado_binario import ArchivoGuardado, cargar_estado_partida, guardar_estado
+
+        with motor_con_historia_offline() as motor, TemporaryDirectory() as carpeta:
+            partida = integrar_historia(motor, 2)
+            bitacora = BitacoraReplay(Path(carpeta) / "partida.log")
+            bitacora.iniciar(partida.meta)
+            vida_inicial = motor.jugador.vida
+            self.assertTrue(partida.ejecutar("mover", "E").ok)
+            bitacora.registrar_accion("mover", "E")
+            guardado = partida.exportar_estado()
+            self.assertEqual(guardado.reloj, 100)
+            self.assertLess(guardado.jugador.vida, vida_inicial)
+            archivo_v4 = Path(carpeta) / "partida.bin"
+            guardar_estado(guardado, archivo_v4)
+            with ArchivoGuardado(archivo_v4) as archivo:
+                self.assertEqual(archivo.version, 4)
+
+            self.assertTrue(partida.ejecutar("esperar").ok)
+            bitacora.registrar_accion("esperar")
+            self.assertEqual(motor.reloj, 200)
+            leido = cargar_estado_partida(archivo_v4)
+            self.assertEqual(leido, guardado)
+            partida.restaurar_estado(leido)
+            bitacora.registrar_carga(leido)
+            self.assertTrue(partida.ejecutar("mover", "O").ok)
+            bitacora.registrar_accion("mover", "O")
+            self.assertEqual((motor.reloj, motor.jugador.posicion_actual), (200, 100))
+            archivo_v4.unlink()
+            self.assertFalse(archivo_v4.exists())
+
+            historia = partida.linea_tiempo
+            for tiempo, sala, vida in ((99, 101, vida_inicial), (100, 101, guardado.jugador.vida),
+                                       (200, 100, motor.jugador.vida)):
+                with self.subTest(hasta=tiempo):
+                    consulta = consultar(historia, str(tiempo))
+                    self.assertEqual(consulta.estado.obtener("sala")[0], sala)
+                    self.assertEqual(consulta.estado.obtener("jugador")[0], vida)
+                    self.assertEqual(self.reproducir_offline(motor, bitacora.ruta, tiempo),
+                                     resumir(consulta))
+            self.assertEqual(self.reproducir_offline(motor, bitacora.ruta, 201),
+                             "El replay terminó antes de t=201.\n" + resumir(historia.consultar_final()))
+
+    def test_parser_rechaza_hasta_negativo(self):
+        from main import leer_argumentos
+
+        salida = StringIO()
+        with redirect_stderr(salida), self.assertRaises(SystemExit) as error:
+            leer_argumentos(["--replay", "partida.log", "--hasta", "-1"])
+        self.assertEqual(error.exception.code, 2)
+        self.assertIn("instante entero no negativo", salida.getvalue())
+
+    def test_replay_rechaza_bitacora_mal_formada(self):
+        from datos.bitacora_replay import BitacoraReplay, ReplayCorrupto
+
+        with motor_con_historia_offline() as motor, TemporaryDirectory() as carpeta:
+            bitacora = BitacoraReplay(Path(carpeta) / "truncada.log")
+            bitacora.iniciar(motor.meta)
+            with bitacora.ruta.open("a", encoding="utf-8") as archivo:
+                archivo.write('{"tipo": "accion",')
+            with self.assertRaises(ReplayCorrupto):
+                self.reproducir_offline(motor, bitacora.ruta, 100)
+
+    def test_replay_rechaza_cargas_historicas_invalidas(self):
+        from controlador.partida_historica import integrar_historia
+        from datos.bitacora_replay import BitacoraReplay, ReplayIncompatible
+
+        with motor_con_historia_offline() as motor, TemporaryDirectory() as carpeta:
+            partida = integrar_historia(motor, 2)
+            self.assertTrue(partida.ejecutar("mover", "E").ok)
+            estado = partida.exportar_estado()
+            for nombre, carga, mensaje in (
+                ("sin-historia", replace(estado, historia=None), "no contiene una historia"),
+                ("historia-corrupta", replace(estado, historia=estado.historia[:-1]), "historia"),
+                ("frontera-incoherente", replace(estado, reloj=101), "frontera"),
+            ):
+                with self.subTest(caso=nombre):
+                    bitacora = BitacoraReplay(Path(carpeta) / f"{nombre}.log")
+                    bitacora.iniciar(motor.meta)
+                    bitacora.registrar_carga(carga)
+                    with self.assertRaisesRegex(ReplayIncompatible, mensaje):
+                        self.reproducir_offline(motor, bitacora.ruta, 100)
+
+    def test_archivos_invalidos_no_se_registran_como_carga(self):
+        from controlador.partida_historica import integrar_historia
+        from datos.bitacora_replay import BitacoraReplay
+        from datos.guardado_binario import (
+            FormatoIncompatible, GuardadoCorrupto, cargar_estado_partida, guardar_estado,
+        )
+
+        with motor_con_historia_offline() as motor, TemporaryDirectory() as carpeta:
+            partida = integrar_historia(motor, 2)
+            self.assertTrue(partida.ejecutar("mover", "E").ok)
+            raiz = Path(carpeta)
+            bitacora = BitacoraReplay(raiz / "partida.log")
+            bitacora.iniciar(motor.meta)
+            bitacora.registrar_accion("mover", "E")
+            log_original = bitacora.ruta.read_bytes()
+            v3, v4, truncado = raiz / "v3.bin", raiz / "v4.bin", raiz / "truncado.bin"
+            guardar_estado(motor.exportar_estado(), v3)
+            guardar_estado(partida.exportar_estado(), v4)
+            truncado.write_bytes(v4.read_bytes()[:-1])
+
+            for ruta, error in ((v3, FormatoIncompatible), (truncado, GuardadoCorrupto)):
+                with self.subTest(archivo=ruta.name), self.assertRaises(error):
+                    bitacora.registrar_carga(cargar_estado_partida(ruta))
+            self.assertEqual(bitacora.ruta.read_bytes(), log_original)
 
 
 if __name__ == "__main__":
