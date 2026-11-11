@@ -1234,9 +1234,57 @@ class Motor:
         return evento
 
 
+class _MotorConHistoriaDePrueba(Motor):
+    """Productor de consultas H3 para una partida nueva de prueba."""
+
+    def __init__(self, jugador, salas_lista, semilla):
+        super().__init__(jugador, salas_lista, semilla)
+        self._historia_h3 = None
+
+    def estado_historico_inicial(self):
+        from modelo.linea_tiempo import EstadoHistorico
+
+        # El escenario empieza antes de la primera acción, sin efectos activos.
+        return EstadoHistorico(self.proyeccion_h3() + (("efectos", ()),))
+
+    def conectar_historia(self, historia):
+        from modelo.errores_historia import CambioHistoriaIncoherente
+
+        if (self._historia_h3 is not None or self.reloj != 0 or self.acciones_jugador != 0
+                or historia.reloj != 0 or historia.cantidad_acciones != 0):
+            raise CambioHistoriaIncoherente("H3 requiere conectar la historia al inicio de la partida.")
+        self._historia_h3 = historia
+
+    def ejecutar(self, accion, argumento=None, *, registrar_h3=None):
+        if self._historia_h3 is not None:
+            if registrar_h3 is not None:
+                raise ValueError("H3 ya tiene un receptor conectado.")
+            registrar_h3 = self._registrar_accion_h3
+        return super().ejecutar(accion, argumento, registrar_h3=registrar_h3)
+
+    def _registrar_accion_h3(self, inicio, fin, ordinal, cambios, eventos):
+        from modelo.errores_historia import CambioHistoriaIncoherente
+        from modelo.snapshots import CambioHistorico, EventoHistorico, ValorHistorico
+
+        historia = self._historia_h3
+        if inicio != historia.reloj or ordinal != historia.cantidad_acciones + 1:
+            raise CambioHistoriaIncoherente("El reloj o el ordinal del lote H3 no coincide con la historia.")
+
+        def convertir(deltas):
+            return tuple(CambioHistorico(clave, ValorHistorico(True, antes), ValorHistorico(True, despues))
+                         for clave, antes, despues in deltas)
+
+        historia.registrar_accion(
+            fin, convertir(cambios),
+            tuple(EventoHistorico(tiempo, secuencia, convertir(deltas))
+                  for tiempo, secuencia, deltas in eventos),
+            terminal=self.terminado,
+        )
+
+
 def crear_juego(gestor_precarga, cripta_id, semilla, notificar=None,
                 version_cripta=None, version_catalogo=None, *,
-                conocimiento_para_pruebas=False):
+                conocimiento_para_pruebas=False, historia_para_pruebas=False):
     from modelo.snapshots import MetaPartida
     from modelo.inventario import Inventario
 
@@ -1258,7 +1306,8 @@ def crear_juego(gestor_precarga, cripta_id, semilla, notificar=None,
         llaves_obtenidas=[],
     )
 
-    motor = Motor(jugador=jugador, salas_lista=preparada.salas, semilla=semilla)
+    tipo_motor = _MotorConHistoriaDePrueba if historia_para_pruebas else Motor
+    motor = tipo_motor(jugador=jugador, salas_lista=preparada.salas, semilla=semilla)
     if conocimiento_para_pruebas:
         from modelo.conocimiento import ConocimientoMapa, SalaConocible, SalidaConocible
 

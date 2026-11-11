@@ -1,10 +1,13 @@
 """AD-H3: productor optativo y contrato con la línea de tiempo de D."""
 
+from contextlib import contextmanager
+from functools import partial
 from importlib.util import find_spec
 from random import Random
 import unittest
 from unittest.mock import patch
 
+from modelo.juego import crear_juego
 from tests.datos_terreno_cazador import motor_terreno
 
 
@@ -225,6 +228,100 @@ class PruebasH3ConD(unittest.TestCase):
 
             self.assertTrue(motor.ejecutar("mover", "E", registrar_h3=aceptar).ok)
             self.assertEqual((historia.cantidad_acciones, historia.reloj), (1, 100))
+
+
+@contextmanager
+def motor_con_historia_offline():
+    fabrica = partial(crear_juego, historia_para_pruebas=True)
+    with patch("tests.datos_terreno_cazador.crear_juego", new=fabrica), motor_terreno() as motor:
+        yield motor
+
+
+class PruebasAdaptadorHistoricoOffline(unittest.TestCase):
+    def test_consultas_del_adaptador_en_la_frontera_del_motor(self):
+        from controlador.partida_historica import PartidaHistorica, integrar_historia
+        from controlador.resumen_historia import consultar, resumir
+
+        with motor_con_historia_offline() as motor:
+            motor.cola.fijar_contador(10)
+            vida_inicial = motor.jugador.vida
+            partida = integrar_historia(motor, 2)
+            self.assertIsInstance(partida, PartidaHistorica)
+            historia = partida.linea_tiempo
+            self.assertEqual((historia.reloj, historia.cantidad_acciones), (0, 0))
+            inicial = historia.consultar_t(0).estado
+            self.assertEqual(inicial.obtener("sala")[0], 100)
+            self.assertEqual(inicial.obtener("efectos"), ())
+
+            self.assertTrue(partida.ejecutar("mover", "E").ok)
+            self.assertEqual((historia.reloj, historia.cantidad_acciones), (100, 1))
+            vida_frontera = motor.jugador.vida
+            self.assertLess(vida_frontera, vida_inicial)
+            eventos = historia.exportar().acciones[0].eventos
+            self.assertEqual(tuple((e.tiempo, e.secuencia) for e in eventos),
+                             ((100, 0), (100, 10), (100, 11)))
+            self.assertEqual(eventos[1].cambios, ())
+            self.assertEqual(eventos[2].cambios[0].clave, "jugador")
+            self.assertEqual(eventos[2].cambios[0].nuevo.valor[0], vida_frontera)
+
+            self.assertTrue(partida.ejecutar("esperar").ok)
+            self.assertEqual((motor.reloj, motor.acciones_jugador), (200, 2))
+            self.assertEqual((historia.reloj, historia.cantidad_acciones), (200, 2))
+            self.assertLess(motor.jugador.vida, vida_frontera)
+            antes = estado_motor(motor), historia.exportar()
+            for referencia, reloj, vida in (("99", 99, vida_inicial), ("100", 100, vida_frontera),
+                                           ("#2", 100, vida_frontera)):
+                with self.subTest(referencia=referencia):
+                    consulta = consultar(historia, referencia)
+                    self.assertEqual(consulta.reloj, reloj)
+                    self.assertEqual(consulta.estado.obtener("sala")[0], 101)
+                    self.assertEqual(consulta.estado.obtener("jugador")[0], vida)
+                    texto = resumir(consulta)
+                    self.assertIn(f"Historia t={reloj} | Sala 101", texto)
+                    self.assertIn(f"Vida {vida}/", texto)
+            self.assertEqual((estado_motor(motor), historia.exportar()), antes)
+
+    def test_rechazo_del_registro_del_adaptador_revierte_el_turno(self):
+        from controlador.partida_historica import integrar_historia
+        from modelo.errores_historia import CambioHistoriaIncoherente
+
+        with motor_con_historia_offline() as motor:
+            motor.cola.fijar_contador(10)
+            partida = integrar_historia(motor, 2)
+            historia = partida.linea_tiempo
+            registrar = historia.registrar_accion
+            previo = estado_motor(motor), historia.exportar()
+            mensajes = []
+            motor.establecer_notificador(mensajes.append)
+
+            def agregar_delta_incoherente(fin, cambios, eventos, **opciones):
+                self.assertEqual((fin, motor.reloj, motor.acciones_jugador), (100, 100, 1))
+                self.assertEqual(cambios[0].clave, "sala")
+                self.assertEqual(motor.historial.cantidad_turnos(), 0)
+                return registrar(fin, cambios + (cambios[0],), eventos, **opciones)
+
+            with patch.object(historia, "registrar_accion", side_effect=agregar_delta_incoherente) as intento:
+                with self.assertRaises(CambioHistoriaIncoherente):
+                    partida.ejecutar("mover", "E")
+            intento.assert_called_once()
+            self.assertEqual((estado_motor(motor), historia.exportar()), previo)
+            self.assertEqual(mensajes, [])
+            self.assertTrue(partida.ejecutar("mover", "E").ok)
+            self.assertEqual((historia.reloj, historia.cantidad_acciones), (100, 1))
+
+    def test_partida_normal_no_se_envuelve_y_variante_limita_acciones(self):
+        from controlador.partida_historica import integrar_historia
+
+        with motor_terreno() as motor:
+            self.assertIs(integrar_historia(motor, 2), motor)
+            self.assertTrue(motor.ejecutar("mover", "E").ok)
+        with motor_con_historia_offline() as motor:
+            partida = integrar_historia(motor, 2)
+            historia = partida.linea_tiempo
+            previo = estado_motor(motor), historia.exportar()
+            with self.assertRaisesRegex(ValueError, "solo admite mover y esperar"):
+                partida.ejecutar("retroceso")
+            self.assertEqual((estado_motor(motor), historia.exportar()), previo)
 
 
 if __name__ == "__main__":
