@@ -1286,3 +1286,22 @@ por separado y se mantuvo la omisión de la prueba conjunta mientras
 falten captura y restauración. Se consultó el listado del servicio,
 se preparó la mayor cripta con B y se midió el análisis offline.
 Se registraron comandos, muestras y límites sin modificar el motor.
+
+## 2026-11-10 — Consumidores de D tras integrar C
+
+Herramienta: Codex desktop. Prompt textual:
+
+> listo ya me traje los cambios de la persona C que puedes ir avanzando con eso para mi parte D?
+
+Uso: actualizar la copia local a la integración de C en `004-linea-tiempo` y
+adaptar los consumidores de mapa e historia. D presenta la proyección filtrada
+de C y reconstruye la presentación del inventario siguiendo sus enlaces
+históricos. Se añade el campo opcional de hechos de paso propuesto por C y se
+conserva el resultado completo de cada intento en el controlador. No se infiere
+daño por diferencia de vida ni se cambian algoritmos de C o captura de A.
+
+Se ejecutaron seis pruebas nuevas y regresiones de C/D: 128 pruebas en total,
+126 aprobadas y dos omisiones por productor/restauración histórica del motor
+pendientes. Se verifican binario, recorte, consulta sin mutación, filtrado,
+orden/equipamiento y compatibilidad de acciones/replay. El viaje automático
+integrado y T010 siguen pendientes de los productores de A/C.

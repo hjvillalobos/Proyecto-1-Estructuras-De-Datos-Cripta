@@ -20,6 +20,20 @@ Las marcas completadas incluyen el núcleo y los consumidores de D. La aceptaci�
 - [x] T008 [US2] Crear pruebas H2,H6,EX04,EX07 en tests/test_persistencia_historia.py; verificar inventario de pergaminos, recorte, nueva rama y corrupción (FR-007, FR-011, FR-012).
 - [x] T009 [US2] Recortar sufijo y registrar corrección persistente de pergaminos en modelo/linea_tiempo.py; liberar bloques descartados sin recorrer prefijo (FR-006, FR-007, FR-009).
 - [ ] T010 [US2] Conectar cambios de conocimiento e inventario mediante modelo/snapshots.py y productores del motor; incluir mapa recordado (FR-004, FR-007, FR-011).
+
+Avance parcial de T010/T017/T018 (2026-11-10): el consumidor de D presenta la
+proyección estructurada y los campos históricos reales de C. El inventario
+conserva enlaces, orden, equipo y cursor; el mapa histórico usa solo recuerdos
+del instante consultado. Se preparó `ResultadoAccion.hechos_paso` y acceso al
+resultado completo en el controlador, conservando su retorno booleano. El
+productor del motor, el viaje por pasos en la interfaz y la restauración
+conjunta siguen pendientes. No se completa T010 por estas pruebas.
+
+Validación: `tests.test_presentacion_conocimiento` agrega seis pruebas con
+conocimiento/inventario de C, deltas, binario y recorte reales de D, ausencia
+de HTTP y compatibilidad del resultado de acción. Regresión seleccionada de
+15 módulos: 128 pruebas, 126 aprobadas y dos omisiones de historia con motor
+real. No representa certificación de una partida integrada ni de toda la suite.
 - [x] T011 [US2] Implementar formato binario 4 con historia, K, RNG y versiones en datos/guardado_binario.py; rechazar P1, validar límites/CRC y carga atómica (FR-008, FR-011, FR-012).
 
 Incremento independiente dentro de T008/T011 (no completa el formato integrado):

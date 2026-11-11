@@ -1,5 +1,6 @@
 """Presentación común de historia, independiente de la vista."""
 from modelo.errores_historia import EntradaHistoriaInvalida
+from controlador.presentacion_conocimiento import inventario_historico, mapa_historico
 
 
 def consultar(historia, texto):
@@ -36,10 +37,16 @@ def resumir(consulta):
             enemigos.append(f"{tipo} [{instancia}] {actual}/{total}{detalle}")
         elif clave.startswith("mapa:"):
             mapa.append(str(valor))
+    inventario_c = inventario_historico(estado)
+    if inventario_c is not None:
+        inventario = inventario_c
+    mapa_c = mapa_historico(estado)
+    if mapa_c:
+        mapa = mapa_c
     try:
         mapa_disponible = estado.obtener("conocimiento")
     except KeyError:
-        mapa_disponible = False
+        mapa_disponible = bool(mapa_c)
     efectos = estado.obtener("efectos")
     lineas = [
         f"Historia t={consulta.reloj} | Sala {sala} · {nombre}",

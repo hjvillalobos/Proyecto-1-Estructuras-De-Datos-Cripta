@@ -2,6 +2,7 @@ import os
 from subprocess import CalledProcessError
 
 from controlador.resumen_historia import consultar, resumir
+from controlador.presentacion_conocimiento import lineas_mapa
 from modelo.errores_historia import ErrorHistoria
 from datos.bitacora_replay import BitacoraReplay, RUTA_REPLAY_PREDETERMINADA
 from datos.guardado_binario import (
@@ -57,6 +58,7 @@ class ControladorJuego:
         self.ejecutando = True
         self._puntaje_registrado = False
         self._grabacion_valida = True
+        self.ultimo_resultado_accion = None
 
     # ---------------------------------------------------------
     # BITÁCORA EN PANTALLA
@@ -467,7 +469,7 @@ class ControladorJuego:
         mapa = getattr(self.modelo, "mapa_conocido", None)
         if not callable(mapa):
             return self.vista.mostrar_error("El mapa conocido todavía no está disponible.")
-        return self._mostrar_informe("Mapa conocido", "\n".join(mapa()) or "El mapa está vacío.")
+        return self._mostrar_informe("Mapa conocido", "\n".join(lineas_mapa(mapa())) or "El mapa está vacío.")
 
     def _viaje(self, argumentos):
         if len(argumentos) != 2 or argumentos[0].lower() != "a":
@@ -494,13 +496,14 @@ class ControladorJuego:
         return self.vista.mostrar_info(viajar(destino, mover))
 
     def _accion_modelo(self, accion, argumento=None):
-
+        self.ultimo_resultado_accion = None
         if (callable(getattr(type(self.vista), "ejecutar_tarea", None))
                 and getattr(self.vista, "root", None) is not None):
             resultado = self.vista.ejecutar_tarea(self.modelo.ejecutar, accion, argumento)
         else:
             resultado = self.modelo.ejecutar(accion, argumento)
 
+        self.ultimo_resultado_accion = resultado
         if not resultado.ok:
 
             mensaje = (

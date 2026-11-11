@@ -77,3 +77,34 @@ contra las interfaces de A y C:
 
 La rama no contiene cambios de este incremento en el código del motor de A
 ni en algoritmos de B o C.
+
+## Consumo de C tras su integración (2026-11-10)
+
+D acepta también la proyección estructurada de `ConocimientoMapa.mapa_conocido()`:
+`(id, estado, nombre, salidas)`, con salidas `(direccion, destino, costo, puerta,
+recuerdo)`. El controlador presenta solo los datos filtrados entregados por C;
+las salas avistadas muestran únicamente ID y estado. No consulta el terreno
+real para completar nombres, puertas ni salidas.
+
+El resumen histórico consume `conocimiento:sala:<id>` y
+`conocimiento:puerta:<id>` de C, además de las claves anteriores de D. Presenta
+los recuerdos correspondientes al instante consultado, sin leer conocimiento
+vivo. Como los deltas de C no incluyen nombres ni topología, la historia muestra
+identificadores y estados. El inventario de C usa `inventario_estado` y
+`inventario_nodo:<instancia>`: D sigue los enlaces históricos para conservar el
+orden real, identifica equipo/cursor y rechaza enlaces incompletos o cíclicos.
+Si existe este inventario, prevalece sobre la proyección anterior, incluso vacío.
+
+D añade `ResultadoAccion.hechos_paso: ResultadoPaso | None = None` al final del
+registro, conservando las llamadas posicionales existentes. El controlador
+guarda el resultado completo en `ultimo_resultado_accion` y mantiene el retorno
+booleano de `_accion_modelo`. Lo reinicia antes de cada intento para no reutilizar
+hechos de un paso previo tras una excepción. Esto prepara el consumo de viaje;
+no captura ni deduce hechos del motor.
+
+Continúan pendientes de A/C la captura de daño ocurrido y enemigos al entrar,
+el proveedor de conocimiento durante la partida y su publicación en el mismo
+lote histórico del motor. La ejecución de `ControlViaje` entre comandos y la
+restauración conjunta se validarán después de esa entrega. T003, T010 y la
+aceptación integrada permanecen abiertas; este incremento verifica consumidores
+de D con los módulos reales de C, no una partida completa.
