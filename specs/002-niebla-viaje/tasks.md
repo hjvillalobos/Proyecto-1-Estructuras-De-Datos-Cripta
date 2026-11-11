@@ -1,5 +1,12 @@
 # Tareas de I1: conocimiento independiente
 
+## I10: rechazo local de origen sin salida
+
+- [ ] T038 Probar C42 antes de implementar, verificando localidad y recuperación por apertura, exploración y reversión (FR-008/010/012/014/017).
+- [ ] T039 Añadir el rechazo local en el adaptador de C; ejecutar regresión y comparar el cierre de I9 (mismos requisitos, PR-001 parcial).
+
+Coherencia revisada: no hay cambios funcionales ni decisiones nuevas sobre puertas de API; se reutiliza el filtro existente. Q1 y conexión A/D quedan fuera. Confirmar estos documentos antes del código y publicar pruebas/medición al terminar.
+
 ## I9: diagnóstico independiente ampliado
 
 - [x] T035 Escribir pruebas de C40/C41, incluyendo detección de discrepancias (FR-008/010/014/017, PR-001 parcial).

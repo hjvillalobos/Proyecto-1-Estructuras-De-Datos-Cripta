@@ -9,6 +9,10 @@
 
 ## User Scenarios & Testing
 
+### I10: origen sin salida conocida transitable
+
+Optimización local de FR-008/010/012/014/017, motivada por I9. C42: si el destino es distinto y el origen no tiene ninguna salida conocida transitable, responder sin ruta sin recorrer el resto del mapa. Incluye puertas cerradas/no observadas y vecinas no exploradas. Reabrir, explorar o revertir debe permitir consultar de nuevo sin conservar un rechazo obsoleto. Si origen y destino coinciden, se conserva llegada; una salida alternativa transitable no debe descartarse. No cambia las reglas ni acredita por sí solo PR-001.
+
 ### I9: diagnóstico de rutas con alternativas
 
 Alcance autorizado: ampliar la evidencia de FR-008/010/014/017 y PR-001 sin cambiar reglas ni contratos compartidos. La copia local no contiene la cripta de 300 salas citada por D; no se sustituye por una carga sintética al certificar el requisito.

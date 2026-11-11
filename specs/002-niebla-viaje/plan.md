@@ -86,6 +86,8 @@ I1 y la evaluación independiente de I2 están implementados conforme a tasks.md
 
 ## Mediciones previstas
 
+I10: antes de una búsqueda nueva, consultar el primer arco de la adyacencia ya filtrada de C. Si no existe, devolver sin_ruta. No añadir recorridos al caso que reutiliza etiquetas cerradas. El costo del rechazo queda en O(log V + grado del origen), sin nuevas estructuras ni cambios a A. Mantener las validaciones de origen/destino y llegada antes de este atajo; invalidar la referencia de caché antes de un nuevo intento. Comparar el cierre de puerta en la misma carga de I9 y revisar rutas alternativas, apertura y reversión.
+
 I9 añade `utilidades/bench_escenarios_rutas.py`, ejecutado desde el verificador aislado existente. Genera cadenas, anillos con atajos y grafos dirigidos con costos positivos mediante Random con semilla. Usa listas, IDs dispersos y puertas explícitas; importa el adaptador anterior fijado en Git como comparación, sin modificar A. Cada resultado completo se compara fuera del intervalo medido. Las observaciones y reversiones también quedan fuera del tiempo de consulta. Separar cierres y reversiones para evitar mezclar búsquedas exitosas y sin ruta en una media. Preparación medida aparte; no incluye descarga, construcción del conocimiento ni renderizado. Pruebas pequeñas verifican reproducción, equivalencia y detección de resultados incorrectos. No cambiar código del juego solo para mejorar cifras.
 
 Cargas deterministas con igual cantidad de salas reveladas y distintos tamaños de mapa total; registrar trabajo y tiempo para distinguir preparación de actualización. Comparar IDs compactos y dispersos. Medir consultas de salas/puertas, repetición de observaciones, cantidad de deltas y aplicación/inversión.
