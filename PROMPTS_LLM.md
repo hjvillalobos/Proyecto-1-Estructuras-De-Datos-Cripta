@@ -895,6 +895,245 @@ Prompt textual a agente de investigación requerido por speckit-plan:
 
 Uso de respuesta: capturar cambios tipados en lugar de closures, exigir cierre de lote temporal, conservar excepción persistente del pergamino y separar reconstrucción del restaurador con catálogo. Pruebas actuales y límites en baseline.md. No se atribuyen resultados de benchmarks todavía no ejecutados.
 
+## Persona C — inicio de especificación — 2026-11-08
+
+Herramienta: Codex desktop; identificador exacto de modelo no registrado. Fecha de esta sesión, no atribuida retrospectivamente a mensajes anteriores.
+
+Prompts textuales de la secuencia actual:
+
+> puedes volver a revisar el repositorio y las ramas para ver si ya podemos avanzar con algo
+
+> entonces por donde empezamos
+
+> okay, entonces tratemos de hacerlo asi de la mejor manera
+
+Uso: revisar referencias remotas y contratos; actualizar la rama existente de C por avance directo a main, respaldando y conservando puntajes; preparar borrador de especificación de niebla y viaje, lista de calidad y coordinación. Se aplicó la habilidad versionada `speckit-specify` leyendo sus instrucciones; no se atribuye una invocación CLI que no ocurrió. Se resolvió la plantilla con el script del repositorio. Directorio explícito de capacidad: `specs/002-niebla-viaje`, conforme al reparto acordado. No se crearon plan ni tareas ni código de la capacidad; clarify queda pendiente por Q1.
+
+Fuentes: enunciado Parte II y reparto aportados por el usuario; constitución publicada y acuerdo textual previamente pegado en este chat. Esta entrada no reemplaza ni reconstruye los prompts anteriores de C: la conciliación del registro histórico completo desde P1 continúa pendiente; no se declaran completos los registros históricos ni se inventan sus fechas.
+
+### Persona C — revisión y commit documental — 2026-11-08
+
+Herramienta: Codex desktop; identificador exacto de modelo no registrado.
+
+Prompts textuales:
+
+> ya te fijaste que nada cause conflicto?
+
+> okay, que mas podemos hacer para hacer aportes, ya que me van a llamar la atencion
+
+> okay, entonces haz ese commit en mi rama, recuerda no subir nada a la main hasta tener una version estable sin conflictos e inteligente de eso
+
+Uso: comprobar estado y posibles conflictos textuales entre commits mediante merge-tree sin fusionar ramas; explicar límites de esa comprobación y acuerdos funcionales pendientes; preparar commit local de la especificación en borrador y documentos asociados exclusivamente en `codex/002-niebla-viaje`. Se excluyen puntajes locales; no se autoriza ni realiza publicación o integración en main. La aclaración Q1, contratos compartidos y fases posteriores permanecen pendientes.
+
+### Persona C — propuesta de contratos — 2026-11-08
+
+Herramienta: Codex desktop; identificador exacto de modelo no registrado.
+
+Prompt textual que autoriza continuar:
+
+> okay, entonces debemos de actuar de la mejor manera o de forma mas eficiente
+
+Uso: contrastar contratos disponibles de A/D con historial e inventario actuales; redactar propuesta de interfaces y casos verificables, pendiente de aceptación, sin modificar código del juego. Se registran como riesgos concretos el resultado booleano insuficiente del movimiento, la interrupción entre pasos y las funciones no serializables del retroceso actual. Los mensajes del grupo y capturas aportados anteriormente se usan como contexto reportado, sin atribuirlos como pruebas locales ni copiar teléfonos. Su transcripción histórica completa no se declara incorporada por esta entrada.
+
+### Persona C — contraste con ramas actualizadas — 2026-11-08
+
+Herramienta: Codex desktop; identificador exacto de modelo no registrado.
+
+> okay, si mis compañeros han subido algo a las ramas o algo así, tambien seria bueno guiarse para que coincida o si no hay nada asi, empezamos nosotros
+
+Uso: actualizar referencias remotas, revisar el incremento 97ee910 de D y contrastar consumidores reales del mapa/viaje, tipos históricos y firma de rutas de A. Actualizar la propuesta de integración con nombres existentes y diferencias pendientes, sin fusionar ramas ni cambiar código. La lectura de la habilidad clarify no se presenta como ejecución completa de esa fase.
+
+### Persona C — seguimiento de aclaración Q1 — 2026-11-08
+
+Herramienta: Codex desktop; identificador exacto de modelo no registrado.
+
+Prompt textual:
+
+> okay, entonces dejalo como pendiente
+
+Uso: registrar Q1 como pendiente de aclaración oficial, sin convertir la interpretación sugerida en una regla aceptada. Delimitar el caso de puertas remotas sin observación física y distinguirlo de la puerta observable desde la sala actual. Mantener abierta la revisión de aclaraciones y señalar el trabajo documental independiente. No se modifica código ni se publica nada.
+
+### Persona C — investigación y plan provisional — 2026-11-08
+
+Herramienta: Codex desktop; identificador exacto de modelo no registrado.
+
+> de acuerdo, sigamos
+
+Uso: leer habilidades de plan, tareas y análisis; ejecutar setup-plan; preparar plan provisional e investigación técnica. Se conserva Q1 abierta. No se ejecutan tasks/analyze ni implementación: la puerta de control de plan no está superada. Se revisaron restricciones de estructuras propias y formatos reales de D; no hay resultados nuevos de pruebas o mediciones.
+
+Prompt textual de investigación delegada, requerida por speckit-plan:
+
+> La habilidad speckit-plan pide investigación delegada. Solo lectura: revisa modelo/historial.py, inventario.py, rastro.py, tipos.py y las interfaces de origin/004-linea-tiempo/modelo/snapshots.py (git show). Propón estructura propia para conocimiento y deltas que cumpla actualización incremental, IDs dispersos y serialización. Identifica límites reales, no afirmes contratos aprobados. No edites archivos ni implementes. Q1 antorcha sigue pendiente; concentra diseño independiente.
+
+Uso de respuesta: comparar índice compacto con indexación directa por ID, conservar diferencia entre rollback y retroceso, señalar restauración de cursor y adaptar valores a los tipos históricos existentes. Son decisiones candidatas documentadas; no contratos aceptados.
+
+### Persona C — implementación del incremento I1 — 2026-11-08
+
+Herramienta: Codex desktop; identificador exacto de modelo no registrado.
+
+Prompts textuales recientes:
+
+> okay, que mas se puede hacer?
+
+> o sea, no se puede avanzar mas?
+
+> okay, entonces hagamos todo lo que no dependa de mis compañeros o sea util y no les cause conflicto
+
+Uso: delimitar y aclarar I1, adaptar plan y datos, generar tareas mediante flujo speckit-tasks y revisar consistencia antes de implementar. La autorización permite continuar I1 sin resolver las casillas generales ajenas a ese alcance; no se marcaron como cumplidas. Se usó speckit-implement con pruebas previas, implementación propia, regresión y mediciones locales. No existe extensions.yml; no hubo hooks de las fases. La investigación de planificación anterior se reutilizó, sin agentes de edición adicionales.
+
+Se confirmó primero documentación en fa5418a, después se implementó conocimiento básico, observaciones y deltas en archivos nuevos. Resultado: 16 pruebas nuevas y 125 seleccionadas existentes pasan. Q1, contratos compartidos, historia/inventario, antorcha y viaje permanecen pendientes. No se publica ni se modifica main, y puntajes se excluyen de los commits.
+
+### Persona C — ampliación I2 — 2026-11-09
+
+Herramienta: Codex desktop; identificador exacto de modelo no registrado.
+
+Prompts textuales:
+
+> de acuerdo, quedamos hasta ahí o se puede hacer mas?
+
+> algo mas o solo eso podemos hacer sin depender de ellos?
+
+> hazlo y si tienes que hacer algo grafico, tiene que mantener el mismo mismo estilo con el que se ha venido trabajando
+>
+> adelante, recuerda ser muy inteligente con lo que se hace y no uses cosas que no se deberían usar
+
+Uso: definir FR-018/PR-004 y C15–C17, actualizar plan/tareas, revisar consistencia del alcance y confirmar documentación en e3e16a6 antes del código. Reutilizar instrucciones de las fases spec-kit ya leídas, consultar constitución y scripts de requisitos; sin hooks configurados. Implementar decisión pura de detención, pruebas de secuencias y combinaciones, demostración por consola y mediciones separadas de memoria/tiempo. No se añade GUI ni se alteran estilos. Q1 y conexiones ajenas siguen pendientes. Se ejecutaron 148 pruebas seleccionadas con resultado OK; benchmark y límites están en baseline.md. No hay publicación ni cambio en main.
+
+### Revisión y corrección documental de C — 2026-11-09
+
+Herramienta: Codex desktop; identificador exacto de modelo no registrado.
+
+Prompts textuales:
+
+> hasta el momento, de lo que hemos hecho, todo está correcto y sigue el plan a como deberíamos de estar trabajando de forma correcta? Revisa eso super bien y luego continuamos
+
+> ENTONCES?
+
+Uso: revisar código, trazabilidad, historial y restricciones; repetir 148 pruebas seleccionadas (17.395 s, OK); verificar puntajes y ausencia de cambios en módulos preexistentes del juego. Corregir estados documentales obsoletos, separar resultados locales de pendientes integrados y ajustar complejidad de aplicación/inversión y preparación al código real. Reexpresar FR-018 y aclaraciones de I1/I2 como comportamiento, manteniendo detalles técnicos en plan/data-model. Sin cambios funcionales, nuevos resultados de rendimiento ni publicación.
+
+Registro histórico: estas entradas conservan los prompts aquí disponibles y no certifican exhaustividad de todo el período desde P1. La conciliación de mensajes anteriores sigue pendiente; no se inventan fechas ni se sustituye texto original por resúmenes para cerrar ese requisito.
+
+### Persona C — adaptador de historia I3 — 2026-11-09
+
+Herramienta: Codex desktop; identificador exacto de modelo no registrado.
+
+Prompts textuales inmediatos:
+
+> okay, entonces que podemos hacer de momento?
+
+> entonces hagamos eso
+
+Uso: actualizar propuesta con garantía de validación atómica reportada por A/D y comprobada en código; registrar soporte real de limite=None de A; especificar FR-019 y C18–C20, plan y tareas, revisar consistencia y confirmar documentos en 00110f4 antes del código. Crear conversión independiente al formato histórico real de D, pruebas y verificador aislado fijado a commit. Ninguna modificación en motor, interfaz o persistencia ajenos. Comprobación de 19 pruebas aisladas sin omisiones y 148 seleccionadas de regresión. La proyección visual y nombres de campos siguen pendientes de aceptación; no se declara partida integrada. Publicar únicamente los commits de C en su rama para mantener visible el avance, sin fusionar main ni puntajes.
+### Persona C — rutas conocidas I4 — 2026-11-09
+
+Herramienta: Codex desktop; identificador exacto de modelo no registrado.
+
+Prompts textuales de seguimiento:
+
+> del 1 al 100 en cuanto estamos de lo que cubre mi parte del proyecto?
+
+> gracias! Eso que sigue se puede hacer ya o hay que esperar a algun cambio de los compañeros?
+>
+> Vi que Sebas acaba de subir algo, puedes revisar de nuevo el repo por favor
+
+> Okay, sigamos con la otra parte
+
+> del 1 al 100 cuanto llevamos de mi parte?
+
+Uso: revisar referencias remotas y cambios H3 de A sin fusionar; estimar avance completo en torno al 45 %, distinguiendo módulos aislados de integración. Delimitar I4 con escenarios existentes, aclaraciones, plan, tareas y análisis; confirmar documentación e2a1f61 antes del código. Aplicar habilidades de análisis e implementación al incremento. Preparar fuente de rutas filtrada reutilizando el buscador propio de A, pruebas y diagnóstico aislados. Documentar resultados y límite de rendimiento observado; publicar solo en rama C. Sin cambios a main, motor, interfaz ni puntajes. Este registro no resuelve la conciliación histórica pendiente de prompts.
+### Persona C — control local de viaje I5 — 2026-11-10
+
+Herramienta: Codex desktop; identificador exacto del modelo no registrado. Inicio de la solicitud en la sesión del 2026-11-09; continuación el 2026-11-10 según fecha del cliente.
+
+Prompts textuales, en orden:
+
+> okay, que sigue?
+
+> adelante
+
+> adelante
+
+> y subelo a la rama al final, para que no vuelvan a decir que no he hecho nada
+
+> puedes continuar con la tarea esa por favor, implementarla de la mejor manera
+
+Uso: delimitar I5, especificar estados y escenarios, revisar coherencia y confirmar documentación en 2af6094 antes del código. Implementar control local de viaje con una propuesta pendiente, resultados validados y cancelación; comprobar con buscador real de A sin modificar motor/controlador. Ejecutar pruebas y documentar límites; publicar solo en codex/002-niebla-viaje. No declarar integración completa ni modificar main o puntajes locales. Se aplicó el flujo de implementación de spec-kit al alcance independiente autorizado.
+### Persona C — revisión GitHub y ensayo motor I6 — 2026-11-10
+
+Herramienta: Codex desktop; identificador exacto del modelo no registrado.
+
+> hay nuevos cambios en el github, revisa eso antes de continuar y seguimos con eso que dices
+
+Uso: fetch y revisión de los dos nuevos commits de B; confirmar A/D sin cambios. Identificar que el resultado de movimiento y callback del controlador todavía no aportan los hechos generales necesarios. Especificar y confirmar fee27ca antes de añadir prueba acotada C31/C32 con motor e historia reales y un verificador reproducible. Repetir 11 pruebas A/C/D y 14 de B en copias separadas. Documentar alcance, fallo inicial del exportador por main.py ausente y corrección. Publicar solo en rama C; no modificar módulos de compañeros ni main.
+### Persona C — inventario histórico I7 — 2026-11-10
+
+Herramienta: Codex desktop; modelo exacto no registrado.
+
+> cuanto hemos avanzado?
+
+> se puede seguir con otra cosa?
+
+> hagamoslo de la mejor forma para que no hayan conflictos o nada raro que me puedan reclamar
+>
+> en caso de documentar algo, es mejor no extenderse tanto y escribir humano, no robotizado, solo digo, verdad, para que no pase
+
+Uso: revisar inventario/retroceso y tipos de D; especificar FR-020 antes del código (2254020). Añadir captura incremental en un módulo separado, pruebas y verificador con historia real. Mantener documentación breve y distinguir compatibilidad probada de integración pendiente. Publicar en rama C, sin modificar módulos compartidos ni main.
+### Persona C — revisión de integración — 2026-11-10
+
+Herramienta: Codex desktop; modelo exacto no registrado.
+
+> se puede hacer algo mas?
+
+> adelante, de la mejor forma por favor
+
+> del 1 al 100, por donde vamos aproximadamente?
+>
+> PODRIAS CONTINUAR, YA SE PUEDE
+
+Uso: actualizar referencias y ensayar unión A/B/C/D en copia local separada. Resolver solapamientos solo allí, ejecutar suite completa, investigar seis casos de prueba y ajustar su preparación sin quitar aserciones. Primera corrida: 672 pruebas, 5 fallos, 3 errores, 5 omisiones; repetición: 672, OK con 5 omisiones. Publicar informe breve y parche de pruebas para revisión, sin aplicar cambios compartidos ni fusionar main. Estimación aproximada de C: 65 %, pendiente de integración funcional.
+### Persona C — propuesta de conexión del viaje — 2026-11-10
+
+Herramienta: Codex desktop; modelo exacto no registrado.
+
+> OKAY, ADELANTE CON LO QUE SIGUE, IMPLEMENTADO DE LA MEJOR FORMA POR FAVOR
+
+Pregunta: «Para conectar el viaje al juego hay que modificar puntos compartidos de A y D. El acuerdo del equipo pide coordinar esos contratos antes de implementarlos: ¿Sebas y Belén ya aceptaron que preparemos esos cambios en tu rama para su revisión, sin tocar main?»
+
+> Todavía no; preparar propuesta
+
+Uso: revisar los puntos reales de captura de entrada y daño, así como el callback del controlador. Preparar una propuesta breve en dos pasos, con campos, archivos y pruebas de aceptación. No implementar ni atribuir acuerdos de A/D; publicar la propuesta en C para revisión.
+
+### Persona C — reutilización de rutas — 2026-11-10
+
+Herramienta: Codex desktop; modelo exacto no registrado.
+
+> VEO QUE HAY NUEVOS CAMBIOS EN EL REPO, PUEDES REVISAR SI ES ALGO QUE NOS FUNCIONE?
+
+> ENTONCES DE MOMENTO NO PODEMOS CONTINUAR O SI?
+
+> OKAY, ADLANTE CON ESO Y LUEGO QUE HABLEMOS CON MIS COMPAÑEROS HACEMOS ESO OTRO
+
+Uso: revisar novedades de B y comprobar sus escenarios de inicio. Especificar I8 antes del código (3afd9eb), probar equivalencia e invalidación y optimizar únicamente los componentes de C. Comparar contra la versión previa, documentando también primera búsqueda y recálculos que superan 5 ms. Mantener pendiente la conexión compartida hasta coordinar con A/D. Publicar en la rama de C.
+
+### Persona C — diagnóstico ampliado de rutas — 2026-11-10
+
+Herramienta: Codex desktop; modelo exacto no registrado.
+
+> como vamos en cuanto a mi parte
+
+> podemos hacer algo mas? Antes revisa si hay algo nuevo en el repositorio y lo traes a la rama
+
+> okay, entonces hagamos eso que no depende de ellos, pero de forma muy inteligente y que no se salga de lo que se puede hacer
+
+Uso: consultar GitHub (sin novedades) y revisar paquetes locales. Al faltar la referencia de 300 salas y seguir pendiente la identidad compartida de puertas, delimitar I9 a diagnóstico sintético reproducible. Confirmar especificación antes del código; añadir pruebas y medición comparativa de primeras búsquedas, pasos y cambios de puertas. Publicar resultados favorables y regresiones, sin modificar el juego ni declarar cumplido PR-001.
+
+### Persona C — rechazo local de origen bloqueado — 2026-11-10
+
+Herramienta: Codex desktop; modelo exacto no registrado.
+
+> okay, se puede avanzar mas
+
+Uso: atender el caso costoso detectado en I9 con una comprobación local de salidas transitables. Confirmar especificación en c4a929c; escribir dos pruebas que fallan antes del cambio y pasan después. Repetir las 41 pruebas y los escenarios de medición; conservar los límites de primeras búsquedas y recálculos restantes. Publicar solo en C, sin modificar A/D ni main.
 
 ## 2026-11-02 — núcleo de línea de tiempo
 
