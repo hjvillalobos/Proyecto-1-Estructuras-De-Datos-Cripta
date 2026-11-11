@@ -132,3 +132,24 @@ Se midió AC-20 en la mayor cripta publicada, con un máximo incremental
 de 16.140 ms. T021 conserva los pendientes de integración de A/C y las
 mediciones de Parte I con la carga nueva.
 [Pruebas y medición de referencia](aceptacion.md#resolubilidad-de-referencia-2026-11-09).
+
+Actualización tras integrar main en `2b347da` (2026-11-10). La revisión conjunta
+de B y D ya cerró T025/T026/T030/T031/T034 de la especificación de resolubilidad;
+las notas anteriores de revisión pendiente describen estados históricos.
+El detalle está en el apartado «Cierre de la integración B y D» de
+`specs/001-verificador-resolubilidad/tasks.md`. Se repitió la regresión de
+integración en este árbol: 92 pruebas, 89 aprobadas y tres omisiones opcionales.
+El comando de `cripta-06` reconoce 300 salas, diez muestras por estrategia y
+cero solicitudes.
+
+Avance parcial de T003: `controlador/receptor_h3.py` consume el lote optativo
+que A ya entrega para sala/jugador. Cuatro pruebas nuevas de D usan el motor
+real, validan frontera/ordinal/orden, consultan 99/100/#2, recargan el fragmento
+histórico y rechazan lotes inválidos sin publicación parcial. La integración
+completa del motor y el guardado de partida siguen pendientes; no se elimina
+la omisión de esos casos ni se completa T003 por este ensayo acotado.
+
+Aceptación posterior al merge de main y al receptor de D: 709 pruebas,
+703 aprobadas, seis omitidas y ningún fallo/error. Se hizo independiente de la
+caché de trabajo la prueba de reinicio de D; conserva sus comprobaciones.
+[Evidencia y límites](aceptacion.md#main-integrado-y-receptor-h3-de-d-2026-11-10).

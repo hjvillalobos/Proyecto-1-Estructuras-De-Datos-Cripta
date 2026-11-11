@@ -250,3 +250,44 @@ T003/T010 y la aceptación integrada de T021: el motor debe entregar el proveedo
 de conocimiento/viaje, hechos del movimiento y captura/restauración histórica
 completas. Los tiempos de esta corrida son duración de pruebas, no evidencia
 de los umbrales de rendimiento del enunciado.
+
+### Main integrado y receptor H3 de D (2026-11-10)
+
+Base `2b347da` en `004-linea-tiempo`: contiene el cierre conjunto B/D de
+T025/T026/T030/T031/T034 importado desde main. La regresión de integración
+ejecutó 92 pruebas: 89 aprobadas y tres opcionales omitidas. El comando offline
+de `cripta-06@f9ed9afa683d` reconoció 300 salas, diez muestras por estrategia y
+cero solicitudes; máximo incremental 9.977 ms, preparación medida por separado.
+
+Se añadió `ReceptorH3`, un consumidor de D para el productor optativo de
+sala/jugador de A. Cuatro pruebas nuevas usan `motor_terreno()` real y
+`LineaTiempo` real para comprobar consultas 99/100/#2, binario y aislamiento
+de consultas. Un delta tardío incompatible hace rechazar el lote antes de
+publicar la historia; el motor revierte el turno y puede ejecutar de nuevo la
+acción #1. Se rechazan entradas mutables, orden incorrecto, ordinal/frontera
+incompatibles y lotes repetidos. No se alteraron el motor ni los módulos B/C.
+
+La primera corrida completa se detuvo por el límite de diagnóstico en
+`test_main_reinicia_con_motor_y_precarga_nuevos`. La prueba de D usaba una
+cripta de la caché de trabajo y, con la validación de B integrada, reintentaba
+por datos ausentes. Se reemplazó esa dependencia por un paquete temporal completo,
+conservando las aserciones sobre reloj, vida, inventario, motores y precargas
+independientes. La regresión seleccionada posterior aprobó 28 pruebas.
+
+Corrida final con Python 3.14.6 y `CRIPTA_SIN_AUDIO=1`: **709 pruebas, 703
+aprobadas, seis omisiones y cero fallos/errores**, en 128.960 s. Registro local:
+`.cache/revision-d-main-h3.log`. Se usó el mismo runner de descubrimiento con
+límite de diagnóstico por caso descrito en la sección anterior. Reproducción:
+
+```powershell
+$env:CRIPTA_SIN_AUDIO='1'
+python -X utf8 -m unittest discover -s tests -v
+python -X utf8 -m unittest tests.test_receptor_h3_d tests.test_replay_reinicio -v
+```
+
+Se mantienen las seis omisiones documentadas anteriormente. En particular,
+las dos pruebas de historia completa de partida siguen pendientes del productor
+y restauración de A; el receptor optativo de sala/jugador no las reemplaza ni
+habilita automáticamente `integrar_historia`. T003/T010 y la aceptación integral
+de T021 permanecen abiertas. Todos los cambios de este incremento son de D y
+se publican únicamente en `004-linea-tiempo`.

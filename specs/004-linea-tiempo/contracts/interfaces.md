@@ -151,3 +151,29 @@ Este consumidor se comprueba con `ControlViaje`, `PlanificadorConocido` y
 `ConocimientoMapa` reales y un motor de prueba que entrega hechos explícitos.
 La partida real sigue requiriendo el proveedor de A/C, los hechos del motor y
 restauración histórica completa; no se completan T003/T010 por esta entrega.
+
+## Receptor de D para el caso H3 de A (2026-11-10)
+
+`controlador.receptor_h3.ReceptorH3(linea)` implementa el receptor optativo
+`registrar_h3` ya disponible en A. Su llamada recibe `(inicio, fin, ordinal,
+cambios, eventos)`. Cada cambio es `(clave, anterior, nuevo)`; cada evento es
+`(tiempo, secuencia, cambios)`. Los contenedores son tuplas inmutables.
+
+D comprueba que inicio y ordinal coincidan con la frontera y la siguiente
+acción de la línea de tiempo. Convierte la proyección acotada de `sala` y
+`jugador` a `CambioHistorico`, `ValorHistorico` y `EventoHistorico`, manteniendo
+el orden recibido, incluso eventos sin cambios. Los campos ya existen en la
+base: este receptor no interpreta altas, bajas ni presencia de otros ámbitos.
+La validación y publicación atómica del lote se delegan a `registrar_accion`.
+Errores de esquema, orden, frontera, ordinal o valores anteriores son
+`ErrorHistoria`; no se reintenta ni se recorta la historia desde el receptor.
+
+La base del ensayo se construye con `EstadoHistorico(motor.proyeccion_h3())`.
+Se usa explícitamente el receptor al ejecutar `mover` y `esperar`. La prueba
+de D comprueba el guardián real, las consultas 99/100/#2, el fragmento binario,
+ausencia de mutaciones por consulta y rollback de ambos estados tras rechazar
+un delta tardío. No se modifica `integrar_historia`, la CLI ni el motor de A.
+
+Es una entrega acotada del consumidor de D. La historia completa de partida
+requiere efectos, enemigos, puertas, inventario, conocimiento, terminales y
+restauración conjunta; T003/T010 y E-D-RESTAURA conservan sus pendientes.

@@ -1358,3 +1358,28 @@ completaron conservando sus aserciones. La prueba de destrucción hizo visible
 un callback de precarga pendiente; el menú de D ahora lo cancela al destruirse
 y la prueba también comprueba esa limpieza. Los resultados y límites finales
 se registran en specs/004-linea-tiempo/aceptacion.md.
+
+## 2026-11-10 — Avance de D sobre main integrado
+
+Herramienta: Codex desktop. Prompt textual:
+
+> que puedes avanzar con esos cambios que me traje a mi rama?
+
+Restricción vigente comunicada por el usuario:
+
+> no subas nada al main aun solo mi rama
+
+Uso: mantener el trabajo en `004-linea-tiempo`, actualizar la trazabilidad del
+cierre B/D incorporado desde main y aprovechar la interfaz H3 existente de A
+desde un receptor de D. Se convierten los lotes de sala/jugador a registros de
+la línea de tiempo, con validación de frontera/ordinal y publicación atómica.
+Cuatro pruebas de D comprueban el motor real, consultas 99/100/#2, binario y
+rollback de un lote rechazado. No se modifican A/B/C ni se presenta esta
+proyección como historia completa. T003/T010 y la restauración siguen abiertas.
+
+La prueba de reinicio de D todavía dependía de `cripta-01` en `.cache/cripta`.
+Al ejecutar la suite con la validación integrada de B entró en reintentos por
+datos locales ausentes; el límite de diagnóstico detuvo ese caso. Se cambió
+solo su preparación a un paquete temporal completo de `tests.datos_prueba`,
+conservando las aserciones sobre motor/precarga nuevos, reloj, vida e inventario.
+La regresión seleccionada posterior aprobó 28 pruebas sin omisiones.

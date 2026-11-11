@@ -407,6 +407,13 @@ Esta conexión del consumidor no habilita por sí sola el proveedor en el motor.
 python -m unittest tests.test_controlador_viaje tests.test_presentacion_conocimiento -v
 ```
 
+El receptor de D para el caso H3 de A se comprueba con
+`python -m unittest tests.test_receptor_h3_d -v`. Consume explícitamente
+`registrar_h3`, verifica consultas anteriores/posteriores al ataque del guardián
+y conserva historia y motor ante el rechazo de un lote. Su alcance es la
+proyección de sala y jugador; la partida histórica completa requiere los demás
+productores y la restauración conjunta.
+
 R4 se comprobó en `004-linea-tiempo` después de integrar el verificador de B.
 El caso offline coloca la llave de salida detrás de su propia puerta.
 `--verificar` muestra el ciclo, el inicio normal se bloquea y `--forzar`
