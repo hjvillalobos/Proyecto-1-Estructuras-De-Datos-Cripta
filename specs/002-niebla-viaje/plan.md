@@ -86,6 +86,8 @@ I1 y la evaluación independiente de I2 están implementados conforme a tasks.md
 
 ## Mediciones previstas
 
+I9 añade `utilidades/bench_escenarios_rutas.py`, ejecutado desde el verificador aislado existente. Genera cadenas, anillos con atajos y grafos dirigidos con costos positivos mediante Random con semilla. Usa listas, IDs dispersos y puertas explícitas; importa el adaptador anterior fijado en Git como comparación, sin modificar A. Cada resultado completo se compara fuera del intervalo medido. Las observaciones y reversiones también quedan fuera del tiempo de consulta. Separar cierres y reversiones para evitar mezclar búsquedas exitosas y sin ruta en una media. Preparación medida aparte; no incluye descarga, construcción del conocimiento ni renderizado. Pruebas pequeñas verifican reproducción, equivalencia y detección de resultados incorrectos. No cambiar código del juego solo para mejorar cifras.
+
 Cargas deterministas con igual cantidad de salas reveladas y distintos tamaños de mapa total; registrar trabajo y tiempo para distinguir preparación de actualización. Comparar IDs compactos y dispersos. Medir consultas de salas/puertas, repetición de observaciones, cantidad de deltas y aplicación/inversión.
 
 Para viaje: mapa completo de referencia, alternativas de costo distinto, empates y puertas recordadas que cambian tras observación. Medir cálculo completo del paso, incluida adaptación de fuente, sin red/renderizado. Incluir coste de preparación separado, sin ocultar reconstrucciones por paso. Repetir inventario e historial de P1 con la nueva carga. Documentar semilla, entorno, unidades, tamaño y resultados en DECISIONES.md solo después de ejecutar.

@@ -9,6 +9,15 @@
 
 ## User Scenarios & Testing
 
+### I9: diagnóstico de rutas con alternativas
+
+Alcance autorizado: ampliar la evidencia de FR-008/010/014/017 y PR-001 sin cambiar reglas ni contratos compartidos. La copia local no contiene la cripta de 300 salas citada por D; no se sustituye por una carga sintética al certificar el requisito.
+
+- C40: con semilla fija, mapas con alternativas y salidas dirigidas conservan el resultado de la búsqueda anterior en consultas nuevas, reutilizadas y posteriores a una observación/reversión.
+- C41: la medición separa preparación, primera búsqueda, pasos sucesivos y recálculos por puertas; identifica tamaño, semilla, entorno, muestras, media y máximo. Rechaza cualquier diferencia de resultados y comprueba que consultar no cambie el conocimiento.
+
+Aclaración local: el mapa completo conocido y las puertas abiertas son condiciones iniciales del diagnóstico, no reglas de exploración. Las puertas sintéticas tienen identidad explícita. No se interpreta la identidad de puertas de la API ni se implementa Q1. No se afirma cumplimiento de PR-001 sin referencia oficial e integración.
+
 ### User Story 1 - Consultar solamente lo conocido (Priority: P1)
 
 Como jugador quiero distinguir lo explorado de lo que solamente he avistado, sin recibir información por una descarga anticipada.

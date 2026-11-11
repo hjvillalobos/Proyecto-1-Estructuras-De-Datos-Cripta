@@ -1,5 +1,13 @@
 # Tareas de I1: conocimiento independiente
 
+## I9: diagnóstico independiente ampliado
+
+- [ ] T035 Escribir pruebas de C40/C41, incluyendo detección de discrepancias (FR-008/010/014/017, PR-001 parcial).
+- [ ] T036 Añadir escenarios reproducibles y opción de ejecución aislada, sin modificar el modelo ni A/D (mismos requisitos).
+- [ ] T037 Ejecutar pruebas y mediciones, documentar límites y publicar en C (PR-001 parcial).
+
+Análisis previo: escenarios, plan y tareas coinciden; no introducen reglas ni estructuras prohibidas. Q1 y revisión cruzada siguen abiertos fuera de I9. Documentación confirmada antes de código; T035 precede a T036 y T037 cierra la evidencia local.
+
 ## I8: rendimiento de rutas
 
 - [x] T032 Escribir C37–C39 de equivalencia e invalidación (FR-008/010/014/017).
