@@ -166,6 +166,38 @@ class TestRutasConocidas(unittest.TestCase):
                 self.assertEqual((r.siguiente, r.costo_total), (vecino, costo))
             self.assertEqual(buscar.call_count, 1)
 
+    def test_c42_origen_bloqueado_no_busca_y_reversion_lo_recupera(self):
+        """FR-010/012/014: no recorrer el mapa para un origen sin salida."""
+        m = crear((10, 20, 30), ((10, 20, 1, 7), (20, 30, 1, None)))
+        m.entrar(20)
+        m.entrar(30)
+        p = self.planificador(m)
+        with patch.object(p, '_buscar', side_effect=AssertionError('Búsqueda innecesaria')):
+            self.assertEqual(p.consultar(10, 30).estado, 'sin_ruta')  # No observada.
+            self.assertEqual(p.consultar(10, 10).estado, 'llegada')
+        m.observar_puerta(10, 7, False)
+        self.assertEqual(p.consultar(10, 30).costo_total, 2)
+        cierre = m.observar_puerta(10, 7, True)
+        with patch.object(p, '_buscar', side_effect=AssertionError('Búsqueda innecesaria')):
+            self.assertEqual(p.consultar(10, 30).estado, 'sin_ruta')
+        m.revertir(cierre)
+        self.assertEqual(p.consultar(10, 30).costo_total, 2)
+
+    def test_c42_explorar_habilita_salida_y_no_descarta_alternativa(self):
+        """FR-008/017: usar conocimiento, sin confundir falta de ruta con cierre."""
+        m = crear((10, 20, 30, 40), ((10, 20, 1, None), (20, 30, 1, None),
+                                   (10, 40, 4, 7), (40, 30, 4, None)))
+        m.entrar(30)
+        p = self.planificador(m)
+        with patch.object(p, '_buscar', side_effect=AssertionError('Búsqueda innecesaria')):
+            self.assertEqual(p.consultar(10, 30).estado, 'sin_ruta')
+        entrada = m.entrar(20)
+        self.assertEqual(p.consultar(10, 30).costo_total, 2)
+        m.revertir(entrada)
+        m.entrar(40)
+        m.observar_puerta(10, 7, False)
+        self.assertEqual(p.consultar(10, 30).costo_total, 8)
+
     def test_grafo_dirigido_y_origen_fuera_de_region_cerrada(self):
         """C37/C39: transponer arcos, no asumir salidas recíprocas."""
         salas = (SalaConocible(10, 'a', (SalidaConocible('E', 20, 1),)),

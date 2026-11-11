@@ -85,6 +85,10 @@ class PlanificadorConocido:
         clave = (destino, self._mapa.revision)
         if self._cache != clave or not self._espacio.esta_cerrado(indice_origen):
             self._cache = None  # Una excepción no publica etiquetas parciales.
+            # Sin un primer paso conocido no existe una ruta al otro destino.
+            # Revisar solo al recalcular: el caso reutilizado conserva su costo.
+            if next(iter(fuente.adyacencias[indice_origen]), None) is None:
+                return ConsultaRuta('sin_ruta')
             self._buscar(self._inversa, self._espacio, self._frontera,
                          _indice(fuente.ids, destino), indice_origen, None)
             self._cache = clave

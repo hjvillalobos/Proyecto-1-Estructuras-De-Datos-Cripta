@@ -1,5 +1,13 @@
 # Comprobación inicial de C
 
+## I10 — origen bloqueado (2026-11-10)
+
+Especificación previa: c4a929c. C42 falló antes del cambio en sus dos pruebas por ejecutar una búsqueda innecesaria. Después: **41 pruebas, OK, sin omisiones**, usando el verificador aislado y `--bench-escenarios`. Se comprueban puerta no observada, cierre, apertura, exploración, reversión, llegada y ruta alternativa. El rechazo usa únicamente la adyacencia conocida; no modifica A ni el motor.
+
+Misma carga sintética y entorno de I9, nueva ejecución: cerrar la puerta inicial en la cadena de 5000 salas tuvo **0.029 ms de media y 0.053 ms de máximo** (10 muestras). En la corrida I9 había dado 29.912/36.496 ms; son ejecuciones separadas. Las pruebas comprueban además que ese caso no llama al buscador, por lo que la mejora no depende solo del tiempo observado. El costo queda limitado a localizar el origen y revisar sus salidas.
+
+La primera búsqueda de esa cadena aún promedió 28.953 ms; la reversión, 27.523 ms. En alternativas de 5000 salas la primera búsqueda tuvo máximo 119.656 ms. I10 solo resuelve el origen sin salidas transitables: no corrige todos los recálculos ni acredita PR-001. Se conserva la reutilización en pasos sucesivos y la integración compartida sigue pendiente.
+
 ## I9 — alternativas y recálculos (2026-11-10)
 
 Especificación previa: daa684e. `python -B -m utilidades.verificar_conocimiento_rutas --bench-escenarios`: **39 pruebas, OK, sin omisiones**. C40/C41 verifican reproducción, equivalencia completa y rechazo de resultados incorrectos. En las mediciones se compara cada consulta con C anterior ad531fd y se comprueba que no altere el conocimiento. Buscador real de A: 9730482. No cambió código del juego.

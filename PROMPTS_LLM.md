@@ -990,3 +990,11 @@ Herramienta: Codex desktop; modelo exacto no registrado.
 > okay, entonces hagamos eso que no depende de ellos, pero de forma muy inteligente y que no se salga de lo que se puede hacer
 
 Uso: consultar GitHub (sin novedades) y revisar paquetes locales. Al faltar la referencia de 300 salas y seguir pendiente la identidad compartida de puertas, delimitar I9 a diagnóstico sintético reproducible. Confirmar especificación antes del código; añadir pruebas y medición comparativa de primeras búsquedas, pasos y cambios de puertas. Publicar resultados favorables y regresiones, sin modificar el juego ni declarar cumplido PR-001.
+
+### Persona C — rechazo local de origen bloqueado — 2026-11-10
+
+Herramienta: Codex desktop; modelo exacto no registrado.
+
+> okay, se puede avanzar mas
+
+Uso: atender el caso costoso detectado en I9 con una comprobación local de salidas transitables. Confirmar especificación en c4a929c; escribir dos pruebas que fallan antes del cambio y pasan después. Repetir las 41 pruebas y los escenarios de medición; conservar los límites de primeras búsquedas y recálculos restantes. Publicar solo en C, sin modificar A/D ni main.
