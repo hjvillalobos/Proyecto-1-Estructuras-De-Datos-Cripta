@@ -235,11 +235,20 @@ class PruebasH3ConD(unittest.TestCase):
 
 
 @contextmanager
-def motor_con_historia_offline(*, con_mapa=False):
+def motor_con_historia_offline(*, con_mapa=False, con_trampa_venenosa=False):
     def fabrica(precarga, *args, **opciones):
-        precarga.cliente.almacen.guardar_ficha("cat1", {
+        almacen = precarga.cliente.almacen
+        almacen.guardar_ficha("cat1", {
             "id": "pergamino-h3", "clase": "pergamino_retroceso", "nombre": "Pergamino",
         })
+        if con_trampa_venenosa:
+            almacen.guardar_ficha("cat1", {
+                "id": "trampa-h3", "clase": "trampa", "nombre": "Trampa venenosa",
+                "veneno": {"dano_por_pulso": 1},
+            })
+            contenido = almacen.leer_contenido("prueba", "v1", 101)
+            contenido["trampas"] = [{"instancia": "t-h3-101", "tipo": "trampa-h3"}]
+            almacen.guardar_contenido("prueba", "v1", contenido)
         return crear_juego(precarga, *args, historia_para_pruebas=True,
                            conocimiento_para_pruebas=con_mapa, **opciones)
 
@@ -338,6 +347,59 @@ class PruebasAdaptadorHistoricoOffline(unittest.TestCase):
         self.assertIsNotNone(inventario.recoger(
             ObjetoInstancia("p-h3", "pergamino-h3", "inventario")))
         return inventario
+
+    def test_historia_registra_veneno_expiracion_y_retroceso(self):
+        from controlador.partida_historica import integrar_historia
+        from controlador.resumen_historia import resumir
+        from modelo.errores_historia import ReferenciaHistoricaInvalida
+        from modelo.snapshots import CambioHistorico, ValorHistorico
+
+        with motor_con_historia_offline(con_trampa_venenosa=True) as motor:
+            partida = integrar_historia(motor, 2)
+            historia = partida.linea_tiempo
+            inventario = self.dar_pergamino(motor)
+            self.assertEqual(historia.consultar_t(0).estado.obtener("efectos"), ())
+            resultado = partida.ejecutar("mover", "E")
+            self.assertTrue(resultado.ok)
+            self.assertEqual(resultado.trampas_activadas, ["t-h3-101"])
+            expiracion = motor.jugador.veneno.evento_fin
+            self.assertEqual((motor.reloj, expiracion.tiempo, expiracion.tipo),
+                             (100, 400, "fin_veneno"))
+            self.assertEqual(historia.consultar_t(1).estado.obtener("efectos"), ("veneno",))
+
+            for reloj in (200, 300):
+                self.assertTrue(partida.ejecutar("esperar").ok)
+                self.assertEqual(motor.reloj, reloj)
+            self.assertEqual(historia.consultar_t(300).estado.obtener("efectos"), ("veneno",))
+            self.assertTrue(partida.ejecutar("esperar").ok)
+            self.assertEqual((motor.reloj, historia.reloj), (400, 400))
+            self.assertIsNone(motor.jugador.veneno)
+            self.assertFalse(expiracion.en_cola)
+            self.assertIn("Efectos: veneno", resumir(historia.consultar_t(399)))
+            self.assertIn("Efectos: ninguno", resumir(historia.consultar_t(400)))
+
+            alta = CambioHistorico("efectos", ValorHistorico(True, ()),
+                                   ValorHistorico(True, ("veneno",)))
+            baja = CambioHistorico("efectos", alta.nuevo, alta.anterior)
+            cambios_accion = []
+            cambios_evento = []
+            for ordinal, accion in enumerate(historia.exportar().acciones, 1):
+                cambios_accion.extend((ordinal, c) for c in accion.cambios if c.clave == "efectos")
+                for evento in accion.eventos:
+                    cambios_evento.extend((ordinal, evento.tiempo, evento.secuencia, c)
+                                          for c in evento.cambios if c.clave == "efectos")
+            self.assertEqual(cambios_accion, [(1, alta)])
+            self.assertEqual(cambios_evento, [(4, 400, expiracion.secuencia, baja)])
+
+            self.assertTrue(partida.ejecutar("retroceso").ok)
+            self.assertEqual((motor.reloj, historia.reloj, historia.cantidad_acciones), (300, 300, 3))
+            self.assertIs(motor.jugador.veneno.evento_fin, expiracion)
+            self.assertTrue(expiracion.en_cola)
+            self.assertFalse(expiracion.cancelado)
+            self.assertEqual(historia.consultar_final().estado.obtener("efectos"), ("veneno",))
+            self.assertEqual(inventario.contar("pergamino-h3"), 0)
+            with self.assertRaises(ReferenciaHistoricaInvalida):
+                historia.consultar_t(400)
 
     def test_pergamino_recorta_solo_la_ultima_accion_y_permite_otra_rama(self):
         from controlador.partida_historica import integrar_historia

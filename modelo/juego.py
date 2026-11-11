@@ -444,6 +444,23 @@ class Motor:
 
     # ---------- vista / resumen ----------
 
+    def _efectos_activos(self):
+        efectos_activos = []
+        if self.jugador.veneno is not None:
+            efectos_activos.append("veneno")
+
+        jug = self.jugador
+        if self.efectos.antorchas_encendidas:
+            efectos_activos.append("antorcha")
+        velocidad_base = jug.velocidad
+        if self.gestor_precarga and self.gestor_precarga.generales:
+            jugador_gen = self.gestor_precarga.generales.get("jugador")
+            if jugador_gen is not None:
+                velocidad_base = jugador_gen.get("velocidad", jug.velocidad)
+        if jug.velocidad != velocidad_base:
+            efectos_activos.append("velocidad")
+        return efectos_activos
+
     def estado_vista(self):
         from modelo.snapshots import EstadoVista, SalidaVista, EnemigoVista, ItemVista
         from modelo.snapshots import TrampaVista, EventoVista
@@ -477,20 +494,8 @@ class Motor:
                 comportamiento=enemigo.comportamiento,
             ))
 
-        efectos_activos = []
-        if self.jugador.veneno is not None:
-            efectos_activos.append("veneno")
-
         jug = self.jugador
-        if self.efectos.antorchas_encendidas:
-            efectos_activos.append("antorcha")
-        velocidad_base = jug.velocidad
-        if self.gestor_precarga and self.gestor_precarga.generales:
-            jugador_gen = self.gestor_precarga.generales.get("jugador")
-            if jugador_gen is not None:
-                velocidad_base = jugador_gen.get("velocidad", jug.velocidad)
-        if jug.velocidad != velocidad_base:
-            efectos_activos.append("velocidad")
+        efectos_activos = self._efectos_activos()
 
                 # Objetos presentes en el suelo de la sala actual
         from modelo.snapshots import ItemVista
@@ -1248,8 +1253,10 @@ class _MotorConHistoriaDePrueba(Motor):
     def estado_historico_inicial(self):
         from modelo.linea_tiempo import EstadoHistorico
 
-        # El escenario empieza antes de la primera acción, sin efectos activos.
-        return EstadoHistorico(self.proyeccion_h3() + (("efectos", ()),))
+        return EstadoHistorico(self.proyeccion_h3())
+
+    def proyeccion_h3(self):
+        return super().proyeccion_h3() + (("efectos", tuple(self._efectos_activos())),)
 
     def conectar_historia(self, historia):
         from modelo.errores_historia import CambioHistoriaIncoherente
