@@ -876,13 +876,40 @@ class Motor:
         self.historial = HistorialRetroceso(self.registro_rastro, self.cola)
         self._sincronizar_referencias()
 
-    def ejecutar(self, accion, argumento=None):
+    def proyeccion_h3(self):
+        """Valores independientes para la prueba de historia, sin estado de guardado."""
+        jugador = self.jugador
+        sala = self.salas[jugador.posicion_actual]
+        return (
+            ("sala", (sala.id, sala.nombre)),
+            ("jugador", (jugador.vida, jugador.vida_max, jugador.ataque,
+                         jugador.defensa, jugador.velocidad)),
+        )
+
+    def _cambios_h3(self, anterior):
+        posterior = self.proyeccion_h3()
+        if len(anterior) != len(posterior):
+            raise ValueError("Las proyecciones H3 tienen distinta longitud.")
+        if any(clave != clave_nueva for (clave, _), (clave_nueva, _) in zip(anterior, posterior)):
+            raise ValueError("Las proyecciones H3 deben tener las mismas claves en el mismo orden.")
+        return tuple((clave, antes, despues)
+                     for (clave, antes), (_, despues) in zip(anterior, posterior)
+                     if antes != despues)
+
+    def ejecutar(self, accion, argumento=None, *, registrar_h3=None):
+        """El receptor optativo de prueba recibe (inicio, fin, ordinal, cambios, eventos).
+
+        Un rechazo de validación del receptor debe dejar su historia intacta.
+        El motor revierte su turno y propaga la excepción sin reintentar el lote.
+        """
+        if registrar_h3 is not None and accion not in ("mover", "esperar"):
+            raise ValueError("El productor H3 de prueba solo admite mover y esperar.")
         reloj = self.reloj
         notificador = self._notificador
         mensajes = []
         self._notificador = mensajes.append if notificador is not None else None
         try:
-            resultado = self._ejecutar_accion(accion, argumento)
+            resultado = self._ejecutar_accion(accion, argumento, registrar_h3)
         except Exception:
             self.historial.descartar_turno()
             self.reloj = reloj
@@ -898,7 +925,7 @@ class Motor:
                 notificador(mensaje)
         return resultado
 
-    def _ejecutar_accion(self, accion, argumento=None):
+    def _ejecutar_accion(self, accion, argumento=None, registrar_h3=None):
         from modelo.snapshots import ResultadoAccion
         from modelo.enemigos import decidir_accion
 
@@ -931,6 +958,11 @@ class Motor:
         for atributo in ("cursor", "arma_equipada", "armadura_equipada"):
             self.historial.registrar_atributo(inventario, atributo)
         sala_origen = self.jugador.posicion_actual
+
+        if registrar_h3 is not None:
+            inicio_h3 = self.reloj
+            estado_h3 = self.proyeccion_h3()
+            eventos_h3 = []
 
         trampas_activadas = []
         if accion == "mover":
@@ -1099,11 +1131,18 @@ class Motor:
         self.registro_rastro.marcar_visita(sala_origen, self.reloj)
         self._sincronizar_referencias()
 
+        if registrar_h3 is not None:
+            cambios_h3 = self._cambios_h3(estado_h3)
+
         frontera = None
         while not self.terminado:
+            if registrar_h3 is not None:
+                estado_h3 = self.proyeccion_h3()
             evento = self.ejecutar_ciclo(decidir_accion, hasta=frontera)
             if evento is None:
                 break
+            if registrar_h3 is not None:
+                eventos_h3.append((evento.tiempo, evento.secuencia, self._cambios_h3(estado_h3)))
             if evento.tipo == "turno_jugador":
                 frontera = evento.tiempo
 
@@ -1111,8 +1150,11 @@ class Motor:
 
         self.historial.registrar_atributo(self, "acciones_jugador")
         self.acciones_jugador += 1
+        resultado = ResultadoAccion(ok=True, trampas_activadas=trampas_activadas)
+        if registrar_h3 is not None:
+            registrar_h3(inicio_h3, self.reloj, self.acciones_jugador, cambios_h3, tuple(eventos_h3))
         self.historial.cerrar_turno()
-        return ResultadoAccion(ok=True, trampas_activadas=trampas_activadas)
+        return resultado
 
     def _rechazar_accion(self, mensaje):
         from modelo.snapshots import ResultadoAccion

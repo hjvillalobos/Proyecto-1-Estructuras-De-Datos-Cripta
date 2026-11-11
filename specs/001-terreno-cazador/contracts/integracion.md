@@ -76,6 +76,24 @@ Propuesta de sobre conceptual de cambio: identidad estable de entidad, campo u o
 - D recibe costo de salidas y tipo cazador para presentación; si necesita recurso gráfico debe consultarlo. A no genera ni reemplaza arte.
 - D conecta funciones de medición de A a bench.py y revisa ejecución sin vista. El replay actual sin GUI instancia VistaConsola; no usarlo como certificación headless hasta revisión de D.
 
+### Primer caso H3 con motor real
+
+Parte II §3.6 y el Apéndice B exigen que la consulta por tiempo incluya todos los eventos hasta ese instante y preceda a la decisión que coincida con él. `historia #k` reconstruye el estado anterior a la acción `k`. La propuesta valida FR-006, FR-014, FR-018 y FR-020 en un caso acotado. No cambia reglas funcionales ni el estado pendiente de E-D-CAMBIOS y E-D-RESTAURA.
+
+**Datos y aceptación.** Usar `motor_terreno()` con guardián y salida al este sin campo `costo` (100 según Parte II §3.1). Capturar la vida inicial `V0` en sala 100, ejecutar `mover E` como acción #1 y, al cerrar `t=100`, guardar como `V1` la vida observada tras el ataque. Con el contador preparado por la prueba H3, se procesa el turno del jugador con secuencia 10 antes del ataque del guardián de destino con secuencia 11. Ejecutar `esperar` como acción #2 para que su ordinal exista. Contrastar:
+
+| Consulta | Reloj | Sala | Vida |
+| --- | --- | --- | --- |
+| `historia 99` | 99 | 101 | `V0`, sin daño del ataque de `t=100`. |
+| `historia 100` | 100 | 101 | `V1`, con el daño de secuencia 11 aplicado una vez. |
+| `historia #2` | 100 | 101 | `V1`, antes de aplicar `esperar` o sus eventos posteriores. |
+
+**Interfaz acotada.** `proyeccion_h3()` captura valores inmutables de `sala = (id, nombre)` y `jugador = (vida, vida_max, ataque, defensa, velocidad)` para construir la base antes de la primera acción. `ejecutar(..., registrar_h3=receptor)` habilita explícitamente el productor de prueba para `mover` y `esperar`. El receptor recibe reloj inicial, reloj final, ordinal, cambios inmediatos y eventos en el orden del motor. Cada cambio contiene clave y valores anterior/nuevo. Cada evento contiene su tiempo y secuencia reales y una tupla de cambios, vacía si no altera la proyección. El adaptador de prueba construye los tipos de D y llama a `registrar_accion`, que deriva el ordinal de las acciones aceptadas. `modelo/juego.py` conserva tipos propios de A.
+
+**Publicación y fallos.** D confirmó, según la comunicación del usuario, que `registrar_accion` valida todo el lote antes de aplicar cambios. Un `ErrorHistoria` de validación conserva el estado, reloj y ordinal de D, incluso si el lote comienza con un delta válido. A entrega el lote una sola vez, después de cerrar la frontera FR-020 y antes de `cerrar_turno()`. Si la validación falla, el rollback existente revierte el turno de A y su ordinal, descarta los mensajes y propaga el error sin recortar D. Las excepciones inesperadas también se propagan sin reintento. La garantía de D solo cubre rechazos de validación.
+
+**Límites.** El adaptador de prueba consulta la línea de tiempo real de D sin activar `integrar_historia()` ni su guardado/carga. La proyección de sala y jugador sirve a las tres consultas del caso. El mapa, el inventario, los efectos, el recorte por pergamino, la carga y el flujo histórico completo quedan fuera del caso. Los acuerdos de proyección completa y restauración siguen pendientes. El fixture no requiere entregas nuevas de B o C.
+
 ## Criterios de acuerdo pendientes
 
 Revisión cruzada A↔C y B↔D; equipo revisa tipos/guardado y determinismo. Ningún texto de este documento constituye consentimiento de los compañeros. Q1/Q2 requieren evidencia; Q3 requiere referencia oficial. Todos los cambios de archivos fuera del alcance de A siguen requiriendo autorización.
