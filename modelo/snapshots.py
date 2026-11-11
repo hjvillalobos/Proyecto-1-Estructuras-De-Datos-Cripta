@@ -5,6 +5,10 @@
   * ResultadoAccion -> lo que devuelve el modelo tras intentar una acción del jugador.
 """
 from dataclasses import dataclass, field, asdict
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from modelo.viaje import ResultadoPaso
 
 from modelo.errores_historia import EntradaHistoriaInvalida
 
@@ -223,6 +227,7 @@ class ResultadoAccion:
     ok: bool                # False = acción rechazada (no consume tiempo, Apéndice B)
     mensaje: str = ""
     trampas_activadas: list[str] = field(default_factory=list)
+    hechos_paso: "ResultadoPaso | None" = None
 
 
 @dataclass

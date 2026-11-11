@@ -85,6 +85,8 @@ class TestSonidos(unittest.TestCase):
         menu.animacion, menu.panel, menu.fin = Mock(), Mock(), Mock()
         menu.botones = [Mock()]
         menu.resultado = ("jugar", None)
+        menu.dibujar = Mock()
+        menu._precarga_selector = None
         self.assertEqual(menu.mostrar(), ("jugar", None))
         menu.vista.sonidos.reproducir.assert_called_once_with("inicio")
         menu.vista.root.wait_variable.assert_called_once_with(menu.fin)

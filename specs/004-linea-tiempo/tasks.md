@@ -20,6 +20,20 @@ Las marcas completadas incluyen el núcleo y los consumidores de D. La aceptaci�
 - [x] T008 [US2] Crear pruebas H2,H6,EX04,EX07 en tests/test_persistencia_historia.py; verificar inventario de pergaminos, recorte, nueva rama y corrupción (FR-007, FR-011, FR-012).
 - [x] T009 [US2] Recortar sufijo y registrar corrección persistente de pergaminos en modelo/linea_tiempo.py; liberar bloques descartados sin recorrer prefijo (FR-006, FR-007, FR-009).
 - [ ] T010 [US2] Conectar cambios de conocimiento e inventario mediante modelo/snapshots.py y productores del motor; incluir mapa recordado (FR-004, FR-007, FR-011).
+
+Avance parcial de T010/T017/T018 (2026-11-10): el consumidor de D presenta la
+proyección estructurada y los campos históricos reales de C. El inventario
+conserva enlaces, orden, equipo y cursor; el mapa histórico usa solo recuerdos
+del instante consultado. Se preparó `ResultadoAccion.hechos_paso` y acceso al
+resultado completo en el controlador, conservando su retorno booleano. El
+productor del motor, el viaje por pasos en la interfaz y la restauración
+conjunta siguen pendientes. No se completa T010 por estas pruebas.
+
+Validación: `tests.test_presentacion_conocimiento` agrega seis pruebas con
+conocimiento/inventario de C, deltas, binario y recorte reales de D, ausencia
+de HTTP y compatibilidad del resultado de acción. Regresión seleccionada de
+15 módulos: 128 pruebas, 126 aprobadas y dos omisiones de historia con motor
+real. No representa certificación de una partida integrada ni de toda la suite.
 - [x] T011 [US2] Implementar formato binario 4 con historia, K, RNG y versiones en datos/guardado_binario.py; rechazar P1, validar límites/CRC y carga atómica (FR-008, FR-011, FR-012).
 
 Incremento independiente dentro de T008/T011 (no completa el formato integrado):
@@ -42,6 +56,31 @@ Incremento independiente dentro de T008/T011 (no completa el formato integrado):
 - [x] T016 [US4] Crear pruebas EX06 de mapa filtrado, costos, cazador y viaje en tests/test_comandos_integracion.py (FR-018, FR-019).
 - [x] T017 [US4] Interpretar viaje/mapa y mostrar motivo, costos y comportamiento en controlador/controlador.py, vista/consola.py y vista/grafica.py; delegar reglas a productores (FR-018, FR-019).
 - [x] T018 [US4] Registrar pasos como movimientos y orden como comentario en datos/bitacora_replay.py; no registrar consultas (FR-005, FR-019).
+
+Incremento de D del 2026-11-10: el controlador ya consume `ControlViaje` real
+de C por pasos. Inicia la orden sin mover, acepta comandos entre propuestas y
+ejecuta cada paso por la ruta ordinaria de acción/animación/replay. Conserva
+todas las causas y cancela antes de acciones manuales, pergamino, carga,
+replay, salida y nueva orden. Detiene el intento ante falta/incoherencia de
+hechos, excepciones o fallo de bitácora. La consola interactiva y la ventana
+permiten continuación automática; la entrada inyectada usa Enter por paso.
+
+`tests/test_controlador_viaje.py` prueba el consumidor con mapa, planificador
+y control reales de C y hechos explícitos de un motor de prueba. Incluye
+alternativa tras observar puerta cerrada, propuesta invalidada, rechazo sin
+progreso, ausencia de hechos, fallo de replay y entrada/cierre de ventana.
+No sustituye la aceptación con un motor de producción. Se mantienen abiertas
+T003, T010 y T021 hasta disponer de los productores y la restauración completa.
+
+La revisión de toda la suite detectó tres preparaciones incompletas de pruebas
+de D: menú oculto sin dimensiones y dobles sin escena/precarga. Se completaron
+sin retirar aserciones. Además, el menú cancela su callback de precarga al
+destruirse, evitando ejecutarlo sobre un canvas destruido.
+
+Verificación final del incremento: 701 pruebas descubiertas, 695 aprobadas,
+6 omisiones y ningún fallo/error. Las 18 pruebas nuevas del viaje de D pasan.
+La [evidencia y omisiones](aceptacion.md#viaje-por-pasos-y-cierre-de-regresiones-de-d-2026-11-10)
+conserva los límites de integración y rendimiento; no completa T003/T010/T021.
 
 ## Medición y cierre
 

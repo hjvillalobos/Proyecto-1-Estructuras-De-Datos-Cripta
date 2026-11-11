@@ -205,3 +205,48 @@ versión `f9ed9afa683d`. El benchmark offline midió diez muestras por
 estrategia y cero solicitudes. El máximo incremental fue **16.140 ms**
 frente al límite de **200 ms** de AC-20. El máximo de lectura y validación,
 medido aparte, fue 36.503 ms. [Comando, equipo y muestras](../../DECISIONES.md#parte-ii--integración-y-mediciones-de-la-persona-d).
+
+### Viaje por pasos y cierre de regresiones de D (2026-11-10)
+
+Alcance autorizado: solo D. Se cambiaron controlador, entradas de consola/GUI,
+limpieza de menú, pruebas y documentación. No se modificaron el motor de A,
+algoritmos de C, datos ni verificador de B.
+
+Se verificó el consumidor con `ControlViaje`, `PlanificadorConocido` y
+`ConocimientoMapa` reales. Un motor de prueba suministra los hechos explícitos;
+esto no sustituye una partida de producción. Los 18 casos nuevos de
+`tests/test_controlador_viaje.py` cubren inicio sin movimiento, dos pasos y
+llegada, causas simultáneas, destinos no admitidos, consultas intercaladas,
+cancelación de propuestas, pergamino/carga/salida, ausencia e incoherencia de
+hechos, excepciones y fallos de bitácora. También verifican alternativa tras
+observar cierre, rechazo sin progreso, posición/proveedor reemplazados y entrada
+automática/interrupción/cierre de ventana y consola.
+
+La primera suite completa detectó tres casos de preparación de pruebas de D.
+Se fijaron dimensiones del menú oculto y se completaron los dobles de escena y
+precarga, conservando las aserciones originales. La comprobación de destrucción
+detectó un callback de precarga que sobrevivía al menú; ahora se cancela al
+destruirlo y se verifica que no queda pendiente.
+
+Corrida final con Python 3.14.6, Windows y `CRIPTA_SIN_AUDIO=1`: **701 pruebas,
+695 aprobadas, 6 omisiones y cero fallos/errores**, en 147.274 s. Se usó un runner
+local de `unittest` con descubrimiento de `tests/`, salida por caso y un límite
+de diagnóstico de 45 s por caso. Registro local:
+`.cache/revision-d-viaje-suite-final.log`. Reproducción ordinaria:
+
+```powershell
+$env:CRIPTA_SIN_AUDIO='1'
+python -X utf8 -m unittest discover -s tests -v
+python -X utf8 -m unittest tests.test_controlador_viaje -v
+```
+
+Omisiones: comparación de escenarios de C que requiere preparar revisiones
+reales (una clase); dos casos con paquete oficial opcional no indicado; API real
+sin habilitación explícita; dos casos de historia con motor real pendientes del
+productor/restauración. No se eliminaron pruebas ni se cuentan como aprobadas.
+
+El resultado acredita la regresión y el consumidor de D. Permanecen abiertos
+T003/T010 y la aceptación integrada de T021: el motor debe entregar el proveedor
+de conocimiento/viaje, hechos del movimiento y captura/restauración histórica
+completas. Los tiempos de esta corrida son duración de pruebas, no evidencia
+de los umbrales de rendimiento del enunciado.

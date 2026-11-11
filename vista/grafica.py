@@ -22,6 +22,7 @@ RATÓN
 TECLADO
   W / ↑  norte      S / ↓  sur      D / →  este      A / ←  oeste
   Espacio  esperar        R  usar pergamino de retroceso
+  Escape  cancelar viaje
 
 BOTONES
   Usar / Equipar / Soltar actúan sobre el objeto seleccionado
@@ -121,6 +122,7 @@ class VistaGrafica:
         self.boton_esperar = ttk.Button(self.barra_botones, text="Esperar", command=lambda: self._enviar("esperar"))
         self.boton_esperar.pack(side="left", padx=(0, 8))
         ttk.Button(self.barra_botones, text="Retroceso", command=lambda: self._enviar("retroceso")).pack(side="left")
+        ttk.Button(self.barra_botones, text="Cancelar viaje", command=lambda: self._enviar("cancelar")).pack(side="left")
         self.var_tiempo = tk.StringVar()
         self.lbl_tiempo = self._etiqueta(izq, variable=self.var_tiempo, color=TENUE, fuente="Consolas")
         self.lbl_tiempo.pack(anchor="e")
@@ -281,6 +283,7 @@ class VistaGrafica:
         for tecla, comando in mapa:
             self.root.bind(f"<{tecla}>",
                            lambda ev, c=comando, t=tecla: self._tecla(c, t))
+        self.root.bind("<Escape>", lambda _evento: self._enviar("cancelar"))
 
     def _tecla(self, comando, tecla):
         foco = self.root.focus_get()
@@ -352,6 +355,28 @@ class VistaGrafica:
             return None
         self._refrescar_inv = True
         return self._cola.pop(0)
+
+    def pedir_comando_viaje(self, espera_ms=650):
+        if self._cerrada:
+            return None
+        if self._refrescar_inv:
+            self._refrescar_inv = False
+            return self._cmd_inventario()
+        self._actualizar_ui()
+        if not self._cola and not self._cerrada:
+            listo = tk.BooleanVar(master=self.root, value=False)
+            temporizador = self.root.after(espera_ms, lambda: listo.set(True))
+            try:
+                self.root.wait_variable(listo)
+            except tk.TclError:
+                self._cerrada = True
+            finally:
+                if not self._cerrada:
+                    self.root.after_cancel(temporizador)
+        if self._cerrada:
+            return None
+        self._refrescar_inv = True
+        return self._cola.pop(0) if self._cola else ""
 
     def pedir_texto(self, pregunta):
         if self._cerrada:

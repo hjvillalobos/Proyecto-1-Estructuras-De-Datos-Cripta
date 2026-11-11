@@ -392,6 +392,21 @@ con datos de prueba que la consulta por tiempo y por número de acción incluyen
 el daño de los eventos empatados antes de la siguiente decisión. La prueba
 con el motor real se omite hasta que este entregue los cambios históricos.
 
+El consumidor de viaje por pasos de D ya utiliza `ControlViaje` de C cuando el
+modelo lo entrega como `control_viaje`. `ir a <sala>` inicia el viaje y
+`cancelar` lo detiene. En la ventana también se puede usar Escape o el botón
+Cancelar viaje. En consola interactiva continúa automáticamente entre pasos;
+con entrada redirigida o inyectada se confirma cada paso con Enter. Se pueden
+consultar mapa e historia durante el viaje. Una acción manual, carga o pergamino
+cancela la continuación antes de ejecutarse. Cada movimiento aceptado conserva
+su registro en replay. Para continuar, el motor debe entregar hechos explícitos
+del movimiento; D se detiene si faltan, sin deducir daño por la vida final.
+Esta conexión del consumidor no habilita por sí sola el proveedor en el motor.
+
+```powershell
+python -m unittest tests.test_controlador_viaje tests.test_presentacion_conocimiento -v
+```
+
 R4 se comprobó en `004-linea-tiempo` después de integrar el verificador de B.
 El caso offline coloca la llave de salida detrás de su propia puerta.
 `--verificar` muestra el ciclo, el inicio normal se bloquea y `--forzar`

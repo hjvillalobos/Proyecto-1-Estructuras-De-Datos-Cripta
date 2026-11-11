@@ -104,6 +104,7 @@ class TestEscena(unittest.TestCase):
         v._actualizar_log = Mock()
         v._mostrar_detalle = Mock()
         v._animar_vida = Mock()
+        v.escena = Mock()
         v.root = Mock()
         v.mostrar_estado(datos.motor.estado_vista(), [])
         datos.motor.jugador.vida -= 4

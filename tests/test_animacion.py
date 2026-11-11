@@ -19,6 +19,8 @@ class TestAnimacion(unittest.TestCase):
         self.addCleanup(vista.cerrar)
         vista.root.withdraw()
         menu = MenuInicio(vista, Mock(), Mock())
+        menu.canvas.winfo_width = Mock(return_value=800)
+        menu.canvas.winfo_height = Mock(return_value=600)
         menu.dibujar()
         anterior = menu.animacion
         menu.dibujar()
@@ -28,6 +30,7 @@ class TestAnimacion(unittest.TestCase):
         self.assertIsNotNone(menu.animacion.pendiente)
         self.assertFalse(menu.animacion._detenida)
         menu.panel.destroy()
+        self.assertIsNone(menu._precarga_selector)
         self.assertIsNone(menu.animacion.pendiente)
         self.assertTrue(menu.animacion._detenida)
 

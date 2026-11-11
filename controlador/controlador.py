@@ -2,7 +2,9 @@ import os
 from subprocess import CalledProcessError
 
 from controlador.resumen_historia import consultar, resumir
+from controlador.presentacion_conocimiento import lineas_mapa
 from modelo.errores_historia import ErrorHistoria
+from modelo.viaje import ControlViaje, ResultadoPaso
 from datos.bitacora_replay import BitacoraReplay, RUTA_REPLAY_PREDETERMINADA
 from datos.guardado_binario import (
     guardar_estado, cargar_estado, cargar_estado_partida, RUTA_GUARDADO_PREDETERMINADA,
@@ -37,6 +39,7 @@ class ControladorJuego:
         tabla_puntajes=None,
         lanzador_replay=None,
         partida_p2=False,
+        control_viaje=None,
     ):
         self.modelo = modelo
         self.vista = vista
@@ -57,6 +60,11 @@ class ControladorJuego:
         self.ejecutando = True
         self._puntaje_registrado = False
         self._grabacion_valida = True
+        self.ultimo_resultado_accion = None
+        self._control_viaje_inyectado = control_viaje
+        self.control_viaje = self._obtener_control_viaje()
+        self._viaje_activo = False
+        self._paso_rechazado = None
 
     # ---------------------------------------------------------
     # BITÁCORA EN PANTALLA
@@ -70,7 +78,7 @@ class ControladorJuego:
     # ---------------------------------------------------------
 
     def iniciar(self, estado_inicial=None):
-   
+        self._cancelar_viaje(mostrar=False)
 
     # Iniciar bitácora de replay.
         if hasattr(self.modelo, "meta"):
@@ -106,7 +114,10 @@ class ControladorJuego:
             self._mostrar_estado()
 
             try:
-                comando = self.vista.pedir_comando()
+                if self._viaje_activo and callable(getattr(type(self.vista), "pedir_comando_viaje", None)):
+                    comando = self.vista.pedir_comando_viaje()
+                else:
+                    comando = self.vista.pedir_comando()
             except (EOFError, KeyboardInterrupt):
                 self.vista.mostrar_info("\nPartida interrumpida.")
                 break
@@ -117,6 +128,14 @@ class ControladorJuego:
             comando = comando.strip()
 
             if not comando:
+                if self._viaje_activo:
+                    try:
+                        self._avanzar_viaje()
+                    except KeyboardInterrupt:
+                        self._cancelar_viaje()
+                    except Exception as error:
+                        self._cancelar_viaje(mostrar=False)
+                        self.vista.mostrar_error(f"Viaje detenido: {error}")
                 continue
 
             try:
@@ -137,6 +156,7 @@ class ControladorJuego:
             if getattr(self.modelo, "terminado", False):
                 break
 
+        self._cancelar_viaje(mostrar=False)
         # Mostrar el último estado para que se vea cómo terminó.
         if getattr(self.modelo, "terminado", False):
             self._mostrar_estado()
@@ -208,6 +228,15 @@ class ControladorJuego:
             argumentos = [ruta] if ruta else []
         else:
             argumentos = partes[1].split() if len(partes) > 1 else []
+
+        if comando == "cancelar":
+            if argumentos:
+                return self.vista.mostrar_error("Uso: cancelar")
+            if not self._viaje_activo:
+                return self.vista.mostrar_info("No hay un viaje activo.")
+            return self._cancelar_viaje()
+        if self._viaje_activo and comando not in ("historia", "mapa", "inv", "ayuda", "guardar", "puntajes"):
+            self._cancelar_viaje()
 
         # ---------------------------------------------
         # MOVIMIENTO RÁPIDO
@@ -467,7 +496,7 @@ class ControladorJuego:
         mapa = getattr(self.modelo, "mapa_conocido", None)
         if not callable(mapa):
             return self.vista.mostrar_error("El mapa conocido todavía no está disponible.")
-        return self._mostrar_informe("Mapa conocido", "\n".join(mapa()) or "El mapa está vacío.")
+        return self._mostrar_informe("Mapa conocido", "\n".join(lineas_mapa(mapa())) or "El mapa está vacío.")
 
     def _viaje(self, argumentos):
         if len(argumentos) != 2 or argumentos[0].lower() != "a":
@@ -478,29 +507,112 @@ class ControladorJuego:
                 raise ValueError()
         except ValueError:
             return self.vista.mostrar_error("El destino debe ser un identificador de sala válido.")
+        self._cancelar_viaje(mostrar=False)
+        self.control_viaje = self._obtener_control_viaje()
+        if self.control_viaje is not None:
+            try:
+                self.control_viaje.iniciar(self.modelo.estado_vista().sala_id, destino)
+            except ValueError as error:
+                return self.vista.mostrar_error(str(error))
+            if self.control_viaje.estado != "listo":
+                return self._mostrar_fin_viaje()
+            if not self._registrar_orden_viaje(destino):
+                self.control_viaje.cancelar()
+                return
+            self._viaje_activo = True
+            self._paso_rechazado = None
+            return self.vista.mostrar_info(f"Viaje a sala {destino} iniciado. Puedes cancelar entre pasos.")
         viajar = getattr(self.modelo, "viajar_hasta", None)
         if not callable(viajar):
             return self.vista.mostrar_error("El viaje automático todavía no está disponible.")
-        if self._grabacion_valida:
-            try:
-                self.bitacora_replay.registrar_comentario(f"ir a {destino}")
-            except OSError as error:
-                self._fallo_grabacion(error)
-                return
+        if not self._registrar_orden_viaje(destino):
+            return
 
         def mover(direccion):
             return self.ejecutando and self._accion_modelo("mover", direccion)
 
         return self.vista.mostrar_info(viajar(destino, mover))
 
-    def _accion_modelo(self, accion, argumento=None):
+    def _obtener_control_viaje(self):
+        proveedor = (self._control_viaje_inyectado if self._control_viaje_inyectado is not None
+                     else getattr(self.modelo, "control_viaje", None))
+        return proveedor if isinstance(proveedor, ControlViaje) else None
 
+    def _registrar_orden_viaje(self, destino):
+        if not self.ejecutando or not self._grabacion_valida:
+            return False
+        try:
+            self.bitacora_replay.registrar_comentario(f"ir a {destino}")
+        except OSError as error:
+            self._fallo_grabacion(error)
+            return False
+        return True
+
+    def _cancelar_viaje(self, mostrar=True):
+        activo = self._viaje_activo
+        self._viaje_activo = False
+        self._paso_rechazado = None
+        if self.control_viaje is not None and (activo or self.control_viaje.pendiente is not None):
+            self.control_viaje.cancelar()
+        if activo and mostrar:
+            self.vista.mostrar_info("Viaje detenido: cancelación.")
+
+    def _mostrar_fin_viaje(self):
+        self._viaje_activo = False
+        etiquetas = (("llegada", "destino alcanzado"), ("dano", "daño recibido"),
+                     ("enemigos", "enemigos al entrar"), ("fin_partida", "fin de partida"),
+                     ("sin_ruta", "sin ruta conocida"), ("destino_no_explorado", "destino no explorado"),
+                     ("origen_no_explorado", "origen no explorado"), ("cancelacion", "cancelación"))
+        motivos = [next((texto for clave, texto in etiquetas if clave == causa), causa)
+                   for causa in self.control_viaje.causas]
+        return self.vista.mostrar_info("Viaje detenido: " + "; ".join(motivos) + ".")
+
+    def _avanzar_viaje(self):
+        if not self._viaje_activo:
+            return
+        if not self.ejecutando or not self._grabacion_valida or getattr(self.modelo, "terminado", False):
+            return self._cancelar_viaje(mostrar=False)
+        try:
+            if self.control_viaje is not self._obtener_control_viaje():
+                raise ValueError("El proveedor de viaje cambió; inicia otro viaje.")
+            if self.modelo.estado_vista().sala_id != self.control_viaje.posicion:
+                raise ValueError("La posición cambió fuera del viaje; inicia otro viaje.")
+            paso = self.control_viaje.proponer()
+            if paso is None:
+                return self._mostrar_fin_viaje()
+            identidad = (paso.origen, paso.ruta.siguiente, paso.ruta.direccion)
+            if identidad == self._paso_rechazado:
+                raise ValueError("El movimiento fue rechazado y la ruta conocida no cambió.")
+            if not self._viaje_activo or self.control_viaje.pendiente is not paso:
+                return self._cancelar_viaje(mostrar=False)
+            self._accion_modelo("mover", paso.ruta.direccion, desde_viaje=True)
+            if not self._viaje_activo:
+                return
+            resultado = self.ultimo_resultado_accion
+            hechos = getattr(resultado, "hechos_paso", None)
+            if not isinstance(hechos, ResultadoPaso):
+                raise ValueError("El motor todavía no entrega los hechos del movimiento para continuar el viaje.")
+            if hechos.aceptado != resultado.ok or hechos.posicion != self.modelo.estado_vista().sala_id:
+                raise ValueError("Los hechos del movimiento no coinciden con el resultado del motor.")
+            self.control_viaje.registrar_resultado(paso.numero, hechos)
+            self._paso_rechazado = identidad if not resultado.ok else None
+            if self.control_viaje.estado == "detenido":
+                return self._mostrar_fin_viaje()
+        except Exception:
+            self._cancelar_viaje(mostrar=False)
+            raise
+
+    def _accion_modelo(self, accion, argumento=None, *, desde_viaje=False):
+        if not desde_viaje:
+            self._cancelar_viaje()
+        self.ultimo_resultado_accion = None
         if (callable(getattr(type(self.vista), "ejecutar_tarea", None))
                 and getattr(self.vista, "root", None) is not None):
             resultado = self.vista.ejecutar_tarea(self.modelo.ejecutar, accion, argumento)
         else:
             resultado = self.modelo.ejecutar(accion, argumento)
 
+        self.ultimo_resultado_accion = resultado
         if not resultado.ok:
 
             mensaje = (
@@ -717,6 +829,7 @@ class ControladorJuego:
             )
 
     def _fallo_grabacion(self, error):
+        self._cancelar_viaje(mostrar=False)
         self._grabacion_valida = False
         self.ejecutando = False
         texto = (f"La accion se realizo, pero no pudo grabarse: {error}. "
@@ -732,7 +845,7 @@ class ControladorJuego:
     # ---------------------------------------------------------
 
     def _cargar(self, ruta):
-
+        self._cancelar_viaje(mostrar=False)
         if not hasattr(self.modelo, "restaurar_estado"):
             return self.vista.mostrar_error(
                 "El modelo todavía no implementa restaurar_estado()."
