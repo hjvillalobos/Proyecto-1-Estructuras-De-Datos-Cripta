@@ -185,7 +185,7 @@ class TestOffline(unittest.TestCase):
                     self.assertEqual(args.datos_dir, args.offline)
             args = leer_argumentos(["--offline", "paquete", "--datos-dir", "sesion"])
             self.assertEqual(Path(args.offline), self.paquete.resolve())
-            self.assertEqual(Path(args.datos_dir), self.raiz / "sesion")
+            self.assertEqual(Path(args.datos_dir), (self.raiz / "sesion").resolve())
         finally:
             os.chdir(anterior)
 
@@ -196,21 +196,29 @@ class TestOffline(unittest.TestCase):
         self.assertIn(str(self.paquete.resolve()), str(fallo.exception))
 
     def test_cli_offline_y_reporte(self):
+        # El origen ofrece v1 completa y otra versión como actual.
+        almacen = AlmacenLocal(self.paquete)
+        almacen.guardar_llaves("prueba", "v1", {"llaves": []})
+        almacen.guardar_generales(dict(almacen.leer_generales("prueba", "v1"), version="v2"))
+        destino = self.raiz / "sesion"
         salida = io.StringIO()
         with redirect_stdout(salida), patch("requests.sessions.Session.request",
                                           side_effect=AssertionError("Se usó red")):
             codigo = main(["--offline", str(self.paquete), "--cripta", "prueba",
-                           "--datos-dir", str(self.raiz / "sesion"), "--cache-size", "3",
-                           "--descargar-todo"])
+                           "--datos-dir", str(destino), "--cache-size", "3",
+                           "--version-cripta", "v1", "--descargar-todo"])
         self.assertEqual(codigo, 0)
         self.assertIn('"solicitudes_realizadas": 0', salida.getvalue())
         self.assertIn('"capacidad_cache": 3', salida.getvalue())
+        self.assertEqual(AlmacenLocal(destino).leer_llaves("prueba", "v1"), {"llaves": []})
+        self.assertIsNone(AlmacenLocal(destino).leer_generales("prueba", "v2"))
 
     def test_cli_error_controlado(self):
         salida = io.StringIO()
         errores = io.StringIO()
         with redirect_stdout(salida), redirect_stderr(errores):
             codigo = main(["--offline", str(self.paquete), "--cripta", "ausente",
-                           "--datos-dir", str(self.raiz / "sesion")])
+                           "--datos-dir", str(self.raiz / "sesion"), "--descargar-todo"])
         self.assertEqual(codigo, 1)
         self.assertIn("faltan datos", errores.getvalue())
+        self.assertIn(str(self.paquete.resolve()), errores.getvalue())

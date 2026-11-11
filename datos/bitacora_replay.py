@@ -97,6 +97,10 @@ class BitacoraReplay:
             )
             archivo.write("\n")
 
+    def registrar_comentario(self, texto):
+        with self.ruta.open("a", encoding="utf-8") as archivo:
+            archivo.write(json.dumps({"tipo": "comentario", "texto": texto}, ensure_ascii=False) + "\n")
+
     def registrar_accion(
         self,
         accion,
@@ -222,6 +226,10 @@ class BitacoraReplay:
 
             if not isinstance(registro, dict):
                 raise ReplayCorrupto(f"Linea {numero}: se esperaba un objeto JSON.")
+            if registro.get("tipo") == "comentario":
+                if not isinstance(registro.get("texto"), str):
+                    raise ReplayCorrupto(f"Línea {numero}: comentario inválido.")
+                continue
             if registro.get("tipo") == "cargar":
                 if not isinstance(registro.get("estado"), dict):
                     raise ReplayIncompatible("La carga no contiene el estado necesario para reproducirla.")
@@ -270,9 +278,10 @@ class BitacoraReplay:
 def aplicar_accion_replay(juego, accion):
     if accion.accion == "cargar":
         from modelo.snapshots import EstadoGuardado, ResultadoAccion
+        from datos.guardado_binario import ErrorGuardado
         try:
             juego.restaurar_estado(EstadoGuardado.desde_dict(accion.argumento))
-        except (ValueError, TypeError, KeyError, IndexError) as error:
+        except (ValueError, TypeError, KeyError, IndexError, ErrorGuardado) as error:
             raise ReplayIncompatible(f"No se puede restaurar la carga del replay: {error}") from error
         return ResultadoAccion(ok=True)
     return juego.ejecutar(accion.accion, accion.argumento)

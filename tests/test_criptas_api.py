@@ -8,6 +8,7 @@ import unittest
 from contextlib import redirect_stdout
 from pathlib import Path
 from unittest.mock import Mock, patch
+from tests.datos_integracion_d import reporte_prueba
 
 import main
 from datos.almacen import AlmacenLocal
@@ -40,6 +41,7 @@ class TestSeleccionCriptas(unittest.TestCase):
                 sesion.cliente.listar_criptas.return_value = {"criptas": CRIPTAS}
                 juego = Mock(resultado=None)
                 with patch("main.SesionDatos", return_value=sesion), \
+                        patch("controlador.aplicacion.verificar", return_value=reporte_prueba()), \
                         patch("vista.grafica.VistaGrafica", return_value=vista), \
                         patch("modelo.juego.crear_juego", return_value=juego) as crear, \
                         patch("controlador.controlador.ControladorJuego"), \
@@ -52,8 +54,11 @@ class TestSeleccionCriptas(unittest.TestCase):
         sesion = Mock()
         sesion.cliente.listar_criptas.return_value = {"criptas": CRIPTAS}
         sesion.precarga.preparar_cripta.return_value.salas = [Mock(id=1)]
-        with patch("main.SesionDatos", return_value=sesion), redirect_stdout(io.StringIO()):
+        with patch("main.SesionDatos", return_value=sesion), \
+                patch("red.verificacion.preparar_verificacion", return_value=Mock(version="v1")) as preparar, \
+                redirect_stdout(io.StringIO()):
             self.assertEqual(main.main(["--descargar-todo"]), 0)
+        self.assertEqual([llamada.args[2] for llamada in preparar.call_args_list], [c["id"] for c in CRIPTAS])
         self.assertEqual(sesion.renovar.call_count, 3)
         self.assertEqual([llamada.args[0] for llamada in sesion.precarga.preparar_cripta.call_args_list],
                          [cripta["id"] for cripta in CRIPTAS])

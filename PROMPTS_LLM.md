@@ -739,13 +739,149 @@ modelo no se consigna porque no está confirmada para estas intervenciones.
   la selección de archivos del commit. La integración en `main` queda para el
   siguiente paso; no se registra como realizada.
 
+### 2026-10-30 — Especificación del verificador de resolubilidad
+
+- **Herramienta/modelo:** Codex; variante del modelo no registrada.
+- **Prompt textual:**
+
+> Integra la preparacion en main, asi todos podemos partir de la misma constitucion y configuracion
+>
+> Y genera la especificacion de mi nueva parte, el verificador de resolubilidad, definiendo primero que debe hacer y como se acepta, despues seguiriamos con las declaraciones, plan, tareas y codigo
+
+- **Uso de la respuesta:** Comprobar que la preparación ya estaba integrada en
+  `main` y sincronizar la copia local. Generar con `speckit-specify` el borrador
+  de la especificación del verificador, con requisitos, escenarios de aceptación,
+  criterios de éxito y separación de responsabilidades entre B y D. Revisar su
+  calidad documental. No se implementó código ni se generaron el plan o las tareas.
+
+### 2026-11-01 — Aclaraciones del verificador de resolubilidad
+
+- **Herramienta/modelo:** Codex; variante del modelo no registrada.
+- **Prompt textual:**
+
+> Mantén ambos criterios con esa distinción, con el fin de rechazar ubicaciones alternativas validas y separar los obstáculos del juego de los errores de información, implementa la solución
+
+- **Uso de la respuesta:** Aplicar mediante `speckit-clarify` los criterios aceptados:
+  un mismo ID puede tener ubicaciones alternativas y una llave ausente del listado
+  completo y válido se considera imposible de obtener. Distinguir estos obstáculos
+  de las descargas fallidas, datos incompletos o inválidos y versiones incompatibles,
+  que impiden completar la verificación. Por el contexto de aceptación de ambos
+  criterios, «rechazar ubicaciones alternativas validas» se interpretó como
+  «evitar rechazar ubicaciones alternativas válidas», conservando arriba el texto
+  original. Actualizar requisitos y escenarios de aceptación, sin implementar código
+  ni generar todavía el plan o las tareas. No se atribuye esta interpretación al profesor.
+
+
+### 2026-11-01 — Plan técnico del verificador de resolubilidad
+
+- **Herramienta/modelo:** Codex; variante del modelo no registrada.
+- **Prompt textual:**
+
+> Me parece la opcion mas sensata, dejemoslo asi, continuemos con el `speckit-plan`, para definir como implementarlo con estructuras propias y sencillas, despues seguiriamos con tareas, analisis y guardar la especificacion en un commit antes del codigo
+
+- **Uso de la respuesta:** Ejecutar preparación de `speckit-plan`, revisar constitución, especificación y módulos existentes. Elaborar `plan.md` y `research.md` parciales con propuesta de arreglos, cola e índices propios, preparación versionada y mediciones. Detectar B1: el cierre incremental puede reunir llaves de ramas sin regreso y dar una victoria falsa. Dejar la fase 1 pendiente de aclaración; no generar tareas, implementar código ni realizar commit. Mantener los criterios de llaves acordados sin atribuir al profesor una respuesta más específica que «exacto».
+
+### 2026-11-01 — Alcance acumulativo y cierre del plan
+
+- **Herramienta/modelo:** Codex; variante del modelo no registrada.
+- **Prompt textual:**
+
+> Registra el supuesto y su limitación en la especificación con altas probabilidades de quedar como opción definitiva en un futuro y completa el plan con ese alcance
+
+- **Uso de la respuesta:** Registrar el modelo acumulativo como supuesto provisional autorizado y opción preferida del equipo, sin probabilidad numérica inventada ni aprobación atribuida al profesor. Incorporar AC-21 y alcance explícito del resultado. Completar plan, investigación, modelo de datos, contrato para D y guía de validación; revisar la lista documental. No generar tareas, ejecutar pruebas del verificador inexistente ni implementar o confirmar código.
+
+### 2026-11-01 — Tareas del verificador de resolubilidad
+
+- **Herramienta/modelo:** Codex; variante del modelo no registrada.
+- **Prompt textual:**
+
+> Continuemos con `speckit-tasks`
+
+- **Uso de la respuesta:** Generar `tasks.md` desde especificación, plan, investigación, modelo de datos y contrato. Organizar 34 tareas por fases e historias, con requisitos, escenarios, dependencias, pruebas y responsables B/D. Conservar alcance acumulativo provisional y commit de especificación previo al código. Verificar formato y cobertura documental; no ejecutar tareas, pruebas funcionales, implementación ni commit.
+
+### 2026-11-01 — Análisis de coherencia documental
+
+- **Herramienta/modelo:** Codex; variante del modelo no registrada.
+- **Prompt textual:**
+
+> Continua con`speckit-analyze` para revisar la coherencia entre especificación, plan y tareas antes del commit
+
+- **Uso de la respuesta:** Revisión de solo lectura con cuatro hallazgos C1, I1, U1 y A1. Este registro se incorpora en la edición posterior autorizada, no durante el análisis.
+
+### 2026-11-01 — Autorización de recomendaciones
+
+- **Herramienta/modelo:** Codex; variante del modelo no registrada.
+- **Prompt textual:**
+
+> Para cada uno de los hallazgos aplica las respectivas recomendaciones y utiliza las mismas como el prompt a formular para dicha implementación
+
+- **Uso de la respuesta:** Aplicar recomendaciones a documentación de especificación, diseño, tareas y validación. Las siguientes entradas son recomendaciones del asistente aprobadas como prompts por el usuario; no se presentan como mensajes textuales originalmente escritos por él. No se implementa código ni se realiza commit.
+
+### 2026-11-01 — C1 — Conformidad pendiente
+
+- **Herramienta/modelo:** Codex; variante del modelo no registrada.
+- **Prompt propuesto aprobado:**
+
+> Conservar tu supuesto autorizado, pero identificar la conformidad con ese requisito como pendiente de confirmación, no como superada.
+
+- **Uso de la respuesta:** Se mantuvo AC-21 y se corrigieron estado, control constitucional y checklist. No se declara resuelta la conformidad académica.
+
+### 2026-11-01 — I1 — Evidencia de ciclos
+
+- **Herramienta/modelo:** Codex; variante del modelo no registrada.
+- **Prompt propuesto aprobado:**
+
+> Precisar cuándo se informa un ciclo como causa de bloqueo y cuándo es solo una relación circular encontrada. Agregar un caso que combine desconexión, una llave y una puerta de regreso que la requiera.
+
+- **Uso de la respuesta:** Se documentaron clasificación de evidencia, prueba suficiente conservadora y AC-22, con tareas y contrato asociados. No se afirma que detectar una SCC certifique bloqueo ni que la prueba suficiente sea completa.
+
+### 2026-11-01 — U1 — Publicación versionada
+
+- **Herramienta/modelo:** Codex; variante del modelo no registrada.
+- **Prompt propuesto aprobado:**
+
+> Establecer que los datos descargados no se publican como reutilizables hasta completar la validación de versión. Probar también la siguiente ejecución, no solo la que detectó el cambio.
+
+- **Uso de la respuesta:** Se especificó lote privado en memoria hasta validar conjunto y versión final, publicación posterior y actual.json al final, sin prometer transacción multiarquivo. AC-23 comprueba segunda ejecución offline.
+
+### 2026-11-01 — A1 — Evidencia de escalamiento
+
+- **Herramienta/modelo:** Codex; variante del modelo no registrada.
+- **Prompt propuesto aprobado:**
+
+> Separar las cotas de normalización, recorrido y diagnóstico, y concretar la evidencia de escalamiento exigida sin excluir trabajo del tiempo total.
+
+- **Uso de la respuesta:** Se agregó protocolo N/2N/4N, conteos, razones temporales y costo total con factores logarítmicos; no se relajó FR-015 ni se afirmó cumplimiento de 200 ms.
+
+### 2026-11-01 — Cierre del diseño del diagnóstico de ciclos
+
+- **Herramienta/modelo:** Codex; variante del modelo no registrada.
+- **Prompt textual:**
+
+> Muy bien, cierra con el diagnostico de ciclos
+
+- **Uso de la respuesta:** Completar el diseño documental: certificado global del cierre para justificar pendientes, componentes para mostrar ciclos concretos y alternativas por referencias. Sustituir la certificación incompleta por componente; distinguir bloqueo autónomo, bloqueos externos y desconexión. Agregar AC-24/25 y actualizar tareas, modelo, contrato y guía. Sin código ni commit; no atribuir confirmación al profesor.
+
+### 2026-11-02 — Confirmación del profesor y cierre de C1
+
+- **Herramienta/modelo:** Codex; variante del modelo no registrada.
+- **Prompt textual:**
+
+> El profesor respondio afirmativamente
+
+- **Contexto de la confirmación:** El usuario había comunicado la consulta «Podemos acumular llaves entre salas alcanzables sin exigir una trayectoria única ?». La respuesta afirmativa se registra según lo informado por el usuario; no se inventa una cita textual adicional del profesor.
+- **Uso de la respuesta:** Completar la autorización previa de resolver y aprobar C1 al recibirse la evidencia faltante. Registrar aclaración fechada y actualizar estados de especificación, plan, tareas, investigación, contrato, guía y checklist. Mantener limitación de trayectoria y pendientes de código, pruebas y rendimiento. Sin commit ni implementación.
+
+### 2026-11-02 — Implementación del verificador
+
+- **Herramienta/modelo:** Codex.
+- **Prompt textual:** «Continua con el speckit-implement».
+- **Uso de la respuesta:** Implementación del verificador de resolubilidad siguiendo la especificación, el plan y las tareas previamente aprobados. Las tareas completadas y las pruebas ejecutadas se registran según los resultados reales.
 
 
 ## 2026-11-02 — preparación de línea de tiempo
 
-Herramienta: Codex desktop. Modelo concreto: no expuesto. Solicitud textual:
 
-> puedes hacerlo tu? dejando lo que mi compañero ya hizo solo añadiendo lo que falta para empezar y explicame que haras, tambien no pongas las letras de a,b,c,d
 
 Contexto textual previo:
 
@@ -758,3 +894,186 @@ Prompt textual a agente de investigación requerido por speckit-plan:
 > La habilidad speckit-plan exige agentes de investigación. Solo lectura: revisa modelo/juego.py e historial.py en C:/Users/Belén/Documents/2026/Datos/Proyecto/Proyecto-1-Estructuras-De-Datos-Cripta para determinar fronteras acciones/eventos, pergamino, captura serializable. Devuelve decisiones de diseño compatibles y riesgos concretos. No edites archivos.
 
 Uso de respuesta: capturar cambios tipados en lugar de closures, exigir cierre de lote temporal, conservar excepción persistente del pergamino y separar reconstrucción del restaurador con catálogo. Pruebas actuales y límites en baseline.md. No se atribuyen resultados de benchmarks todavía no ejecutados.
+
+
+## 2026-11-02 — núcleo de línea de tiempo
+
+Herramienta: Codex desktop; modelo concreto no expuesto. Prompt textual:
+
+> okay empecemos con el codigo entonces la parte que me toca a mi, que se puede ir haciendo sin depender de los compañeros?
+
+Uso: aplicar speckit-implement al subconjunto independiente T002/T004–T006/T009. Checklist de requisitos: 8 satisfechos, 0 pendientes; scripts de prerrequisitos correctos; sin extensions.yml ni hooks. Se precisó el plan y el orden del núcleo sintético antes del código en commit 9ac1088. Se implementaron contratos inmutables, estado puro con búsqueda propia, deltas/checkpoints, consultas y recorte. Pruebas escritas antes del módulo; fallo inicial esperado por importación aún inexistente. Después: 14 nuevas pruebas correctas, 147 incluyendo regresión seleccionada. Demo ejecutada. No se modificaron reglas del motor, guardado binario, red ni vista. Integración pendiente.
+
+
+## 2026-11-02 — persistencia del núcleo histórico
+
+Herramienta: Codex desktop; modelo concreto no expuesto. Solicitud textual:
+
+
+
+> okay hazlo, pero antes tengo una duda, tu puedes ver el primer enunciado? cripta parte 1? Es que necesito que todo vaya acorde a los dos enunciados para garantizar un trabajo correcto
+
+Uso: revisar archivo P1 indicado (0 bytes, imposible extraer contenido), continuar el guardado/carga del núcleo aislado conforme al plan. No se afirma haber leído P1. Se aplicó el subconjunto T022–T024 de speckit-implement tras prerrequisitos y checklist ya completos; no hay extensions.yml ni hooks. Precisión documental previa al código en commit 4bbc87b. Pruebas escritas primero, fallo esperado de módulo aún inexistente; implementados contratos exportables, carga validada y codec CRLH con escritura atómica. 164 pruebas aprobadas en regresión seleccionada, incluidas 31 nuevas de núcleo/persistencia. Sin cambios de reglas, guardado integrado, vista o red. No se publicaron cambios remotos.
+
+
+## 2026-11-02 — decisiones, prompts y manejo de errores
+
+Herramienta: Codex desktop; modelo concreto no expuesto. Prompt textual:
+
+> tambien ocupo que metas las deciciones, promots y los manejo de errores ya que nos bajaron puntos en la parte 1 por el manejo de errores le faltaba un poco mas de documentacion, es buena idea no?
+
+Uso: revisar y completar las decisiones del núcleo, conservar las entradas anteriores de esta bitácora y añadir la matriz de manejo de errores. Se precisó el diseño antes de cambiar el código, en commit 129bdbf. Bajo speckit-implement, prerrequisitos correctos, checklist previo completo y sin extensions.yml/hooks. Se escribió primero tests/test_errores_historia.py y se observó el fallo esperado por módulo aún inexistente. Se implementaron clases de dominio compatibles con ValueError, validación de claves/rutas/datos binarios y conservación del error principal si falla la limpieza del temporal. Regresión seleccionada: 172 pruebas aprobadas, incluidas 8 nuevas de errores. Sin cambios de vista, red o reglas del motor; no se anuncia integración completa ni rendimiento no medido.
+
+## 2026-11-06 — integración de la persona D
+
+Herramienta: Codex desktop. Prompts textuales:
+
+> en base a los enunciados y mi parte D no puedo seguir avanzando ? con el codigo? puedes revisar github tambien
+
+> ya me traje los cambios a mi rama linea del tiempo, los cambios son del motor, que puedo ir avanzando?
+
+> hazlo todo, pero haz pruebas de todo, sigue el enunciado al pie de le letra, haz los prompts, deciciones no te equivoques por favor sigue la parte D
+
+> solo puedes trabajar en la rama linea tiempo
+
+Uso: revisar el enunciado, el reparto y las referencias Git, actualizar la copia
+local a a7acb0e, analizar los requisitos y ejecutar la implementación y las
+pruebas de D en 004-linea-tiempo. Registrar decisiones y resultados reproducibles.
+
+Alcance confirmado por la usuaria: D implementa el receptor y sus
+consumidores. A conserva los puntos de captura y las reglas del ciclo,
+incluido el cierre de empates. El receptor se prueba con el protocolo
+propuesto y no atribuye esa prueba al motor todavía sin instrumentar.
+La integración consume el verificador de B cuando esté disponible en la rama.
+
+Prompts textuales adicionales del 2026-11-06 (Codex desktop):
+
+> porfa nunca hagas trabajo de A
+
+> solo trabaja con la parte de D plis, haz todo lo que puedas
+
+Uso: retirar la instrumentación local iniciada en archivos del motor y delimitar
+el incremento al receptor, los adaptadores y la validación a cargo de D.
+
+## 2026-11-07 — evidencia de implementación de D
+
+Herramienta: Codex desktop. Se aplicaron las instrucciones locales
+speckit-analyze y speckit-implement a la solicitud textual ya registrada.
+Se contrastaron las reglas de tiempo, guardado, replay y benchmark con
+los enunciados. Se incorporaron consumidores y pruebas de D, con
+productores simulados donde todavía faltan contratos reales. Se registraron
+decisiones, mediciones, errores, regresiones y dependencias en sus archivos.
+No se enviaron prompts a otros agentes ni se atribuyen acuerdos a compañeros.
+
+### 2026-11-09 — Entrega de costos y rango de B a A
+
+- **Herramienta/modelo:** Codex (GPT-6).
+- **Prompt textual:**
+
+> Implementa el siguiente paso:
+>
+> Cerrar E-BCOSTOS y despues E-B-RANGO. Para el primero, la prueba de entrega más clara es descargar una salida con costo explícito y otra con costo omitido, volver a abrir la cripta offline y comprobar que A obtiene el costo publicado y 100, respectivamente. Para el segundo, aplicar la misma comprobación a una ficha de cazador y verificar que A recibe su rango por tipo de enemigo sin hacer HTTP durante la búsqueda
+
+- **Uso de la respuesta:** Verificar la entrega de costos y rango con datos válidos, incorporar la consulta de fichas preparadas por tipo y probar la reapertura offline. B registró la evidencia en el contrato A–B. La revisión de A queda pendiente.
+
+### 2026-11-10 — Validación final del verificador
+
+- **Herramienta/modelo:** Codex (GPT-6).
+- **Prompt textual:**
+
+> Valida el inicio con (T026). La prueba que hicimos confirma que --verificar lee el paquete offline. Falta comprobar que hace el juego al iniciar una cripta resoluble debe arrancar normalmente, una no resoluble debe arrancar solo con --forzar, y una verificacion no completada debe bloquear el inicio incluso con --forzar.
+>
+> Despues cierra la revision de rendimiento (T030–T031). A D le corresponde ajustar el comando general del benchmark. De nuestro lado nos corresponde comprobar que funcione con las repeticiones predeterminadas y con un paquete real. Para FR-015, ya tenemos las mediciones de escalamiento y la prueba de la cripta de 300 salas. Queda valorar el crecimiento observado teniendo en cuenta que la normalizacion cuesta 0(N log N)
+>
+> Y por ulitmo actualiza el estado final (T032–T034). Después de las pruebas conjuntas, registrar qué pasó, enlazar la evidencia y ajustar las casillas pendientes a lo que realmente quedó integrado.
+
+- **Uso de la respuesta:** Ejecutar la matriz real de consola, reproducir dos pendientes del benchmark general, medir de nuevo la cripta preparada y actualizar [el estado de las tareas](specs/001-verificador-resolubilidad/tasks.md).
+
+## 2026-11-08 — aceptación offline de D
+
+Herramienta: Codex desktop. Prompts textuales:
+
+> no tenemos la aclaracion de la api aun entonces que puedo ir completando?
+
+> puedes hacer tu eso ? pero no toques nada de A basate en mi parte D plisssss y en el enunciado
+
+Uso: comprobar H3 y R4 según Parte II §§3.1, 3.5, 3.6 y el Apéndice B.
+Se amplió la cobertura de D y se comprobó el bloqueo y el inicio forzado
+con B en una copia temporal. La prueba conjunta de H3 queda preparada
+para cuando A entregue cambios serializables. La matriz distingue los
+resultados observados de las dependencias pendientes. El trabajo se limitó
+a pruebas y documentación de D.
+
+### Continuación de T021
+
+Herramienta: Codex desktop. Prompt textual:
+
+> dale haz todo lo que puedas, no se si me traigo los cambios de b o ya estan ?
+
+Uso: comprobar las referencias de Git, reproducir la falla de salida en
+CP1252 y corregir la presentación y selección del benchmark de D. Se verificaron R4,
+las filas del benchmark con B y la prueba gráfica en una copia de
+integración. La matriz registra los resultados y su alcance.
+
+### Sincronización después del PR #22
+
+Herramienta: Codex desktop. Prompts textuales:
+
+> listo ya me traje los cambios de resolubilidad que mas se puede hacer ?
+
+> haz todo lo que puedas
+
+Uso: sincronizar la rama local `004-linea-tiempo` con `a34d926`, conservar
+los cambios locales de D y resolver la unión de las dos secciones del
+README. Se repitieron R4, el benchmark en CP1252 y la regresión seleccionada
+en la rama sincronizada. La aceptación de historia con el motor real
+continúa pendiente de los productores.
+
+### Descarga de llaves y verificación offline
+
+Herramienta: Codex desktop. Prompts textuales:
+
+> y de momento no puedo hacer nada por mientras ?
+
+> hazlo y recuerda poner prompts pruebas y eso
+
+Uso: conectar `--descargar-todo` con la preparación por versión de B,
+comprobar que el resultado se pueda verificar offline y probar el bloqueo
+real de `--forzar` cuando faltan llaves. Las pruebas de descarga
+reprodujeron el fallo antes del ajuste. El caso de bloqueo por datos
+incompletos ya pasaba y quedó cubierto con el verificador real.
+Se actualizaron comandos, decisiones y aceptación. Los ensayos usaron
+datos de prueba y no se introdujeron reglas para costos ambiguos.
+
+### Medición offline y publicación de D
+
+Herramienta: Codex desktop. Prompt textual:
+
+> hazlo si y sube todo lo que haz hecho a mi rama, avanza todo lo que puedas de mi parte
+
+Uso: conectar el benchmark de resolubilidad de D con el paquete local y
+publicar los cambios de D en `004-linea-tiempo`. Se añadieron pruebas del
+paquete seleccionado y del rechazo de datos incompletos. Antes del
+ajuste ambos casos ejecutaban la carga sintética. Se reutilizaron los
+módulos de B sin modificar sus algoritmos. La evidencia de prueba
+no acredita el límite oficial de 200 ms.
+
+## 2026-11-09 — Verificación conjunta de D
+
+Herramienta: Codex desktop. Prompt textual:
+
+> dale haz todo eso pero solo en mi rama linea de tiempo, sigue el enunciado, que no hayan bugs y que se siga correctamente mi parte
+
+Uso. Actualizar `004-linea-tiempo` al PR #23 y preparar la prueba que
+compara historia, guardado, carga y replay de una misma partida. El caso
+con el productor de prueba pasó. Se comprobó la frontera del motor real
+por separado y se mantuvo la omisión de la prueba conjunta mientras
+falten captura y restauración. Se consultó el listado del servicio,
+se preparó la mayor cripta con B y se midió el análisis offline.
+Se registraron comandos, muestras y límites sin modificar el motor.
+
+### 2026-11-10 — Cierre integrado de B y D
+
+- **Herramienta/modelo:** Codex (GPT-6).
+- **Prompt textual:** «Resuelve todos los pendientes y confirma su solución».
+- **Uso de la respuesta:** Integrar el commit de D, reconciliar la descarga y los paquetes de prueba y comprobar el informe incompleto, el inicio y la medición offline. [Registro del cierre](specs/001-verificador-resolubilidad/tasks.md).

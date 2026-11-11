@@ -1,6 +1,8 @@
 """Escala/contenido nuevo y verificacion explicita de API real (opcional)."""
 
 import os
+import subprocess
+import sys
 from pathlib import Path
 import tempfile
 import unittest
@@ -13,11 +15,48 @@ from red.cache import CacheCatalogoOrdenado
 from red.catalogo import GestorCatalogo
 from red.cliente_api import ClienteApi
 from red.precarga import GestorPrecarga
-from tests.datos_prueba import ServidorFalso
+from tests.datos_prueba import ServidorFalso, crear_paquete
 from controlador.controlador import ControladorJuego
 from datos.puntajes import TablaPuntajes
 from utilidades.bench_juego import motor_sintetico
 from vista.consola import VistaConsola
+
+
+class TestInicioVerificado(unittest.TestCase):
+    def test_T026_FR013_AC15_AC18_inicio_y_verificacion_exclusiva(self):
+        programa = Path(__file__).resolve().parents[1] / "main.py"
+        for estado in ("resoluble", "no resoluble", "no completada"):
+            with tempfile.TemporaryDirectory() as temporal:
+                raiz = Path(temporal)
+                paquete = raiz / "paquete"
+                almacen = crear_paquete(paquete, salas=2)
+                pagina = almacen.leer_pagina("prueba", "v1", 1)
+                pagina["salas"][0]["salidas"]["E"].update(cerrada=True, llave="obj_0")
+                almacen.guardar_pagina("prueba", "v1", pagina)
+                if estado == "no resoluble":
+                    almacen.guardar_llaves("prueba", "v1", {"llaves": []})
+                elif estado == "no completada":
+                    next(paquete.rglob("llaves.json")).unlink()
+                for modo in ("normal", "forzar", "verificar"):
+                    with self.subTest(estado=estado, modo=modo):
+                        carpeta = raiz / modo
+                        carpeta.mkdir()
+                        opciones = ["--verificar" if modo == "verificar" else "--cripta", "prueba"]
+                        if modo == "forzar":
+                            opciones.append("--forzar")
+                        proceso = subprocess.run(
+                            [sys.executable, "-X", "utf8", "-X", "importtime", str(programa),
+                             "--offline", str(paquete), *opciones], cwd=carpeta, input="salir\n",
+                            capture_output=True, encoding="utf-8", timeout=30)
+                        inicia = modo != "verificar" and (estado == "resoluble" or
+                                                          (modo == "forzar" and estado == "no resoluble"))
+                        self.assertEqual(proceso.returncode, 0 if inicia or estado == "resoluble" else 1,
+                                         proceso.stdout + proceso.stderr[-1000:])
+                        self.assertIn(f"Verificación de prueba: {estado}", proceso.stdout)
+                        self.assertEqual((carpeta / "datos_generados/partida.log").is_file(), inicia)
+                        self.assertEqual("Sesión finalizada." in proceso.stdout, inicia)
+                        if modo == "verificar":
+                            self.assertNotRegex(proceso.stderr, r"(?m)\|\s*(vista(?:\.|$)|modelo\.juego$)")
 
 
 class TestCierrePuntajeConsola(unittest.TestCase):

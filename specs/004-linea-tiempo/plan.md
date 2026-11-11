@@ -8,6 +8,18 @@ Se conserva la constitución compartida 1.1.0 de main. Índices propios sin dict
 
 ## Decisión propuesta
 
+### Primer incremento independiente
+
+El núcleo recibe un estado histórico puro: campos de clave textual estable y valores inmutables (escalares o tuplas recursivas). Cada cambio conserva presencia y valor antes/después, para expresar creación y eliminación además de sustitución. No contiene objetos vivos, closures ni índices dict/set. El adaptador al estado del motor se implementará después.
+
+Un arreglo ordenado propio de campos con búsqueda binaria permite leer claves; insertar/eliminar desplaza campos y cuesta O(numero de campos). No se promete actualización constante. Se valida una acción completa sobre solo los campos afectados antes de modificar el estado actual, sin copiar todo el mundo por acción.
+
+Una acción registrada contiene sus cambios inmediatos, el reloj inicial/final y lotes de eventos ordenados por tiempo y secuencia. Cada acción ordinaria avanza el reloj; eventos dentro del intervalo tienen tiempo mayor al inicio y menor o igual al final. Los cambios inmediatos se observan para t mayor al inicio; en el instante inicial se devuelve el estado anterior a decidir. Si el motor produce eventos en el propio instante inicial, los entrega antes de publicar esa frontera, no como efectos futuros de la acción. Consultar #k identifica antes de la acción k. La adaptación del motor debe verificar estas precondiciones, no alterar el orden de eventos a escondidas.
+
+Se almacenan bloques de hasta K acciones y una base al principio de cada bloque. La búsqueda binaria propia de los tiempos finales localiza la frontera; un máximo de K acciones, incluidas las parciales, se aplica sobre una copia independiente. Se expone el conteo reconstruido como evidencia estructural del límite, sin afirmar tiempos de rendimiento.
+
+Recortar conserva un número dado de acciones completas, elimina el sufijo y permite continuar una rama. Las correcciones persistentes del pergamino se adjuntan a la frontera como cambios adicionales; al coincidir con un checkpoint se reemplaza esa base, sin añadir controles fuera de cadencia. Este incremento no escribe archivos ni conecta comandos del juego.
+
 Reconstrucción hacia adelante aplicando deltas completos de todos los cambios reales, no reejecutando comandos contra red o mundo presente. Base inicial y copia de control cada K acciones completadas. Una copia contiene un estado reconstruible independiente, incluido azar, agenda y secuencias. Los deltas deben incluir cambios de eventos automáticos entre decisiones y dentro de un instante; un delta solo por comando resulta insuficiente para consultar cualquier t.
 
 Historial segmentado en bloques de K acciones. Índice ordenado de checkpoints por frontera temporal y número de acción, con búsqueda binaria propia. Cada registro conserva tiempo y secuencia total para empates. Registros por eventos dentro de cada acción permiten detener reconstrucción en t sin aplicar eventos posteriores.
@@ -32,6 +44,24 @@ Con motor = acciones, S = tamaño de estado y integración = volumen de cambios,
 - `bench.py`: integrar mediciones integración y funciones entregadas por los demás.
 
 ## Persistencia
+
+### Manejo de errores del núcleo independiente
+
+Los errores esperados del dominio se identificarán por clases en `modelo/errores_historia.py`: entrada inválida, referencia histórica inexistente/futura e incoherencia de cambios. Todas heredarán de ValueError para conservar compatibilidad. La consulta de un campo ausente mantiene KeyError; es distinta de un campo nulo.
+
+La capa binaria mantiene ErrorGuardado, FormatoIncompatible y GuardadoCorrupto ya compartidos por datos. Las rutas inválidas y los tipos no binarios se traducen a ErrorGuardado con mensaje claro. La carga no altera una historia viva; registrar/recortar valida antes de mutar. Si falla la escritura se conserva el destino y se intenta limpiar su temporal; si falla esa limpieza, se añade una nota al error principal, sin ocultarlo ni borrar otro archivo. Errores inesperados de programación no se silencian con `except Exception`.
+
+La matriz de errores y su comprobación se documentará en `errores.md`; el controlador deberá capturar las clases esperadas cuando se haga la integración real. Este incremento no simula que la interfaz ya los muestra.
+
+### Incremento independiente de persistencia histórica
+
+Antes de cambiar el archivo de partida, `datos/historia_binaria.py` implementará un fragmento binario independiente con firma CRLH y versión de fragmento 1. No se anuncia como archivo de partida P2 ni sustituye el formato CRPT 3 existente. Al recibir CRPT, el lector de historia informa incompatibilidad explícita.
+
+El contrato `HistoriaGuardada` contiene K, campos iniciales y acciones con sus tiempos, cambios, eventos y correcciones persistentes. Exportar conserva solo la rama vigente. Importar construye una línea nueva y valida todos los registros antes de entregarla; no muta una historia activa. Los checkpoints y el presente se regeneran determinísticamente a partir de base y deltas durante la carga, evitando duplicar copias completas dentro del fragmento. Esto conserva toda la información histórica; no promete carga aleatoria de checkpoints en disco.
+
+Valores codificados por etiquetas explícitas: nulo, booleano, entero de precisión arbitraria, real finito, texto UTF-8 y tuplas recursivas. Se incluyen longitud y CRC del contenido y versión. Se rechazan truncamientos, bytes sobrantes, etiquetas/UTF-8 inválidos, profundidad excesiva, valores incoherentes, K inválido y acciones fuera de orden. Guardar usa temporal único en la misma carpeta y reemplazo al completar; si falla, se conserva el archivo anterior.
+
+El formato integrado 4, acceso a salas y captura completa del motor siguen pendientes. El PDF P1 proporcionado el 2026-11-02 está vacío (0 bytes); no se da por revisado ese contrato heredado. El fragmento permite avanzar y comprobar ida/vuelta, continuación, azar sintético y recortes sin depender de los productores del motor.
 
 Formato 4 elegido para esta rama: encabezado con identidad/versiones, K, frontera vigente y descriptor de bloques; estado actual, base inicial, controles y deltas con longitudes y comprobaciones. Mantener capacidades de acceso a salas de P1; revisar el enunciado completo P1 antes de cerrar el diseño del archivo. Validar truncamiento, offsets fuera del archivo, K inválido, fronteras desordenadas y referencias inconsistentes antes de reemplazar la partida activa. Escribir en temporal y reemplazar al finalizar correctamente.
 
@@ -60,3 +90,25 @@ Retroceso restaura azar, secuencia y contador; después descuenta pergamino fuer
 Preparación y contratos → núcleo sintético → captura real → recorte/persistencia → modos sin vista → interfaz → mediciones/defensa. Tareas concretas en tasks.md. La integración real requiere entregas de motor, conocimiento y verificador; el núcleo sintético no depende de que estén terminadas.
 
 K inicial elegido para desarrollo: 50. Es un parámetro configurable, no una conclusión de rendimiento. La elección definitiva debe revisarse con T019. Formato P2: 4, después de confirmar en esta rama que el actual es 3. Sin migración automática.
+
+## Incremento de integración de D
+
+El reloj de la consulta se toma del motor, con pruebas de salidas ponderadas y
+eventos empatados. Una acción terminal puede completar sin avanzar el reloj:
+la consulta por el instante de decisión conserva el estado previo y el
+resumen final del replay posterior al fin usa el resultado de la partida.
+El historial recibe proyecciones y cambios serializables en puntos de mutación
+del motor, nunca copias de salas completas por acción. El estado vivo y el
+conocimiento que pueda aportar su productor se guardan junto a la rama vigente.
+
+Para la verificación se consume el módulo entregado por B y se mantiene su
+distinción entre dictamen negativo y verificación incompleta. La presentación
+de mapa y viaje se valida con un productor de prueba mientras no haya una
+implementación de C disponible. No se alteran sus reglas ni se declara
+aceptación integrada con C sin su implementación.
+
+La captura de los productores permanece a cargo de A/C. D entrega un receptor
+con inicio, acción completa, recorte y restauración. La adhesión al protocolo
+se comprueba con dobles de prueba y se declara separada de la aceptación con
+los productores reales. La CLI puede señalar que el verificador aún no está
+disponible en esta rama, sin sustituir el algoritmo de B.

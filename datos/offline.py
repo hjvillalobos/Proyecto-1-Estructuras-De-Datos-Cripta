@@ -4,7 +4,10 @@ from red.validacion import entero, identificador, lote
 
 
 class ClienteOffline:
-    def __init__(self, carpeta):
+    def __init__(self, carpeta, version_cripta=None):
+        if version_cripta is not None:
+            identificador(version_cripta)
+        self.version_cripta = version_cripta
         self.almacen = AlmacenLocal(carpeta)
         self.solicitudes_realizadas = 0
         self.presupuesto_solicitudes = None
@@ -24,7 +27,9 @@ class ClienteOffline:
 
     def obtener_datos_generales(self, cripta_id):
         identificador(cripta_id)
-        datos = self._exigir(self.almacen.leer_generales(cripta_id), f"cripta {cripta_id}")
+        datos = self._exigir(self.almacen.leer_generales(cripta_id, self.version_cripta), f"cripta {cripta_id}")
+        from red.precarga import validar_generales
+        validar_generales(datos, cripta_id)
         self.configurar_presupuesto(datos["presupuesto_solicitudes"])
         return datos
 
@@ -37,6 +42,11 @@ class ClienteOffline:
         version = self.obtener_version_cripta(cripta_id)["version"]
         return self._exigir(self.almacen.leer_pagina(cripta_id, version, pagina),
                             f"página {pagina} de {cripta_id}")
+
+    def obtener_llaves(self, cripta_id):
+        version = self.obtener_version_cripta(cripta_id)["version"]
+        return self._exigir(self.almacen.leer_llaves(cripta_id, version),
+                            f"llaves de {cripta_id}, versión {version}")
 
     def obtener_contenido_salas(self, cripta_id, salas_ids):
         ids = lote(salas_ids, salas=True)

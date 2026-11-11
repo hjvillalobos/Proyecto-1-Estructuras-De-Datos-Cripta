@@ -659,3 +659,287 @@ del sistema operativo. Los maximos de distintas columnas pueden ser casos distin
 Validacion de este ajuste: 31 pruebas aprobadas de animacion, cadencia, puertas,
 trampas y transicion de inicio; auditoria estatica sin hallazgos. El detalle de
 los recorridos posteriores esta en `.cache/puertas.json`.
+
+
+## Decisión de diseño: verificador de resolubilidad
+
+Fecha: 2026-11-02. Usamos arreglos ordenados con búsqueda binaria propia para
+convertir IDs a posiciones compactas. El recorrido usa una cola con lista e índice,
+marcas de salas alcanzadas y puertas pendientes agrupadas por llave. Cada sala se
+procesa una vez; obtener una llave habilita sus pendientes sin recorrer el mapa
+completo de nuevo. El orden es determinista y se conserva la primera evidencia
+de entrada a cada sala y obtención de cada llave.
+
+Las ubicaciones repetidas de una llave son alternativas. Si no aparece en un
+listado completo válido, no se puede obtener. Si faltan datos o la versión cambia,
+el resultado es `no_completada`, sin presentar un diagnóstico parcial como hecho.
+El criterio acumulativo fue aceptado por el profesor según lo informado por el
+usuario: no exige una trayectoria única y esa limitación se incluye en el resultado.
+
+Para explicar bloqueos guardamos un único grafo de condiciones: una sala o llave
+puede tener alternativas; pasar una puerta cerrada requiere su origen y su llave.
+Kosaraju iterativo identifica grupos circulares y muestra un ciclo concreto por
+grupo. Se conservan todas las alternativas mediante referencias compartidas y se
+distinguen bloqueo circular autónomo, dependencias con bloqueos externos y ciclos
+en regiones desconectadas. Un ciclo encontrado no se presenta como causa única.
+
+La preparación reutiliza el cliente y el almacén existentes. Las respuestas nuevas
+quedan en memoria hasta validar el conjunto y confirmar la versión final. Después
+se escriben páginas y llaves; los metadatos y `actual.json` se publican al final
+cuando corresponde una versión nueva. La escritura es atómica por archivo, no
+una transacción de todo el conjunto. El modo offline exige datos completos de la
+versión seleccionada y no hace HTTP.
+
+### Complejidad y comparación
+
+Con N = salas + salidas + llaves + ubicaciones, la normalización cuesta O(N log N)
+y el recorrido y diagnóstico O(N), más el tamaño del reporte. El total es
+O(N log N + salida), considerando aparte el costo de comparar IDs de texto.
+No se declara estrictamente lineal. FR-015 conserva pendiente la revisión académica
+de crecimiento aproximadamente lineal con la evidencia disponible.
+
+La referencia repetitiva vuelve a recorrer las salas después de obtener llaves;
+solo pertenece al benchmark. En una cadena de 128 salas procesó 8.256 salas frente
+a 128 del incremental. Los dos algoritmos se comparan después de validar dictámenes
+y órdenes. El incremental no tiene por qué ganar en todas las muestras pequeñas.
+
+Promedios de diez repeticiones, en milisegundos; semilla 20261102:
+
+| Familia | Salas | Incremental | Repetitivo |
+|---|---:|---:|---:|
+| cadena | 32 | 0.365 | 0.512 |
+| cadena | 64 | 0.786 | 1.320 |
+| cadena | 128 | 1.779 | 3.927 |
+| ciclo | 32 | 0.628 | 0.499 |
+| ciclo | 64 | 1.170 | 1.140 |
+| ciclo | 128 | 2.308 | 2.407 |
+| alternativas | 32 | 0.514 | 0.675 |
+| alternativas | 64 | 1.270 | 1.828 |
+| alternativas | 128 | 2.602 | 4.821 |
+
+### Cripta publicada y alcance de la evidencia
+
+El listado consultado identificó `cripta-06` como la mayor: 300 salas, versión
+`f9ed9afa683d`. Tiene 760 salidas y el verificador obtuvo cuatro llaves; el dictamen
+fue resoluble. El benchmark incluye normalización, recorrido y construcción del
+resultado; en un resultado positivo no se ejecuta diagnóstico de bloqueo.
+
+| Estrategia | Promedio ms | Mínimo ms | Máximo ms | Desviación ms |
+|---|---:|---:|---:|---:|
+| incremental | 2.721 | 2.522 | 3.586 | 0.295 |
+| repetitivo | 3.064 | 2.653 | 3.550 | 0.270 |
+
+Muestras incrementales totales (ms): 3.585800, 2.539700, 2.596400, 2.679100, 2.672600, 2.715600, 2.618800, 2.707800, 2.521500, 2.577100.
+
+La lectura local y validación se midieron aparte: promedio 6,519 ms y cero HTTP.
+La adquisición inicial tardó 4.894,375 ms y consumió 11 solicitudes, incluido el
+listado. Esa adquisición incluye validación y persistencia, no solo espera de red.
+
+Equipo: Windows 11, Intel64 Family 6 Model 170 Stepping 4, GenuineIntel;
+Python 3.15.0a5. Las muestras completas, mínimos, máximos, desviaciones, tamaños,
+longitudes de IDs, conteos y razones temporales por fase están en
+[mediciones.json](specs/001-verificador-resolubilidad/mediciones.json).
+
+Las diez muestras del análisis real quedaron por debajo de 200 ms. Esto demuestra
+el resultado observado en ese equipo y versión, no garantiza futuras criptas ni
+el límite de 20 ms del juego completo. Los negativos se cubren con mediciones
+sintéticas de ciclos. La integración del comando general de medición pertenece a D.
+
+Validación ampliada: 175 pruebas aprobadas y una opcional omitida. Se probaron
+además 60 mapas sintéticos contra un recorrido de referencia, certificados y
+arcos contrastados con la entrada, ciclos de 1.600 salas sin recursión, cambios de
+versión seguidos por una ejecución offline nueva y conservación de archivos previos.
+Auditoría estática de los tres módulos nuevos: sin índices hash, ordenamientos
+automáticos ni comentarios nuevos. No se modificaron `main.py` ni `bench.py`.
+## Parte II — fragmento persistible de línea de tiempo (incremento independiente)
+
+Especificación: [spec.md](specs/004-linea-tiempo/spec.md), FR-011/012. Diseño: [plan.md](specs/004-linea-tiempo/plan.md), sección de persistencia independiente. No es todavía la decisión final sobre el archivo integrado de partida.
+
+Problema: preservar y reconstruir la rama vigente sin copiar el estado completo en cada acción y sin depender de los productores reales del motor. Alternativas: almacenar controles redundantes o guardar base y registros y regenerarlos al cargar. Decisión: fragmento binario versionado CRLH 1 con base y deltas; K y correcciones conservados; regeneración determinista de controles. Se mantiene el guardado CRPT del juego intacto. Se evita pickle y no se usan índices dict/set ni bibliotecas de estructuras prohibidas.
+
+El tamaño del fragmento crece con la base y los registros, no con acciones por tamaño total del mundo. La carga recorre las acciones y aplica cambios, más copia del estado cada K acciones: no tiene el límite de K aplicable a consultas individuales. La búsqueda de campos es binaria propia; creación/eliminación puede desplazar el arreglo completo. Los valores repetidos grandes en deltas también ocupan espacio: no se afirma memoria óptima.
+
+Evidencia de corrección, no de rendimiento: 31 pruebas de historia/persistencia aprobadas, 164 con regresión seleccionada; detalle en [baseline.md](specs/004-linea-tiempo/baseline.md). Incluye 5000 acciones y continuación del azar sintético. La decisión coincide con el plan de este incremento. No hay mediciones finales de latencia/memoria ni elección empírica definitiva de K.
+
+Límites: acceso por salas, identidad/versiones de cripta y formato integrado 4 pendientes; el PDF P1 recibido estaba vacío y debe revisarse al estar disponible. Que el fragmento rechace CRPT no certifica la incompatibilidad mediante la carga interactiva del juego. No se atribuyen efectos reales del motor a registros sintéticos.
+
+
+## Parte II — núcleo histórico y política de errores
+
+Referencias: [spec.md](specs/004-linea-tiempo/spec.md), FR-001–FR-012 y FR-020; [plan.md](specs/004-linea-tiempo/plan.md); [matriz de errores](specs/004-linea-tiempo/errores.md). La decisión coincide con el plan documentado antes de este incremento; la aceptación dentro del juego sigue pendiente.
+
+### Registro, consultas y recorte
+
+Problema: consultar antes de una acción o entre eventos, conservando el presente y evitando una copia completa por acción. Se consideraron snapshots por acción (no permitidos fuera de la cadencia K), volver a simular comandos y aplicar cambios tipados sobre estado puro. Se eligieron cambios tipados, separados de los callbacks de retroceso P1, bloques de hasta K acciones y reconstrucción hacia adelante. Se registra presencia anterior/nueva para distinguir creación, eliminación y valor nulo. Las correcciones persistentes se adjuntan a la frontera recortada y actualizan un control existente si coincide con ella.
+
+El índice de acciones se consulta por búsqueda binaria propia; localizar un campo en arreglo ordenado cuesta O(log(numero de campos)), mientras insertar o eliminar puede desplazar O(numero de campos). Consultar copia una base y aplica cambios de <=K acciones, pero su tiempo también depende del tamaño del estado y de los cambios. Recortar no recorre el prefijo; liberar el sufijo cuesta según los registros descartados. Los bloques usan arreglos básicos; no se introducen dict/set como índices ni bibliotecas de estructuras prohibidas.
+
+Evidencia: pruebas por tiempo/ordinal, eventos empatados, consultas aisladas, creación/eliminación, errores atómicos, recorte/repetición y 5000 acciones. No se presentan esas pruebas como mediciones de tiempo o memoria; K=50 sigue siendo inicial, pendiente de bench.
+
+### Errores del dominio y de archivo
+
+Problema: permitir al controlador distinguir una entrada inválida, una referencia fuera de la rama, registros incoherentes y archivos incompatibles o dañados. Alternativas: un ValueError indiferenciado, valores centinela que el consumidor podría ignorar, captura genérica de todas las excepciones o clases específicas. Se eligieron clases del dominio derivadas de ValueError y las excepciones de archivo ya existentes en datos. Esto conserva compatibilidad y causas técnicas sin acoplar modelo a vista.
+
+Registrar/recortar valida antes de mutar; cargar construye una instancia nueva; guardar reemplaza el destino al completar el temporal. Si falla también la limpieza, se añade una nota al error principal para conservar el diagnóstico original. Rutas y tipos de entrada inválidos tienen mensajes presentables; errores inesperados de programación no se silencian.
+
+Evidencia: 8 pruebas nuevas de errores; 39 entre errores/historia/persistencia y 172 incluyendo regresión seleccionada, aprobadas. Casos y mensajes en errores.md; comando y alcance en baseline.md. No se afirma que el controlador ya maneje estos errores dentro del juego.
+
+## Parte II · Integración y mediciones de la persona D
+
+Referencias: [especificación](specs/004-linea-tiempo/spec.md),
+[plan](specs/004-linea-tiempo/plan.md) y
+[contrato](specs/004-linea-tiempo/contracts/interfaces.md).
+
+**Captura y reconstrucción.** Se mantiene la decisión del plan de avanzar
+desde la base o el punto de control más cercano anterior. Los productores
+entregan cambios por acción y evento. El consumidor localiza la acción con
+búsqueda binaria propia (O(log A)) y reconstruye como máximo K acciones.
+El costo también depende del número de cambios por acción y del tamaño de
+la base que se copia. El recorte reconstruye hasta el límite, aplica las
+correcciones persistentes y libera el sufijo, sin recorrer el prefijo.
+
+**Persistencia.** CRPT v4 conserva el índice ordenado de salas y añade un
+descriptor de un bloque CRLH. El estado actual conserva identidad, versiones,
+agenda y RNG. CRLH guarda K, base y deltas de la rama vigente. Al cargar se
+regeneran los controles. Se prefirió esto a escribir también las copias de
+control, que son derivables. El lector de partida detecta v3, longitudes
+inválidas, corrupción y fronteras incoherentes antes de entregar la restauración
+al productor. La escritura usa temporal único en el directorio de destino y
+reemplazo atómico. Leer una sala continúa sin cargar la historia.
+
+**Comandos y replay.** La consulta interactiva y el replay comparten un
+formateador puro. Replay se ejecuta sin vista y no detiene la reproducción
+por tiempo si el resto del log todavía contiene una carga o un posible
+pergamino capaz de sustituir esa rama. Si la acción terminal ocurre en el
+instante de decisión, la consulta exacta muestra el estado previo. Un replay
+pedido después del fin muestra el estado final efectivo. El verificador
+mantiene separado un dictamen negativo de una comprobación incompleta.
+
+**Protocolo de medición.** Windows 11, AMD Ryzen 7 7730U, Python 3.12.14,
+semilla 20261001, una pasada de calentamiento y cinco repeticiones.
+37 instantes por repetición, con extremos y consultas reproducibles.
+Se comparan resultados de cada consulta antes de aceptar una medición.
+Los tiempos no incluyen red, archivos ni vista. Memoria retenida y pico
+son asignaciones observadas por tracemalloc durante la construcción,
+no el consumo total del proceso. El recorte descarta cinco acciones
+en prefijos del 25 %, 50 % y final de la carga.
+
+```powershell
+python main.py --bench --subsistemas historia --operaciones 5000 --salas 256 --cambios-historia 2 --repeticiones 5 --semilla 20261001
+python main.py --bench --subsistemas historia --operaciones 10000 --salas 128 --cambios-historia 3 --repeticiones 5 --semilla 20261001
+```
+
+| Acciones | K | Controles | Memoria B | Pico B | Consulta mediana / p95 / máx. ms | >50 ms | Máx. acciones |
+|---:|:---|---:|---:|---:|---:|---:|---:|
+| 5.000 | 10 | 501 | 6.310.928 | 6.523.072 | 0,0958 / 0,2114 / 1,1034 | 0/185 | 10 |
+| 5.000 | 50 | 101 | 5.052.248 | 5.327.504 | 0,3199 / 0,9172 / 1,3961 | 0/185 | 50 |
+| 5.000 | 100 | 51 | 4.965.136 | 5.240.392 | 0,6760 / 1,6518 / 2,0596 | 0/185 | 100 |
+| 5.000 | Sin controles | 1 | 4.428.008 | 4.703.672 | 39,7454 / 77,3422 / 100,3585 | 67/185 | 5.000 |
+| 10.000 | 10 | 1.001 | 15.081.760 | 15.616.024 | 0,1043 / 0,2935 / 0,3933 | 0/185 | 10 |
+| 10.000 | 50 | 201 | 13.433.032 | 13.974.464 | 0,4197 / 1,1137 / 1,4751 | 0/185 | 50 |
+| 10.000 | 100 | 101 | 12.970.400 | 13.511.832 | 0,8310 / 2,4120 / 2,9470 | 0/185 | 100 |
+| 10.000 | Sin controles | 1 | 12.206.248 | 12.775.248 | 104,8145 / 183,3384 / 253,1964 | 139/185 | 10.000 |
+
+K=50 usa 20 % menos memoria retenida que K=10 con 5.000 acciones, y su
+p95 es 0,9172 ms. K=100 ahorra alrededor de 1,7 % adicional en esa carga
+y reconstruye hasta el doble de acciones. Por eso se conserva K=50.
+En las dos cargas, la búsqueda para K=50 tuvo p95 de 0,0308 y 0,0344 ms.
+La reconstrucción medida por separado tuvo p95 de 0,9755 y 1,1854 ms.
+El máximo de recorte con K=50 fue 0,8678 y 1,7655 ms. La alternativa
+inversa desde el presente superó 50 ms en 68/185 y 132/185 consultas al
+medirla junto a K=50. Para una misma carga, CRLH ocupó los mismos bytes
+en las cuatro variantes: 586.434 con 5.000 acciones y 1.544.634 con 10.000.
+
+Son mediciones de estructuras históricas con dos cargas sintéticas. La
+segunda se ejecutó en el mismo equipo durante parte de las regresiones.
+La medición con el motor instrumentado, el conocimiento real y la cripta
+de referencia queda pendiente para evaluar su costo de captura y repetir
+las mediciones de Parte I con la carga integrada.
+
+**Guardado v4 frente a JSON (Parte I §4.10).** Python 3.14.6, 256 salas,
+5.000 acciones, K=50, misma semilla, cinco repeticiones tras calentamiento.
+
+```powershell
+python main.py --bench --subsistemas guardado-historia --operaciones 5000 --salas 256 --repeticiones 5 --semilla 20261001
+```
+
+| Formato | Bytes | Escritura media ms | Carga media ms | Lectura de una sala ms |
+|---|---:|---:|---:|---:|
+| CRPT v4 | 601.167 | 8,89 | 460,17 | 0,53 |
+| JSON | 1.207.040 | 23,22 | 445,07 | No disponible |
+
+Se comprobó la igualdad de datos y de historia reconstruida. JSON usa la
+misma representación hexadecimal del fragmento que el log de replay.
+La escritura v4 incluye sincronización a disco. La comparación de carga
+incluye decodificar la historia en ambos formatos. En esta muestra el
+binario ocupa cerca de la mitad y conserva la lectura directa de una sala.
+La carga completa resultó similar y el JSON fue algo más rápido en esta
+ejecución.
+
+## Revisión de FR-015 del 2026-11-10
+
+Las [series de escalamiento](specs/001-verificador-resolubilidad/mediciones.json) comparan diez muestras por tamaño. Al pasar de 32 a 64 y a 128 salas, el trabajo incremental por unidad de N se mantuvo en torno a 1,50 en cadenas, 9,19–9,24 en ciclos y 1,20 con ubicaciones alternativas. Los tiempos medios en ms fueron 0,365 / 0,786 / 1,779, 0,628 / 1,170 / 2,308 y 0,514 / 1,270 / 2,602 respectivamente. Esto respalda un crecimiento cercano al lineal en el recorrido para esas cargas. El tiempo total aumentó entre 1,84 y 2,47 veces al duplicar aproximadamente N. La normalización ordena e indexa en O(N log N), con un total O(N log N + tamaño del reporte). La evidencia de estas tres escalas respalda la observación empírica y deja abierta su aceptación académica para FR-015.
+
+Se repitió la medición por la función de B con la copia offline de `cripta-06`, versión `f9ed9afa683d`, 300 salas. En diez muestras el incremental promedió 3,412 ms con máximo de 4,060 ms. La referencia repetitiva promedió 3,875 ms con máximo de 4,922 ms. Se observaron cero solicitudes HTTP. Las diez ejecuciones incrementales quedaron bajo 200 ms. El comando general aún requiere el ajuste de D para publicar esa serie y ejecutar con los valores predeterminados. [Reproducción](specs/001-verificador-resolubilidad/quickstart.md).
+
+**Conexión del benchmark de resolubilidad (Parte II §6.3).** El comando
+general conserva sus cargas cortas. La comparación incremental y
+repetitiva se selecciona con `--subsistemas resolubilidad`, que usa diez
+repeticiones por defecto. Así se respetan las condiciones del verificador
+sin cambiar las cargas de los demás subsistemas. La salida expresa la
+desviación estándar en milisegundos con una etiqueta compatible con
+CP1252. La corrida de integración produjo 18 filas para tres tamaños con
+diez muestras por fila. La carga valida la conexión de D con B y no
+sustituye la medición de la mayor cripta publicada.
+[Plan de D](specs/004-linea-tiempo/plan.md) y
+[evidencia de aceptación](specs/004-linea-tiempo/aceptacion.md).
+
+**Paquete offline para verificar (Parte II §§3.5, 4.2 y 4.3).** La CLI
+reutiliza la preparación de B para validar el esqueleto y las llaves
+antes de descargar el contenido. La precarga queda ligada a la versión
+validada. Al exportar desde otro paquete local, el cliente lee esa versión
+y D copia su archivo de llaves al destino. Así se usa la misma validación
+y el mismo presupuesto que en el verificador, y se evita publicar el
+lote de llaves si la API cambia de versión durante su adquisición.
+Con un paquete incompleto, la descarga devuelve un error y el inicio se
+bloquea aun con `--forzar`. Los ensayos usan datos de prueba, con
+transporte simulado para la adquisición y el cliente real para el tramo
+offline. [Especificación de D](specs/004-linea-tiempo/spec.md) ·
+[Plan de D](specs/004-linea-tiempo/plan.md) ·
+[Pruebas de aceptación](specs/004-linea-tiempo/aceptacion.md).
+
+**Medición de resolubilidad con un paquete local (Parte II §6.1).** D
+reutiliza la preparación y medición de B. Carga la cripta elegida,
+fija su versión y reporta por separado lectura y validación frente al
+análisis con datos ya preparados. Ambos algoritmos analizan la misma
+entrada. El resultado identifica la versión y registra todas las
+muestras y el máximo en milisegundos. Un paquete incompleto termina
+con error. [Plan de D](specs/004-linea-tiempo/plan.md) ·
+[Evidencia de aceptación](specs/004-linea-tiempo/aceptacion.md#benchmark-de-un-paquete-offline).
+
+**Medición de referencia (2026-11-09).** El listado del servicio identificó
+`cripta-06` como la mayor, con 300 salas. El paquete de la versión
+`f9ed9afa683d` se preparó con 11 solicitudes de un presupuesto de 63.
+El benchmark se ejecutó después sin red ni renderizado, en Windows 11,
+AMD Ryzen 7 7730U y Python 3.12.14.
+
+```powershell
+python main.py --bench --subsistemas resolubilidad --paquete .cache/resolubilidad/d-referencia --cripta cripta-06 --version-cripta f9ed9afa683d --repeticiones 10
+```
+
+| Fase | Media ms | Mínimo ms | Máximo ms | Desv. estándar ms |
+|---|---:|---:|---:|---:|
+| Lectura y validación del paquete | 23.917 | 18.310 | 36.503 | 5.436 |
+| Análisis incremental | 9.279 | 7.971 | 16.140 | 2.332 |
+| Análisis repetitivo | 9.942 | 8.840 | 11.555 | 0.864 |
+
+- Preparación (ms) `21.782, 22.409, 19.039, 23.681, 36.503, 29.989, 26.879, 21.501, 19.074, 18.310`
+- Incremental (ms) `8.019, 9.508, 8.575, 8.560, 8.067, 8.222, 8.974, 8.756, 16.140, 7.971`
+- Repetitivo (ms) `8.840, 9.360, 9.689, 9.915, 10.707, 8.890, 11.128, 11.555, 9.662, 9.678`
+
+Los dos algoritmos dictaminaron `resoluble` para `N=1068`.
+El máximo incremental de 16.140 ms cumple el límite de 200 ms
+en la versión y el equipo medidos. Incluye normalización, recorrido,
+diagnóstico cuando corresponde y construcción del reporte. La
+preparación se muestra aparte. Queda pendiente la revisión cruzada
+con B y la medición del ciclo integrado con cazadores.

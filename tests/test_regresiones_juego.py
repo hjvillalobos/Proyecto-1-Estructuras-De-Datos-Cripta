@@ -423,7 +423,8 @@ class TestRegresionesJuego(unittest.TestCase):
         self.motor.efectos.aplicar_regeneracion(enemigo, 4, intervalo=50)
         agenda = self._agenda()
         self._accion("esperar")
-        self.assertEqual(enemigo.vida, 14)
+        self.assertEqual(self.motor.reloj, 100)
+        self.assertEqual(enemigo.vida, 18)  # Pulsos de t=50 y t=100.
         self._accion("retroceso")
         self.assertEqual(enemigo.vida, 10)
         self.assertCountEqual(self._agenda(), agenda)

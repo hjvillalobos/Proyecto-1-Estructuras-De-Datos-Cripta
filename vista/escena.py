@@ -168,7 +168,10 @@ class EscenaCripta:
                                fill="#403925" if salida.cerrada else "#20392f",
                                outline=AMARILLO if salida.cerrada else VERDE, width=2, tags=(etiqueta,))
             nombre = next(n for d, n in nombres if d == salida.direccion)
-            c.create_text(x, y, text=f"{nombre}\n{verbo.capitalize()} {self.vista._costo(verbo)}",
+            costo = (max(1, getattr(salida, "costo", 100) * 100 // estado.velocidad)
+                     if verbo == "mover" and getattr(estado, "velocidad", 0) > 0
+                     else self.vista._costo(verbo))
+            c.create_text(x, y, text=f"{nombre}\n{verbo.capitalize()} {costo}",
                           fill=TEXTO, font=("Segoe UI", 9), tags=(etiqueta,))
             self.vista._ligar(etiqueta, f"{verbo} {salida.direccion}")
 
@@ -330,7 +333,8 @@ class EscenaCripta:
                 r = min(12, altura * .15)
                 c.create_oval(x - r, y - altura * .7 - r, x + r, y - altura * .7 + r,
                               fill="#c4cbb8", outline="", tags=(etiqueta,))
-            c.create_text(x, y + 15, text=enemigo.nombre, fill=TEXTO, width=celda - 8,
+            nombre = enemigo.nombre + (" · Cazador" if enemigo.comportamiento == "cazador" else "")
+            c.create_text(x, y + 15, text=nombre, fill=TEXTO, width=celda - 8,
                           font=("Segoe UI", 10, "bold"), tags=(etiqueta,))
             w = min(130, celda - 18)
             c.create_rectangle(x - w / 2, y + 35, x + w / 2, y + 43, fill=FONDO, outline="", tags=(etiqueta,))

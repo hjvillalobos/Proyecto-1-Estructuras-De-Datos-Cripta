@@ -2,6 +2,8 @@
 import json
 import os
 import struct
+import sys
+import tempfile
 import zlib
 
 
@@ -13,9 +15,11 @@ from utilidades.ordenamiento import ordenar
 RUTA_GUARDADO_PREDETERMINADA = "datos_generados/partida.bin"
 
 MAGIC = b"CRPT"
-FORMATO_VERSION = 3          # incluye evidencia de apertura con llave; rechaza formatos anteriores
+FORMATO_VERSION_P1 = 3
+FORMATO_VERSION = 4
 
 _ENCABEZADO = struct.Struct("<4sHHIQIQ")     # 4+2+2+4+8+4+8 = 32 bytes
+_HISTORIA = struct.Struct("<QQ")            # offset y longitud del fragmento CRLH
 _ENTRADA = struct.Struct("<IQI")             # sala_id, offset, longitud = 16 bytes
 _U8, _U16, _U32 = struct.Struct("<B"), struct.Struct("<H"), struct.Struct("<I")
 _I64, _F64 = struct.Struct("<q"), struct.Struct("<d")
@@ -219,10 +223,20 @@ def guardar_estado(estado: EstadoGuardado, ruta: str):
         if salas[i].sala_id == salas[i - 1].sala_id:
             raise ErrorGuardado(f"la sala {salas[i].sala_id} aparece repetida en el estado")
 
-    tmp = ruta + ".tmp"
+    ruta = os.fspath(ruta)
+    tmp = None
+    version = FORMATO_VERSION if estado.historia is not None else FORMATO_VERSION_P1
+    if estado.historia is not None:
+        from datos.historia_binaria import validar_fragmento
+
+        validar_fragmento(estado.historia)
     try:
-        with open(tmp, "wb") as f:
-            f.write(b"\x00" * _ENCABEZADO.size)              # reservamos el encabezado
+        with tempfile.NamedTemporaryFile(mode="wb", dir=os.path.dirname(ruta) or ".",
+                                         prefix=".cripta-", suffix=".tmp", delete=False) as f:
+            tmp = f.name
+            f.write(b"\x00" * _ENCABEZADO.size)
+            if version == FORMATO_VERSION:
+                f.write(b"\x00" * _HISTORIA.size)
             bloque_global = _con_crc(_codificar_global(estado))
             off_global = f.tell()
             f.write(bloque_global)
@@ -233,30 +247,38 @@ def guardar_estado(estado: EstadoGuardado, ruta: str):
                 indice.append((s.sala_id, f.tell(), len(bloque)))
                 f.write(bloque)
 
+            if version == FORMATO_VERSION:
+                off_historia = f.tell()
+                f.write(estado.historia)
             off_indice = f.tell()
             for entrada in indice:
                 f.write(_ENTRADA.pack(*entrada))
 
             f.seek(0)                                        # ahora sí, el encabezado real
-            f.write(_ENCABEZADO.pack(MAGIC, FORMATO_VERSION, 0, len(salas),
+            f.write(_ENCABEZADO.pack(MAGIC, version, 0, len(salas),
                                      off_global, len(bloque_global), off_indice))
+            if version == FORMATO_VERSION:
+                f.write(_HISTORIA.pack(off_historia, len(estado.historia)))
             f.flush()
             os.fsync(f.fileno())
         os.replace(tmp, ruta)
+        tmp = None
     except struct.error as exc:
-        _borrar_silencioso(tmp)
         raise ErrorGuardado(f"un valor no cabe en el formato binario: {exc}") from exc
     except OSError as exc:
-        _borrar_silencioso(tmp)
         raise ErrorGuardado(f"no se pudo escribir '{ruta}': {exc}") from exc
-    return os.path.getsize(ruta)
-
-
-def _borrar_silencioso(ruta):
-    try:
-        os.remove(ruta)
-    except OSError:
-        pass
+    finally:
+        if tmp is not None:
+            principal = sys.exception()
+            try:
+                os.remove(tmp)
+            except FileNotFoundError:
+                pass
+            except OSError as limpieza:
+                if principal is None:
+                    raise ErrorGuardado(f"No se pudo eliminar el temporal: {limpieza}") from limpieza
+                principal.add_note(f"No se pudo eliminar el temporal: {limpieza}")
+    return off_indice + len(indice) * _ENTRADA.size
 
 # Lectura con acceso aleatorio
 class ArchivoGuardado:
@@ -285,13 +307,23 @@ class ArchivoGuardado:
         magic, version, _, n, off_g, len_g, off_i = _ENCABEZADO.unpack(crudo)
         if magic != MAGIC:
             raise ErrorGuardado(f"'{ruta}' no es un archivo de guardado de CRIPTA")
-        if version != FORMATO_VERSION:
-            raise FormatoIncompatible(
-                f"el guardado usa el formato v{version} y este programa entiende "
-                f"solo el v{FORMATO_VERSION}; no se puede cargar")
+        if version not in (FORMATO_VERSION_P1, FORMATO_VERSION):
+            raise FormatoIncompatible(f"El formato de guardado v{version} no es compatible.")
+        self.version = version
+        self._off_historia = off_i
+        self._len_historia = 0
+        inicio_global = _ENCABEZADO.size
+        if version == FORMATO_VERSION:
+            descriptor = self._f.read(_HISTORIA.size)
+            if len(descriptor) != _HISTORIA.size:
+                raise GuardadoCorrupto("Descriptor de historia truncado.")
+            self._off_historia, self._len_historia = _HISTORIA.unpack(descriptor)
+            if not self._len_historia or self._off_historia + self._len_historia != off_i:
+                raise GuardadoCorrupto("El bloque de historia está fuera de rango.")
+            inicio_global += _HISTORIA.size
         tam = os.fstat(self._f.fileno()).st_size
-        if (off_i + n * _ENTRADA.size != tam or off_g < _ENCABEZADO.size
-                or len_g < _U32.size or off_g + len_g > off_i):
+        if (off_i + n * _ENTRADA.size != tam or off_g != inicio_global
+                or len_g < _U32.size or off_g + len_g > self._off_historia):
             raise GuardadoCorrupto(f"'{ruta}' está truncado o tiene un encabezado inválido")
         self.n_salas, self._off_global, self._len_global, self._off_indice = n, off_g, len_g, off_i
 
@@ -337,7 +369,7 @@ class ArchivoGuardado:
 
     def _validar_rango_sala(self, off, ln):
         if (off < self._off_global + self._len_global or ln < _U32.size
-                or off + ln > self._off_indice):
+                or off + ln > self._off_historia):
             raise GuardadoCorrupto("Bloque de sala fuera de la zona de salas.")
 
     def ids_salas(self):
@@ -352,18 +384,29 @@ class ArchivoGuardado:
         estado = self.leer_global()
         inicio = self._off_global + self._len_global
         self._f.seek(inicio)
-        zona = self._f.read(self._off_indice - inicio)
+        zona = self._f.read(self._off_historia - inicio)
+        if self._len_historia:
+            estado.historia = self._f.read(self._len_historia)
+            if len(estado.historia) != self._len_historia:
+                raise GuardadoCorrupto("Bloque de historia truncado.")
+            from datos.historia_binaria import validar_fragmento
+
+            validar_fragmento(estado.historia)
         indice = self._f.read(self.n_salas * _ENTRADA.size)
-        if len(zona) != self._off_indice - inicio or len(indice) != self.n_salas * _ENTRADA.size:
+        if len(zona) != self._off_historia - inicio or len(indice) != self.n_salas * _ENTRADA.size:
             raise GuardadoCorrupto("lectura incompleta de las salas")
         salas = []
         anterior = -1
+        siguiente_offset = inicio
         for i in range(self.n_salas):
             sid, off, ln = _ENTRADA.unpack_from(indice, i * _ENTRADA.size)
             if sid <= anterior:
                 raise GuardadoCorrupto("Indice de salas desordenado o repetido.")
             anterior = sid
             self._validar_rango_sala(off, ln)
+            if off != siguiente_offset:
+                raise GuardadoCorrupto("Los bloques de sala se superponen o dejan un hueco.")
+            siguiente_offset = off + ln
             rel = off - inicio
             bloque = zona[rel:rel + ln] if rel >= 0 else b""
             if len(bloque) != ln:
@@ -372,6 +415,8 @@ class ArchivoGuardado:
             if sala.sala_id != sid:
                 raise GuardadoCorrupto("El indice no corresponde al identificador de la sala.")
             salas.append(sala)
+        if siguiente_offset != self._off_historia:
+            raise GuardadoCorrupto("La zona de salas no coincide con el índice.")
         estado.salas = salas
         return estado
 
@@ -388,6 +433,15 @@ class ArchivoGuardado:
 def cargar_estado(ruta) -> EstadoGuardado:
     with ArchivoGuardado(ruta) as g:
         return g.leer_todo()
+
+
+def cargar_estado_partida(ruta) -> EstadoGuardado:
+    """Entrada de Parte II: rechaza el archivo antiguo antes de restaurar."""
+    with ArchivoGuardado(ruta) as archivo:
+        if archivo.version != FORMATO_VERSION:
+            raise FormatoIncompatible(
+                "El guardado pertenece a Parte I y no contiene una línea de tiempo.")
+        return archivo.leer_todo()
 
 
 # ===========================================================================================

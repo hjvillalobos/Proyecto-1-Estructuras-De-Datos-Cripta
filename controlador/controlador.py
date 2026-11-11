@@ -1,7 +1,12 @@
 import os
+from subprocess import CalledProcessError
 
+from controlador.resumen_historia import consultar, resumir
+from modelo.errores_historia import ErrorHistoria
 from datos.bitacora_replay import BitacoraReplay, RUTA_REPLAY_PREDETERMINADA
-from datos.guardado_binario import guardar_estado, cargar_estado, RUTA_GUARDADO_PREDETERMINADA
+from datos.guardado_binario import (
+    guardar_estado, cargar_estado, cargar_estado_partida, RUTA_GUARDADO_PREDETERMINADA,
+)
 from datos.puntajes import RegistroPuntaje
 from vista.bitacora_pantalla import BufferCircular
 
@@ -31,9 +36,11 @@ class ControladorJuego:
         ruta_replay=RUTA_REPLAY_PREDETERMINADA,
         tabla_puntajes=None,
         lanzador_replay=None,
+        partida_p2=False,
     ):
         self.modelo = modelo
         self.vista = vista
+        self.partida_p2 = partida_p2
 
         self.mensajes = BufferCircular(20)
         self._modelo_notifica = callable(getattr(type(modelo), "establecer_notificador", None))
@@ -151,6 +158,12 @@ class ControladorJuego:
 
     def _mostrar_estado(self):
         estado = self.modelo.estado_vista()
+        salas = getattr(self.modelo, "salas", None)
+        if isinstance(salas, list) and 0 <= estado.sala_id < len(salas):
+            sala = salas[estado.sala_id]
+            if sala is not None:
+                for salida in estado.salidas:
+                    salida.costo = sala.salidas.get(salida.direccion, {}).get("costo", 100)
 
         self.vista.mostrar_estado(
             estado,
@@ -200,6 +213,12 @@ class ControladorJuego:
         # MOVIMIENTO RÁPIDO
         # ---------------------------------------------
 
+        if comando == "historia":
+            return self._historia(argumentos)
+        if comando == "mapa":
+            return self._mapa(argumentos)
+        if comando == "ir":
+            return self._viaje(argumentos)
         if comando in ("n", "s", "e", "o"):
             return self._accion_modelo(
                 "mover",
@@ -425,6 +444,55 @@ class ControladorJuego:
     # EJECUTAR ACCIÓN DEL MODELO
     # ---------------------------------------------------------
 
+    def _mostrar_informe(self, titulo, texto):
+        if callable(getattr(type(self.vista), "mostrar_informe", None)):
+            return self.vista.mostrar_informe(titulo, texto)
+        return self.vista.mostrar_info(texto)
+
+    def _historia(self, argumentos):
+        if len(argumentos) != 1:
+            return self.vista.mostrar_error("Uso: historia <t> o historia #<acción>.")
+        historia = getattr(self.modelo, "linea_tiempo", None)
+        if historia is None:
+            return self.vista.mostrar_error("El motor todavía no entrega cambios históricos.")
+        try:
+            texto = resumir(consultar(historia, argumentos[0]))
+        except ErrorHistoria as error:
+            return self.vista.mostrar_error(str(error))
+        return self._mostrar_informe("Historia", texto)
+
+    def _mapa(self, argumentos):
+        if argumentos:
+            return self.vista.mostrar_error("Uso: mapa")
+        mapa = getattr(self.modelo, "mapa_conocido", None)
+        if not callable(mapa):
+            return self.vista.mostrar_error("El mapa conocido todavía no está disponible.")
+        return self._mostrar_informe("Mapa conocido", "\n".join(mapa()) or "El mapa está vacío.")
+
+    def _viaje(self, argumentos):
+        if len(argumentos) != 2 or argumentos[0].lower() != "a":
+            return self.vista.mostrar_error("Uso: ir a <sala>")
+        try:
+            destino = int(argumentos[1])
+            if destino < 0:
+                raise ValueError()
+        except ValueError:
+            return self.vista.mostrar_error("El destino debe ser un identificador de sala válido.")
+        viajar = getattr(self.modelo, "viajar_hasta", None)
+        if not callable(viajar):
+            return self.vista.mostrar_error("El viaje automático todavía no está disponible.")
+        if self._grabacion_valida:
+            try:
+                self.bitacora_replay.registrar_comentario(f"ir a {destino}")
+            except OSError as error:
+                self._fallo_grabacion(error)
+                return
+
+        def mover(direccion):
+            return self.ejecutando and self._accion_modelo("mover", direccion)
+
+        return self.vista.mostrar_info(viajar(destino, mover))
+
     def _accion_modelo(self, accion, argumento=None):
 
         if (callable(getattr(type(self.vista), "ejecutar_tarea", None))
@@ -597,15 +665,21 @@ class ControladorJuego:
             )
 
         try:
-            self.lanzador_replay(ruta)
+            if callable(getattr(type(self.vista), "ejecutar_tarea", None)):
+                salida = self.vista.ejecutar_tarea(self.lanzador_replay, ruta)
+            else:
+                salida = self.lanzador_replay(ruta)
 
-        except OSError as error:
+        except (OSError, CalledProcessError) as error:
             return self.vista.mostrar_error(
                 f"No se pudo abrir el replay: {error}"
             )
 
         self.notificar(f"Replay abierto: {ruta}")
-        self.vista.mostrar_info(f"Replay abierto: {ruta}")
+        if isinstance(salida, str):
+            self._mostrar_informe("Replay", salida)
+        else:
+            self.vista.mostrar_info(f"Replay abierto: {ruta}")
 
     # ---------------------------------------------------------
     # GUARDADO
@@ -620,6 +694,8 @@ class ControladorJuego:
 
         try:
             estado = self.modelo.exportar_estado()
+            if self.partida_p2 and estado.historia is None:
+                return self.vista.mostrar_error("No se puede guardar Parte II sin la historia del motor.")
 
             guardar_estado(
                 estado,
@@ -663,7 +739,9 @@ class ControladorJuego:
             )
 
         try:
-            estado = cargar_estado(ruta)
+            estado = (cargar_estado_partida if self.partida_p2 else cargar_estado)(ruta)
+            if self.partida_p2 and getattr(self.modelo, "linea_tiempo", None) is None:
+                return self.vista.mostrar_error("El motor todavía no admite restaurar la historia.")
 
             self.modelo.restaurar_estado(
                 estado
