@@ -3,13 +3,16 @@
 import random
 from copy import copy, deepcopy
 from contextlib import nullcontext
+from functools import partial
 from red.errores import ErrorCripta
+from modelo.cazador import decidir_cazador
 from modelo.eventos import ColaEventos
 from modelo.efectos import GestorEfectos
 from modelo.tipos import Jugador, InstanciaEnemigo, ObjetoInstancia
 from modelo.rastro import RegistroRastro
 from modelo.historial import HistorialRetroceso
 from modelo.coleccion_enemigos import EnemigosSala
+from modelo.rutas import EspacioBusqueda, GrafoTerreno, HeapRutas, buscar_ruta
 
 
 _COSTO_MOVER = 100
@@ -46,6 +49,9 @@ class Motor:
             (sala.id, direccion, "cerrada" in salida, salida.get("cerrada", False))
             for sala in salas_lista for direccion, salida in sala.salidas.items()
         ]
+        self._grafo_cazador = GrafoTerreno(salas_lista)
+        espacio = EspacioBusqueda(self._grafo_cazador.ids)
+        self._consultar_ruta_cazador = partial(buscar_ruta, self._grafo_cazador, espacio, HeapRutas(espacio))
 
         self.cola = ColaEventos()
         self.azar = random.Random(semilla)
@@ -345,10 +351,23 @@ class Motor:
         sala_actual = self.salas[id_sala]
         jugador_en_sala = (self.jugador.posicion_actual == id_sala)
 
-        accion, dato = decidir_accion_enemigo(
-            enemigo, sala_actual, jugador_en_sala,
-            self.registro_rastro, self.azar, self.reloj
-        )
+        if enemigo.comportamiento != "cazador":
+            accion, dato = decidir_accion_enemigo(
+                enemigo, sala_actual, jugador_en_sala,
+                self.registro_rastro, self.azar, self.reloj
+            )
+        elif jugador_en_sala:
+            accion, dato = "atacar", None
+        else:
+            ficha = self.gestor_precarga.catalogo.ficha_preparada(enemigo.tipo_catalogo)
+            rango = ficha.atributos["rango"]
+            if rango is not None and type(rango) is not int:
+                raise TypeError("El rango suministrado al cazador debe ser un entero o null.")
+            grafo = self._grafo_cazador
+            accion, dato, _ = decidir_cazador(
+                grafo.indice(id_sala), grafo.indice(self.jugador.posicion_actual),
+                rango, self._consultar_ruta_cazador
+            )
 
         if accion == "atacar":
             self.atacar(enemigo, self.jugador)
