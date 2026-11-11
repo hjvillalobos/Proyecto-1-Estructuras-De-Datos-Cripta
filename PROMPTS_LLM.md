@@ -978,3 +978,15 @@ Herramienta: Codex desktop; modelo exacto no registrado.
 > OKAY, ADLANTE CON ESO Y LUEGO QUE HABLEMOS CON MIS COMPAÑEROS HACEMOS ESO OTRO
 
 Uso: revisar novedades de B y comprobar sus escenarios de inicio. Especificar I8 antes del código (3afd9eb), probar equivalencia e invalidación y optimizar únicamente los componentes de C. Comparar contra la versión previa, documentando también primera búsqueda y recálculos que superan 5 ms. Mantener pendiente la conexión compartida hasta coordinar con A/D. Publicar en la rama de C.
+
+### Persona C — diagnóstico ampliado de rutas — 2026-11-10
+
+Herramienta: Codex desktop; modelo exacto no registrado.
+
+> como vamos en cuanto a mi parte
+
+> podemos hacer algo mas? Antes revisa si hay algo nuevo en el repositorio y lo traes a la rama
+
+> okay, entonces hagamos eso que no depende de ellos, pero de forma muy inteligente y que no se salga de lo que se puede hacer
+
+Uso: consultar GitHub (sin novedades) y revisar paquetes locales. Al faltar la referencia de 300 salas y seguir pendiente la identidad compartida de puertas, delimitar I9 a diagnóstico sintético reproducible. Confirmar especificación antes del código; añadir pruebas y medición comparativa de primeras búsquedas, pasos y cambios de puertas. Publicar resultados favorables y regresiones, sin modificar el juego ni declarar cumplido PR-001.

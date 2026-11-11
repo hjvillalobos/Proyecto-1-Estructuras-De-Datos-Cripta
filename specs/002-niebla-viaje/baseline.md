@@ -1,5 +1,29 @@
 # Comprobación inicial de C
 
+## I9 — alternativas y recálculos (2026-11-10)
+
+Especificación previa: daa684e. `python -B -m utilidades.verificar_conocimiento_rutas --bench-escenarios`: **39 pruebas, OK, sin omisiones**. C40/C41 verifican reproducción, equivalencia completa y rechazo de resultados incorrectos. En las mediciones se compara cada consulta con C anterior ad531fd y se comprueba que no altere el conocimiento. Buscador real de A: 9730482. No cambió código del juego.
+
+Python 3.12.10, Windows 11 (10.0.26300), semilla 927. Mapas sintéticos completamente conocidos, IDs dispersos, costos positivos variables y puertas inicialmente abiertas. Destino intermedio; alternativas agrega atajos y cierre de anillo, dirigido conserva sentidos únicos. Diez muestras por preparación, búsqueda nueva, cierre y reversión; hasta treinta pasos sucesivos. Se alterna el orden anterior/actual. Generación, comprobaciones y observaciones quedan fuera del intervalo de consulta; preparación se informa aparte. Sin red ni vista.
+
+Máximos de la versión actual, en ms:
+
+| Carga | Salas | Búsqueda nueva | Paso sucesivo | Cierre | Reversión |
+|---|---:|---:|---:|---:|---:|
+| Cadena | 300 | 3.043 | 0.035 | 2.873 | 2.358 |
+| Alternativas | 300 | 7.384 | 0.045 | 6.259 | 6.634 |
+| Dirigido | 300 | 1.187 | 0.052 | 1.838 | 1.575 |
+| Cadena | 1000 | 9.947 | 0.043 | 5.920 | 6.455 |
+| Alternativas | 1000 | 15.438 | 0.055 | 19.240 | 18.478 |
+| Dirigido | 1000 | 4.727 | 0.044 | 5.490 | 6.027 |
+| Cadena | 5000 | 35.291 | 0.349 | 36.496 | 35.978 |
+| Alternativas | 5000 | 73.981 | 0.069 | 83.841 | 86.552 |
+| Dirigido | 5000 | 27.973 | 0.400 | 24.763 | 23.798 |
+
+La reutilización beneficia los pasos, pero no todas las consultas. En la cadena de 5000 salas, la primera búsqueda anterior promedió 8.093 ms frente a 30.050 ms actual; cerrar la puerta inicial promedió 0.056 frente a 29.912 ms. La búsqueda inversa puede recorrer más salas que la directa, especialmente si el origen queda aislado. En alternativas de 5000, las medias iniciales fueron 71.090/70.017 ms, y los pasos 69.436/0.048 ms. Son cargas distintas de I8: no comparar sus cifras como si solo hubiera cambiado el código.
+
+PR-001 continúa abierto. Solo hay paquetes locales de 6 y 20 salas; el de 300 que D midió no está disponible aquí. Esta carga de 300 salas no es esa cripta ni la reemplaza. Los datos justifican estudiar el costo de recálculo antes de otra optimización; no se modifican A, las reglas de puertas ni contratos pendientes.
+
 ## I8 — reutilización de rutas (2026-11-10)
 
 Especificación previa: 3afd9eb. C37–C39 comprueban pasos sucesivos, arcos dirigidos, invalidación al aplicar/revertir y recuperación tras errores. El oráculo de 60 grafos ahora consulta varios orígenes con el mismo planificador. Pasaron 36 pruebas de rutas/conocimiento/viaje, 19 de historia, 11 del ensayo con motor y 31 locales (hay pruebas compartidas entre estos conjuntos). Sin omisiones. No se repitió la suite completa del juego.

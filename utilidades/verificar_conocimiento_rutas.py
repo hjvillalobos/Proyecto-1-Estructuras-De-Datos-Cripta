@@ -19,7 +19,8 @@ def main():
                   'modelo/viaje.py', 'modelo/detencion_viaje.py', 'tests/test_viaje.py',
                   'utilidades/__init__.py', 'utilidades/ordenamiento.py',
                   'utilidades/bench_rutas_conocidas.py', 'utilidades/bench_conocimiento.py', 'tests/__init__.py',
-                  'tests/test_conocimiento_rutas.py', 'tests/test_conocimiento.py')
+                  'tests/test_conocimiento_rutas.py', 'tests/test_conocimiento.py',
+                  'tests/test_bench_escenarios_rutas.py', 'utilidades/bench_escenarios_rutas.py')
     for archivo in archivos_c:
         destino = copia / archivo
         destino.parent.mkdir(parents=True, exist_ok=True)
@@ -31,9 +32,13 @@ def main():
     print(f'A: {revision}; C: archivos de trabajo. Copia: {copia}', flush=True)
     resultado = subprocess.run([sys.executable, '-B', '-m', 'unittest',
                                 'tests.test_conocimiento', 'tests.test_conocimiento_rutas',
-                                'tests.test_viaje', '-v'], cwd=copia)
-    if resultado.returncode or '--bench' not in sys.argv[1:]:
+                                'tests.test_viaje', 'tests.test_bench_escenarios_rutas', '-v'], cwd=copia)
+    if resultado.returncode:
         return resultado.returncode
+    if '--bench-escenarios' in sys.argv[1:]:
+        return subprocess.run([sys.executable, '-B', '-m', 'utilidades.bench_escenarios_rutas'], cwd=copia).returncode
+    if '--bench' not in sys.argv[1:]:
+        return 0
     return subprocess.run([sys.executable, '-B', '-m', 'utilidades.bench_rutas_conocidas'], cwd=copia).returncode
 
 
