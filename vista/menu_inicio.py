@@ -20,6 +20,7 @@ class MenuInicio:
         self._precarga_selector = None
         self.fin = tk.BooleanVar(master=vista.root, value=False)
         self.panel = tk.Frame(vista.root, bg=FONDO)
+        self.panel.bind("<Destroy>", self._destruir, add="+")
         self.panel.place(x=0, y=0, relwidth=1, relheight=1)
         self.panel.lift()
         self.canvas = tk.Canvas(self.panel, bg=FONDO, highlightthickness=0)
@@ -95,9 +96,17 @@ class MenuInicio:
         # PhotoImage permanecen en el hilo principal; no se consulta la API.
         self._precarga_selector = self.vista.root.after(120, self._preparar_selector)
 
+    def _destruir(self, evento):
+        if evento.widget is self.panel:
+            self._cancelar_precarga()
+            self.animacion.detener()
+
     def _cancelar_precarga(self):
         if self._precarga_selector is not None:
-            self.vista.root.after_cancel(self._precarga_selector)
+            try:
+                self.vista.root.after_cancel(self._precarga_selector)
+            except tk.TclError:
+                pass
             self._precarga_selector = None
 
     def _preparar_selector(self):

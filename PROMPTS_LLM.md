@@ -1305,3 +1305,27 @@ Se ejecutaron seis pruebas nuevas y regresiones de C/D: 128 pruebas en total,
 pendientes. Se verifican binario, recorte, consulta sin mutación, filtrado,
 orden/equipamiento y compatibilidad de acciones/replay. El viaje automático
 integrado y T010 siguen pendientes de los productores de A/C.
+
+## 2026-11-10 — Viaje por pasos y regresiones de interfaz de D
+
+Herramienta: Codex desktop. Prompt textual:
+
+> dale haz todo lo que puedas de mi parte, SOLO LA PARTE D
+
+Uso: conectar el consumidor de viaje por pasos al controlador de D, usando las
+clases existentes de C sin modificar sus algoritmos ni el motor de A. Cada paso
+usa la acción ordinaria, conserva animación/replay y entrega los hechos explícitos
+a C. D admite cancelación entre pasos, cancela antes de restaurar o usar pergamino,
+revalida posición/proveedor y no repite indefinidamente un movimiento rechazado.
+
+Se incorporaron entradas de viaje en consola y GUI, Escape/botón de cancelación
+y pruebas con C real y un productor de hechos de prueba. No se deduce daño de
+la vida final, ni se inventan observaciones de puertas. El proveedor de A/C y
+la captura/restauración histórica de producción quedan pendientes.
+
+La suite completa detectó tres preparaciones incompletas de pruebas de D ya
+descritas por C: dimensiones de menú oculto y dobles sin escena/precarga. Se
+completaron conservando sus aserciones. La prueba de destrucción hizo visible
+un callback de precarga pendiente; el menú de D ahora lo cancela al destruirse
+y la prueba también comprueba esa limpieza. Los resultados y límites finales
+se registran en specs/004-linea-tiempo/aceptacion.md.

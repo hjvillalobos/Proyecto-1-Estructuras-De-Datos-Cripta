@@ -108,3 +108,46 @@ lote histórico del motor. La ejecución de `ControlViaje` entre comandos y la
 restauración conjunta se validarán después de esa entrega. T003, T010 y la
 aceptación integrada permanecen abiertas; este incremento verifica consumidores
 de D con los módulos reales de C, no una partida completa.
+
+## Viaje por pasos: consumidor de D (2026-11-10)
+
+`ControladorJuego` recibe opcionalmente `control_viaje=ControlViaje(...)` o
+consume `modelo.control_viaje` si contiene una instancia real de C. A/C conservan
+la creación del conocimiento y su actualización dentro de cada turno; D no
+construye ese conocimiento leyendo el terreno real. Sin proveedor se conserva
+la fachada anterior `viajar_hasta` y el aviso de capacidad ausente.
+
+`ir a <id>` inicia el control con la posición de `estado_vista().sala_id`. El
+bucle ordinario procesa entrada entre pasos; un turno vacío de la vista propone
+y ejecuta exactamente un movimiento por `_accion_modelo`. En GUI, una espera
+de presentación de 650 ms atiende eventos y prioriza comandos encolados; su
+temporizador solo habilita entrada, nunca ejecuta el modelo. En consola
+interactiva se espera teclado antes de continuar automáticamente. Para entrada
+inyectada o redirigida se pide Enter u otro comando, sin lectores en segundo
+plano que consuman comandos ajenos. La espera es tiempo de presentación, no
+tiempo del motor.
+
+`cancelar`, Escape y el botón Cancelar viaje invalidan la continuación. Una
+acción manual, carga, retroceso, uso de objeto, nuevo destino, replay o salida
+cancela antes de ejecutarse. Consultas de mapa/historia/inventario, ayuda,
+puntajes y guardado permiten mantener el viaje. El cierre de ventana, EOF,
+fin de partida y fallo de bitácora eliminan la continuación. Un nuevo controlador
+no hereda propuestas pendientes.
+
+Cada movimiento recibe `ResultadoAccion.hechos_paso` de C. D comprueba posición
+y aceptación, y comunica el resultado a `ControlViaje`, que decide las causas.
+Ausencia/incoherencia de hechos o una excepción cancela el viaje sin otro paso.
+Un rechazo no se graba: si C recibió una observación, la siguiente propuesta
+puede tomar una alternativa. Si repite el arco rechazado, D detiene el intento
+para evitar una repetición indefinida sin nueva información. Se muestran todas
+las causas de detención. La orden se registra como comentario y únicamente los
+movimientos aceptados como acciones, conservando animación y trampas. Cuando
+el proveedor viene del modelo, D vuelve a obtenerlo al iniciar cada orden y
+rechaza un cambio de instancia durante el viaje; no reutiliza un planificador
+de una restauración anterior. Un proveedor inyectado explícitamente pertenece
+al ciclo de vida de ese controlador.
+
+Este consumidor se comprueba con `ControlViaje`, `PlanificadorConocido` y
+`ConocimientoMapa` reales y un motor de prueba que entrega hechos explícitos.
+La partida real sigue requiriendo el proveedor de A/C, los hechos del motor y
+restauración histórica completa; no se completan T003/T010 por esta entrega.

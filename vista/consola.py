@@ -1,3 +1,7 @@
+import os
+import sys
+import time
+
 from modelo.snapshots import EstadoVista, ItemVista
 
 AYUDA = """\
@@ -7,6 +11,7 @@ Comandos:
   historia <t|#k>         consultar el pasado de la partida
   mapa                    mostrar el mapa conocido
   ir a <sala>             viajar por el mapa conocido
+  cancelar                detener el viaje; puedes dar otro comando entre pasos
   atacar [id]             atacar (si hay un solo enemigo, el id es opcional)
   esperar                 pasar el tiempo
   recoger [id]            recoger un objeto del suelo
@@ -29,6 +34,24 @@ class VistaConsola:
     #entrada
     def pedir_comando(self):
         return self._entrada("\n> ")
+
+    def pedir_comando_viaje(self, espera_ms=650):
+        pregunta = "\nViaje: Enter para el siguiente paso, cancelar u otro comando > "
+        if self._entrada is not input or not sys.stdin.isatty():
+            return self._entrada(pregunta)
+        self._salida("Viaje en curso. Escribe cancelar u otro comando para interrumpir.")
+        if os.name == "nt":
+            import msvcrt
+            limite = time.monotonic() + espera_ms / 1000
+            while time.monotonic() < limite:
+                if msvcrt.kbhit():
+                    return self._entrada("> ")
+                time.sleep(.02)
+        else:
+            import select
+            if select.select([sys.stdin], [], [], espera_ms / 1000)[0]:
+                return self._entrada("> ")
+        return ""
 
     def pedir_texto(self, pregunta):
         return self._entrada(f"{pregunta}: ").strip()
