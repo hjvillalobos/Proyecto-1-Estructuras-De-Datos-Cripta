@@ -3,7 +3,6 @@
 import random
 from copy import copy, deepcopy
 from contextlib import nullcontext
-from functools import partial
 from red.errores import ErrorCripta
 from modelo.cazador import decidir_cazador
 from modelo.eventos import ColaEventos
@@ -12,7 +11,7 @@ from modelo.tipos import Jugador, InstanciaEnemigo, ObjetoInstancia
 from modelo.rastro import RegistroRastro
 from modelo.historial import HistorialRetroceso
 from modelo.coleccion_enemigos import EnemigosSala
-from modelo.rutas import EspacioBusqueda, GrafoTerreno, HeapRutas, buscar_ruta
+from modelo.rutas import ContextoRutasReales
 
 
 _COSTO_MOVER = 100
@@ -52,9 +51,7 @@ class Motor:
             (sala.id, direccion, "cerrada" in salida, salida.get("cerrada", False))
             for sala in salas_lista for direccion, salida in sala.salidas.items()
         ]
-        self._grafo_cazador = GrafoTerreno(salas_lista)
-        espacio = EspacioBusqueda(self._grafo_cazador.ids)
-        self._consultar_ruta_cazador = partial(buscar_ruta, self._grafo_cazador, espacio, HeapRutas(espacio))
+        self._rutas_reales = ContextoRutasReales(salas_lista)
 
         self.cola = ColaEventos()
         self.azar = random.Random(semilla)
@@ -378,10 +375,10 @@ class Motor:
             rango = ficha.atributos["rango"]
             if rango is not None and type(rango) is not int:
                 raise TypeError("El rango suministrado al cazador debe ser un entero o null.")
-            grafo = self._grafo_cazador
+            grafo = self._rutas_reales.grafo
             accion, dato, _ = decidir_cazador(
                 grafo.indice(id_sala), grafo.indice(self.jugador.posicion_actual),
-                rango, self._consultar_ruta_cazador
+                rango, self._rutas_reales.buscar
             )
 
         if accion == "atacar":
@@ -824,6 +821,7 @@ class Motor:
         preparado.jugador = jugador
         self.__dict__.update(preparado.__dict__)
         self.efectos.motor = self
+        self._rutas_reales.descartar_derivados()
 
     def _restaurar_estado_validado(self, estado):
         from modelo.tipos import InstanciaEnemigo, ObjetoInstancia, Trampa
@@ -990,6 +988,7 @@ class Motor:
             if reloj_anterior is None:
                 return ResultadoAccion(ok=False, mensaje="No hay nada que deshacer")
             self.reloj = reloj_anterior
+            self._rutas_reales.descartar_derivados()
             self.informar("Retroceso: se restaura la accion anterior.")
             return ResultadoAccion(ok=True)
 

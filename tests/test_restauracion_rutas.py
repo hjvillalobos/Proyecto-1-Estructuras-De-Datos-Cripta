@@ -7,6 +7,7 @@ from unittest.mock import patch
 from modelo.tipos import ObjetoInstancia
 from red.errores import ErrorCripta
 from tests.datos_terreno_cazador import motor_terreno
+from tests.test_turno_cazador import partida_cazador
 
 
 PERGAMINO = "pergamino-a12"
@@ -14,6 +15,58 @@ POCION = "velocidad-a12"
 
 
 class PruebasRestauracionRutas(unittest.TestCase):
+    def test_contexto_real_descarta_marcas_al_retroceder_y_cargar(self):
+        """T031 / FR-013 y FR-018: rutas frescas tras restaurar un arco real."""
+        with partida_cazador(350) as (motor, cazador, _):
+            self.assertTrue(motor.ejecutar("mover", "E").ok)
+            self.assertTrue(motor.ejecutar("mover", "E").ok)
+            pergamino = ObjetoInstancia("pergamino-t031", "pergamino", "inventario")
+            self.assertIsNotNone(motor.jugador.inventario.recoger(pergamino))
+            salida = motor.salas[100].salidas["E"]
+            cierre = motor.programar_evento(110, "cierre_puerta", (motor.salas[100], "E"))
+            guardado = motor.exportar_estado()
+
+            contexto = motor._rutas_reales
+            grafo = contexto.grafo
+            espacio = contexto._espacio
+            origen, vecino, objetivo = (grafo.indice(sala) for sala in (100, 101, 102))
+            ruta_abierta = (vecino, "E", 250, 350)
+            self.assertEqual(contexto.buscar(origen, objetivo, 350), ruta_abierta)
+
+            self.assertTrue(motor.ejecutar("esperar").ok)
+            self.assertEqual((cazador.sala_actual, cazador.tiempo_siguiente), (101, 350))
+            self.assertTrue(salida["cerrada"])
+            self.assertIsNone(contexto.buscar(origen, objetivo, 350))
+            self.assertIsNotNone(espacio.etiqueta(origen))
+
+            self.assertTrue(motor.ejecutar("retroceso").ok)
+            self.assertIsNone(espacio.etiqueta(origen))
+            self.assertFalse(espacio.esta_cerrado(origen))
+            self.assertTrue(cierre.en_cola)
+            self.assertFalse(salida.get("cerrada", False))
+            self.assertEqual(contexto.buscar(origen, objetivo, 350), ruta_abierta)
+
+            self.assertTrue(motor.ejecutar("esperar").ok)
+            self.assertTrue(salida["cerrada"])
+            self.assertIsNotNone(espacio.etiqueta(origen))
+            generacion = espacio.generacion
+            with self.assertRaises(ValueError):
+                motor.restaurar_estado(replace(guardado, reloj=-1))
+            self.assertEqual(espacio.generacion, generacion)
+            self.assertTrue(salida["cerrada"])
+
+            motor.restaurar_estado(guardado)
+            self.assertIs(motor._rutas_reales, contexto)
+            self.assertIs(contexto.grafo, grafo)
+            self.assertIs(contexto._espacio, espacio)
+            self.assertIsNone(espacio.etiqueta(origen))
+            self.assertFalse(espacio.esta_cerrado(origen))
+            self.assertFalse(salida.get("cerrada", False))
+            self.assertEqual(contexto.buscar(origen, objetivo, 350), ruta_abierta)
+            restaurado = motor.enemigos_por_sala[100][0]
+            self.assertTrue(motor.ejecutar("esperar").ok)
+            self.assertEqual((restaurado.sala_actual, restaurado.tiempo_siguiente), (101, 350))
+
     def preparar_pergaminos(self, motor, cantidad):
         catalogo = motor.gestor_precarga.catalogo
         catalogo.almacen.guardar_ficha(motor.meta.catalogo_version, {
