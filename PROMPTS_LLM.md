@@ -1383,3 +1383,13 @@ datos locales ausentes; el límite de diagnóstico detuvo ese caso. Se cambió
 solo su preparación a un paquete temporal completo de `tests.datos_prueba`,
 conservando las aserciones sobre motor/precarga nuevos, reloj, vida e inventario.
 La regresión seleccionada posterior aprobó 28 pruebas sin omisiones.
+
+### Persona C — actualización e integración revisada — 2026-11-12
+
+Herramienta: Codex desktop; modelo exacto no registrado.
+
+> okay, podemos avanzar en algo?
+
+> adelante
+
+Uso: actualizar referencias y avanzar la rama C hasta la versión integrada de D d796dae, que contiene main a895d85. Respaldar y conservar los puntajes locales. Comprobar una exportación limpia con la suite completa (753, seis omisiones), selección de integración (90) y verificador aislado de rutas (41). No corregir código sin fallos demostrados ni habilitar contratos pendientes. Publicar la actualización y su evidencia en C, sin modificar main ni ramas ajenas.
