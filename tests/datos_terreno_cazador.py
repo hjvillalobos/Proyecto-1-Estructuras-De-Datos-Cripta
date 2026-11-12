@@ -52,7 +52,7 @@ def crear_cadena(cantidad, semilla):
 @contextmanager
 def motor_terreno(costo=SIN_COSTO_DECLARADO, velocidad=100,
                   comportamiento="guardian", velocidad_enemigo=100,
-                  puerta_inicial_cerrada=False):
+                  puerta_inicial_cerrada=False, *, costo_primera_conexion=SIN_COSTO_DECLARADO):
     """T011/T012: motor real con fixture existente; cero HTTP real.
 
     El paquete sintético existente se configura antes de crear el motor:
@@ -72,11 +72,13 @@ def motor_terreno(costo=SIN_COSTO_DECLARADO, velocidad=100,
         pagina = almacen.leer_pagina("prueba", "v1", 1)
         for sala in pagina["salas"]:
             for salida in sala["salidas"].values():
-                if costo is not SIN_COSTO_DECLARADO:
-                    salida["costo"] = costo
-                if puerta_inicial_cerrada and (
-                        (sala["id"] == 100 and salida["sala"] == 101) or
-                        (sala["id"] == 101 and salida["sala"] == 100)):
+                primera_conexion = (sala["id"], salida["sala"]) in ((100, 101), (101, 100))
+                costo_salida = costo
+                if primera_conexion and costo_primera_conexion is not SIN_COSTO_DECLARADO:
+                    costo_salida = costo_primera_conexion
+                if costo_salida is not SIN_COSTO_DECLARADO:
+                    salida["costo"] = costo_salida
+                if puerta_inicial_cerrada and primera_conexion:
                     salida["cerrada"] = True
                     salida["llave"] = "obj_0"
         almacen.guardar_pagina("prueba", "v1", pagina)
