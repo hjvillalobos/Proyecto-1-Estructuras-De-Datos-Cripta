@@ -646,3 +646,25 @@ La reejecución de `tests.test_localidad_rutas`, rutas, decisión, FR-020 y las 
 El [registro local](prompts-registro-local.md#corte-documental-en-p77) consolida 77 solicitudes íntegras hasta P77, con una fila por ID en orden de envío. Se verificaron 73 cuerpos en el registro y cuatro en los tres anexos. Se conservaron P01–P75 y los anexos, y se cotejaron P76 y P77 con el registro original de la sesión de Codex.
 
 Los dos mensajes incompletos entre P48 y P33 conservan sus fragmentos literales y sus finales siguen pendientes de recuperación. La autorización de este cierre es posterior al corte y queda para el mantenimiento incremental. El traslado a `PROMPTS_LLM.md` sigue pendiente de autorización.
+
+## Revalidación parcial de T027 y estado de integración
+
+En `53c9453`, con Python 3.14.5, el núcleo de rutas y decisión, el turno real del cazador y la prueba de localidad pasaron **30/30**, sin omisiones:
+
+```powershell
+python -B -m unittest tests.test_rutas_cazador tests.test_decision_cazador tests.test_turno_cazador tests.test_localidad_rutas
+```
+
+El turno ordinario verifica el rango inclusivo, `null` explícito sin tope, costos 250 y 100, la puerta cerrada antes de la decisión, agenda y retroceso, y el acceso a la ficha residente sin HTTP ni lectura de disco durante la decisión. El conteo de localidad T039 sigue siendo evidencia de trabajo por consulta sobre el fixture, sin certificar el objetivo temporal de T046. T027 conserva pendiente `tests.test_contrato_rutas_c` por E-C-RUTA y depende del cierre de T024 y T025. T025 sigue pendiente de E-C-DESPACHO.
+
+La entrada al mapa conocido y el productor H3 de A siguen sujetos a opciones explícitas de prueba. Las verificaciones de guardado, carga y replay de ese productor usan la variante histórica offline. Las pruebas de D que exigen un productor en `Motor` base quedan separadas de esa evidencia. La validación de enemigos de `53c9453` compara identidad, tipo y vida en la frontera final de la carga v4; una frontera válida sin enemigos no identifica la generación del productor.
+
+Para T030, las pruebas de frontera temporal ya ejercitan la repetición con la misma agenda y RNG, ambos órdenes de secuencia y la reprogramación por un efecto empatado. Las pruebas de costos verifican la primera activación a costo 100, y las de combate y retroceso cubren muerte, veneno y trampas. Esta evidencia se puede reutilizar al preparar A7–A11. Queda por demostrar el caso conjunto de A8 con puerta, efecto y actor en el mismo instante; la prueba de cierre previa al turno del cazador cubre puerta y actor, y la de velocidad cubre efecto y actor. T030 conserva su dependencia de T025.
+
+La corrida `python -B -m unittest discover -v` en el entorno local sin Pillow reportó 749 pruebas ejecutadas, dos fallos, un error y 46 registros de omisión. Los tres casos que fallaron pasaron al repetirlos con Pillow 12.3.0 desde un directorio temporal. En esa segunda corrida completa, `tests.test_replay_reinicio.TestReplayReinicio.test_main_reinicia_con_motor_y_precarga_nuevos` quedó en reintentos al faltar la ficha `itm_antorcha` en el paquete local `.cache/cripta`. El diagnóstico se realizó sin modificar la prueba ni completar ese paquete.
+
+Al repetir el descubrimiento con Pillow y seleccionar todos los casos salvo esa prueba de reinicio, `unittest` reportó 748 pruebas ejecutadas, 743 aprobadas, cero fallos, cero errores y seis registros de omisión (cinco métodos y un `setUpClass`). Las omisiones fueron dos casos de historia con `Motor` base, dos del paquete oficial opcional, uno de API real y la clase de comparación de revisiones de rutas de C. El caso de reinicio excluido de esta corrida sigue sin verificarse con el paquete local disponible.
+
+### Evidencia posterior de T030
+
+Sobre `53c9453`, con la prueba nueva en el árbol de trabajo, pasaron **172 pruebas seleccionadas**, sin fallos, errores ni omisiones. Los cinco casos de `tests/test_eventos_terreno.py` usan el motor ordinario con datos offline. A8 cubre el empate entre cierre, efecto y turno del cazador en ambos órdenes relativos de cierre y turno. A9 verifica la activación ordenada de enemigos dormidos y la conservación del turno del enemigo que ya llegó activo. A10 verifica el cierre tras cruzar, la conservación de la llave y el rechazo al volver a intentar el mismo arco. A11 verifica la curación y los pulsos reales de regeneración en `t=200` y `t=400`, con el siguiente pulso pendiente en `t=600`. T030 sigue abierta por su dependencia de T025.
