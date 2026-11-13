@@ -443,3 +443,22 @@ python main.py --bench --subsistemas resolubilidad --paquete .cache/cripta --cri
 
 Para reproducir la comparación v4 y JSON de Parte I, usar
 `python main.py --bench --subsistemas guardado-historia --operaciones 5000 --salas 256 --repeticiones 5`.
+
+### Aceptación del controlador de D con A/C reales, 2026-11-12
+
+```powershell
+python -B -X utf8 -m unittest tests.test_controlador_ac_real -v
+```
+
+Nueve pruebas offline verifican comandos de historia, guardado/carga v4,
+continuación, pergamino y replay del log del controlador sin vistas ni archivo
+de guardado original. También comprueban mapa real de C y cancelación de viaje.
+Usan el motor de A con sus opciones explícitas de prueba; la aplicación normal
+todavía no activa esas opciones. No requieren un paquete descargado ni HTTP.
+
+Límites de integración comprobados: el motor aún no entrega `hechos_paso` para
+continuar el viaje y rechaza restaurar historia con mapa conocido activo. Las
+pruebas verifican la detención y el rechazo sin corrupción; no acreditan que
+esos flujos estén completos. La suite de puertas recíprocas preparada por D
+mantiene seis fallos de aceptación pendientes de A.
+[Resultados y alcance](specs/004-linea-tiempo/aceptacion.md).

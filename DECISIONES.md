@@ -943,3 +943,27 @@ en la versión y el equipo medidos. Incluye normalización, recorrido,
 diagnóstico cuando corresponde y construcción del reporte. La
 preparación se muestra aparte. Queda pendiente la revisión cruzada
 con B y la medición del ciclo integrado con cazadores.
+
+## D: aceptación del controlador con A/C reales — 2026-11-12
+
+Problema: las pruebas anteriores de D usaban un productor de contrato mientras
+A ya había entregado captura/restauración H3 offline y conexión del mapa de C.
+Se añadió `tests/test_controlador_ac_real.py` sobre motor, datos offline,
+conocimiento, planificador, control de viaje, binario y replay reales. La vista
+es receptora de prueba. Se verifica la frontera de eventos por los comandos del
+controlador y no escribiendo a mano su bitácora.
+
+Se conserva la activación explícita de prueba de A. Activarla globalmente en
+la CLI sería prematuro: el productor solo admite mover/esperar/atacar, la
+restauración rechaza conocimiento activo y el movimiento no entrega hechos de
+viaje. D no infiere daño desde la vida final ni reconstruye el mapa a partir de
+datos precargados. La alternativa elegida es aceptar lo entregado y verificar
+también los límites con pruebas negativas, sin ampliar reglas de A/C.
+
+Las nueve pruebas nuevas pasaron en 2.376 s con Python 3.14.6. Esto acredita
+funcionamiento en los escenarios documentados, no un límite de rendimiento.
+La consulta no altera estado/azar/log; cargas inválidas no publican cambios;
+el replay conserva la carga embebida aunque se elimine su archivo original.
+El viaje cancelado no mueve; ante hechos ausentes se registra el primer paso
+real y se impide continuar. Con mapa activo, carga rechazada conserva partida,
+mapa, rama histórica y log. Aceptación conjunta completa sigue pendiente.

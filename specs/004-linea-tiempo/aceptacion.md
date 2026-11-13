@@ -351,3 +351,55 @@ python -B -X utf8 -m unittest tests.test_regresiones_juego tests.test_receptor_h
 La entrega nueva de A incorpora captura/restauración históricas bajo activación
 offline; las dos omisiones del flujo general siguen presentes. Estos resultados
 no sustituyen la aceptación integral de producción ni la propuesta de puertas.
+
+## Controlador de D con entregas reales de A/C — 2026-11-12
+
+Especificación DX-01..06 confirmada en `43c0d2e`. Nueva suite:
+`tests/test_controlador_ac_real.py`. Usa un paquete sintético construido por B,
+cliente/precarga offline, motor histórico o mapa de A bajo sus opciones
+explícitas de prueba, mapa/planificador/control de viaje de C y controlador,
+binario e historial de D. Solo la vista se simula y se prohíbe HTTP.
+No se parchean acciones, reglas, resultado de movimiento ni restauración.
+
+```powershell
+python -B -X utf8 -m unittest tests.test_controlador_ac_real -v
+```
+
+**9/9 pruebas aprobadas**, cero fallos, errores u omisiones, en 2.376 s con
+Python 3.14.6. Duración de unittest, sin afirmación de rendimiento.
+
+| Requisito | Evidencia desde el consumidor de D |
+| --- | --- |
+| DX-01 | `mover E`, `esperar`, `historia 99/100/#2`; vida antes/después del ataque empatado. Consulta conserva estado, RNG y bytes del log. |
+| DX-02 | Comandos con ruta con espacios escriben v4 y recuperan estado/historia. Continuación coincide con la ejecución previa a cargar. |
+| DX-02 | P1 y archivo truncado producen error de usuario, sin cambio de partida ni nueva carga en el log. |
+| DX-02 | Pergamino recorta historia, se consume y permite nueva rama; replay conserva las órdenes. No acredita inventario histórico completo. |
+| DX-03 | Replay del log escrito por el controlador, con carga embebida, coincide para 99/100/200 y avisa para 201; funciona sin archivo guardado original ni construir vistas. |
+| DX-04 | Comando mapa presenta conocimiento actualizado por entrada física y oculta la sala desconocida. Consulta conserva partida y log. |
+| DX-05 | Control de viaje real de C sobre mapa conocido del motor; cancelar antes del paso conserva estado/acciones y elimina propuesta. |
+| DX-05, límite | Un paso aceptado se graba; ante `hechos_paso` ausente se cancela y no se repite. El error se verifica, no se inventan daño o enemigos. |
+| DX-06, límite | Carga con mapa activo informa el rechazo explícito de A y conserva partida, conocimiento, historia y bytes del log. |
+
+Pendientes de productores y coordinación: ampliar acciones históricas más allá
+de mover/esperar/atacar; entregar hechos de paso; persistir/restaurar
+conocimiento e inventario históricos y conectar el flujo de producción. La
+conexión de prueba no se activa en la aplicación normal. T003/T010/T021
+permanecen abiertas. Las pruebas PD de puertas conservan su estado de entrega
+TDD pendiente; no se han ocultado para presentar una suite global aprobada.
+
+Regresión completa del mismo árbol con Python 3.14.6, `CRIPTA_SIN_AUDIO=1`
+y temporales escribibles:
+
+```powershell
+python -B -X utf8 -m unittest discover -s tests -v
+```
+
+**776 pruebas: 764 aprobadas, seis fallos, seis omitidas, cero errores**, en
+178.575 s. Salida 1 por los seis casos PD de puertas ya documentados; no se
+atribuyen a la integración DX ni se presentan como aprobados. Las omisiones
+son: comparación opcional por revisiones de rutas (setUpClass), dos casos de
+paquete oficial no indicado, dos casos de historia del motor normal aún sin
+activación de producción y API real deshabilitada. Registro local reproducible:
+`.cache/aceptacion-d-ac-real-2026-11-12.log` (salida generada no versionada).
+No aparecieron fallos adicionales. Esta corrida no renueva mediciones de
+rendimiento ni cierra los contratos pendientes.

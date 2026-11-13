@@ -112,3 +112,20 @@ con inicio, acción completa, recorte y restauración. La adhesión al protocolo
 se comprueba con dobles de prueba y se declara separada de la aceptación con
 los productores reales. La CLI puede señalar que el verificador aún no está
 disponible en esta rama, sin sustituir el algoritmo de B.
+
+### Aceptación integrada offline de D — 2026-11-12
+
+Los párrafos anteriores describen la preparación original. El verificador B
+ya está integrado; se mantienen sus comprobaciones. Ahora se usa además el
+productor histórico real de A bajo activación explícita offline, el mapa real
+de C conectado por A y el control de viaje de C inyectado por la interfaz de D.
+La fábrica de prueba se limita a elegir las opciones existentes de A; no
+reemplaza acciones, eventos ni restauración. Se reutiliza el paquete sintético
+de B con cliente offline y se bloquea HTTP. Solo la vista receptora se simula.
+
+`tests/test_controlador_ac_real.py` verifica DX-01..06, incluidos comandos,
+archivos v4, log generado por el controlador, replay sin vistas, consultas
+puras y cancelación. Prueba por separado los límites actuales: `hechos_paso`
+ausente y rechazo de restauración con conocimiento activo. No se habilitan
+opciones de prueba en la aplicación normal ni se atribuye a esta aceptación
+persistencia del mapa/inventario histórico o viaje automático completo.

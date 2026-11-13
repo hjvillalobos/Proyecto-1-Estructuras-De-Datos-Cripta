@@ -162,3 +162,15 @@ de retroceso posteriores a la precondición bilateral aún no se alcanzan.
 La regresión seleccionada conserva 48 aprobaciones y dos omisiones conocidas.
 [Resultados y pendientes](aceptacion.md#preparación-de-puertas-recíprocas-ad-2026-11-12).
 T003/T010/T021 permanecen abiertas; no hay modificación de producción ni formato.
+
+Incremento DX-01..06 del 2026-11-12: nueve pruebas de D con controlador,
+productor histórico real de A activado offline, datos B y mapa/control de viaje
+reales de C. Pasan consultas puras, guardar/cargar/continuar v4, rechazo de
+archivos inválidos, pergamino, replay sin vistas y sin archivo de carga original,
+mapa tras entradas físicas y cancelación. También se verifican los límites
+del productor: ausencia de hechos de viaje y rechazo de carga con mapa activo.
+No se activan opciones de prueba en producción. Se actualizan README, plan y
+DECISIONES con comandos/alcance reales. T003/T010/T021 siguen abiertas por
+captura completa, inventario/mapa histórico, persistencia conjunta y aceptación
+de producción/mediciones; este incremento sustituye parte de la evidencia con
+dobles por evidencia de integración real, sin declarar cierre global.

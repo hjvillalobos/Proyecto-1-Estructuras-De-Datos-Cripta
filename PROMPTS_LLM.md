@@ -1415,3 +1415,18 @@ Herramienta: Codex desktop; modelo exacto no registrado.
 > adelante
 
 Uso: actualizar referencias y avanzar la rama C hasta la versión integrada de D d796dae, que contiene main a895d85. Respaldar y conservar los puntajes locales. Comprobar una exportación limpia con la suite completa (753, seis omisiones), selección de integración (90) y verificador aislado de rutas (41). No corregir código sin fallos demostrados ni habilitar contratos pendientes. Publicar la actualización y su evidencia en C, sin modificar main ni ramas ajenas.
+
+## 2026-11-12 — D: integración offline con A/C reales
+
+Herramienta: Codex desktop; modelo exacto no verificado. Prompts textuales:
+
+> me traje cambios de C Y A no hay nada que pueda hacer ?
+
+> haz todo y lo subes a mi rama
+
+Uso: aprovechar desde D la entrega histórica offline y el conocimiento real
+del motor A/C. Confirmar DX-01..06 antes de añadir pruebas; ejecutar comandos
+del controlador, persistencia binaria, retroceso, mapa y replay reales. Probar
+cancelación y las limitaciones explícitas del productor sin inferir hechos de
+viaje ni habilitar opciones de prueba en producción. Actualizar evidencia,
+README y DECISIONES, ejecutar regresiones y publicar solo en `004-linea-tiempo`.
