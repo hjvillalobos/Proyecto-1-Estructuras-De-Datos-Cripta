@@ -1,4 +1,4 @@
-"""Fundamentos y búsqueda limitada de A (T008/T010/T021), sin integración.
+"""Fundamentos, búsqueda limitada y contexto de rutas reales de A.
 
 Precondición del grafo: salas/IDs únicos y destinos existentes, costos válidos
 positivos y simétricos. No define políticas de datos inválidos de B (Q1/Q2).
@@ -211,6 +211,23 @@ class HeapRutas:
         """
         while self._nodos:
             self.espacio._posiciones[self._nodos.pop()] = -1
+
+
+class ContextoRutasReales:
+    """Grafo de la partida y auxiliares reutilizables, sin guardar resultados."""
+
+    def __init__(self, salas):
+        self.grafo = GrafoTerreno(salas)
+        self._espacio = EspacioBusqueda(self.grafo.ids)
+        self._frontera = HeapRutas(self._espacio)
+
+    def buscar(self, origen_indice, destino_indice, limite):
+        return buscar_ruta(self.grafo, self._espacio, self._frontera,
+                           origen_indice, destino_indice, limite)
+
+    def descartar_derivados(self):
+        """Invalida las marcas en O(1) entre consultas, conservando los arreglos."""
+        self._frontera.iniciar()
 
 
 def buscar_ruta(grafo, espacio, frontera, origen_indice, destino_indice, limite):

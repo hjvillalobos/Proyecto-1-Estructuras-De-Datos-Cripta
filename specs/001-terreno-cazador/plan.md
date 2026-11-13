@@ -14,7 +14,7 @@ La búsqueda individual limitada por rango es la base propuesta, con Dijkstra le
 
 Los entregables de integración siguen pendientes. La adenda describe la decisión técnica de Persona A para compatibilidad con `historia <t>`, pendiente de validación de integración con D. El algoritmo usa datos válidos suministrados y no hace HTTP. La búsqueda del cazador usa puertas reales. La de C debe usar exclusivamente conocimiento permitido. [Contratos de integración](contracts/integracion.md).
 
-E-B-COSTOS y E-B-RANGO son entregables independientes: T013/T014 requieren solo costos; T025 requiere ambos y el despacho de C. T027 necesita T024 para su finalización completa; una ejecución parcial del núcleo no libera el cierre. La [comunicación reportada de B sobre OpenAPI 1.1.0](research.md#comunicación-reportada-de-b-sobre-openapi-110) carece de copia primaria verificable y no resuelve Q1/Q2 ni acredita entregas. Las reglas del enunciado permanecen vigentes, incluido costo ausente 100 y simetría; rango ausente/null, costo null e inconsistencias siguen pendientes. La espera del profesor no bloquea estas correcciones documentales.
+E-B-COSTOS y E-B-RANGO son entregables independientes: T013/T014 requieren solo costos; T025 requiere ambos y el despacho de C. T027 necesita T024 para su finalización completa; una ejecución parcial del núcleo no libera el cierre. La [comunicación reportada de B sobre OpenAPI 1.1.0](research.md#comunicación-reportada-de-b-sobre-openapi-110) carece de copia primaria verificable. La evidencia posterior de entrega y consumo para datos válidos está en los [contratos](contracts/integracion.md). FR-009 recoge la aclaración de que `rango=null` explícito permite buscar sin tope. Q1 sigue abierta para rango ausente o inválido. Q2 conserva la regla de costo ausente 100 y la simetría, con `costo=null`, valores inválidos e inconsistencias aún pendientes.
 
 ## Technical Context
 
@@ -107,7 +107,7 @@ Consultar sin editar: enemigos.py, historial.py, rastro.py e inventario.py de C;
 4. **Validez y reutilización:** invalidación global conservadora ante cambio efectivo de puerta, con claves por identidad de grafo/época/origen/objetivo/rango según estrategia. Recalcular siempre es referencia; la caché de última consulta es una alternativa mínima, no la decisión final ni una representante de toda reutilización. Comparar también diseños acotados para consultas alternadas bajo cargas equivalentes, midiendo aciertos, memoria, invalidaciones y mantenimiento con puertas estables/inestables; selectiva es otra alternativa por medir. No descartar reutilización por el resultado de una sola caché.
 5. **Agenda:** mantener inicialmente heap propio actual y medir obsoletos; no certificarlo sin carga nueva.
 
-Lectura del código:
+Lectura del código al preparar el plan (línea base histórica):
 
 - mover y la rama de movimiento enemigo usan costo fijo 100; ambos deben utilizar el costo real, conservando 100 en activación inicial.
 - cambiar_velocidad ya implementa la fórmula y pasa por cancelación/programación con historial. Conservar y probar.
@@ -117,6 +117,8 @@ Lectura del código:
 - El motor reserva salas por max(ID). El índice denso propuesto evita repetir ese supuesto en auxiliares; no autoriza refactorizar toda la representación compartida.
 - El historial usa callbacks reversibles, insuficientes por sí solos como formato serializable de D. A debe proponer cambios explícitos sin reemplazar el historial de C.
 - main.ejecutar_replay crea VistaConsola en la rama sin GUI; D debe revisar el requisito sin vista antes de usar ese camino como evidencia headless. A no lo corrige aquí.
+
+En `53c9453`, el movimiento ordinario ya usa costos de salida y el motor despacha al cazador con el grafo completo y las fichas residentes. El grafo conserva referencias a los descriptores de salida y la decisión vuelve a buscar sobre el estado actual. La evidencia de producción para datos válidos no sustituye el acuerdo de despacho E-C-DESPACHO ni acredita la coherencia entre ambos extremos de una puerta. La conexión del mapa y el productor histórico H3 del motor de A siguen bajo activación offline explícita. Véase la [verificación parcial de T027](quickstart.md#revalidación-parcial-de-t027-y-estado-de-integración).
 
 ## Dependencias y gates para Tasks
 

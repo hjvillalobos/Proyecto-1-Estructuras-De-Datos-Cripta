@@ -1405,3 +1405,13 @@ es un resumen de la propuesta, no una cita del usuario.
 Se publica solo en `004-linea-tiempo`. Se conservan los seis fallos reales de
 las siete pruebas nuevas como pendientes de A; no se altera producción ni el
 formato de guardado. Evidencia detallada en `specs/004-linea-tiempo/aceptacion.md`.
+
+### Persona C — actualización e integración revisada — 2026-11-12
+
+Herramienta: Codex desktop; modelo exacto no registrado.
+
+> okay, podemos avanzar en algo?
+
+> adelante
+
+Uso: actualizar referencias y avanzar la rama C hasta la versión integrada de D d796dae, que contiene main a895d85. Respaldar y conservar los puntajes locales. Comprobar una exportación limpia con la suite completa (753, seis omisiones), selección de integración (90) y verificador aislado de rutas (41). No corregir código sin fallos demostrados ni habilitar contratos pendientes. Publicar la actualización y su evidencia en C, sin modificar main ni ramas ajenas.

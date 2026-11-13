@@ -4,12 +4,14 @@ import random
 from copy import copy, deepcopy
 from contextlib import nullcontext
 from red.errores import ErrorCripta
+from modelo.cazador import decidir_cazador
 from modelo.eventos import ColaEventos
 from modelo.efectos import GestorEfectos
 from modelo.tipos import Jugador, InstanciaEnemigo, ObjetoInstancia
 from modelo.rastro import RegistroRastro
 from modelo.historial import HistorialRetroceso
 from modelo.coleccion_enemigos import EnemigosSala
+from modelo.rutas import ContextoRutasReales
 
 
 _COSTO_MOVER = 100
@@ -31,8 +33,11 @@ def calcular_dano(atacante, defensor, azar):
 
 
 class Motor:
+    _acciones_h3 = ("mover", "esperar")
+
     def __init__(self, jugador, salas_lista, semilla):
         self.jugador = jugador
+        self._conocimiento = None
 
         salas_total = 0
         for sala in salas_lista:
@@ -46,6 +51,7 @@ class Motor:
             (sala.id, direccion, "cerrada" in salida, salida.get("cerrada", False))
             for sala in salas_lista for direccion, salida in sala.salidas.items()
         ]
+        self._rutas_reales = ContextoRutasReales(salas_lista)
 
         self.cola = ColaEventos()
         self.azar = random.Random(semilla)
@@ -71,6 +77,13 @@ class Motor:
         self.puertas_abiertas_con_llave = []
         self.meta = None
         self._notificador = None
+
+    @property
+    def mapa_conocido(self):
+        """Expone la consulta solo en instancias habilitadas."""
+        if self._conocimiento is None:
+            raise AttributeError("El mapa conocido no está habilitado.")
+        return self._conocimiento.mapa_conocido
 
     def establecer_notificador(self, notificador):
         self._notificador = notificador
@@ -219,6 +232,11 @@ class Motor:
         pos_anterior = self.jugador.posicion_actual
         self.historial.registrar_inventario(lambda p=pos_anterior: setattr(self.jugador, "posicion_actual", p))
         self.jugador.posicion_actual = id_destino
+        conocimiento = self._conocimiento
+        if conocimiento is not None and id_destino != pos_anterior:
+            cambios = conocimiento.entrar(id_destino)
+            if cambios:
+                self.historial.registrar_cambio(lambda: conocimiento.revertir(cambios))
         self._sincronizar_referencias()
         self._avanzar_actor(self.jugador, costo_salida)
         self.historial.registrar_rastro(id_destino, self.registro_rastro.tiempo_de(id_destino))
@@ -345,10 +363,23 @@ class Motor:
         sala_actual = self.salas[id_sala]
         jugador_en_sala = (self.jugador.posicion_actual == id_sala)
 
-        accion, dato = decidir_accion_enemigo(
-            enemigo, sala_actual, jugador_en_sala,
-            self.registro_rastro, self.azar, self.reloj
-        )
+        if enemigo.comportamiento != "cazador":
+            accion, dato = decidir_accion_enemigo(
+                enemigo, sala_actual, jugador_en_sala,
+                self.registro_rastro, self.azar, self.reloj
+            )
+        elif jugador_en_sala:
+            accion, dato = "atacar", None
+        else:
+            ficha = self.gestor_precarga.catalogo.ficha_preparada(enemigo.tipo_catalogo)
+            rango = ficha.atributos["rango"]
+            if rango is not None and type(rango) is not int:
+                raise TypeError("El rango suministrado al cazador debe ser un entero o null.")
+            grafo = self._rutas_reales.grafo
+            accion, dato, _ = decidir_cazador(
+                grafo.indice(id_sala), grafo.indice(self.jugador.posicion_actual),
+                rango, self._rutas_reales.buscar
+            )
 
         if accion == "atacar":
             self.atacar(enemigo, self.jugador)
@@ -412,6 +443,23 @@ class Motor:
 
     # ---------- vista / resumen ----------
 
+    def _efectos_activos(self):
+        efectos_activos = []
+        if self.jugador.veneno is not None:
+            efectos_activos.append("veneno")
+
+        jug = self.jugador
+        if self.efectos.antorchas_encendidas:
+            efectos_activos.append("antorcha")
+        velocidad_base = jug.velocidad
+        if self.gestor_precarga and self.gestor_precarga.generales:
+            jugador_gen = self.gestor_precarga.generales.get("jugador")
+            if jugador_gen is not None:
+                velocidad_base = jugador_gen.get("velocidad", jug.velocidad)
+        if jug.velocidad != velocidad_base:
+            efectos_activos.append("velocidad")
+        return efectos_activos
+
     def estado_vista(self):
         from modelo.snapshots import EstadoVista, SalidaVista, EnemigoVista, ItemVista
         from modelo.snapshots import TrampaVista, EventoVista
@@ -445,20 +493,8 @@ class Motor:
                 comportamiento=enemigo.comportamiento,
             ))
 
-        efectos_activos = []
-        if self.jugador.veneno is not None:
-            efectos_activos.append("veneno")
-
         jug = self.jugador
-        if self.efectos.antorchas_encendidas:
-            efectos_activos.append("antorcha")
-        velocidad_base = jug.velocidad
-        if self.gestor_precarga and self.gestor_precarga.generales:
-            jugador_gen = self.gestor_precarga.generales.get("jugador")
-            if jugador_gen is not None:
-                velocidad_base = jugador_gen.get("velocidad", jug.velocidad)
-        if jug.velocidad != velocidad_base:
-            efectos_activos.append("velocidad")
+        efectos_activos = self._efectos_activos()
 
                 # Objetos presentes en el suelo de la sala actual
         from modelo.snapshots import ItemVista
@@ -785,6 +821,7 @@ class Motor:
         preparado.jugador = jugador
         self.__dict__.update(preparado.__dict__)
         self.efectos.motor = self
+        self._rutas_reales.descartar_derivados()
 
     def _restaurar_estado_validado(self, estado):
         from modelo.tipos import InstanciaEnemigo, ObjetoInstancia, Trampa
@@ -887,7 +924,10 @@ class Motor:
         )
 
     def _cambios_h3(self, anterior):
-        posterior = self.proyeccion_h3()
+        return self._comparar_campos_fijos_h3(anterior, self.proyeccion_h3())
+
+    @staticmethod
+    def _comparar_campos_fijos_h3(anterior, posterior):
         if len(anterior) != len(posterior):
             raise ValueError("Las proyecciones H3 tienen distinta longitud.")
         if any(clave != clave_nueva for (clave, _), (clave_nueva, _) in zip(anterior, posterior)):
@@ -902,8 +942,9 @@ class Motor:
         Un rechazo de validación del receptor debe dejar su historia intacta.
         El motor revierte su turno y propaga la excepción sin reintentar el lote.
         """
-        if registrar_h3 is not None and accion not in ("mover", "esperar"):
-            raise ValueError("El productor H3 de prueba solo admite mover y esperar.")
+        if registrar_h3 is not None and accion not in self._acciones_h3:
+            acciones = ", ".join(self._acciones_h3[:-1]) + " y " + self._acciones_h3[-1]
+            raise ValueError(f"El productor H3 de prueba solo admite {acciones}.")
         reloj = self.reloj
         notificador = self._notificador
         mensajes = []
@@ -925,6 +966,9 @@ class Motor:
                 notificador(mensaje)
         return resultado
 
+    def _antes_de_retroceder(self):
+        """Punto de extensión previo a aplicar los inversos del turno."""
+
     def _ejecutar_accion(self, accion, argumento=None, registrar_h3=None):
         from modelo.snapshots import ResultadoAccion
         from modelo.enemigos import decidir_accion
@@ -938,11 +982,13 @@ class Motor:
                 return ResultadoAccion(ok=False, mensaje="No hay nada que deshacer")
             # Toda operacion de datos potencialmente fallida precede a los deltas.
             self._sincronizar_referencias(self.historial.referencias_retroceso())
+            self._antes_de_retroceder()
             reloj_anterior = self.historial.usar_pergamino(
                 self.jugador.inventario, pergamino.tipo_catalogo)
             if reloj_anterior is None:
                 return ResultadoAccion(ok=False, mensaje="No hay nada que deshacer")
             self.reloj = reloj_anterior
+            self._rutas_reales.descartar_derivados()
             self.informar("Retroceso: se restaura la accion anterior.")
             return ResultadoAccion(ok=True)
 
@@ -1202,8 +1248,157 @@ class Motor:
         return evento
 
 
+class _MotorConHistoriaDePrueba(Motor):
+    """Productor de consultas H3 para una partida nueva de prueba."""
+
+    _acciones_h3 = ("mover", "esperar", "atacar")
+
+    def __init__(self, jugador, salas_lista, semilla):
+        super().__init__(jugador, salas_lista, semilla)
+        self._historia_h3 = None
+
+    def estado_historico_inicial(self):
+        from modelo.linea_tiempo import EstadoHistorico
+
+        return EstadoHistorico(self.proyeccion_h3())
+
+    def proyeccion_h3(self):
+        from utilidades.ordenamiento import ordenar
+
+        sala = self.jugador.posicion_actual
+        enemigos = ordenar(
+            [enemigo for enemigo in self.enemigos_por_sala[sala] if enemigo.vida > 0],
+            clave=lambda enemigo: enemigo.id_instancia, algoritmo="fusion",
+        )
+        return (super().proyeccion_h3() + (("efectos", tuple(self._efectos_activos())),)
+                + tuple((f"enemigo:{enemigo.id_instancia}",
+                         (enemigo.tipo_catalogo, enemigo.vida, enemigo.vida_max,
+                          enemigo.comportamiento))
+                        for enemigo in enemigos))
+
+    def _cambios_h3(self, anterior):
+        posterior = self.proyeccion_h3()
+        # Sala, jugador y efectos conservan sus claves; los enemigos pueden entrar o salir.
+        cambios = list(self._comparar_campos_fijos_h3(anterior[:3], posterior[:3]))
+        viejos, nuevos = anterior[3:], posterior[3:]
+        i = j = 0
+        while i < len(viejos) and j < len(nuevos):
+            clave_anterior, antes = viejos[i]
+            clave_nueva, despues = nuevos[j]
+            if clave_anterior < clave_nueva:
+                cambios.append((clave_anterior, antes, None))
+                i += 1
+            elif clave_nueva < clave_anterior:
+                cambios.append((clave_nueva, None, despues))
+                j += 1
+            else:
+                if antes != despues:
+                    cambios.append((clave_anterior, antes, despues))
+                i += 1
+                j += 1
+        cambios.extend((clave, antes, None) for clave, antes in viejos[i:])
+        cambios.extend((clave, None, despues) for clave, despues in nuevos[j:])
+        return tuple(cambios)
+
+    def conectar_historia(self, historia):
+        from modelo.errores_historia import CambioHistoriaIncoherente
+
+        if (self._historia_h3 is not None or self.reloj != 0 or self.acciones_jugador != 0
+                or historia.reloj != 0 or historia.cantidad_acciones != 0):
+            raise CambioHistoriaIncoherente("H3 requiere conectar la historia al inicio de la partida.")
+        self._historia_h3 = historia
+
+    def ejecutar(self, accion, argumento=None, *, registrar_h3=None):
+        if self._historia_h3 is not None:
+            if registrar_h3 is not None:
+                raise ValueError("H3 ya tiene un receptor conectado.")
+            if accion == "retroceso":
+                resultado = super().ejecutar(accion, argumento)
+                if resultado.ok:
+                    self._comprobar_frontera_historica()
+                return resultado
+            registrar_h3 = self._registrar_accion_h3
+        return super().ejecutar(accion, argumento, registrar_h3=registrar_h3)
+
+    def _comprobar_frontera_historica(self):
+        from modelo.errores_historia import CambioHistoriaIncoherente
+
+        historia = self._historia_h3
+        if (self.reloj, self.acciones_jugador) != (historia.reloj, historia.cantidad_acciones):
+            raise CambioHistoriaIncoherente("El motor y la historia no coinciden en reloj u ordinal.")
+
+    def _antes_de_retroceder(self):
+        if self._historia_h3 is not None:
+            self._comprobar_frontera_historica()
+            self._historia_h3.recortar(self.acciones_jugador - 1)
+
+    def restaurar_estado_con_historia(self, estado, historia):
+        """Restaura la frontera H3 sin persistir el mapa ni la pila de retroceso."""
+        from modelo.errores_historia import CambioHistoriaIncoherente
+        from utilidades.ordenamiento import ordenar
+
+        if self._conocimiento is not None:
+            raise CambioHistoriaIncoherente("La restauracion H3 no admite el mapa conocido activo.")
+        if (estado.reloj, estado.acciones_jugador) != (historia.reloj, historia.cantidad_acciones):
+            raise CambioHistoriaIncoherente("El estado y la historia no coinciden en reloj u ordinal.")
+
+        final = historia.consultar_final().estado
+        jugador = estado.jugador
+        estadisticas = (jugador.vida, jugador.vida_max, jugador.ataque,
+                        jugador.defensa, jugador.velocidad)
+        try:
+            sala_historica = final.obtener("sala")
+            jugador_historico = final.obtener("jugador")
+        except KeyError as error:
+            raise CambioHistoriaIncoherente("La frontera H3 requiere sala y jugador.") from error
+
+        # La restauracion base valida la existencia de la sala y el resto del estado.
+        sala_id = jugador.sala_id
+        sala = self.salas[sala_id] if type(sala_id) is int and 0 <= sala_id < len(self.salas) else None
+        if sala is None or sala_historica != (sala_id, sala.nombre) or jugador_historico != estadisticas:
+            raise CambioHistoriaIncoherente("La sala o las estadisticas no coinciden con la historia.")
+
+        # El guardado no incluye la vida máxima ni el comportamiento de la ficha.
+        enemigos_guardados = ordenar(
+            [(f"enemigo:{e.instancia}", (e.tipo, e.vida))
+             for bloque in estado.salas if bloque.sala_id == sala_id
+             for e in bloque.enemigos if e.vida > 0],
+            clave=lambda entrada: entrada[0], algoritmo="fusion",
+        )
+        enemigos_historicos = [
+            (clave, valor[:2] if type(valor) is tuple else valor)
+            for clave, valor in final.campos() if clave.startswith("enemigo:")
+        ]
+        if enemigos_guardados != enemigos_historicos:
+            raise CambioHistoriaIncoherente("Los enemigos de la sala no coinciden con la historia.")
+
+        super().restaurar_estado(estado)
+        self._historia_h3 = historia
+
+    def _registrar_accion_h3(self, inicio, fin, ordinal, cambios, eventos):
+        from modelo.errores_historia import CambioHistoriaIncoherente
+        from modelo.snapshots import CambioHistorico, EventoHistorico, ValorHistorico
+
+        historia = self._historia_h3
+        if inicio != historia.reloj or ordinal != historia.cantidad_acciones + 1:
+            raise CambioHistoriaIncoherente("El reloj o el ordinal del lote H3 no coincide con la historia.")
+
+        def convertir(deltas):
+            return tuple(CambioHistorico(clave, ValorHistorico(antes is not None, antes),
+                                         ValorHistorico(despues is not None, despues))
+                         for clave, antes, despues in deltas)
+
+        historia.registrar_accion(
+            fin, convertir(cambios),
+            tuple(EventoHistorico(tiempo, secuencia, convertir(deltas))
+                  for tiempo, secuencia, deltas in eventos),
+            terminal=self.terminado,
+        )
+
+
 def crear_juego(gestor_precarga, cripta_id, semilla, notificar=None,
-                version_cripta=None, version_catalogo=None):
+                version_cripta=None, version_catalogo=None, *,
+                conocimiento_para_pruebas=False, historia_para_pruebas=False):
     from modelo.snapshots import MetaPartida
     from modelo.inventario import Inventario
 
@@ -1225,7 +1420,20 @@ def crear_juego(gestor_precarga, cripta_id, semilla, notificar=None,
         llaves_obtenidas=[],
     )
 
-    motor = Motor(jugador=jugador, salas_lista=preparada.salas, semilla=semilla)
+    tipo_motor = _MotorConHistoriaDePrueba if historia_para_pruebas else Motor
+    motor = tipo_motor(jugador=jugador, salas_lista=preparada.salas, semilla=semilla)
+    if conocimiento_para_pruebas:
+        from modelo.conocimiento import ConocimientoMapa, SalaConocible, SalidaConocible
+
+        salas = []
+        for sala in preparada.salas:
+            salidas = []
+            for direccion, salida in sala.salidas.items():
+                if any(campo not in ("sala", "costo") for campo in salida):
+                    raise ValueError("El mapa de prueba requiere salidas simples sin puertas.")
+                salidas.append(SalidaConocible(direccion, salida["sala"], salida.get("costo", 100)))
+            salas.append(SalaConocible(sala.id, sala.nombre, tuple(salidas)))
+        motor._conocimiento = ConocimientoMapa(salas, (), jugador.posicion_actual)
     motor.gestor_precarga = gestor_precarga
     motor.sala_salida = generales["sala_salida"]
     motor.llave_salida = generales["llave_salida"]

@@ -113,6 +113,29 @@ class PruebasRutasCazador(unittest.TestCase):
         self.comprobar_consulta(self.salas_con_alternativas(True), 90, 80, 500,
                                 (7, "E", 250, 500))
 
+    def test_a6_contexto_real_relee_el_arco_y_el_objetivo_en_cada_consulta(self):
+        """FR-013: una apertura cambia el costo o el primer vecino del empate."""
+        for costo_final in (100, 200):
+            with self.subTest(costo_final=costo_final):
+                salas = crear_salas([90, 7, 3, 80], [
+                    (0, "E", 1, "O", 150, False),
+                    (1, "E", 3, "O", 150, False),
+                    (0, "N", 2, "S", 100, True),
+                    (2, "E", 3, "N", costo_final, False),
+                ])
+                contexto = rutas.ContextoRutasReales(salas)
+                origen, este, norte, destino = (contexto.grafo.indice(sala) for sala in (90, 7, 3, 80))
+                self.assertEqual(contexto.buscar(origen, destino, 300), (este, "E", 150, 300))
+
+                arco = salas[0].salidas["N"]
+                arco["cerrada"] = False
+                self.assertEqual(contexto.buscar(origen, destino, 300),
+                                 (norte, "N", 100, 100 + costo_final))
+                self.assertEqual(contexto.buscar(origen, este, 300), (este, "E", 150, 150))
+
+                arco["cerrada"] = True
+                self.assertEqual(contexto.buscar(origen, destino, 300), (este, "E", 150, 300))
+
     def test_t4_menor_primer_id_pese_a_orden_de_enumeracion(self):
         conexiones = [
             (0, "E", 1, "O", 150, False),
