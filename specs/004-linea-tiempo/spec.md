@@ -110,3 +110,30 @@ Pruebas de D con salas sintéticas, motor, historial y binario reales, sin HTTP.
 No se sustituyen métodos de apertura/cierre para hacer pasar la aceptación.
 Los fallos se registran como pendientes de A, sin omisiones ni expectedFailure.
 
+## Aceptación D con entregas reales offline A/C (2026-11-12)
+
+Incremento de aceptación de T003/T010/T021, sin activar en producción las
+opciones `historia_para_pruebas` o `conocimiento_para_pruebas` del motor de A.
+
+- DX-01: el controlador procesa movimiento y consultas temporales/ordinales con
+  el productor histórico real, sin que consultar altere estado, azar o replay.
+- DX-02: los comandos guardar/cargar usan v4, recuperan historia y permiten
+  continuar; los archivos corruptos o P1 se rechazan sin registrar carga ni
+  mutar la partida. Se conserva la excepción de pergaminos al retroceder.
+- DX-03: el log generado por el controlador reproduce la rama posterior a una
+  carga, incluso después de eliminar el archivo original, sin construir vistas
+  ni realizar HTTP. La fábrica offline selecciona explícitamente el productor
+  entregado por A; no sustituye la ejecución del motor.
+- DX-04: el controlador presenta el mapa real de C actualizado por entradas
+  físicas del motor. No revela salas desconocidas. El control de viaje real de
+  C se inyecta por la interfaz existente de D sobre ese mapa.
+- DX-05: cancelar antes de un paso no mueve ni graba una acción. Si el motor
+  acepta un paso pero no entrega `hechos_paso`, D conserva el movimiento real
+  grabado, cancela la continuación y no repite pasos; no deduce daño/enemigos.
+- DX-06: el rechazo explícito de A al restaurar con mapa activo se presenta al
+  usuario y conserva estado, mapa, historia y log. Esa prueba negativa no
+  certifica persistencia conjunta ni completa T010.
+
+La vista de prueba solo recibe la presentación; modelo, conocimiento, rutas,
+control de viaje, historial, binario y replay son los componentes reales.
+
