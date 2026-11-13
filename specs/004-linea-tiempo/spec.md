@@ -89,3 +89,24 @@ Decisiones adoptadas a partir del enunciado y el motor existente, sin atribuirla
 
 K=1, controles exactos, t entre eventos, #0, negativos, acción inexistente, partida sin acciones, final anticipado, retroceso cruzando checkpoint, nueva rama, archivo corrupto y carga fallida. Resultados en `aceptacion.md` y contratos.
 
+## Aceptación propuesta A–D: puertas recíprocas (2026-11-12)
+
+Preparación de pruebas solicitada por D a partir de la propuesta comunicada de A;
+no acredita una entrega del motor ni resuelve la compatibilidad de guardados antiguos.
+Se conserva el formato binario actual y el objetivo de evento `sala:dirección`.
+
+- PD-01: abrir una puerta recíproca abre ambos extremos y deja un solo cierre
+  vigente. Guardar/cargar preserva ambos extremos incluso si la sala opuesta no
+  tiene contenido cargado ni rastro, sin convertirla en explorada o cargarla.
+- PD-02: guardar/cargar un cierre pendiente conserva tiempo, secuencia y contador;
+  el evento restaurado cierra ambos extremos una sola vez.
+- PD-03: retroceder la apertura restaura ambos extremos cerrados y elimina su
+  cierre; retroceder un turno que contiene el cierre restaura ambos abiertos y
+  el mismo evento pendiente. El pergamino conserva la excepción de Parte I.
+- PD-04: continuar desde el archivo produce el mismo estado y azar que continuar
+  sin cargar, comprobando además explícitamente el cierre de ambos extremos.
+
+Pruebas de D con salas sintéticas, motor, historial y binario reales, sin HTTP.
+No se sustituyen métodos de apertura/cierre para hacer pasar la aceptación.
+Los fallos se registran como pendientes de A, sin omisiones ni expectedFailure.
+
