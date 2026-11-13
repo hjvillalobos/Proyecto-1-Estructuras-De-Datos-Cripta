@@ -1,9 +1,13 @@
 """T034/A12: restauración del motor offline con movimiento, agenda y efectos."""
 
 from dataclasses import replace
+from pathlib import Path
+from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import patch
 
+from datos.guardado_binario import cargar_estado, guardar_estado
+from modelo.juego import crear_juego
 from modelo.tipos import ObjetoInstancia
 from red.errores import ErrorCripta
 from tests.datos_terreno_cazador import motor_terreno
@@ -15,6 +19,51 @@ POCION = "velocidad-a12"
 
 
 class PruebasRestauracionRutas(unittest.TestCase):
+    def test_guardado_conserva_cierre_en_sala_sin_contenido_cargado(self):
+        """FR-015/018: el estado de una salida no depende de cargar su sala."""
+        with partida_cazador(350) as (motor, _, _), TemporaryDirectory() as carpeta:
+            sala = motor.salas[102]
+            salida = sala.salidas["O"]
+            self.assertFalse(motor.contenido_cargado[102])
+            self.assertNotIn("cerrada", salida)
+            cierre = motor.programar_evento(1, "cierre_puerta", (sala, "O"))
+            self.assertTrue(motor.ejecutar("esperar").ok)
+            self.assertFalse(cierre.en_cola)
+            self.assertTrue(salida["cerrada"])
+            self.assertFalse(motor.contenido_cargado[102])
+
+            ruta = Path(carpeta) / "puerta.bin"
+            guardado = motor.exportar_estado()
+            guardar_estado(guardado, ruta)
+            motor.restaurar_estado(cargar_estado(ruta))
+
+            self.assertIs(motor.salas[102].salidas["O"], salida)
+            self.assertTrue(salida["cerrada"])
+            self.assertFalse(motor.contenido_cargado[102])
+            self.assertEqual(motor.exportar_estado(), guardado)
+
+    def test_guardado_omite_puerta_inicial_sin_cambios_en_sala_no_cargada(self):
+        def preparar(precarga, *args, **kwargs):
+            almacen = precarga.cliente.almacen
+            pagina = almacen.leer_pagina("prueba", "v1", 1)
+            pagina["salas"][2]["salidas"]["O"]["cerrada"] = False
+            almacen.guardar_pagina("prueba", "v1", pagina)
+            return crear_juego(precarga, *args, **kwargs)
+
+        with patch("tests.test_turno_cazador.crear_juego", new=preparar), partida_cazador(350) as (motor, _, _):
+            salida = motor.salas[102].salidas["O"]
+            self.assertIs(salida["cerrada"], False)
+            self.assertFalse(motor.contenido_cargado[102])
+            anterior = motor.exportar_estado()
+            self.assertNotIn(102, [sala.sala_id for sala in anterior.salas])
+
+            salida["cerrada"] = True
+            motor.restaurar_estado(anterior)
+
+            self.assertIs(salida["cerrada"], False)
+            self.assertFalse(motor.contenido_cargado[102])
+            self.assertEqual(motor.exportar_estado(), anterior)
+
     def test_contexto_real_descarta_marcas_al_retroceder_y_cargar(self):
         """T031 / FR-013 y FR-018: rutas frescas tras restaurar un arco real."""
         with partida_cazador(350) as (motor, cazador, _):

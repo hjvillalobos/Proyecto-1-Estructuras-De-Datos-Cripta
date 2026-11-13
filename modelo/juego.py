@@ -632,6 +632,16 @@ class Motor:
             if guardado is not None:
                 eventos.append(guardado)
 
+        puertas_modificadas = [None] * len(self.salas)
+        for id_sala, direccion, tenia_campo, cerrada in self._puertas_iniciales:
+            salida = self.salas[id_sala].salidas[direccion]
+            acreditada = (id_sala, direccion) in self.puertas_abiertas_con_llave
+            if "cerrada" in salida and (not tenia_campo or salida["cerrada"] != cerrada or acreditada):
+                if puertas_modificadas[id_sala] is None:
+                    puertas_modificadas[id_sala] = []
+                puertas_modificadas[id_sala].append(
+                    PuertaGuardada(direccion, bool(salida["cerrada"]), acreditada))
+
         salas = []
         for id_sala in range(len(self.salas)):
             sala = self.salas[id_sala]
@@ -640,6 +650,8 @@ class Motor:
             rastro = self.registro_rastro.exportar(id_sala)
             if not (self.contenido_cargado[id_sala] or self.enemigos_por_sala[id_sala]
                     or self.objetos_en_suelo[id_sala] or rastro != -1):
+                if puertas_modificadas[id_sala]:
+                    salas.append(SalaGuardada(sala_id=id_sala, puertas=puertas_modificadas[id_sala]))
                 continue
             salas.append(SalaGuardada(
                 sala_id=id_sala, rastro=rastro,
