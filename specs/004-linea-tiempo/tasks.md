@@ -153,3 +153,12 @@ Aceptación posterior al merge de main y al receptor de D: 709 pruebas,
 703 aprobadas, seis omitidas y ningún fallo/error. Se hizo independiente de la
 caché de trabajo la prueba de reinicio de D; conserva sus comprobaciones.
 [Evidencia y límites](aceptacion.md#main-integrado-y-receptor-h3-de-d-2026-11-10).
+
+Preparación A–D del 2026-11-12: siete pruebas de aceptación PD-01..04 para
+puertas recíprocas, guardado/carga, cierre único, retroceso y continuación.
+Una pasa y seis fallan por entrega bilateral/exportación todavía pendientes
+del motor; no se omiten ni se marcan como fallos esperados. Las comprobaciones
+de retroceso posteriores a la precondición bilateral aún no se alcanzan.
+La regresión seleccionada conserva 48 aprobaciones y dos omisiones conocidas.
+[Resultados y pendientes](aceptacion.md#preparación-de-puertas-recíprocas-ad-2026-11-12).
+T003/T010/T021 permanecen abiertas; no hay modificación de producción ni formato.

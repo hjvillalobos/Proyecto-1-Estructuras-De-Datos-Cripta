@@ -1383,3 +1383,25 @@ datos locales ausentes; el límite de diagnóstico detuvo ese caso. Se cambió
 solo su preparación a un paquete temporal completo de `tests.datos_prueba`,
 conservando las aserciones sobre motor/precarga nuevos, reloj, vida e inventario.
 La regresión seleccionada posterior aprobó 28 pruebas sin omisiones.
+
+## 2026-11-12 — D: aceptación de puertas recíprocas
+
+Herramienta: Codex desktop; modelo exacto no verificado.
+Mensajes textuales de la usuaria que motivan este incremento:
+
+> esto me manda a decir A revisa Actualmente el guardado registra el estado de las puertas por sala y dirección. ¿Ves algún inconveniente en que el motor sincronice ambos extremos, manteniendo un único evento de cierre automático por puerta? Quisiera asegurarme de que la carga y el retroceso sigan funcionando correctamente sin modificar el formato de guardado.
+
+> y de mi parte que puedo hacer? nada?
+
+> hazlo
+
+> y subelo a mi rama
+
+Uso: revisar la compatibilidad y preparar aceptación de D, con especificación
+confirmada antes del archivo de pruebas. La propuesta previa del asistente
+consistía en probar guardado/carga con extremo no visitado, cierre pendiente
+único con tiempo/secuencia, retroceso y continuación determinista; este párrafo
+es un resumen de la propuesta, no una cita del usuario.
+Se publica solo en `004-linea-tiempo`. Se conservan los seis fallos reales de
+las siete pruebas nuevas como pendientes de A; no se altera producción ni el
+formato de guardado. Evidencia detallada en `specs/004-linea-tiempo/aceptacion.md`.

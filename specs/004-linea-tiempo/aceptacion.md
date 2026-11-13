@@ -291,3 +291,48 @@ y restauración de A; el receptor optativo de sala/jugador no las reemplaza ni
 habilita automáticamente `integrar_historia`. T003/T010 y la aceptación integral
 de T021 permanecen abiertas. Todos los cambios de este incremento son de D y
 se publican únicamente en `004-linea-tiempo`.
+
+## Preparación de puertas recíprocas A–D, 2026-11-12
+
+Se preparó `tests/test_puertas_reciprocas_d.py` para PD-01..04 de la
+especificación, confirmados primero en `32b97f6`. No se cambió producción,
+el formato binario ni los contratos de historia completa. La propuesta de A
+todavía no está implementada en el motor de este árbol.
+
+Python 3.14.6, temporales en una carpeta escribible y sin HTTP:
+
+```powershell
+python -B -X utf8 -m unittest tests.test_puertas_reciprocas_d -v
+python -B -X utf8 -m unittest tests.test_regresiones_juego tests.test_receptor_h3_d tests.test_historia_motor
+```
+
+Suite nueva: **7 pruebas, 1 aprobada y 6 fallos de aserción; cero errores y
+cero omisiones**. Es una entrega TDD deliberadamente pendiente; el descubrimiento
+global también incluirá estos fallos hasta integrar la implementación de A.
+
+| Caso | Resultado en la base actual |
+| --- | --- |
+| PD-01 apertura/carga con extremo no visitado | Falla antes de guardar: apertura unilateral. |
+| PD-01 binario de estado bilateral preparado | Falla al cargar: extremo no visitado vuelve a cerrado. |
+| PD-02 preservación de evento y estado | Pasa: tiempo, secuencia, contador y estado completo iguales. |
+| PD-02 ejecución de cierre cargado | Falla: cierra solo un extremo. |
+| PD-03 retroceso de apertura | Falla en la precondición bilateral; las aserciones de retroceso aún no se alcanzan. |
+| PD-03 retroceso de cierre cargado | Falla en la precondición bilateral; las aserciones de retroceso aún no se alcanzan. |
+| PD-04 continuación determinista | La igualdad de estados pasa, pero falla el cierre bilateral exigido. |
+
+Los fixtures abiertos aíslan persistencia/cierre de la apertura pendiente; no
+reemplazan métodos del motor. El caso de exportación prepara expresamente un
+estado bilateral cambiado para reproducir la pérdida de una sala sin contenido
+cargado ni rastro. No acredita que el productor actual abra ambos extremos.
+La agenda contiene un único cierre; todavía no se comprueba la política de
+guardados antiguos contradictorios o con dos cierres de la misma puerta física.
+
+Regresión seleccionada: **50 pruebas, 48 aprobadas, dos omitidas y cero
+fallos/errores** en 2.162 s. Las omisiones siguen siendo la captura y restauración
+de historia completa del motor real. La suite nueva tardó 0.206 s; esas
+duraciones de unittest no son mediciones de rendimiento del juego.
+
+Pendiente de A: sincronizar apertura/cierre y conservar el extremo modificado
+sin cargar ni explorar su sala; registrar ambos deltas y conservar la identidad
+del cierre al retroceder. Pendiente de D: repetir esta aceptación al recibirlo.
+No se cierran T003/T010/T021 por preparar estas pruebas.
