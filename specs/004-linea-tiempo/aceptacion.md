@@ -336,3 +336,18 @@ Pendiente de A: sincronizar apertura/cierre y conservar el extremo modificado
 sin cargar ni explorar su sala; registrar ambos deltas y conservar la identidad
 del cierre al retroceder. Pendiente de D: repetir esta aceptación al recibirlo.
 No se cierran T003/T010/T021 por preparar estas pruebas.
+
+Antes de publicar se consultó la rama remota y se incorporó `8bfe11a` mediante
+el merge `1850722`, conservando los avances nuevos de A/C. El conflicto del
+registro de prompts se resolvió conservando ambas entradas. Se repitieron las
+siete pruebas nuevas: mismo resultado (1 aprobada y 6 fallos), en 0.087 s.
+La regresión ampliada de la base integrada pasó **100 pruebas contabilizadas:
+98 aprobadas, dos omitidas, cero fallos/errores**, en 13.331 s:
+
+```powershell
+python -B -X utf8 -m unittest tests.test_regresiones_juego tests.test_receptor_h3_d tests.test_historia_motor tests.test_eventos_terreno tests.test_restauracion_rutas tests.test_turno_cazador tests.test_cambios_historicos_motor
+```
+
+La entrega nueva de A incorpora captura/restauración históricas bajo activación
+offline; las dos omisiones del flujo general siguen presentes. Estos resultados
+no sustituyen la aceptación integral de producción ni la propuesta de puertas.
