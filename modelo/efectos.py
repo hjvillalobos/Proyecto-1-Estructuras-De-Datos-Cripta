@@ -36,8 +36,7 @@ class GestorEfectos:
         info = actor.veneno
         if info is None:
             return
-        self.motor.historial.registrar_vida(actor, actor.vida)
-        actor.vida = max(0, actor.vida - info.dano_por_pulso)
+        self.motor._aplicar_dano(actor, info.dano_por_pulso)
         self.motor.informar(f"Veneno: pierde {info.dano_por_pulso} de vida.")
         if actor.vida == 0:
             self.motor._matar(actor)
@@ -106,8 +105,7 @@ class GestorEfectos:
         dano = ficha.atributos.get("daño", 0)
         rearme = ficha.atributos.get("rearme", 300)
 
-        self.motor.historial.registrar_vida(self.motor.jugador, self.motor.jugador.vida)
-        self.motor.jugador.vida = max(0, self.motor.jugador.vida - dano)
+        self.motor._aplicar_dano(self.motor.jugador, dano)
         self.motor.informar(f"Trampa: {ficha.nombre} causa {dano} de dano al jugador.")
         if self.motor.jugador.vida == 0:
             self.motor._matar(self.motor.jugador)
