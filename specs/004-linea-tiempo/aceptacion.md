@@ -463,3 +463,8 @@ parcial. Al implementar A/C la carga válida, sustituir ese caso negativo por
 MC-01 y mantener las comprobaciones de cargas inválidas sin mutación. La
 preparación de D está hecha; T003/T010/T021 y la restauración conjunta siguen
 pendientes. No se afirma que el juego ya pueda cargar el mapa.
+
+
+## Cierre conjunto 2026-11-14
+
+Los límites negativos de MC-01/DX-06/PD descritos arriba son históricos y fueron superados por la integración completa autorizada. MC-01 pasa; DX-06 comprueba ahora rechazo de estado/historia incoherentes, conservando atomicidad; PD-01..04 pasan. El motor y el arranque normal conectan mapa, antorcha, inventario, historia, carga y viaje. [Trazabilidad, comandos, resultados y límites actuales](integracion-completa.md). Suite conjunta: 809 pruebas, OK, cuatro omisiones opcionales, sin fallos ni errores.

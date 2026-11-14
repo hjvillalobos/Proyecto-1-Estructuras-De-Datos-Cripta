@@ -298,3 +298,8 @@ Las fechas de esta tabla identifican los commits publicados que respaldan la evi
 | T044 · FR-005/006/016/017, NFR-003, T7/A7–A11/P3 | Mismo commit y suite: identidad y orden de eventos, extracción aislada y ciclo sintético del motor con cambios de velocidad. | T043 y T036. La medición oficial corresponde a T046. |
 
 T003 conserva el [registro contractual vigente](contracts/integracion.md) como fuente del estado de cada acuerdo. La evidencia local o sintética de esta tabla no acredita aceptación externa. T049 espera el cierre de T047 y T048 para completar la trazabilidad de todos los criterios.
+
+
+## Consolidación compartida — 2026-11-14
+
+La autorización de la usuaria amplió el alcance a todas las partes. La integración de producción, las decisiones conservadoras de antorcha/puertas, los benchmarks de A conectados a la CLI y la aceptación del conjunto se documentan en [integracion-completa.md](../004-linea-tiempo/integracion-completa.md). Los balances, gates de autorización y pendientes de entregas anteriores son históricos; no se inventa una respuesta oficial para preguntas del profesor ni se cambian marcadores de checklists de revisión.

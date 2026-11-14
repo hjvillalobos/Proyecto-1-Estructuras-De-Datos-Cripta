@@ -8,15 +8,13 @@ Las marcas completadas incluyen el núcleo y los consumidores de D. La aceptaci�
   descubrir y explorar después, cargar recuperando motor/historia/mapa y
   continuar de forma determinista (FR-011, SC-004). Registrar el fallo actual
   sin skip ni expectedFailure y ejecutar la regresión seleccionada de D.
-- [ ] Repetir MC-01 al recibir la conexión de A/C; sustituir entonces el rechazo
-  válido temporal DX-06 por la aceptación positiva. T003/T010/T021 permanecen
-  abiertos; no cambiar motor, conocimiento ni formato desde esta preparación.
+- [x] Repetir MC-01 con la conexión completa y sustituir DX-06 por carga incoherente sin publicación parcial. Cierre de T003/T010/T021 documentado en integracion-completa.md; los pendientes anteriores se conservan como historial.
 
 ## Preparación y fundamento
 
 - [x] T001 Registrar y clasificar la base de pruebas en specs/004-linea-tiempo/baseline.md, sin confundir fallos heredados con cambios nuevos (FR-011, FR-017).
 - [x] T002 Implementar contratos tipados serializables en modelo/snapshots.py: tiempo entero >=0, secuencia estable, acción desde 1, K >=1, registros independientes del estado vivo (FR-002, FR-003, FR-008, FR-010).
-- [ ] T003 Incorporar captura por evento y frontera de acción en modelo/juego.py y modelo/historial.py; conservar retroceso de cinco acciones y cerrar lote temporal antes de publicar decisión (FR-002, FR-006, FR-010).
+- [x] T003 Incorporar captura por evento y frontera de acción en modelo/juego.py y modelo/historial.py; conservar retroceso de cinco acciones y cerrar lote temporal antes de publicar decisión (FR-002, FR-006, FR-010).
 
 ## US1 — consultar el pasado (P1)
 
@@ -29,7 +27,7 @@ Las marcas completadas incluyen el núcleo y los consumidores de D. La aceptaci�
 
 - [x] T008 [US2] Crear pruebas H2,H6,EX04,EX07 en tests/test_persistencia_historia.py; verificar inventario de pergaminos, recorte, nueva rama y corrupción (FR-007, FR-011, FR-012).
 - [x] T009 [US2] Recortar sufijo y registrar corrección persistente de pergaminos en modelo/linea_tiempo.py; liberar bloques descartados sin recorrer prefijo (FR-006, FR-007, FR-009).
-- [ ] T010 [US2] Conectar cambios de conocimiento e inventario mediante modelo/snapshots.py y productores del motor; incluir mapa recordado (FR-004, FR-007, FR-011).
+- [x] T010 [US2] Conectar cambios de conocimiento e inventario mediante modelo/snapshots.py y productores del motor; incluir mapa recordado (FR-004, FR-007, FR-011).
 
 Avance parcial de T010/T017/T018 (2026-11-10): el consumidor de D presenta la
 proyección estructurada y los campos históricos reales de C. El inventario
@@ -96,7 +94,7 @@ conserva los límites de integración y rendimiento; no completa T003/T010/T021.
 
 - [x] T019 Comparar K=10,50,100 y sin checkpoints; dirección, búsqueda, reconstrucción, memoria y recorte con >=5000 acciones en bench.py (FR-009, FR-010, NFR-001, NFR-002, NFR-003, SC-003).
 - [x] T020 Añadir pruebas de igualdad del estado tras consulta, carga y continuación en tests/test_persistencia_historia.py (NFR-004, SC-004).
-- [ ] T021 Actualizar README.md, PROMPTS_LLM.md y DECISIONES.md con comandos, trazabilidad, mediciones reales y elección final de K; ejecutar regresiones y aceptación (FR-001–FR-020, NFR-001–NFR-004, SC-001, SC-002).
+- [x] T021 Actualizar README.md, PROMPTS_LLM.md y DECISIONES.md con comandos, trazabilidad, mediciones reales y elección final de K; ejecutar regresiones y aceptación (FR-001–FR-020, NFR-001–NFR-004, SC-001, SC-002).
 
 ## Dependencias y estrategia
 
@@ -188,8 +186,11 @@ dobles por evidencia de integración real, sin declarar cierre global.
 
 ## Integración completa — 2026-11-14
 
-- [ ] IC-01 Puertas recíprocas y exportación de extremos no visitados (IA-04, PD-01..04).
-- [ ] IC-02 Mapa de producción, observaciones, antorcha e inversos (IA-01/05).
-- [ ] IC-03 Productor completo y carga conjunta validada (IA-02/03, FR-011, MC-01).
-- [ ] IC-04 Hechos reales y conexión de viaje/replay/CLI (IA-01/06).
+- [x] IC-01 Puertas recíprocas y exportación de extremos no visitados (IA-04, PD-01..04).
+- [x] IC-02 Mapa de producción, observaciones, antorcha e inversos (IA-01/05).
+- [x] IC-03 Productor completo y carga conjunta validada (IA-02/03, FR-011, MC-01).
+- [x] IC-04 Hechos reales y conexión de viaje/replay/CLI (IA-01/06).
 - [ ] IC-05 Regresiones, benchmarks comparativos, documentación y publicación (IA-07..09).
+
+
+Cierre técnico 2026-11-14: IC-01..04 y T003/T010/T021 implementados y validados. La documentación histórica no constituye el estado actual; ver integracion-completa.md. IC-05 conserva el paso de publicación hasta verificar el remoto.

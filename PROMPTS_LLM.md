@@ -1461,3 +1461,12 @@ Herramienta: Codex desktop, agente GPT-6. Prompts textuales:
 > pon prompts, deciciones y todo
 
 Uso: auditoría estática y suite completa (777 pruebas, siete fallos y seis omisiones), seguida de autorización para integrar todas las partes. Aplicación de speckit-implement al incremento IA-01..09, sin hooks configurados; checklist de línea de tiempo 8/8. Las preguntas externas no se presentan como respuestas del profesor. Se registra especificación/plan/tareas antes de producción. Se permite modificar A/B/C/D y publicar exclusivamente 004-linea-tiempo.
+
+
+### Resultado y decisiones de la integración autorizada
+
+Se implementó el productor completo, carga conjunta validada, conocimiento/antorcha, viaje y puertas recíprocas. Se midió primero un ciclo sintético de 30 cazadores que excedía 20 ms; esa evidencia motivó campo compartido para rangos ilimitados, segmentos temporales y después transmisión directa de deltas locales de conocimiento. No se ocultó el incumplimiento inicial. Se descargó la referencia oficial con el cliente del proyecto: 46 de 63 solicitudes; las mediciones posteriores fueron offline.
+
+Al consultar el remoto apareció f8e10ef con avances de A no presentes en la auditoría inicial. Se fusionaron, conservando su captura de daño/entrada, topología, exportación y evaluaciones T040–T044; se conectó su entrega al comando de benchmarks. Se sustituyeron pruebas de indisponibilidad ya superada por aceptación positiva sin eliminar casos de corrupción o rollback. Se documenta el cambio de expectativa de rastro no visitado: la API devuelve None y exporta -1; no se cambió su semántica. Se mantienen las omisiones opcionales y límites externos identificados, sin prometer una calificación ni ausencia absoluta de bugs.
+
+Cierre verificado: suite conjunta 809 pruebas, OK, cuatro omisiones opcionales; selección posterior 40 y regresión de historial 15, sin fallos. Historia K=50: máximo 0.7872 ms en 111 consultas sintéticas de 5000 acciones; referencia con 30 cazadores: ciclo 10.789 ms, paso conocido 4.323 ms; verificación 11.777 ms. Se incluyen README, decisiones, tareas, trazabilidad y resultados conservados. Se publica mediante push ordinario sin forzar ni sobrescribir trabajo remoto.

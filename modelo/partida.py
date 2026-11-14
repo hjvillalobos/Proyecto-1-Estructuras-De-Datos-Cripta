@@ -153,6 +153,9 @@ class MotorPartida(_MotorConHistoriaDePrueba):
         preparado = copy(self)
         preparado.jugador = deepcopy(self.jugador)
         preparado.salas = deepcopy(self.salas)
+        from modelo.rutas import ContextoRutasCompartidas
+        preparado._rutas_reales = ContextoRutasCompartidas(
+            [sala for sala in preparado.salas if sala is not None])
         preparado.registro_rastro = deepcopy(self.registro_rastro)
         preparado._conocimiento = deepcopy(self._conocimiento)
         preparado._deltas_conocimiento = []

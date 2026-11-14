@@ -967,3 +967,41 @@ el replay conserva la carga embebida aunque se elimine su archivo original.
 El viaje cancelado no mueve; ante hechos ausentes se registra el primer paso
 real y se impide continuar. Con mapa activo, carga rechazada conserva partida,
 mapa, rama histórica y log. Aceptación conjunta completa sigue pendiente.
+
+
+## Integración final de Parte II — 2026-11-14
+
+Los estados «pendiente» anteriores son históricos. Fuentes: [especificación IA-01..09](specs/004-linea-tiempo/spec.md), [plan](specs/004-linea-tiempo/plan.md) y [trazabilidad/evidencia](specs/004-linea-tiempo/integracion-completa.md). Se incorporó la entrega remota de A f8e10ef antes de cerrar; se conservaron su captura de pasos, resolución topológica, exportación y pruebas/benchmarks.
+
+### Ruta del cazador
+
+Problema: muchos actores persiguen el mismo objetivo. Alternativas: búsqueda individual, entradas obsoletas, selección lineal, caché de consultas y campo inverso compartido. Decisión: conservar la búsqueda individual acotada para rangos finitos; para rango ilimitado, compartir distancias desde el objetivo, manteniendo el desempate de menor ID del primer paso. Esto cambia la base individual del plan de A, motivado por la comparación medida. La construcción del campo cuesta O((V+E) log V), memoria O(V+E); una decisión compartida examina las salidas del origen. La consulta acotada conserva trabajo según la región alcanzada, sin recorrer el mapa para cada rango pequeño.
+
+### Invalidación
+
+Alternativas: recalcular siempre; reutilizar por objetivo/estado de puertas; dependencias detalladas por ruta. Se elige clave de objetivo y estados de puertas para el campo ilimitado, comprobada una vez por frontera del motor; abrir/cerrar invalida y el retroceso/carga descarta derivados. Fuera de una acción del motor se comprueba la firma real para admitir cambios externos. El movimiento de otro actor no invalida distancias: los actores no bloquean salidas. Las pruebas comparan contra consultas frescas tras cambios. El costo de reconstruir y mantener el campo está incluido en el benchmark, no se presenta solo el acierto barato.
+
+### Conocimiento y viaje
+
+Problema: ocultar información precargada y evitar copiar el mapa al registrar cada evento. Alternativas: derivar del mapa real, copiar la proyección completa o transmitir cambios locales. Se descartan las primeras dos por filtración/costo; se conservan los índices compactos/búsquedas propias de C y se transmiten sus deltas. Una entrada actualiza sala, vecinas pertinentes y observaciones de puertas desde la sala ocupada; la antorcha no activa contenido remoto. Consultas de ruta usan el subgrafo recordado y el control por pasos de C; el motor entrega daño/entrada/enemigos reales mediante A. La búsqueda comparte implementación propia con el cazador, pero no su conocimiento. El caso de puertas remotas es interpretación conservadora del equipo, no respuesta oficial.
+
+### Resolubilidad
+
+Se conserva el análisis incremental y certificado de B frente a repetir un recorrido por cada llave. La normalización es O(N log N), el recorrido es aproximadamente lineal y el reporte depende de su salida; no se borra esta distinción para afirmar linealidad estricta. El modelo acumula alcanzabilidad/llaves; no garantiza un único itinerario si hay salidas sin regreso. Las mediciones de referencia y esa limitación se mantienen explícitas.
+
+### Historia, retroceso y persistencia
+
+Alternativas: copiar la partida por acción, re-simular desde controles o conservar cambios puros. Se mantiene la tercera: diferencias de estadísticas/enemigos/efectos, nodos de inventario y deltas locales de conocimiento, con controles cada K=50. Solo quedan cambios en las acciones, no las proyecciones temporales completas. Se mantiene la elección K=50 respaldada por las series K=10/50/100/sin controles documentadas arriba. Consultar reconstruye como máximo K acciones. El retroceso recorta la rama y registra la corrección irreversible del pergamino consumido.
+
+El binario v4 transporta el físico y la historia; la carga prepara conocimiento y físico independientes, valida frontera/proyección y luego publica. Las copias de preparación existen solo durante carga, no en el historial reversible. Se rechazan guardados P1 y las historias parciales incompatibles, sin migración silenciosa. La puerta modificada se exporta aunque no se haya visitado su otro extremo. Los inversos preservan también la ausencia original del campo `cerrada`.
+
+### Revisión de estructuras de Parte I
+
+Se conserva la agenda propia con cancelación perezosa y el historial por inversos. La entrega de A incorpora comparaciones de heap indexado/obsoletos/lineal, caché acotada y agenda con limpieza/heap indexado frente a la original; se conecta en `--bench --subsistemas terreno-cazador`. El ciclo integrado añade historia/mapa y 30 cazadores. Las alternativas no ganadoras siguen como medición, no como dependencias de producción. Los tiempos y máximos del cierre se registran en la evidencia anexa; no se generalizan a cualquier hardware, cripta o número de actores.
+
+
+### Evidencia final de la integración
+
+Referencia cripta-06@f9ed9afa683d (300 salas), descargada con 46/63 solicitudes. Medición offline con 30 cazadores inyectados y mapa completo: ciclo máximo 10.789 ms (media 3.639 ms), 0/30 sobre 20 ms. Paso conocido con recuerdos de todas las puertas y primera búsqueda incluida: máximo 4.323 ms, 0/30 sobre 5 ms. Verificador incremental: máximo 11.777 ms en diez muestras. Las estrategias compartida, cacheada e individual se comparan sobre idénticas consultas y puertas, comprobando decisiones antes de reportar tiempos. Los rangos pequeños favorecen evitar el campo global; las puertas cambiantes reducen las ventajas de caché, como muestra la salida completa. [Resultados conservados](specs/004-linea-tiempo/integracion-mediciones.json) y [aceptación](specs/004-linea-tiempo/integracion-completa.md).
+
+Suite integrada con la entrega remota de A: 809 pruebas, cero fallos/errores y cuatro omisiones opcionales explícitas. Se conserva el límite del mapa por mayor ID en los arreglos heredados del motor; no se afirma memoria proporcional solo a V para IDs arbitrariamente dispersos. La API permite preparar datos compatibles; el paquete antiguo incompleto no se presenta como validación exitosa.

@@ -237,3 +237,8 @@ El usuario indicó: «okay, entonces dejalo como pendiente». Q1 permanece abier
 El caso pendiente se limita a una puerta entre una vecina revelada y otra sala, sin observación física previa. La puerta que conecta la sala ocupada con esa vecina sí se observa desde la posición actual conforme a FR-004.
 
 Se puede continuar revisando y preparando el conocimiento por entrada física, avistamiento, memoria de puertas observadas y cambios reversibles. Las decisiones y pruebas sobre información de puertas remotas reveladas por antorcha quedan pendientes de respuesta oficial. Esto no declara completa la fase de aclaración ni autoriza omitir plan, tareas y análisis antes de implementar.
+
+
+## Consolidación compartida — 2026-11-14
+
+La autorización de la usuaria amplió el alcance a todas las partes. La integración de producción, las decisiones conservadoras de antorcha/puertas, los benchmarks de A conectados a la CLI y la aceptación del conjunto se documentan en [integracion-completa.md](../004-linea-tiempo/integracion-completa.md). Los balances, gates de autorización y pendientes de entregas anteriores son históricos; no se inventa una respuesta oficial para preguntas del profesor ni se cambian marcadores de checklists de revisión.

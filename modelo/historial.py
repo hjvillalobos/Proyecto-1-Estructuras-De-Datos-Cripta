@@ -175,7 +175,7 @@ class HistorialRetroceso:
     def referencias_retroceso(self):
         return list(self._turnos[-1].referencias) if self._turnos else []
 
-    def usar_pergamino(self, inventario, tipo_pergamino: str = "itm_pergamino_retroceso"):
+    def usar_pergamino(self, inventario, tipo_pergamino: str):
         """
         Revierte el turno más reciente. No consume tiempo virtual y no
         abre un nuevo turno de historial (§2.11): por eso este método NO

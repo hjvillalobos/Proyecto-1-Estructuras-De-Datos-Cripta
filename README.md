@@ -1,5 +1,27 @@
 # Proyecto-1-Estructuras-De-Datos-Cripta
 
+## Estado integrado — 14 de noviembre de 2026
+
+El arranque normal de consola/GUI y el replay activan la partida de Parte II: mapa recordado, viaje por pasos, historia de todas las acciones y guardado/carga conjuntos. Se integraron los avances remotos de A hasta f8e10ef. Los apartados antiguos se conservan como historial; su texto «pendiente» no describe este incremento.
+
+```powershell
+python -m pip install -r requirements.txt
+python main.py --gui
+python main.py --descargar-todo --cripta cripta-06 --datos-dir .cache/entrega-completa
+python main.py --offline .cache/entrega-completa --cripta cripta-06 --semilla 42
+python -B -X utf8 -m unittest discover -s tests -v
+python main.py --bench --subsistemas parte-dos --paquete .cache/entrega-completa --cripta cripta-06 --repeticiones 30
+python main.py --bench --subsistemas terreno-cazador --salas 40 --repeticiones 3
+python main.py --bench --subsistemas historia --operaciones 5000 --salas 100 --repeticiones 3
+```
+
+`parte-dos` compara rutas frescas, caché y campo compartido con puertas estables/cambiantes; mide además un ciclo real con 30 cazadores inyectados y un paso sobre mapa completamente conocido. `terreno-cazador` conecta la entrega de A: localidad, heaps, cachés y agenda/historial bajo carga nueva. La preparación de entradas no se incluye en la consulta medida; las estrategias incluyen su mantenimiento y verifican igualdad de decisiones. Las cargas de actores inyectados se distinguen de una partida natural.
+
+En partida: `mapa`, `ir a ID`, `cancelar`, `historia T`, `historia #K`, `guardar "archivo.bin"`, `cargar "archivo.bin"`. `--replay partida.log --hasta T` no construye vistas. Los guardados antiguos sin historia completa se rechazan explícitamente. Datos descargados, partidas, puntajes y logs permanecen fuera de Git.
+
+La antorcha revela vecinas sin activar contenido; los recuerdos de puertas se actualizan desde la sala ocupada. La interpretación conservadora sobre puertas remotas es una decisión declarada del equipo, no una aclaración oficial. [Aceptación y trazabilidad actuales](specs/004-linea-tiempo/integracion-completa.md).
+
+
 Diseño, implementación y evaluación de estructuras de datos en un juego de mazmorra dirigido por eventos.
 
 ## Preparación compartida de la Parte II

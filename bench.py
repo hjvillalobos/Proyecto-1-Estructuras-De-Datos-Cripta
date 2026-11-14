@@ -11,7 +11,7 @@ from utilidades.bench_juego import (
 
 SUBSISTEMAS_BASE = ("cache", "agenda", "inventario", "historial", "ordenamiento",
                    "guardado", "ciclo", "historia")
-SUBSISTEMAS = SUBSISTEMAS_BASE + ("guardado-historia", "resolubilidad", "parte-dos")
+SUBSISTEMAS = SUBSISTEMAS_BASE + ("guardado-historia", "resolubilidad", "parte-dos", "terreno-cazador")
 
 
 def entero_positivo(texto: str) -> int:
@@ -154,6 +154,19 @@ def main(argv=None):
     if "parte-dos" in args.subsistemas:
         from utilidades.bench_parte_dos import medir
         medir(args.salas, args.semilla, args.repeticiones, args.paquete, args.cripta)
+    if "terreno-cazador" in args.subsistemas:
+        import json
+        from utilidades.bench_terreno_cazador import (
+            medir_rutas, medir_localidad, medir_agendas, medir_ciclo_motor)
+        resultados = {
+            'rutas': [medir_rutas(args.salas, h, limite, inestable, args.semilla, args.repeticiones)
+                      for h in (1, min(24, args.salas - 1)) for limite in (100, None)
+                      for inestable in (False, True)],
+            'localidad': medir_localidad((128, 512, 2048), args.semilla, args.repeticiones),
+            'agenda': medir_agendas(24, 96, args.semilla, args.repeticiones),
+            'ciclo': medir_ciclo_motor(24, args.semilla, args.repeticiones),
+        }
+        print(json.dumps(resultados, indent=2))
 
 
 if __name__ == "__main__":
