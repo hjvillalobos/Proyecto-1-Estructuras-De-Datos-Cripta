@@ -1393,3 +1393,13 @@ Herramienta: Codex desktop; modelo exacto no registrado.
 > adelante
 
 Uso: actualizar referencias y avanzar la rama C hasta la versión integrada de D d796dae, que contiene main a895d85. Respaldar y conservar los puntajes locales. Comprobar una exportación limpia con la suite completa (753, seis omisiones), selección de integración (90) y verificador aislado de rutas (41). No corregir código sin fallos demostrados ni habilitar contratos pendientes. Publicar la actualización y su evidencia en C, sin modificar main ni ramas ajenas.
+
+### Persona C — viaje completo en ensayo offline — 2026-11-13
+
+Herramienta: Codex desktop; modelo exacto no registrado.
+
+> puedes ver que han hecho en el repo para ver si ya podemos seguir
+
+> puedes hacerlo?
+
+Uso: revisar A 0b4f13a y D b656f49 en copia aislada (66 pruebas, siete fallos: seis puertas y una expectativa antigua sobre hechos). Especificar I11 antes del código en ca36567. Añadir ensayo de viaje de tres pasos, cancelación y daño intermedio con motor/controlador reales, conocimiento adquirido por movimiento y vista simulada. Verificador final: 46 pruebas sin omisiones. Publicar solo pruebas, herramienta y documentación de C; no activar producción ni cambiar módulos de compañeros.

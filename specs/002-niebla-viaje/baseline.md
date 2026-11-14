@@ -1,5 +1,13 @@
 # Comprobación inicial de C
 
+## I11 — viaje de varios pasos con motor real (2026-11-13)
+
+Especificación previa ca36567. `python -B -m utilidades.verificar_viaje_completo`: **46 pruebas en 3.420 s, OK, sin omisiones**, incluidas tres nuevas C43–C45 y cinco de los hechos de movimiento de A. Python 3.12.10; motor/controlador reales de A 0b4f13a, módulos actuales de C, paquete sintético offline, semilla 927. El primer intento detectó que faltaba exportar el módulo de bitácora visual requerido por el controlador; se corrigió el verificador y se repitió la ejecución. No se cambió código de A/D.
+
+El camino se conoce mediante seis movimientos reales de ida y vuelta. El viaje posterior llega en tres pasos y 300 unidades virtuales, coincide paso a paso con otra partida manual y registra tres movimientos adicionales. Cancelar tras un paso deja siete acciones totales. Una trampa en el segundo paso detiene por daño con ocho acciones totales. En ambos casos, intentar avanzar otra vez conserva estado y bytes del log. Ningún ResultadoPaso es fabricado; solo se simula la vista y se bloquea HTTP.
+
+Esto acredita el ensayo local sin puertas, no la aplicación normal, persistencia del conocimiento ni viaje con antorcha. La activación de conocimiento sigue usando la opción explícita de prueba de A. No se modificaron las pruebas pendientes de D ni se repitió la suite global de las ramas combinadas; los fallos de puertas y la expectativa antigua de ausencia de hechos siguen siendo asuntos separados. No es una medición de PR-001.
+
 ## I10 — origen bloqueado (2026-11-10)
 
 Especificación previa: c4a929c. C42 falló antes del cambio en sus dos pruebas por ejecutar una búsqueda innecesaria. Después: **41 pruebas, OK, sin omisiones**, usando el verificador aislado y `--bench-escenarios`. Se comprueban puerta no observada, cierre, apertura, exploración, reversión, llegada y ruta alternativa. El rechazo usa únicamente la adyacencia conocida; no modifica A ni el motor.
