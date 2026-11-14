@@ -668,3 +668,13 @@ Al repetir el descubrimiento con Pillow y seleccionar todos los casos salvo esa 
 ### Evidencia posterior de T030
 
 Sobre `53c9453`, con la prueba nueva en el árbol de trabajo, pasaron **172 pruebas seleccionadas**, sin fallos, errores ni omisiones. Los cinco casos de `tests/test_eventos_terreno.py` usan el motor ordinario con datos offline. A8 cubre el empate entre cierre, efecto y turno del cazador en ambos órdenes relativos de cierre y turno. A9 verifica la activación ordenada de enemigos dormidos y la conservación del turno del enemigo que ya llegó activo. A10 verifica el cierre tras cruzar, la conservación de la llave y el rechazo al volver a intentar el mismo arco. A11 verifica la curación y los pulsos reales de regeneración en `t=200` y `t=400`, con el siguiente pulso pendiente en `t=600`. T030 sigue abierta por su dependencia de T025.
+
+## Evidencia de A13 para T037
+
+Sobre `b1e78c8`, con las pruebas de A13 en el árbol de trabajo, pasaron 57 pruebas sin fallos, errores ni omisiones.
+
+```powershell
+.\.venv\Scripts\python.exe -B -m unittest tests.test_costos_terreno tests.test_eventos_terreno tests.test_validez_rutas tests.test_frontera_temporal tests.test_restauracion_rutas tests.test_rastro
+```
+
+Con el motor ordinario y un paquete sintético offline se verificaron el rastro inicial, su refresco al esperar, las marcas de origen y destino al moverse y la espera del guardián en su turno fuera de la sala del jugador. Para el rastreador, la prueba prepara las marcas de rastro y el estado de una salida, activa al enemigo y procesa su turno real en t=400 mediante `ejecutar_ciclo()` con el callback de producción. Comprueba que se desplaza hacia el menor ID con rastros empatados de 399 unidades, espera con rastros de 400 y elige la otra salida cuando la de menor ID está cerrada. En los tres casos se comprueba el siguiente turno en t=800. T037 sigue pendiente de T036. Esta ejecución no mide rendimiento.
