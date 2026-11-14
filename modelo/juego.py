@@ -991,6 +991,7 @@ class Motor:
         except Exception:
             self.historial.descartar_turno()
             self.reloj = reloj
+            self._rutas_reales.descartar_derivados()
             try:
                 self._sincronizar_referencias()
             except (ErrorCripta, OSError):

@@ -1,5 +1,6 @@
 """T034/A12: restauración del motor offline con movimiento, agenda y efectos."""
 
+from contextlib import nullcontext
 from dataclasses import replace
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -8,6 +9,7 @@ from unittest.mock import patch
 
 from datos.guardado_binario import cargar_estado, guardar_estado
 from modelo.juego import crear_juego
+from modelo.errores_historia import CambioHistoriaIncoherente
 from modelo.tipos import ObjetoInstancia
 from red.errores import ErrorCripta
 from tests.datos_terreno_cazador import motor_terreno
@@ -19,6 +21,62 @@ POCION = "velocidad-a12"
 
 
 class PruebasRestauracionRutas(unittest.TestCase):
+    def test_rollback_descarta_las_marcas_de_la_busqueda_del_turno(self):
+        """A12 / FR-018: un turno fallido invalida las etiquetas que produjo."""
+        for fase in ("accion", "publicacion"):
+            with self.subTest(fase=fase):
+                self.comprobar_rollback_de_busqueda(fase)
+
+    def comprobar_rollback_de_busqueda(self, fase):
+        with partida_cazador(350) as (motor, cazador, _):
+            self.assertTrue(motor.ejecutar("mover", "E").ok)
+            self.assertTrue(motor.ejecutar("mover", "E").ok)
+            antes = motor.exportar_estado()
+            turno = cazador.evento_pendiente
+            cantidad_turnos = motor.historial.cantidad_turnos()
+            contexto = motor._rutas_reales
+            origen = contexto.grafo.indice(100)
+            espacio = contexto._espacio
+            self.assertIsNone(espacio.etiqueta(origen))
+
+            def rechazar_lote(*_):
+                self.assertEqual((motor.reloj, cazador.sala_actual), (127, 101))
+                self.assertIsNotNone(espacio.etiqueta(origen))
+                raise CambioHistoriaIncoherente("lote rechazado")
+
+            ejecutar_ciclo = motor.ejecutar_ciclo
+
+            def fallar_despues_del_turno_enemigo(*args, **kwargs):
+                evento = ejecutar_ciclo(*args, **kwargs)
+                if evento is turno:
+                    self.assertEqual((motor.reloj, cazador.sala_actual), (100, 101))
+                    self.assertIsNotNone(espacio.etiqueta(origen))
+                    raise RuntimeError("fallo durante la accion")
+                return evento
+
+            if fase == "accion":
+                contexto_fallo = patch.object(motor, "ejecutar_ciclo", side_effect=fallar_despues_del_turno_enemigo)
+                receptor, error, mensaje = None, RuntimeError, "fallo durante la accion"
+            else:
+                contexto_fallo = nullcontext()
+                receptor, error, mensaje = rechazar_lote, CambioHistoriaIncoherente, "lote rechazado"
+            with contexto_fallo, self.assertRaisesRegex(error, mensaje):
+                motor.ejecutar("esperar", registrar_h3=receptor)
+
+            self.assertEqual(motor.exportar_estado(), antes)
+            self.assertEqual(motor.historial.cantidad_turnos(), cantidad_turnos)
+            self.assertIs(cazador.evento_pendiente, turno)
+            self.assertTrue(turno.en_cola)
+            self.assertFalse(turno.cancelado)
+            self.assertEqual(cazador.sala_actual, 100)
+            self.assertIs(motor._rutas_reales, contexto)
+            self.assertIs(motor._rutas_reales._espacio, espacio)
+            self.assertIsNone(espacio.etiqueta(origen))
+            self.assertFalse(espacio.esta_cerrado(origen))
+
+            self.assertTrue(motor.ejecutar("esperar").ok)
+            self.assertEqual((motor.reloj, cazador.sala_actual, cazador.tiempo_siguiente), (127, 101, 350))
+
     def test_guardado_conserva_cierre_en_sala_sin_contenido_cargado(self):
         """FR-015/018: el estado de una salida no depende de cargar su sala."""
         with partida_cazador(350) as (motor, _, _), TemporaryDirectory() as carpeta:
