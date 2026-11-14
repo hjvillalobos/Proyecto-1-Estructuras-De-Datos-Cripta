@@ -41,8 +41,8 @@ En todos los trabajos futuros: estructuras propias y list de bajo nivel; sin dic
 
 **Objetivo:** registrar evidencia y decisiones externas con autorización documental G-DOC, sin necesitar Implement ni liberar G0. Su listado no significa que estén realizadas; ausencia de evidencia se registra como pendiente, no como cumplimiento.
 
-- [ ] T001 DOC Registrar en specs/001-terreno-cazador/research.md la evidencia recibida para Q1 y su fuente/fecha; actualizar propuesta de entrada en specs/001-terreno-cazador/contracts/integracion.md solo conforme a esa evidencia, manteniendo «sin mínimo/default/invalidez inventados» hasta entonces. Registrar comunicación parcial de B usa G-DOC; cierre BLOQUEADO GB1 hasta fuente y aclaración suficientes, sin considerar el reporte OpenAPI verificación independiente. Dep: ninguna. [FR-007, FR-009; NFR-006; T2, A3, A4]
-- [ ] T002 DOC Registrar en specs/001-terreno-cazador/research.md la evidencia de Q2 y delimitar en specs/001-terreno-cazador/contracts/integracion.md validación de B frente a consumo de A; conservar «costo ausente 100; declarado entero ≥1 y simétrico para datos válidos» sin corregir/rechazar por iniciativa propia. Registrar comunicación parcial de B usa G-DOC; cierre BLOQUEADO GB2: costo null e inconsistencias siguen sin política, sin confundir null con ausencia. Dep: ninguna. [FR-001; NFR-006; A1, A2]
+- [x] T001 DOC Registrar en specs/001-terreno-cazador/research.md la evidencia recibida para Q1 y su fuente/fecha; actualizar propuesta de entrada en specs/001-terreno-cazador/contracts/integracion.md solo conforme a esa evidencia, manteniendo «sin mínimo/default/invalidez inventados» hasta entonces. Registrar comunicación parcial de B usa G-DOC; cierre BLOQUEADO GB1 hasta fuente y aclaración suficientes, sin considerar el reporte OpenAPI verificación independiente. Dep: ninguna. [FR-007, FR-009; NFR-006; T2, A3, A4]
+- [x] T002 DOC Registrar en specs/001-terreno-cazador/research.md la evidencia de Q2 y delimitar en specs/001-terreno-cazador/contracts/integracion.md validación de B frente a consumo de A; conservar «costo ausente 100; declarado entero ≥1 y simétrico para datos válidos» sin corregir/rechazar por iniciativa propia. Registrar comunicación parcial de B usa G-DOC; cierre BLOQUEADO GB2: costo null e inconsistencias siguen sin política, sin confundir null con ausencia. Dep: ninguna. [FR-001; NFR-006; A1, A2]
 - [x] T003 DOC Mantener en specs/001-terreno-cazador/contracts/integracion.md registros separados E-B-COSTOS, E-B-RANGO, E-BC-PUERTA, E-C-RUTA, E-C-DESPACHO, E-C-OBS, E-C-UNDO, E-D-CAMBIOS, E-D-RESTAURA y E-D-MEDICION: responsable, alcance, evidencia/fecha y estado. Puede prepararse con G-DOC; su checkbox solo se completa cuando todas las entregas requeridas estén verificadas. Los consumidores dependen de sus E-* concretos, nunca de completar T003 entero. Todos siguen pendientes hasta evidencia; A no implementa componentes ajenos. Dep: ninguna. [FR-008, FR-012, FR-015, FR-018, FR-019; NFR-004, NFR-006; A5, A9–A13]
 - [ ] T004 DOC Documentar en specs/001-terreno-cazador/research.md cripta/versión oficial, equipo y posibles enmiendas de Q3 con fuente; mantener <20 ms y condiciones oficiales sin evidencia contraria. BLOQUEADA GR; no bloquea por sí sola experimentos sintéticos autorizados. Dep: ninguna. [NFR-001, NFR-003; P1]
 
@@ -101,7 +101,7 @@ En todos los trabajos futuros: estructuras propias y list de bajo nivel; sin dic
 
 **Cierre documental de T015–T017.** Con T012 y T014 completadas, se cierra T015 por la reprogramación verificada sin ajustes de producción; luego T016 por la cobertura de costos y movimiento, y T017 por la ejecución conjunta en el HEAD `5c67c8d`. Resultado: 114 aprobadas, 0 fallidas, 0 errores y 0 omitidas. Los criterios oficiales de T7 están cubiertos por las pruebas existentes en cronologías separadas; el ejemplo encadenado 250 → 150 → 225 conserva cobertura parcial. [Comando y evidencia de cierre](quickstart.md#revalidación-y-cierre-de-t015t017).
 
-- [ ] T018 [US1] DOC Cuando llegue evidencia T001/T002, añadir a specs/001-terreno-cazador/quickstart.md los casos de entrada autorizados que A debe consumir y los errores cuya prueba corresponde a B; no escribir política de rechazo/normalización en modelo/juego.py por defecto. BLOQUEADA GB1/GB2. Dep: T001, T002, T017. [FR-001, FR-009; NFR-006; A1, A2, A4]
+- [x] T018 [US1] DOC Cuando llegue evidencia T001/T002, añadir a specs/001-terreno-cazador/quickstart.md los casos de entrada autorizados que A debe consumir y los errores cuya prueba corresponde a B; no escribir política de rechazo/normalización en modelo/juego.py por defecto. BLOQUEADA GB1/GB2. Dep: T001, T002, T017. [FR-001, FR-009; NFR-006; A1, A2, A4]
 
 **Checkpoint:** MVP de movimiento con datos válidos verificable al completar T017; T018 puede seguir pendiente y mantiene explícita la falta de contrato de entrada completo.
 
@@ -328,7 +328,7 @@ Las reglas vigentes de datos válidos, la decisión del cazador, el orden tempor
 
 ### Cierre de la entrega integrada de A
 
-**41 de 51 casillas marcadas (20 anteriores y 21 en este incremento).** Se aplica la decisión de integración comunicada por Sebastián. Las interfaces y su alcance constan en el [registro contractual](contracts/integracion.md) y en la [constancia técnica](research.md#interfaces-de-la-entrega-integrada).
+**44 de 51 casillas marcadas (41 en la consolidación publicada y tres en el cierre de entradas).** Se aplica la decisión de integración comunicada por Sebastián. Las interfaces y su alcance constan en el [registro contractual](contracts/integracion.md) y en la [constancia técnica](research.md#interfaces-de-la-entrega-integrada).
 
 | Cierre en orden de dependencia | Evidencia |
 |---|---|
@@ -338,19 +338,18 @@ Las reglas vigentes de datos válidos, la decisión del cazador, el orden tempor
 | T036–T038 | Regresión conjunta de eventos, validez, restauración y costos con A13 publicado. No se encontró un defecto que exigiera ajustar producción en T036. La investigación registra la matriz evento→distancias/programación. |
 | T040–T045 | Benchmark de `0396f60`, equivalencia contra T026, localidad del campo inverso, mantenimiento de cachés y comparación de agendas. La CLI integrada ejecutó ocho cargas, tres tamaños de localidad y un ciclo con 24 cazadores. La conexión publicada por D acredita la recepción del entregable de A. |
 
+**Cierre de T001, T002 y T018.** El [contraste con el enunciado](research.md#alcance-oficial-de-q1-y-q2) delimita los gates GB1/GB2 originales. Las políticas generales de rechazo o normalización eran preguntas de planificación. Sus casos quedan fuera del cierre de A para entradas conformes. T017 ya estaba cerrada y la [guía de entradas](quickstart.md#entradas-verificadas-de-terreno-y-rango) registra consumo en A y validación en B. Se conservan las filas originales como trazabilidad.
+
 ### Tareas abiertas para la entrega
 
 **Excepción formal de T025.** E-C-DESPACHO se usa en la integración y las pruebas de turnos reales verifican el despacho con datos válidos y la conservación del callback de C. El criterio original pide confirmación de Juan y no consta una confirmación expresa verificable. Se conservan las demás casillas y su evidencia; las dependencias formales que pasan por T025 conservan esa salvedad.
 
 | Tarea | Criterio pendiente |
 |---|---|
-| T001 | Política oficial para rango ausente o inválido (Q1). |
-| T002 | Política oficial para costo nulo, inválido o inconsistente (Q2). |
 | T004 | Designación oficial de cripta/versión y enmiendas aplicables (Q3). |
-| T018 | Cierre de T001 y T002. Las entradas válidas ya constan en la guía. |
 | T025 | Confirmación específica exigida por la fila original. La integración y su evidencia técnica constan en E-C-DESPACHO. |
 | T046 | T004 y evidencia de medición sobre la referencia Q3. Existe una medición candidata de cripta-06 con mínimo, mediana y máximo. |
-| T047 | T001, T002, T004 y T046. |
+| T047 | T004 y T046. |
 | T048 | T046. La guía de reproducción integrada está preparada. |
 | T049 | T047 y T048. |
 | T050 | T047–T049 y revisión de completitud. El [índice del paquete local](research.md#evaluación-sintética-y-paquete-local-de-entrega-t047t050) identifica los materiales para README.md y DECISIONES.md. |

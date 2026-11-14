@@ -29,11 +29,19 @@ La ausencia reportada de restricciones en un esquema no deroga las reglas del ju
 
 ## Aclaración del profesor sobre Q2
 
-**Registro del 2026-11-09.** El usuario comunicó que el profesor confirmó dos reglas de Parte II §3.1: si falta el campo `costo`, se usa 100, y se asume el mismo costo en ambos sentidos de una puerta entre salas adyacentes. Sigue pendiente cómo tratar `costo=null`, valores inválidos y contradicciones entre descriptores. La simetría del costo no acredita que el estado abierto o cerrado esté sincronizado entre extremos. E-B-COSTOS sigue pendiente de que B demuestre el suministro versionado de costos válidos hasta el motor de A. Q1 (rango ausente o inválido) y Q3 (referencia de rendimiento) siguen abiertas.
+**Registro del 2026-11-09.** El usuario comunicó que el profesor confirmó dos reglas de Parte II §3.1: si falta el campo `costo`, se usa 100, y se asume el mismo costo en ambos sentidos de una puerta entre salas adyacentes. Sigue pendiente cómo tratar `costo=null`, valores inválidos y contradicciones entre descriptores. La aclaración posterior del usuario ratifica que la simetría es una condición de los datos de entrada. El motor consume el costo de la salida recorrida. La prueba `test_movimiento_reciproco_costo_250` verifica ambos sentidos con datos válidos; la evidencia de suministro figura en [E-B-COSTOS](contracts/integracion.md).
 
 ## Aclaración del profesor sobre Q1
 
-**Procedencia:** aclaración del profesor comunicada por el usuario. Un valor `rango=null` explícito indica que el cazador busca sin tope de costo. Un entero válido conserva el límite inclusivo. Los casos de campo ausente y de valor inválido siguen pendientes. E-B-RANGO debe preservar la distinción entre esos estados y acreditar el acceso del motor al dato versionado sin HTTP durante la búsqueda. Su aceptación sigue pendiente.
+**Procedencia:** aclaración del profesor comunicada por el usuario. Un valor `rango=null` explícito indica que el cazador busca sin tope de costo. Un entero válido conserva el límite inclusivo. Los casos de campo ausente y de valor inválido siguen pendientes. E-B-RANGO debe preservar la distinción entre esos estados y acreditar el acceso del motor al dato versionado sin HTTP durante la búsqueda. El registro integrado de [E-B-RANGO](contracts/integracion.md) acredita el acceso para entradas válidas. La prueba de turno con ruta de costo 400 verifica el caso ilimitado.
+
+## Alcance oficial de Q1 y Q2
+
+Parte II §3.2 (p. 4) exige el campo de rango en la ficha del cazador. La aclaración del profesor comunicada por el usuario establece el significado del valor `null` explícito. El enunciado no prescribe que A acepte fichas sin el campo ni define un valor de reemplazo para datos inválidos (T001, FR-007/FR-009).
+
+Parte II §3.1 (p. 4) permite omitir el costo y fija 100 en ese caso. Cuando se declara, exige un entero ≥1 y el mismo costo en ambos sentidos. La aclaración comunicada por el usuario confirma esa simetría. Un costo `null`, inválido o contradictorio queda fuera de las entradas conformes. El enunciado no prescribe una reparación o un rechazo del motor para esas entradas (T002, FR-001).
+
+El reparto oficial (§Persona A, p. 3) sitúa la validación y normalización de datos en la coordinación A/B. El [registro de integración](contracts/integracion.md) delimita los datos que entrega B y consume A. Las preguntas originales de GB1/GB2 quedan registradas como casos de robustez fuera de la aceptación funcional de A. La [guía](quickstart.md#entradas-verificadas-de-terreno-y-rango) documenta las reglas y las pruebas para T018.
 
 ## Notación
 

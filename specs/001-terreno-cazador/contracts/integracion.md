@@ -23,7 +23,7 @@
 
 **Evidencia de coordinación A/C.** E-C-RUTA y E-C-DESPACHO se usaron en la integración. El código y las pruebas citadas acreditan su funcionamiento.
 
-Q1/Q2 y Q3 tienen registros de evidencia separados en research.md. A puede describir estos acuerdos con autorización documental; no puede aprobar por B/C/D, resolver preguntas oficiales ni implementar sus entregas.
+El [alcance oficial de Q1 y Q2](../research.md#alcance-oficial-de-q1-y-q2) documenta el dominio que consume A y la validación de datos que corresponde a B. Q3 tiene su propio registro de evidencia. A puede describir estos acuerdos con autorización documental; no puede aprobar por B/C/D, resolver preguntas oficiales ni implementar sus entregas.
 
 **Corrección I1/I5/C2 posterior al segundo Analyze, 2026-11-05:** hay diez entregables independientes. E-B-COSTOS y E-B-RANGO sustituyen el entregable agrupado anterior; ambos estaban pendientes en esa fecha. Una comunicación sobre el esquema no acredita suministro/acceso efectivo. T027 necesita T024 para su cierre completo; una ejecución parcial del núcleo no completa el contrato de C ni la tarea.
 
