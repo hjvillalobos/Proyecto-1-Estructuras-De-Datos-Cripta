@@ -88,3 +88,5 @@ Python 3.14.6, Windows 11: **810 pruebas en 217.145 s; OK (skipped=2), cero fall
 Las dos omisiones corresponden a la comparación contra otra revisión de C (preparada y aprobada por separado: 41 pruebas, incluyendo sus tres casos comparativos) y a la API real (aprobada por separado sobre las cinco criptas). No quedan escenarios opcionales identificados sin ejecución, aunque sus condiciones de preparación siguen siendo optativas en la suite normal. No se suman estos conjuntos solapados.
 
 La regresión de foco aislada pasó tres repeticiones: 15 pruebas, OK, 21.790 s; log `.cache/qa-final-dialogo-foco.log`. La primera suite y la repetición diagnóstica fueron interrumpidas por la prueba de foco, y se conservan como evidencia fallida/interrumpida, no como resultados verdes. No se eliminaron ni omitieron casos para obtener la aprobación final.
+
+Publicación verificada: commit `acd84db`, push ordinario a `origin/004-linea-tiempo` el mismo día. No se modificaron main ni ramas de otras personas. Las fuentes/respuestas externas anteriores conservan su estado pendiente.

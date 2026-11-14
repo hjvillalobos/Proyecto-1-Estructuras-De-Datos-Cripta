@@ -205,6 +205,8 @@ Publicación verificada 2026-11-14: integración y documentación 1c35819 enviad
 - [x] QA-04 Añadir partidas inéditas completas con tres semillas y replay sin archivo de guardado.
 - [x] QA-05 Inspeccionar guardar/cargar, mapa, equipo e historia en GUI nativa.
 - [x] QA-06 Documentar fuentes externas faltantes, consultas de interpretación, decisiones y prompts; excluir defensa y envío de mensajes.
-- [ ] QA-07 Cerrar regresión conjunta y verificar publicación ordinaria en 004-linea-tiempo.
+- [x] QA-07 Cerrar regresión conjunta y verificar publicación ordinaria en 004-linea-tiempo.
+
+Publicación comprobada: acd84db enviado mediante push ordinario a origin/004-linea-tiempo; suite 810, OK (skipped=2), opciones omitidas aprobadas por separado. Sin cambios en main ni ramas ajenas. La defensa queda excluida.
 
 La recuperación del PDF original y de dos finales de prompts, así como las respuestas del profesor, requieren fuentes externas; no se marcan como resueltas por documentación. Ver qa-adicional-2026-11-14.md.
