@@ -145,3 +145,8 @@ puras y cancelación. Prueba por separado los límites actuales: `hechos_paso`
 ausente y rechazo de restauración con conocimiento activo. No se habilitan
 opciones de prueba en la aplicación normal ni se atribuye a esta aceptación
 persistencia del mapa/inventario histórico o viaje automático completo.
+
+
+## Plan de integración completa — 2026-11-14
+
+Reutilizar Motor y sus inversos; un productor de producción amplía la proyección H3 con inventario y conocimiento de C y genera diferencias ordenadas propias. No persistir copias físicas por acción. Compartir identidad de puerta por pareja de extremos recíprocos; no inventar conexiones inversas en salidas dirigidas. La antorcha procesa solo vecinos revelados; los recuerdos remotos quedan desconocidos. Preparar conocimiento fuera del vivo al cargar; validar proyección contra frontera histórica antes de restaurar. Mantener el formato v4 mediante campos históricos puros; ausencia de campos requeridos causa incompatibilidad explícita. Hechos de daño se capturan cuando ocurre, no comparando vida inicial/final. Pruebas primero con aceptación ya fallida MC/PD y nuevas pruebas de producción. Comparar alternativas en benchmarks sin activar optimizaciones sin evidencia. Ningún índice dict/set ni biblioteca restringida. Revisión de consistencia: IA-01..09 enlazan FR-004/007/011/013/018/019; las pruebas se ejecutarán con motor real y los límites se reportarán por carga.

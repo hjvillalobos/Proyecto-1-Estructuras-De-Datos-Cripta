@@ -184,3 +184,12 @@ DECISIONES con comandos/alcance reales. T003/T010/T021 siguen abiertas por
 captura completa, inventario/mapa histórico, persistencia conjunta y aceptación
 de producción/mediciones; este incremento sustituye parte de la evidencia con
 dobles por evidencia de integración real, sin declarar cierre global.
+
+
+## Integración completa — 2026-11-14
+
+- [ ] IC-01 Puertas recíprocas y exportación de extremos no visitados (IA-04, PD-01..04).
+- [ ] IC-02 Mapa de producción, observaciones, antorcha e inversos (IA-01/05).
+- [ ] IC-03 Productor completo y carga conjunta validada (IA-02/03, FR-011, MC-01).
+- [ ] IC-04 Hechos reales y conexión de viaje/replay/CLI (IA-01/06).
+- [ ] IC-05 Regresiones, benchmarks comparativos, documentación y publicación (IA-07..09).

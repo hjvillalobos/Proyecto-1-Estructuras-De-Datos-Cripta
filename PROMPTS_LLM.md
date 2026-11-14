@@ -1448,3 +1448,16 @@ de FR-011 y su plan/tarea; después añadir el caso real, sin ocultar su fallo
 pendiente de A/C. Conservar producción y formato, documentar la coordinación
 necesaria y la evidencia. No se invocan comandos de spec-kit ni se publica en
 remoto en este incremento.
+
+
+## 2026-11-14 — integración completa y auditoría
+
+Herramienta: Codex desktop, agente GPT-6. Prompts textuales:
+
+> haga un analisis total de todo el proyecto de absolutamente todo y dime por aca si todo esta bien para ganarnos un 100 segun el enunciado. tambien si falta algo dime detalladamente que falta, haz como un check list pero aca, que el proyecto no tennga bugs ni nada
+
+> porfa haz absolutamente todo lo que falte y lo subes a mi rama ya no importa si es de a,b,c,d ocupo tener eso listo
+
+> pon prompts, deciciones y todo
+
+Uso: auditoría estática y suite completa (777 pruebas, siete fallos y seis omisiones), seguida de autorización para integrar todas las partes. Aplicación de speckit-implement al incremento IA-01..09, sin hooks configurados; checklist de línea de tiempo 8/8. Las preguntas externas no se presentan como respuestas del profesor. Se registra especificación/plan/tareas antes de producción. Se permite modificar A/B/C/D y publicar exclusivamente 004-linea-tiempo.

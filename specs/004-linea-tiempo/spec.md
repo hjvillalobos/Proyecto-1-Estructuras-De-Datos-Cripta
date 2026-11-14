@@ -163,3 +163,8 @@ entrega actual, no una regla permanente: al conectar A/C la carga válida, su
 prueba negativa deberá sustituirse por MC-01; conservar las pruebas de carga
 inválida sin mutación. Preparar esta aceptación no completa T010.
 
+
+
+## Integración completa autorizada — 2026-11-14
+
+La usuaria autoriza completar todas las partes y publicar en su rama. IA-01: mapa, viaje, historia y guardado disponibles desde consola/GUI y replay normales. IA-02: toda acción aceptada y sus eventos producen cambios históricos, incluyendo inventario, efectos y conocimiento; retroceso recorta y conserva la excepción de pergaminos. IA-03: cargar valida y recupera conjuntamente físico, historia, conocimiento y cursor, sin publicar parcialmente. IA-04: una puerta física recíproca abre/cierra ambos extremos con un cierre pendiente; exportar conserva extremos modificados sin explorar su contenido. IA-05: antorcha revela vecinas y sus salidas sin activar contenido; observación de puertas solo desde la posición ocupada. Esta última elección sobre puertas remotas es decisión conservadora del equipo, no aclaración atribuida al profesor. IA-06: cada movimiento entrega hechos reales de daño y enemigos presentes al entrar para detener viaje. IA-07: benchmarks reproducibles comparan rutas individuales/compartidas, reutilización/recálculo y mapa/viaje, además de la carga integrada; publican máximos e incumplimientos. IA-08: pruebas antiguas de ausencia de capacidades se sustituyen por aceptación positiva, conservando corrupción/atomicidad. IA-09: documentación, tareas y prompts reflejan resultados reales y pendientes externos, sin garantía de nota.
