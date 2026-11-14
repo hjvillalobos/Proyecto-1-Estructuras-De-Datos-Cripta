@@ -9,6 +9,12 @@
 
 ## User Scenarios & Testing
 
+### I11: viaje de varios pasos con hechos reales
+
+Ensayo offline sin puertas; FR-007/009/010/011/015/017, sin acreditar producción ni PR-001. C43: tras explorar físicamente un camino y volver al origen, un viaje de tres pasos llega al destino, registra exactamente tres movimientos y coincide con repetirlos manualmente. C44: cancelar entre pasos conserva posición, reloj e historial de acciones aunque se solicite avanzar otra vez. C45: una trampa en un paso intermedio entrega daño real y detiene el viaje antes del siguiente movimiento; el log conserva solo los pasos ejecutados.
+
+Aclaración: datos sintéticos separados de producción, sin puertas, antorcha ni cambios de identidad. Motor, mapa, planificador, control y controlador reales; solo vista simulada. Se consume ResultadoPaso de A sin fabricar hechos ni parchear movimientos. La historia completa, guardado y activación normal quedan fuera.
+
 ### I10: origen sin salida conocida transitable
 
 Optimización local de FR-008/010/012/014/017, motivada por I9. C42: si el destino es distinto y el origen no tiene ninguna salida conocida transitable, responder sin ruta sin recorrer el resto del mapa. Incluye puertas cerradas/no observadas y vecinas no exploradas. Reabrir, explorar o revertir debe permitir consultar de nuevo sin conservar un rechazo obsoleto. Si origen y destino coinciden, se conserva llegada; una salida alternativa transitable no debe descartarse. No cambia las reglas ni acredita por sí solo PR-001.

@@ -1,5 +1,13 @@
 # Tareas de I1: conocimiento independiente
 
+## I11: viaje real en mapa sin puertas
+
+- [ ] T040 Añadir C43–C45 con preparación offline reproducible (FR-007/009/010/011/015/017).
+- [ ] T041 Ejecutar contra A 0b4f13a y controlador real mediante copia aislada; no fabricar hechos ni cambiar consumidores compartidos.
+- [ ] T042 Registrar pruebas y límites, publicar en C y conservar pendientes de puertas/producción.
+
+Análisis: spec, plan y tareas cubren el mismo ensayo; no hay reglas nuevas ni dependencias de Q1. Documentación antes del código. Los pendientes generales de aclaración/revisión cruzada no se dan por resueltos.
+
 ## I10: rechazo local de origen sin salida
 
 - [x] T038 Probar C42 antes de implementar, verificando localidad y recuperación por apertura, exploración y reversión (FR-008/010/012/014/017).
