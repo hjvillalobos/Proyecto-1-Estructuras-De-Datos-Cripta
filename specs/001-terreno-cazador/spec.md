@@ -165,7 +165,7 @@ Como jugador, quiero que el procesamiento entre mis decisiones siga siendo ágil
 
 ### Measurable Outcomes
 
-- **SC-001**: T1–T7 y A1–A13 tienen pruebas reproducibles que satisfacen todos sus resultados esperados y citan los FR asociados; P1–P3 aportan evidencia de NFR-001–NFR-003. Estado actual: definidos, no ejecutados.
+- **SC-001**: T1–T7 y A1–A13 tienen pruebas reproducibles que satisfacen todos sus resultados esperados y citan los FR asociados; P1–P3 aportan evidencia de NFR-001–NFR-003. Evidencia de ejecución y alcance por escenario en [la trazabilidad de entrega](tasks.md#cierre-de-la-entrega-integrada-de-a). La medición oficial conserva la dependencia Q3.
 - **SC-002**: Todas las decisiones de cazador en las cargas comparadas coinciden con la referencia desde cero, incluidos empates y cambios de puertas u objetivo; cero diferencias admitidas.
 - **SC-003**: Dos ejecuciones de cada escenario determinista producen idénticas decisiones, estados, tiempos y secuencias, sin diferencias debidas a latencia ni conocimiento del jugador.
 - **SC-004**: El ciclo completo cumple NFR-001 con decenas de cazadores; la evidencia identifica equipo, carga y condiciones. No se afirma cumplimiento antes de medir.

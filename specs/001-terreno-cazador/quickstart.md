@@ -701,4 +701,16 @@ Antes de crear `0396f60`, sobre `53d7367` con el contenido publicado de la utili
 .\.venv\Scripts\python.exe -B -m unittest tests.test_bench_terreno_cazador tests.test_rutas_cazador tests.test_localidad_rutas tests.test_validez_rutas tests.test_eventos_terreno tests.test_frontera_temporal tests.test_restauracion_rutas tests.test_turno_cazador tests.test_velocidad_terreno tests.test_costos_terreno
 ```
 
-T048 conserva pendientes la integración de rutas filtradas, la validación conjunta de T037, la conexión de medición con D y la medición oficial.
+Las rutas filtradas y la conexión de medición forman parte de la entrega integrada. La [regresión conjunta](#reproducción-de-la-entrega-integrada-de-a) aporta evidencia para T037 y T048. El cierre de T048 queda sujeto a T046, incluida la referencia oficial para la medición. T027, T037 y T045 ya constan en el cierre integrado de A.
+
+## Reproducción de la entrega integrada de A
+
+Sobre `980168a`, ejecutar desde la raíz del worktree integrado. La corrida registrada usó el intérprete del entorno virtual del proyecto. El ejemplo lo busca en el directorio hermano y, si no está allí, usa el entorno virtual activo.
+
+```powershell
+$interprete = if (Test-Path '..\.venv\Scripts\python.exe') { '..\.venv\Scripts\python.exe' } else { 'python' }
+& $interprete -B -m unittest tests.test_contrato_rutas_c tests.test_rutas_cazador tests.test_decision_cazador tests.test_conocimiento_rutas tests.test_turno_cazador tests.test_eventos_terreno tests.test_validez_rutas tests.test_restauracion_rutas tests.test_puertas_reciprocas_d tests.test_bench_terreno_cazador tests.test_controlador_ac_real tests.test_partida_completa tests.test_receptor_h3_d
+& $interprete -B main.py --bench --subsistemas terreno-cazador --salas 40 --semilla 20261113 --repeticiones 3
+```
+
+La primera corrida registró **99 pruebas aprobadas** y cubre aceptación funcional sobre paquetes temporales y la búsqueda sin red. La segunda ejecuta la carga sintética de evaluación vía la CLI conectada por D. Usar [la constancia de interfaces](research.md#interfaces-de-la-entrega-integrada) para trazar el alcance de cada entrega. La [medición separada de cripta-06](research.md#ciclo-integrado-en-cripta-06-evidencia-para-t046) conserva sus valores y condiciones. La designación oficial de Q3 sigue pendiente.

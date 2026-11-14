@@ -2,7 +2,7 @@
 
 **Branch**: `feature/motor-eventos` | **Date**: 2026-11-02 | **Spec**: [spec.md](spec.md)
 
-**Estado al 2026-11-05: PROVISIONAL.** Plan y 51 tareas generados; dos revisiones Analyze realizadas. Tras las primeras correcciones I1/C1/I2/I3/I4/D1, se incorporan las correcciones documentales I1/I5/C2 de la segunda revisión. Q1–Q3 y contratos externos siguen pendientes. No hay autorización de código, pruebas ni nuevas ejecuciones de habilidades. Estas últimas correcciones requieren revisión posterior autorizada antes de liberar implementación.
+**Corte histórico del 2026-11-05 (plan provisional).** Plan y 51 tareas generados; dos revisiones Analyze realizadas. Tras las primeras correcciones I1/C1/I2/I3/I4/D1, se incorporan las correcciones documentales I1/I5/C2 de la segunda revisión. Q1–Q3 y contratos externos siguen pendientes. No hay autorización de código, pruebas ni nuevas ejecuciones de habilidades. Estas últimas correcciones requieren revisión posterior autorizada antes de liberar implementación.
 
 **Histórico:** el Plan del 2026-11-02 fue autorizado como borrador condicionado; Tasks y Analyze se autorizaron posteriormente de forma separada. Las prohibiciones previas de avanzar se conservan aquí como historia de permisos, no como una negación de las fases documentales ya realizadas.
 
@@ -25,6 +25,8 @@ El cambio futuro se concentra en el bucle de `Motor._ejecutar_accion()` llamado 
 El límite debe aplicarse **antes de extraer un evento vigente posterior**, también al descartar raíces canceladas. Una sola inspección de la raíz seguida de `extraer_minimo()` sin límite no basta: esa extracción puede saltar cancelados en t y alcanzar t+1. Opción propuesta: un límite opcional propagado por `ejecutar_ciclo()` al extractor del heap, que compruebe el tiempo de la raíz en cada iteración. Reutiliza el heap y evita escanear `pendientes()` o sacar/reinsertar un evento futuro. Ese auxiliar requeriría autorizar expresamente el ajuste en `modelo/eventos.py`; esta etapa no autoriza ningún cambio de producción.
 
 El lote debe quedar dentro de los deltas y la publicación diferida de mensajes de la acción anterior. Mantener restauración en caso de fallo, contador y azar, y verificar regresiones de retroceso/replay cuando se implemente. La frontera queda pendiente de validación de integración con D. El formato de cambios, las capturas y la reconstrucción siguen pendientes en E-D-CAMBIOS. La medición del ciclo incluirá este trabajo futuro. Q3 sigue pendiente.
+
+**Estado integrado.** La frontera temporal, la restauración y la publicación histórica ya tienen evidencia conjunta en [la entrega integrada](tasks.md#cierre-de-la-entrega-integrada-de-a). La CLI de medición está conectada y queda pendiente medir sobre la referencia oficial Q3.
 
 **Language/Version**: Python ≥3.11 por enunciado; versión exacta y equipo de medición por registrar. No se impone el intérprete auxiliar de lectura de PDF.
 
