@@ -1,9 +1,15 @@
 """T034/A12: restauración del motor offline con movimiento, agenda y efectos."""
 
+from contextlib import nullcontext
 from dataclasses import replace
+from pathlib import Path
+from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import patch
 
+from datos.guardado_binario import cargar_estado, guardar_estado
+from modelo.juego import crear_juego
+from modelo.errores_historia import CambioHistoriaIncoherente
 from modelo.tipos import ObjetoInstancia
 from red.errores import ErrorCripta
 from tests.datos_terreno_cazador import motor_terreno
@@ -15,6 +21,107 @@ POCION = "velocidad-a12"
 
 
 class PruebasRestauracionRutas(unittest.TestCase):
+    def test_rollback_descarta_las_marcas_de_la_busqueda_del_turno(self):
+        """A12 / FR-018: un turno fallido invalida las etiquetas que produjo."""
+        for fase in ("accion", "publicacion"):
+            with self.subTest(fase=fase):
+                self.comprobar_rollback_de_busqueda(fase)
+
+    def comprobar_rollback_de_busqueda(self, fase):
+        with partida_cazador(350) as (motor, cazador, _):
+            self.assertTrue(motor.ejecutar("mover", "E").ok)
+            self.assertTrue(motor.ejecutar("mover", "E").ok)
+            antes = motor.exportar_estado()
+            turno = cazador.evento_pendiente
+            cantidad_turnos = motor.historial.cantidad_turnos()
+            contexto = motor._rutas_reales
+            origen = contexto.grafo.indice(100)
+            espacio = contexto._espacio
+            self.assertIsNone(espacio.etiqueta(origen))
+
+            def rechazar_lote(*_):
+                self.assertEqual((motor.reloj, cazador.sala_actual), (127, 101))
+                self.assertIsNotNone(espacio.etiqueta(origen))
+                raise CambioHistoriaIncoherente("lote rechazado")
+
+            ejecutar_ciclo = motor.ejecutar_ciclo
+
+            def fallar_despues_del_turno_enemigo(*args, **kwargs):
+                evento = ejecutar_ciclo(*args, **kwargs)
+                if evento is turno:
+                    self.assertEqual((motor.reloj, cazador.sala_actual), (100, 101))
+                    self.assertIsNotNone(espacio.etiqueta(origen))
+                    raise RuntimeError("fallo durante la accion")
+                return evento
+
+            if fase == "accion":
+                contexto_fallo = patch.object(motor, "ejecutar_ciclo", side_effect=fallar_despues_del_turno_enemigo)
+                receptor, error, mensaje = None, RuntimeError, "fallo durante la accion"
+            else:
+                contexto_fallo = nullcontext()
+                receptor, error, mensaje = rechazar_lote, CambioHistoriaIncoherente, "lote rechazado"
+            with contexto_fallo, self.assertRaisesRegex(error, mensaje):
+                motor.ejecutar("esperar", registrar_h3=receptor)
+
+            self.assertEqual(motor.exportar_estado(), antes)
+            self.assertEqual(motor.historial.cantidad_turnos(), cantidad_turnos)
+            self.assertIs(cazador.evento_pendiente, turno)
+            self.assertTrue(turno.en_cola)
+            self.assertFalse(turno.cancelado)
+            self.assertEqual(cazador.sala_actual, 100)
+            self.assertIs(motor._rutas_reales, contexto)
+            self.assertIs(motor._rutas_reales._espacio, espacio)
+            self.assertIsNone(espacio.etiqueta(origen))
+            self.assertFalse(espacio.esta_cerrado(origen))
+
+            self.assertTrue(motor.ejecutar("esperar").ok)
+            self.assertEqual((motor.reloj, cazador.sala_actual, cazador.tiempo_siguiente), (127, 101, 350))
+
+    def test_guardado_conserva_cierre_en_sala_sin_contenido_cargado(self):
+        """FR-015/018: el estado de una salida no depende de cargar su sala."""
+        with partida_cazador(350) as (motor, _, _), TemporaryDirectory() as carpeta:
+            sala = motor.salas[102]
+            salida = sala.salidas["O"]
+            self.assertFalse(motor.contenido_cargado[102])
+            self.assertNotIn("cerrada", salida)
+            cierre = motor.programar_evento(1, "cierre_puerta", (sala, "O"))
+            self.assertTrue(motor.ejecutar("esperar").ok)
+            self.assertFalse(cierre.en_cola)
+            self.assertTrue(salida["cerrada"])
+            self.assertFalse(motor.contenido_cargado[102])
+
+            ruta = Path(carpeta) / "puerta.bin"
+            guardado = motor.exportar_estado()
+            guardar_estado(guardado, ruta)
+            motor.restaurar_estado(cargar_estado(ruta))
+
+            self.assertIs(motor.salas[102].salidas["O"], salida)
+            self.assertTrue(salida["cerrada"])
+            self.assertFalse(motor.contenido_cargado[102])
+            self.assertEqual(motor.exportar_estado(), guardado)
+
+    def test_guardado_omite_puerta_inicial_sin_cambios_en_sala_no_cargada(self):
+        def preparar(precarga, *args, **kwargs):
+            almacen = precarga.cliente.almacen
+            pagina = almacen.leer_pagina("prueba", "v1", 1)
+            pagina["salas"][2]["salidas"]["O"]["cerrada"] = False
+            almacen.guardar_pagina("prueba", "v1", pagina)
+            return crear_juego(precarga, *args, **kwargs)
+
+        with patch("tests.test_turno_cazador.crear_juego", new=preparar), partida_cazador(350) as (motor, _, _):
+            salida = motor.salas[102].salidas["O"]
+            self.assertIs(salida["cerrada"], False)
+            self.assertFalse(motor.contenido_cargado[102])
+            anterior = motor.exportar_estado()
+            self.assertNotIn(102, [sala.sala_id for sala in anterior.salas])
+
+            salida["cerrada"] = True
+            motor.restaurar_estado(anterior)
+
+            self.assertIs(salida["cerrada"], False)
+            self.assertFalse(motor.contenido_cargado[102])
+            self.assertEqual(motor.exportar_estado(), anterior)
+
     def test_contexto_real_descarta_marcas_al_retroceder_y_cargar(self):
         """T031 / FR-013 y FR-018: rutas frescas tras restaurar un arco real."""
         with partida_cazador(350) as (motor, cazador, _):
@@ -101,9 +208,25 @@ class PruebasRestauracionRutas(unittest.TestCase):
             self.assertFalse(actual.cancelado)
 
     def test_retroceso_reinserta_eventos_originales_y_repetir_es_determinista(self):
-        with motor_terreno(250) as motor:
+        """A12: un mismo turno revierte movimiento, efecto y cierre de un arco."""
+        def preparar(precarga, *args, **kwargs):
+            almacen = precarga.almacen
+            pagina = almacen.leer_pagina("prueba", "v1", 1)
+            salida = pagina["salas"][0]["salidas"]["E"]
+            salida.update(cerrada=False, llave="obj_0")
+            almacen.guardar_pagina("prueba", "v1", pagina)
+            return crear_juego(precarga, *args, **kwargs)
+
+        with patch("tests.datos_terreno_cazador.crear_juego", new=preparar), motor_terreno(250) as motor:
             self.preparar_pergaminos(motor, 1)
             expiracion = self.aplicar_aceleracion(motor)
+            sala_origen = motor.salas[100]
+            salida = sala_origen.salidas["E"]
+            cierre = motor.programar_evento(100, "cierre_puerta", (sala_origen, "E"))
+            contexto = motor._rutas_reales
+            origen, destino = map(contexto.grafo.indice, (100, 101))
+            ruta = (destino, "E", 250, 250)
+            self.assertEqual(contexto.buscar(origen, destino, 250), ruta)
             enemigo_origen = motor.enemigos_por_sala[100][0]
             turno_enemigo = enemigo_origen.evento_pendiente
             anteriores = sorted(motor.cola.pendientes(), key=lambda evento: evento.secuencia)
@@ -125,6 +248,9 @@ class PruebasRestauracionRutas(unittest.TestCase):
             self.assertTrue(sustituido.cancelado)
             self.assertFalse(sustituido.en_cola)
             self.assertFalse(expiracion.en_cola)
+            self.assertFalse(cierre.en_cola)
+            self.assertTrue(salida["cerrada"])
+            self.assertIsNone(contexto.buscar(origen, destino, 250))
             self.assertEqual((motor.reloj, motor.jugador.posicion_actual, motor.jugador.velocidad),
                              (200, 101, 100))
             despues = motor.exportar_estado()
@@ -133,6 +259,9 @@ class PruebasRestauracionRutas(unittest.TestCase):
 
             self.assertTrue(motor.ejecutar("retroceso").ok)
             self.comprobar_mismos_eventos(motor, anteriores)
+            self.assertIs(cierre.referencia[0], sala_origen)
+            self.assertFalse(salida.get("cerrada", False))
+            self.assertEqual(contexto.buscar(origen, destino, 250), ruta)
             self.assertIs(motor.jugador.evento_velocidad, expiracion)
             self.assertIs(expiracion.referencia[0], motor.jugador)
             self.assertIs(enemigo_origen.evento_pendiente, turno_enemigo)
@@ -143,6 +272,9 @@ class PruebasRestauracionRutas(unittest.TestCase):
             self.assertEqual(motor.exportar_estado(), esperado)
 
             self.assertTrue(motor.ejecutar("mover", "E").ok)
+            self.assertFalse(cierre.en_cola)
+            self.assertTrue(salida["cerrada"])
+            self.assertIsNone(contexto.buscar(origen, destino, 250))
             esperado = replace(despues, jugador=replace(despues.jugador, inventario=[]))
             self.assertEqual(motor.exportar_estado(), esperado)
 

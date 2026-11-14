@@ -5,6 +5,7 @@ positivos y simétricos. No define políticas de datos inválidos de B (Q1/Q2).
 """
 
 from dataclasses import dataclass
+from enum import Enum
 
 
 @dataclass(frozen=True, slots=True)
@@ -14,6 +15,18 @@ class ArcoTerreno:
     direccion: str
     costo: int
     puerta: object
+
+
+class EstadoEmparejamiento(Enum):
+    EMPAREJADA = "emparejada"
+    SIN_RETORNO = "sin_retorno"
+    AMBIGUA = "ambigua"
+
+
+@dataclass(frozen=True, slots=True)
+class EmparejamientoSalida:
+    estado: EstadoEmparejamiento
+    retorno: tuple[int, str] | None = None
 
 
 def _ordenar_salas(salas):
@@ -72,6 +85,28 @@ class GrafoTerreno:
         if izquierda == len(self.ids) or self.ids[izquierda] != identificador:
             raise LookupError("El ID no pertenece al grafo preparado")
         return izquierda
+
+    def resolver_retorno(self, sala_id, direccion):
+        """Resuelve extremos por topología, sin inferir una identidad de puerta.
+
+        Exige unicidad en ambos sentidos. No usa la dirección opuesta, el
+        costo, la llave ni el estado de apertura para decidir entre candidatas.
+        """
+        origen = self.indice(sala_id)
+        salidas = self.adyacencias[origen]
+        arco = next((salida for salida in salidas if salida.direccion == direccion), None)
+        if arco is None:
+            raise LookupError("La dirección no pertenece a la sala indicada")
+
+        retornos = [salida for salida in self.adyacencias[arco.destino]
+                    if salida.destino == origen and salida is not arco]
+        if not retornos:
+            return EmparejamientoSalida(EstadoEmparejamiento.SIN_RETORNO)
+        if (origen == arco.destino or len(retornos) != 1
+                or sum(salida.destino == arco.destino for salida in salidas) != 1):
+            return EmparejamientoSalida(EstadoEmparejamiento.AMBIGUA)
+        return EmparejamientoSalida(EstadoEmparejamiento.EMPAREJADA,
+                                   (self.ids[arco.destino], retornos[0].direccion))
 
 
 class EspacioBusqueda:

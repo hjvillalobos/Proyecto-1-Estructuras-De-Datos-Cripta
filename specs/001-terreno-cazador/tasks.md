@@ -282,3 +282,19 @@ Estas actividades no renumeran T001–T051 ni cambian sus casillas. La autorizac
 **Validación de AD-H3.** Con Python 3.14.5 pasaron 3 pruebas locales del productor, 11 de frontera, 14 de rutas y localidad, 9 de decisión del cazador, 9 de retroceso y las 99 regresiones documentadas. En un proceso separado se cargaron en memoria los módulos históricos de `97ee910` sin integrar la rama de D. Pasaron 2 pruebas H3 con el motor y la línea de tiempo reales y las 14 pruebas de `tests/test_linea_tiempo.py`, sin omisiones. El rechazo de un lote que empieza con un cambio válido dejó intactos ambos estados y permitió repetir explícitamente la acción con el mismo lote. La evidencia se limita a este caso.
 
 **Observación de trazabilidad.** `33d97ac` incluyó la aclaración de FR-009 (`rango=null` explícito) y su implementación en una misma confirmación. Parte II §2.6 y constitución IV exigen confirmar una corrección de la especificación antes de su código y por separado. FR-020 sí quedó confirmada en `26be407` antes de `299079d`. Se registra la diferencia sin reescribir el historial publicado.
+
+## Evidencia parcial para entrega
+
+Las fechas de esta tabla identifican los commits publicados que respaldan la evidencia. Los comandos y resultados constan en la guía. Los tres casos de T029/T033 se incluyen junto con esta documentación en [las pruebas de validez de rutas](../../tests/test_validez_rutas.py).
+
+| Tarea y criterio | Prueba o evidencia | Alcance pendiente |
+|---|---|---|
+| T029 · FR-013/015, T5/A6 | `5494d79` (2026-11-13), `tests.test_validez_rutas`: retorno único, ausente y ambiguo. Caso local de recálculo con cierre, apertura, empate y cambio de objetivo incluido en la [regresión de 90 pruebas](quickstart.md#regresión-de-publicación). | Aceptación desde el extremo opuesto bajo E-BC-PUERTA. |
+| T033 · FR-005/013/017, T7/A6/A11 | Dos casos locales en la misma regresión: velocidad reprograma sin alterar distancias, y la ocupación o muerte no bloquean la ruta. | Cambios indirectos con T032 integrada. |
+| T037 · FR-011/019, A13 | `53d7367` (2026-11-13), [57 pruebas aprobadas](quickstart.md#evidencia-de-a13-para-t037): refresco del rastro y turnos reales de rastreador y guardián. | T036 y validación conjunta final. |
+| T040/T041 · FR-014/008/010, NFR-002/003/005, T3/T4/P2/P3 | `0396f60` (2026-11-13), `tests.test_bench_terreno_cazador`: matriz por semilla, separación de fases y contraste de selección lineal y heaps con el oráculo de T026. [Comando y regresión](quickstart.md#evaluación-sintética-de-rutas-y-agendas). | T037 para T040 y cierre de T040 para T041. |
+| T042 · FR-008/009/010/013, NFR-002/003, T1–T5/P2/P3 | Mismo commit y suite: equivalencia del campo inverso y [límite de localidad medido](research.md#evaluación-sintética-y-paquete-local-de-entrega-t047t050). | Cierre de T041. |
+| T043 · FR-013, NFR-002/003/005, T5/A6/P3 | Mismo commit y suite: recálculo y FIFO acotadas, con conteos y tiempos de mantenimiento por fase. | Cierre de T042. |
+| T044 · FR-005/006/016/017, NFR-003, T7/A7–A11/P3 | Mismo commit y suite: identidad y orden de eventos, extracción aislada y ciclo sintético del motor con cambios de velocidad. | T043 y T036. La medición oficial corresponde a T046. |
+
+T003 conserva el [registro contractual vigente](contracts/integracion.md) como fuente del estado de cada acuerdo. La evidencia local o sintética de esta tabla no acredita aceptación externa. T049 espera el cierre de T047 y T048 para completar la trazabilidad de todos los criterios.
