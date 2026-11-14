@@ -190,7 +190,9 @@ dobles por evidencia de integración real, sin declarar cierre global.
 - [x] IC-02 Mapa de producción, observaciones, antorcha e inversos (IA-01/05).
 - [x] IC-03 Productor completo y carga conjunta validada (IA-02/03, FR-011, MC-01).
 - [x] IC-04 Hechos reales y conexión de viaje/replay/CLI (IA-01/06).
-- [ ] IC-05 Regresiones, benchmarks comparativos, documentación y publicación (IA-07..09).
+- [x] IC-05 Regresiones, benchmarks comparativos, documentación y publicación (IA-07..09).
 
 
 Cierre técnico 2026-11-14: IC-01..04 y T003/T010/T021 implementados y validados. La documentación histórica no constituye el estado actual; ver integracion-completa.md. IC-05 conserva el paso de publicación hasta verificar el remoto.
+
+Publicación verificada 2026-11-14: integración y documentación 1c35819 enviadas mediante push ordinario a origin/004-linea-tiempo, incorporando f8e10ef de A. IC-05 completada.
