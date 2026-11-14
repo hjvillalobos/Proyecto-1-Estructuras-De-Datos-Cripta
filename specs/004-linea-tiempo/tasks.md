@@ -196,3 +196,15 @@ dobles por evidencia de integración real, sin declarar cierre global.
 Cierre técnico 2026-11-14: IC-01..04 y T003/T010/T021 implementados y validados. La documentación histórica no constituye el estado actual; ver integracion-completa.md. IC-05 conserva el paso de publicación hasta verificar el remoto.
 
 Publicación verificada 2026-11-14: integración y documentación 1c35819 enviadas mediante push ordinario a origin/004-linea-tiempo, incorporando f8e10ef de A. IC-05 completada.
+
+## Aceptación adicional sin defensa — 2026-11-14
+
+- [x] QA-01 Repetir comparación aislada de rutas con revisiones reales (41 pruebas).
+- [x] QA-02 Completar copia compatible de datos históricos y verificar cuatro victorias/replays, salas y persistencia (dos pruebas).
+- [x] QA-03 Verificar todas las criptas publicadas con caché fría/caliente, presupuesto y procesos independientes.
+- [x] QA-04 Añadir partidas inéditas completas con tres semillas y replay sin archivo de guardado.
+- [x] QA-05 Inspeccionar guardar/cargar, mapa, equipo e historia en GUI nativa.
+- [x] QA-06 Documentar fuentes externas faltantes, consultas de interpretación, decisiones y prompts; excluir defensa y envío de mensajes.
+- [ ] QA-07 Cerrar regresión conjunta y verificar publicación ordinaria en 004-linea-tiempo.
+
+La recuperación del PDF original y de dos finales de prompts, así como las respuestas del profesor, requieren fuentes externas; no se marcan como resueltas por documentación. Ver qa-adicional-2026-11-14.md.

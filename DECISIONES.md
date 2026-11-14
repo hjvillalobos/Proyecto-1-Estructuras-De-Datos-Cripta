@@ -1005,3 +1005,17 @@ Se conserva la agenda propia con cancelación perezosa y el historial por invers
 Referencia cripta-06@f9ed9afa683d (300 salas), descargada con 46/63 solicitudes. Medición offline con 30 cazadores inyectados y mapa completo: ciclo máximo 10.789 ms (media 3.639 ms), 0/30 sobre 20 ms. Paso conocido con recuerdos de todas las puertas y primera búsqueda incluida: máximo 4.323 ms, 0/30 sobre 5 ms. Verificador incremental: máximo 11.777 ms en diez muestras. Las estrategias compartida, cacheada e individual se comparan sobre idénticas consultas y puertas, comprobando decisiones antes de reportar tiempos. Los rangos pequeños favorecen evitar el campo global; las puertas cambiantes reducen las ventajas de caché, como muestra la salida completa. [Resultados conservados](specs/004-linea-tiempo/integracion-mediciones.json) y [aceptación](specs/004-linea-tiempo/integracion-completa.md).
 
 Suite integrada con la entrega remota de A: 809 pruebas, cero fallos/errores y cuatro omisiones opcionales explícitas. Se conserva el límite del mapa por mayor ID en los arreglos heredados del motor; no se afirma memoria proporcional solo a V para IDs arbitrariamente dispersos. La API permite preparar datos compatibles; el paquete antiguo incompleto no se presenta como validación exitosa.
+
+## Validación adicional sin preparación de defensa — 2026-11-14
+
+Se completó una copia del paquete histórico con fichas reales del catálogo publicado compatible, conservando el paquete original y las versiones de mapas. Se corrigió la estrategia del bot ante inventario lleno mediante acciones reales de soltar y un límite de recolección de pociones; no se aumentó la capacidad del juego. Las dos pruebas opcionales de las cuatro criptas aprueban.
+
+La API ya no publica los cuatro IDs fijos de la prueba antigua. Se consulta el listado vigente y se verifican todas sus entradas con procesos separados por fase fría/caliente, para respetar UUID, contador y presupuesto por ejecución. Se incluye el verificador y el motor completo; esta prueba de datos no reemplaza el bloqueo de arranque de criptas no resolubles.
+
+Se añade aceptación completa con IDs/costos nuevos para tres semillas: comandos del controlador, historia, equipo, luz, llave, puerta, victoria y replay sin archivo de guardado original. Se complementa con inspección manual de guardar/cargar, mapa e historia en la GUI real. La comparación histórica de rutas vuelve a ejecutarse aislada. Las opciones omitidas de una ejecución estándar tienen evidencia separada, sin transformarlas en aprobaciones ficticias.
+
+Se registran las fuentes faltantes y tres preguntas de interpretación en [QA adicional](specs/004-linea-tiempo/qa-adicional-2026-11-14.md). No se inventan finales de prompts ni respuestas del profesor; no se envían mensajes ni se preparan materiales de defensa.
+
+La ejecución conjunta detectó una espera intermitente en la prueba de teclado del nombre de puntaje. Se diagnosticó con pila y se sincronizó la transferencia de foco antes de inyectar teclas, conservando los bindings y las aserciones. Las ejecuciones detenidas se declaran separadamente de la regresión final; no se modifica el diálogo de producción sin evidencia de un fallo en su uso real.
+
+Resultado posterior: 810 pruebas en 217.145 s, OK (skipped=2), cero fallos/errores. Las dos omisiones opcionales tienen ejecución separada aprobada: comparación de revisiones (41) y API publicada (una prueba con cinco criptas/fría/caliente). La regresión aislada de foco pasó 15 pruebas en tres repeticiones. Los conjuntos se solapan y no se suman.

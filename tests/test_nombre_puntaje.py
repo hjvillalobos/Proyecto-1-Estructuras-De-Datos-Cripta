@@ -31,6 +31,7 @@ class TestNombrePuntaje(unittest.TestCase):
             self.vista._enviar("esperar")
             dialogo.nombre.set("  Belén  ")
             dialogo.entrada.focus_force()
+            self.vista.root.update()
             dialogo.entrada.event_generate("<Return>")
         self.vista.root.after(100, confirmar)
         self.assertEqual(dialogo.mostrar(), "Belén")
@@ -49,9 +50,11 @@ class TestNombrePuntaje(unittest.TestCase):
                         dialogo.boton_cancelar.invoke()
                     elif accion == "escape":
                         dialogo.entrada.focus_force()
+                        self.vista.root.update()
                         dialogo.entrada.event_generate("<Escape>")
                     elif accion == "enter_cancelar":
                         dialogo.boton_cancelar.focus_force()
+                        self.vista.root.update()
                         dialogo.boton_cancelar.event_generate("<Return>")
                     else:
                         dialogo.dialogo.tk.call(dialogo.dialogo.protocol("WM_DELETE_WINDOW"))

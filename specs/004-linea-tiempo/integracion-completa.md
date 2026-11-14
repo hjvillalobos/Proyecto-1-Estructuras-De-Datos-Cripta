@@ -44,6 +44,10 @@ Las pruebas automáticas y los benchmarks no garantizan cero bugs ni una nota. N
 
 La suite contiene pruebas opcionales del paquete antiguo de cuatro criptas, API en vivo y comparación contra otra revisión. Sus omisiones se reportan separadamente, sin contarlas como éxitos. El paquete antiguo disponible está incompleto; la aceptación actual adicional usa el paquete oficial de referencia descargado del servicio.
 
+Actualización posterior del mismo día: se completó una copia compatible del paquete histórico y se ejecutaron las cuatro criptas, la API publicada actual y la comparación aislada de C. Se añadieron partidas inéditas completas e inspección manual de GUI. [Resultados adicionales y fuentes pendientes](qa-adicional-2026-11-14.md). Las omisiones de la ejecución anterior se conservan como registro histórico.
+
+Regresión posterior a estas mejoras de aceptación: **810 pruebas, OK (skipped=2)**, cero fallos/errores, 217.145 s. Ambas opciones omitidas se ejecutaron separadamente con éxito. Se corrigió únicamente la sincronización de foco de una prueba de teclado intermitente; no se cambiaron reglas de producción en este incremento.
+
 
 ## Resultado del cierre integrado
 

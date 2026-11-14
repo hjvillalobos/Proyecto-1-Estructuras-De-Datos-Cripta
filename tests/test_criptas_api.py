@@ -128,6 +128,16 @@ class TestPaqueteOficial(unittest.TestCase):
                 def recoger(tipo):
                     instancia = objeto(tipo, suelo=True)
                     if instancia is not None:
+                        if motor.jugador.inventario.esta_lleno():
+                            inv = motor.jugador.inventario
+                            candidato = next((o for o in inv
+                                if o is not inv.arma_equipada_objeto
+                                and o is not inv.armadura_equipada_objeto
+                                and motor._resolver_clase(o.tipo_catalogo) != "llave"
+                                and o.tipo_catalogo != tipo), None)
+                            if candidato is None:
+                                return None
+                            actuar("soltar", candidato.id_instancia)
                         actuar("recoger", instancia)
                     return instancia
 
@@ -167,7 +177,8 @@ class TestPaqueteOficial(unittest.TestCase):
                                 actuar("atacar", enemigos[0].id_instancia)
                             if motor.terminado:
                                 break
-                            while objeto("itm_pocion_menor", suelo=True) is not None:
+                            while (objeto("itm_pocion_menor", suelo=True) is not None
+                                   and not motor.jugador.inventario.esta_lleno()):
                                 recoger("itm_pocion_menor")
                             recoger("itm_llave_negra")
                             puerta = motor.salas[motor.jugador.posicion_actual].salidas["N"]

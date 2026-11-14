@@ -21,6 +21,10 @@ En partida: `mapa`, `ir a ID`, `cancelar`, `historia T`, `historia #K`, `guardar
 
 La antorcha revela vecinas sin activar contenido; los recuerdos de puertas se actualizan desde la sala ocupada. La interpretación conservadora sobre puertas remotas es una decisión declarada del equipo, no una aclaración oficial. [Aceptación y trazabilidad actuales](specs/004-linea-tiempo/integracion-completa.md).
 
+Validación adicional: comparación de rutas (41 pruebas), cuatro criptas históricas hasta victoria/replay, API publicada con caché fría/caliente, tres partidas inéditas completas y revisión manual de la GUI. [Checklist, reproducción y fuentes pendientes](specs/004-linea-tiempo/qa-adicional-2026-11-14.md). Preparación de defensa excluida por indicación de la usuaria.
+
+Regresión actual: **810 pruebas, OK (skipped=2)** en 217.145 s, cero fallos/errores. Las dos opciones omitidas (comparación de revisiones y API real) tienen ejecuciones separadas aprobadas; no se suman los conjuntos.
+
 
 Diseño, implementación y evaluación de estructuras de datos en un juego de mazmorra dirigido por eventos.
 

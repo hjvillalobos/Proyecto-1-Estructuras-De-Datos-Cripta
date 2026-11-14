@@ -1470,3 +1470,19 @@ Se implementó el productor completo, carga conjunta validada, conocimiento/anto
 Al consultar el remoto apareció f8e10ef con avances de A no presentes en la auditoría inicial. Se fusionaron, conservando su captura de daño/entrada, topología, exportación y evaluaciones T040–T044; se conectó su entrega al comando de benchmarks. Se sustituyeron pruebas de indisponibilidad ya superada por aceptación positiva sin eliminar casos de corrupción o rollback. Se documenta el cambio de expectativa de rastro no visitado: la API devuelve None y exporta -1; no se cambió su semántica. Se mantienen las omisiones opcionales y límites externos identificados, sin prometer una calificación ni ausencia absoluta de bugs.
 
 Cierre verificado: suite conjunta 809 pruebas, OK, cuatro omisiones opcionales; selección posterior 40 y regresión de historial 15, sin fallos. Historia K=50: máximo 0.7872 ms en 111 consultas sintéticas de 5000 acciones; referencia con 30 cazadores: ciclo 10.789 ms, paso conocido 4.323 ms; verificación 11.777 ms. Se incluyen README, decisiones, tareas, trazabilidad y resultados conservados. Se publica mediante push ordinario sin forzar ni sobrescribir trabajo remoto.
+
+## 2026-11-14 — validación adicional, excluida la defensa
+
+Herramienta: Codex desktop, agente GPT-6. Prompts textuales posteriores:
+
+> que falta para ganarnos un 100?
+
+> haz todo eso
+
+> no hagas nada mas la defensa lo demas si
+
+Interpretación comunicada: realizar las validaciones y documentación restantes, excluyendo la preparación de defensa. Se conserva la autorización previa para publicar en 004-linea-tiempo. Se ejecutan comparación de rutas, paquete histórico y API real; se añade aceptación completa con tres semillas y se revisa manualmente la GUI nativa mediante la habilidad computer-use. Se documentan fuentes originales no recuperables y consultas de interpretación sin enviar mensajes a terceros ni atribuirles respuestas. No se promete un 100 ni cero bugs.
+
+La primera ejecución del bot histórico llenó el inventario; se corrigió el bot preservando capacidad y reglas. La API se descubre por listado y se prueba en procesos separados para no reiniciar artificialmente su presupuesto. Se preservan los dos fragmentos históricos de A sin inventar sus finales. Detalle y reproducción en specs/004-linea-tiempo/qa-adicional-2026-11-14.md.
+
+La suite conjunta se bloqueó en una prueba que inyectaba teclas antes de completar la transferencia de foco. Se conservó el diagnóstico, se procesó el foco con root.update() antes de los eventos y se aprobaron tres repeticiones aisladas (15 casos). Resultado conjunto final: 810 pruebas, OK (skipped=2), cero fallos/errores en 217.145 s. Las dos opciones omitidas tienen evidencia separada aprobada; no se suman conjuntos ni se ocultan las ejecuciones interrumpidas.
