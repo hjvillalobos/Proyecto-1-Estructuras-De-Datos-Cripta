@@ -137,3 +137,29 @@ opciones `historia_para_pruebas` o `conocimiento_para_pruebas` del motor de A.
 La vista de prueba solo recibe la presentación; modelo, conocimiento, rutas,
 control de viaje, historial, binario y replay son los componentes reales.
 
+## Aceptación pendiente de carga conjunta del mapa — 2026-11-13
+
+MC-01 concreta FR-011 y SC-004 desde D, dentro de T003/T010/T021. Usa la
+activación offline de A/C existente; no agrega una capacidad ni habilita el
+flujo de producción.
+
+- Tras entrar físicamente en una sala, guardar por el controlador en formato
+  v4 y comprobar que el lector real devuelve el estado y la historia guardados.
+- Entrar en otra sala después del guardado: una sala avistada pasa a explorada
+  y otra, antes desconocida, pasa a avistada. Verificar ambos cambios antes de
+  intentar cargar, sin modificar directamente el conocimiento.
+- Cargar por el controlador debe tener éxito y recuperar el estado físico,
+  la historia vigente, K y el mapa exactos del guardado. La sala descubierta
+  después debe volver a desconocida y la explorada después, a avistada; el
+  comando `mapa` debe mostrar el mismo contenido que al guardar.
+- El log debe registrar una sola carga aceptada. Repetir el movimiento desde
+  lo cargado debe producir el mismo estado, historia y conocimiento que antes
+  de cargar, descartando la rama posterior al guardado.
+
+La prueba usa motor, conocimiento, controlador y archivo reales, sin HTTP ni
+parches de reglas/restauración. El bloqueo actual de A debe producir un fallo
+visible de MC-01, sin skip ni expectedFailure. DX-06 documenta el rechazo de la
+entrega actual, no una regla permanente: al conectar A/C la carga válida, su
+prueba negativa deberá sustituirse por MC-01; conservar las pruebas de carga
+inválida sin mutación. Preparar esta aceptación no completa T010.
+

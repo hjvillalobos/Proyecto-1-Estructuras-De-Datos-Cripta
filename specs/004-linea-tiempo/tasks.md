@@ -2,6 +2,16 @@
 
 Las marcas completadas incluyen el núcleo y los consumidores de D. La aceptación con productores reales de A, B y C se registra por separado.
 
+## Incremento de aceptación MC-01 — 2026-11-13
+
+- [ ] Preparar el caso MC-01 en `tests/test_controlador_ac_real.py`: guardar,
+  descubrir y explorar después, cargar recuperando motor/historia/mapa y
+  continuar de forma determinista (FR-011, SC-004). Registrar el fallo actual
+  sin skip ni expectedFailure y ejecutar la regresión seleccionada de D.
+- [ ] Repetir MC-01 al recibir la conexión de A/C; sustituir entonces el rechazo
+  válido temporal DX-06 por la aceptación positiva. T003/T010/T021 permanecen
+  abiertos; no cambiar motor, conocimiento ni formato desde esta preparación.
+
 ## Preparación y fundamento
 
 - [x] T001 Registrar y clasificar la base de pruebas en specs/004-linea-tiempo/baseline.md, sin confundir fallos heredados con cambios nuevos (FR-011, FR-017).

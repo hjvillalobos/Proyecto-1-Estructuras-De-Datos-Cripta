@@ -71,6 +71,22 @@ Comparar K 10/50/100 y reconstrucción desde inicio sin checkpoints solo como al
 
 ## Dependencias y límites
 
+### Preparación MC-01 desde D — 2026-11-13
+
+Ampliar `tests/test_controlador_ac_real.py` con un caso positivo de FR-011
+reutilizando su fixture offline real. Guardar después de la primera entrada,
+avanzar a otra sala y cargar. Comparar el DTO leído del binario, el estado
+exportado, la historia exportada (incluido K), el mapa estructurado y su
+presentación; repetir el movimiento para comprobar continuación determinista.
+El caso atraviesa un checkpoint y exige olvidar descubrimientos posteriores.
+
+Solo se agregan aceptación y documentación de D. A conserva la conexión de
+`restaurar_estado_con_historia`; con C debe incorporar el conocimiento inicial,
+sus deltas y la reconstrucción validada. No se decide un nuevo esquema de
+persistencia ni se quita la restricción del motor en este incremento. Un fallo
+real se documenta como pendiente, conforme al criterio de puertas recíprocas.
+No se añaden índices ni estructuras de producción, dependencias o agentes.
+
 Contratos en `contracts/interfaces.md`; datos en `data-model.md`; tareas y pruebas en sus documentos. No está verificada la captura exhaustiva actual de motor y conocimiento. No se promete determinismo hasta probar restauración de agenda, secuencias, azar y conocimiento completos. No se ejecutaron pruebas de P1 ni benchmarks en esta preparación.
 
 

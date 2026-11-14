@@ -1430,3 +1430,21 @@ del controlador, persistencia binaria, retroceso, mapa y replay reales. Probar
 cancelación y las limitaciones explícitas del productor sin inferir hechos de
 viaje ni habilitar opciones de prueba en producción. Actualizar evidencia,
 README y DECISIONES, ejecutar regresiones y publicar solo en `004-linea-tiempo`.
+
+## 2026-11-13 — D: preparación de carga conjunta del mapa conocido
+
+Herramienta: Codex desktop; agente Codex basado en GPT-6. Prompts textuales:
+
+> me traje unos cambios de A a mi rama no se si se puede avanzar ?
+
+> dale hazlo
+
+Uso: preparar la prueba positiva de aceptación ofrecida desde D: guardar,
+descubrir otra sala, cargar y exigir recuperar motor, historia y conocimiento
+del mismo momento; comprobar también la continuación. Revisión previa de
+`b656f49`: 26 pruebas de controlador/persistencia aprobadas, pero el motor
+todavía rechaza la carga con mapa activo. Confirmar primero la precisión MC-01
+de FR-011 y su plan/tarea; después añadir el caso real, sin ocultar su fallo
+pendiente de A/C. Conservar producción y formato, documentar la coordinación
+necesaria y la evidencia. No se invocan comandos de spec-kit ni se publica en
+remoto en este incremento.
