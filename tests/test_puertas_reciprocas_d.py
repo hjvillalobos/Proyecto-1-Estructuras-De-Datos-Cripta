@@ -69,7 +69,7 @@ class PuertasReciprocasDTest(unittest.TestCase):
         self.cargar_archivo(motor)
         self.assertEqual(self.extremos(motor), (False, False))
         self.assertFalse(motor.contenido_cargado[2])
-        self.assertEqual(motor.registro_rastro.tiempo_de(2), -1)
+        self.assertIsNone(motor.registro_rastro.tiempo_de(2))
 
     def test_pd01_binario_conserva_extremo_modificado_sin_cargar_sala(self):
         motor = self.motor(opuesta_cargada=False)
@@ -80,7 +80,7 @@ class PuertasReciprocasDTest(unittest.TestCase):
         self.cargar_archivo(motor)
         self.assertEqual(self.extremos(motor), (False, False), "Se perdió el extremo no visitado")
         self.assertFalse(motor.contenido_cargado[2])
-        self.assertEqual(motor.registro_rastro.tiempo_de(2), -1)
+        self.assertIsNone(motor.registro_rastro.tiempo_de(2))
 
     def test_pd02_binario_preserva_evento_unico_y_estado_completo(self):
         motor = self.motor(abierta=True)

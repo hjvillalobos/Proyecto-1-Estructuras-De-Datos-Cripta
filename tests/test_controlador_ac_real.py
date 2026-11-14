@@ -45,8 +45,8 @@ class ControladorACRealTest(TestCase):
                 try:
                     motor = crear_juego(precarga, "prueba", semilla=42,
                                         version_cripta="v1", version_catalogo="cat1",
-                                        historia_para_pruebas=historia,
-                                        conocimiento_para_pruebas=mapa)
+                                        partida_completa=historia,
+                                        conocimiento_para_pruebas=mapa and not historia)
                     juego = integrar_historia(motor, 2) if historia else motor
                     vista = Mock()
                     viaje = ControlViaje(PlanificadorConocido(motor._conocimiento)) if mapa else None
@@ -142,7 +142,7 @@ class ControladorACRealTest(TestCase):
             esperados = [(t, resumir(consultar(juego.linea_tiempo, str(t)))) for t in (99, 100, 200)]
             final = resumir(juego.linea_tiempo.consultar_final())
             def fabrica(fuente, cripta_id, semilla, **versiones):
-                return crear_juego(fuente, cripta_id, semilla, historia_para_pruebas=True, **versiones)
+                return crear_juego(fuente, cripta_id, semilla, partida_completa=True, **versiones)
             with patch("vista.consola.VistaConsola", side_effect=AssertionError("vista")), \
                     patch("vista.grafica.VistaGrafica", side_effect=AssertionError("vista")):
                 for t, esperado in esperados:
@@ -192,15 +192,19 @@ class ControladorACRealTest(TestCase):
             self.assertEqual((motor.exportar_estado(), control.bitacora_replay.ruta.read_bytes()), antes)
             self.assertEqual(self.acciones(control), ["mover", "mover", "mover"])
 
-    def test_dx06_carga_con_mapa_activo_rechazada_sin_publicacion_parcial(self):
+    def test_dx06_carga_incoherente_con_mapa_no_publica_estado_parcial(self):
         with self.partida(mapa=True) as (motor, juego, control, vista, raiz, _):
             control.procesar_comando("mover E")
             ruta = raiz / "mapa.bin"
             control.procesar_comando(f'guardar "{ruta}"')
             control.procesar_comando("esperar")
+            from dataclasses import replace
+            from datos.guardado_binario import cargar_estado_partida
+            guardado = cargar_estado_partida(ruta)
+            guardar_estado(replace(guardado, jugador=replace(guardado.jugador, vida=1)), ruta)
             antes = juego.exportar_estado(), motor.mapa_conocido(), control.bitacora_replay.ruta.read_bytes()
             control.procesar_comando(f'cargar "{ruta}"')
-            self.assertIn("no admite el mapa conocido activo", vista.mostrar_error.call_args.args[0])
+            self.assertIn("no coincide", vista.mostrar_error.call_args.args[0])
             self.assertEqual((juego.exportar_estado(), motor.mapa_conocido(), control.bitacora_replay.ruta.read_bytes()), antes)
 
     def test_mc01_cargar_descarta_descubrimientos_posteriores_y_permite_continuar(self):

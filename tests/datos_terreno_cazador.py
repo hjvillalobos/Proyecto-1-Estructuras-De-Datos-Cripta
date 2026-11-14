@@ -52,7 +52,7 @@ def crear_cadena(cantidad, semilla):
 @contextmanager
 def motor_terreno(costo=SIN_COSTO_DECLARADO, velocidad=100,
                   comportamiento="guardian", velocidad_enemigo=100,
-                  puerta_inicial_cerrada=False, *, costo_primera_conexion=SIN_COSTO_DECLARADO):
+                  puerta_inicial_cerrada=False, *, costo_primera_conexion=SIN_COSTO_DECLARADO, completa=False):
     """T011/T012: motor real con fixture existente; cero HTTP real.
 
     El paquete sintético existente se configura antes de crear el motor:
@@ -86,7 +86,7 @@ def motor_terreno(costo=SIN_COSTO_DECLARADO, velocidad=100,
         catalogo = GestorCatalogo(cliente, CacheCatalogoOrdenado(25), almacen)
         precarga = GestorPrecarga(cliente, catalogo)
         try:
-            motor = crear_juego(precarga, "prueba", semilla=20261105)
+            motor = crear_juego(precarga, "prueba", semilla=20261105, partida_completa=completa)
             for sala in precarga.salas:
                 preparada = precarga.preparar_entrada(sala.id, motor._ids_en_uso(sala.id))
                 _incorporar_sala_preparada(motor, preparada)

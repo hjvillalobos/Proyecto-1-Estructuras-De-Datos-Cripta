@@ -270,3 +270,32 @@ def buscar_ruta(grafo, espacio, frontera, origen_indice, destino_indice, limite)
         return None
     finally:
         frontera.finalizar()
+
+
+class ContextoRutasCompartidas(ContextoRutasReales):
+    """Comparte rangos ilimitados; los rangos pequeños mantienen localidad."""
+    def __init__(self, salas):
+        super().__init__(salas)
+        from modelo.rutas_compartidas import RutasCompartidas
+        self._compartido = RutasCompartidas(self.grafo)
+        self.frontera_activa = False
+        self._firma = None
+
+    def invalidar_puertas(self):
+        self._firma = None
+        self._compartido.clave = None
+
+    def buscar(self, origen_indice, destino_indice, limite):
+        if limite is not None:
+            return super().buscar(origen_indice, destino_indice, limite)
+        puertas = self._firma if self.frontera_activa else None
+        if puertas is None:
+            puertas = tuple(a.puerta.get('cerrada', False)
+                            for fila in self.grafo.adyacencias for a in fila)
+            if self.frontera_activa:
+                self._firma = puertas
+        return self._compartido.buscar(origen_indice, destino_indice, limite, puertas)
+
+    def descartar_derivados(self):
+        super().descartar_derivados()
+        self.invalidar_puertas()

@@ -123,7 +123,7 @@ def ejecutar_juego(args, sesion, lanzador_replay):
                         return 0
                     if reporte.version is not None:
                         versiones["version_cripta"] = reporte.version
-                juego = cargar_datos(crear_juego, sesion.precarga, args.cripta, semilla, **versiones)
+                juego = cargar_datos(crear_juego, sesion.precarga, args.cripta, semilla, partida_completa=True, **versiones)
                 if checkpoint is not None:
                     juego = integrar_historia(juego, checkpoint)
                     if estado_inicial is not None and getattr(juego, "linea_tiempo", None) is None:

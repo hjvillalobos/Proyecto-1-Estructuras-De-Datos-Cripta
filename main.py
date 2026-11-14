@@ -22,7 +22,8 @@ def ejecutar_replay(args, gestor_precarga):
     from controlador.replay_sin_vista import reproducir
     from modelo.juego import crear_juego
 
-    print(reproducir(args.replay, gestor_precarga, crear_juego,
+    from functools import partial
+    print(reproducir(args.replay, gestor_precarga, partial(crear_juego, partida_completa=True),
                      args.checkpoint_cada, args.hasta))
     return 0
 

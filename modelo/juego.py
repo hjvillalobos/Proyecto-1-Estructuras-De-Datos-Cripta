@@ -190,8 +190,12 @@ class Motor:
         if llave_necesaria and not self._tiene_llave(llave_necesaria):
             return False, "No tenés la llave correcta"
 
-        self.historial.registrar_puerta(salida, "cerrada", salida.get("cerrada", False))
-        salida["cerrada"] = False
+        for _, _, extremo in self.extremos_puerta(sala_actual, direccion):
+            self.historial.registrar_puerta(extremo, "cerrada", extremo.get("cerrada", False))
+            extremo["cerrada"] = False
+        invalidar = getattr(self._rutas_reales, 'invalidar_puertas', None)
+        if invalidar is not None:
+            invalidar()
         if llave_necesaria and apertura not in self.puertas_abiertas_con_llave:
             self.puertas_abiertas_con_llave.append(apertura)
             self.historial.registrar_cambio(lambda: self.puertas_abiertas_con_llave.remove(apertura))
@@ -202,6 +206,37 @@ class Motor:
             self.programar_evento(tiempo_cierre, "cierre_puerta", (sala_actual, direccion))
 
         return True, None
+
+    def extremos_puerta(self, sala, direccion):
+        salida = sala.salidas[direccion]
+        extremos = [(sala, direccion, salida)]
+        destino = self.salas[salida["sala"]]
+        opuesta = (("N", "S"), ("S", "N"), ("E", "O"), ("O", "E"))
+        inversa = next(d for a, d in opuesta if a == direccion)
+        regreso = destino.salidas.get(inversa)
+        if regreso is not None and regreso["sala"] == sala.id:
+            extremos.append((destino, inversa, regreso))
+        return extremos
+
+    def _actualizar_conocimiento(self, revelar=False):
+        conocimiento = self._conocimiento
+        if conocimiento is None:
+            return
+        sala = self.salas[self.jugador.posicion_actual]
+        cambios = list(conocimiento.entrar(sala.id)) if revelar else []
+        if revelar and self.efectos.antorchas_encendidas:
+            for salida in sala.salidas.values():
+                cambios.extend(conocimiento.entrar(salida["sala"]))
+        referencias = self._puertas_conocibles[sala.id] if hasattr(self, "_puertas_conocibles") else ()
+        for direccion, identificador in referencias:
+            cambios.extend(conocimiento.observar_puerta(sala.id, identificador,
+                                                       sala.salidas[direccion].get("cerrada", False)))
+        if cambios:
+            lote = tuple(cambios)
+            self.historial.registrar_cambio(lambda: conocimiento.revertir(lote))
+            pendientes = getattr(self, '_deltas_conocimiento', None)
+            if pendientes is not None:
+                pendientes.extend(lote)
 
     def mover(self, direccion, trampas_activadas=None):
         puede, error = self.puede_moverse(direccion)
@@ -232,11 +267,7 @@ class Motor:
         pos_anterior = self.jugador.posicion_actual
         self.historial.registrar_inventario(lambda p=pos_anterior: setattr(self.jugador, "posicion_actual", p))
         self.jugador.posicion_actual = id_destino
-        conocimiento = self._conocimiento
-        if conocimiento is not None and id_destino != pos_anterior:
-            cambios = conocimiento.entrar(id_destino)
-            if cambios:
-                self.historial.registrar_cambio(lambda: conocimiento.revertir(cambios))
+        self._actualizar_conocimiento(revelar=True)
         self._sincronizar_referencias()
         self._avanzar_actor(self.jugador, costo_salida)
         self.historial.registrar_rastro(id_destino, self.registro_rastro.tiempo_de(id_destino))
@@ -270,6 +301,8 @@ class Motor:
     def atacar(self, atacante, defensor):
         dano = calcular_dano(atacante, defensor, self.azar)
         self.historial.registrar_vida(defensor, defensor.vida)
+        if defensor is self.jugador and dano > 0:
+            self._dano_en_accion = True
         defensor.vida = max(0, defensor.vida - dano)
         if self._notificador is not None:
             self.informar(f"{self.nombre_actor(atacante)} ataca a {self.nombre_actor(defensor)}: {dano} de dano.")
@@ -638,8 +671,11 @@ class Motor:
             if sala is None:
                 continue
             rastro = self.registro_rastro.exportar(id_sala)
+            puerta_modificada = any(sid == id_sala and d in sala.salidas and
+                (presente != ("cerrada" in sala.salidas[d]) or valor != sala.salidas[d].get("cerrada", False))
+                for sid, d, presente, valor in self._puertas_iniciales)
             if not (self.contenido_cargado[id_sala] or self.enemigos_por_sala[id_sala]
-                    or self.objetos_en_suelo[id_sala] or rastro != -1):
+                    or self.objetos_en_suelo[id_sala] or rastro != -1 or puerta_modificada):
                 continue
             salas.append(SalaGuardada(
                 sala_id=id_sala, rastro=rastro,
@@ -1004,6 +1040,9 @@ class Motor:
         for atributo in ("cursor", "arma_equipada", "armadura_equipada"):
             self.historial.registrar_atributo(inventario, atributo)
         sala_origen = self.jugador.posicion_actual
+        self._dano_en_accion = False
+        enemigos_al_entrar = (accion == "mover" and argumento in self.salas[sala_origen].salidas
+            and any(e.vida > 0 for e in self.enemigos_por_sala[self.salas[sala_origen].salidas[argumento]["sala"]]))
 
         if registrar_h3 is not None:
             inicio_h3 = self.reloj
@@ -1157,6 +1196,9 @@ class Motor:
 
         if not ok:
             return self._rechazar_accion(error)
+        if accion == "mover":
+            enemigos_al_entrar = any(e.vida > 0 for e in self.enemigos_por_sala[self.jugador.posicion_actual])
+        self._actualizar_conocimiento()
 
         if self._notificador is not None:
             if accion in ("recoger", "soltar", "equipar", "usar"):
@@ -1187,6 +1229,7 @@ class Motor:
             evento = self.ejecutar_ciclo(decidir_accion, hasta=frontera)
             if evento is None:
                 break
+            self._actualizar_conocimiento()
             if registrar_h3 is not None:
                 eventos_h3.append((evento.tiempo, evento.secuencia, self._cambios_h3(estado_h3)))
             if evento.tipo == "turno_jugador":
@@ -1197,6 +1240,10 @@ class Motor:
         self.historial.registrar_atributo(self, "acciones_jugador")
         self.acciones_jugador += 1
         resultado = ResultadoAccion(ok=True, trampas_activadas=trampas_activadas)
+        if getattr(self, "_partida_completa", False) and accion == "mover":
+            from modelo.viaje import ResultadoPaso
+            resultado.hechos_paso = ResultadoPaso(self.jugador.posicion_actual, True,
+                self._dano_en_accion, True, enemigos_al_entrar, self.terminado)
         if registrar_h3 is not None:
             registrar_h3(inicio_h3, self.reloj, self.acciones_jugador, cambios_h3, tuple(eventos_h3))
         self.historial.cerrar_turno()
@@ -1398,7 +1445,7 @@ class _MotorConHistoriaDePrueba(Motor):
 
 def crear_juego(gestor_precarga, cripta_id, semilla, notificar=None,
                 version_cripta=None, version_catalogo=None, *,
-                conocimiento_para_pruebas=False, historia_para_pruebas=False):
+                conocimiento_para_pruebas=False, historia_para_pruebas=False, partida_completa=False):
     from modelo.snapshots import MetaPartida
     from modelo.inventario import Inventario
 
@@ -1420,7 +1467,9 @@ def crear_juego(gestor_precarga, cripta_id, semilla, notificar=None,
         llaves_obtenidas=[],
     )
 
-    tipo_motor = _MotorConHistoriaDePrueba if historia_para_pruebas else Motor
+    from modelo.partida import MotorPartida, conectar_mapa
+    tipo_motor = (MotorPartida if partida_completa else
+                  (_MotorConHistoriaDePrueba if historia_para_pruebas else Motor))
     motor = tipo_motor(jugador=jugador, salas_lista=preparada.salas, semilla=semilla)
     if conocimiento_para_pruebas:
         from modelo.conocimiento import ConocimientoMapa, SalaConocible, SalidaConocible
@@ -1447,6 +1496,8 @@ def crear_juego(gestor_precarga, cripta_id, semilla, notificar=None,
     _incorporar_sala_preparada(motor, preparada.inicial)
     id_inicial = preparada.inicial.sala.id
     motor.activar_enemigos_de_sala(id_inicial, motor.enemigos_por_sala[id_inicial])
+    if partida_completa:
+        conectar_mapa(motor)
 
     if notificar:
         notificar(f"Cripta '{cripta_id}' cargada: {len(preparada.salas)} salas.")

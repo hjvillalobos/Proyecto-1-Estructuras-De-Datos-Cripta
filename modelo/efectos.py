@@ -37,6 +37,8 @@ class GestorEfectos:
         if info is None:
             return
         self.motor.historial.registrar_vida(actor, actor.vida)
+        if actor is self.motor.jugador and info.dano_por_pulso > 0:
+            self.motor._dano_en_accion = True
         actor.vida = max(0, actor.vida - info.dano_por_pulso)
         self.motor.informar(f"Veneno: pierde {info.dano_por_pulso} de vida.")
         if actor.vida == 0:
@@ -107,6 +109,8 @@ class GestorEfectos:
         rearme = ficha.atributos.get("rearme", 300)
 
         self.motor.historial.registrar_vida(self.motor.jugador, self.motor.jugador.vida)
+        if dano > 0:
+            self.motor._dano_en_accion = True
         self.motor.jugador.vida = max(0, self.motor.jugador.vida - dano)
         self.motor.informar(f"Trampa: {ficha.nombre} causa {dano} de dano al jugador.")
         if self.motor.jugador.vida == 0:
@@ -130,6 +134,10 @@ class GestorEfectos:
     def ejecutar_cierre_puerta(self, sala, direccion):
         salida = sala.salidas.get(direccion)
         if salida is not None:
-            self.motor.historial.registrar_puerta(salida, "cerrada", salida.get("cerrada", False))
-            salida["cerrada"] = True
+            for _, _, extremo in self.motor.extremos_puerta(sala, direccion):
+                self.motor.historial.registrar_puerta(extremo, "cerrada", extremo.get("cerrada", False))
+                extremo["cerrada"] = True
+            invalidar = getattr(self.motor._rutas_reales, 'invalidar_puertas', None)
+            if invalidar is not None:
+                invalidar()
             self.motor.informar(f"La puerta {direccion} de la sala {sala.id} se cierra.")
