@@ -7,6 +7,15 @@ from modelo.rutas import EspacioBusqueda, HeapRutas
 
 
 class PruebasHeapRutas(unittest.TestCase):
+    def test_descenso_preserva_desempate_con_marca_de_origen(self):
+        espacio, heap = self.crear_heap([8, 2, 4, 6, 0])
+        for indice, distancia, primero in ((0, 1, 3), (1, 2, 0), (2, 2, None),
+                                           (3, 2, None), (4, 3, 0)):
+            heap.insertar_o_disminuir(indice, distancia, primero)
+        for esperado in ((0, 1, 3), (2, 2, None), (3, 2, None), (1, 2, 0), (4, 3, 0)):
+            self.assertEqual(heap.extraer(), esperado)
+            self.comprobar_posiciones(espacio, heap)
+
     def crear_heap(self, ids):
         espacio = EspacioBusqueda(ids)
         heap = HeapRutas(espacio)
