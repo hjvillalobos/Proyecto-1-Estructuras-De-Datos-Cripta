@@ -1,7 +1,10 @@
-"""DX-01..06: consumidor D con motor A, datos B y mapa/viaje C reales.
+"""DX-01..06 y MC-01: consumidor D con A, B y C reales.
 
 Activación offline explícita de la entrega de A. Solo se simula la vista y
 se bloquean HTTP/constructores de vista; no se parchean reglas ni resultados.
+MC-01 exige la carga conjunta pendiente: su fallo TDD no se omite ni se marca
+expectedFailure. DX-06 conserva el rechazo de la entrega actual hasta recibir
+la conexión A/C; entonces deberá sustituirse por la aceptación positiva.
 """
 from contextlib import contextmanager
 from pathlib import Path
@@ -14,6 +17,7 @@ from controlador.partida_historica import integrar_historia
 from controlador.replay_sin_vista import reproducir
 from controlador.resumen_historia import consultar, resumir
 from datos.guardado_binario import ArchivoGuardado, guardar_estado
+from modelo.conocimiento import AVISTADA, DESCONOCIDA, EXPLORADA
 from modelo.conocimiento_rutas import PlanificadorConocido
 from modelo.juego import crear_juego
 from modelo.tipos import ObjetoInstancia
@@ -198,3 +202,59 @@ class ControladorACRealTest(TestCase):
             control.procesar_comando(f'cargar "{ruta}"')
             self.assertIn("no admite el mapa conocido activo", vista.mostrar_error.call_args.args[0])
             self.assertEqual((juego.exportar_estado(), motor.mapa_conocido(), control.bitacora_replay.ruta.read_bytes()), antes)
+
+    def test_mc01_cargar_descarta_descubrimientos_posteriores_y_permite_continuar(self):
+        """FR-011 / SC-004: recuperar motor, historia y mapa de la misma frontera."""
+        with self.partida(mapa=True) as (motor, juego, control, vista, raiz, _):
+            control.procesar_comando("mover E")
+            vista.mostrar_error.assert_not_called()
+            self.assertEqual(motor.jugador.posicion_actual, 101)
+            self.assertEqual(motor._conocimiento.estado_sala(102), AVISTADA)
+            self.assertEqual(motor._conocimiento.estado_sala(103), DESCONOCIDA)
+            guardado = juego.exportar_estado()
+            historia_guardada = juego.linea_tiempo.exportar()
+            mapa_guardado = motor.mapa_conocido()
+            control.procesar_comando("mapa")
+            texto_guardado = vista.mostrar_info.call_args.args[0]
+            self.assertNotIn("103", texto_guardado)
+
+            ruta = raiz / "mapa conocido.bin"
+            control.procesar_comando(f'guardar "{ruta}"')
+            vista.mostrar_error.assert_not_called()
+            with ArchivoGuardado(ruta) as archivo:
+                self.assertEqual(archivo.version, 4)
+                self.assertEqual(archivo.leer_todo(), guardado)
+
+            # Movimiento real: explora 102 y descubre 103 después de guardar.
+            # La segunda acción también cruza el checkpoint K=2 del fixture.
+            control.procesar_comando("mover E")
+            vista.mostrar_error.assert_not_called()
+            self.assertEqual(motor.jugador.posicion_actual, 102)
+            self.assertEqual(motor._conocimiento.estado_sala(102), EXPLORADA)
+            self.assertEqual(motor._conocimiento.estado_sala(103), AVISTADA)
+            despues = juego.exportar_estado()
+            historia_despues = juego.linea_tiempo.exportar()
+            mapa_despues = motor.mapa_conocido()
+            self.assertNotEqual(despues, guardado)
+            self.assertNotEqual(mapa_despues, mapa_guardado)
+
+            vista.reset_mock()
+            control.procesar_comando(f'cargar "{ruta}"')
+            self.assertEqual(vista.mostrar_error.call_args_list, [],
+                             "MC-01 pendiente de A/C: la carga válida debe restaurar también el mapa.")
+            self.assertEqual(juego.exportar_estado(), guardado)
+            self.assertEqual(juego.linea_tiempo.exportar(), historia_guardada)
+            self.assertEqual(motor.mapa_conocido(), mapa_guardado)
+            self.assertEqual(motor._conocimiento.estado_sala(102), AVISTADA)
+            self.assertEqual(motor._conocimiento.estado_sala(103), DESCONOCIDA)
+            control.procesar_comando("mapa")
+            self.assertEqual(vista.mostrar_info.call_args.args[0], texto_guardado)
+            self.assertEqual(self.acciones(control), ["mover", "mover", "cargar"])
+
+            # No debe conservar la rama futura ni acumular sus descubrimientos.
+            control.procesar_comando("mover E")
+            vista.mostrar_error.assert_not_called()
+            self.assertEqual(juego.exportar_estado(), despues)
+            self.assertEqual(juego.linea_tiempo.exportar(), historia_despues)
+            self.assertEqual(motor.mapa_conocido(), mapa_despues)
+            self.assertEqual(self.acciones(control), ["mover", "mover", "cargar", "mover"])

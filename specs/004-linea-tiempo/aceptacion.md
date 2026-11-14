@@ -403,3 +403,63 @@ activación de producción y API real deshabilitada. Registro local reproducible
 `.cache/aceptacion-d-ac-real-2026-11-12.log` (salida generada no versionada).
 No aparecieron fallos adicionales. Esta corrida no renueva mediciones de
 rendimiento ni cierra los contratos pendientes.
+
+## Carga conjunta del mapa conocido MC-01 — 2026-11-13
+
+Precisión de FR-011 / SC-004 confirmada antes del código en `49db7f5`.
+Se añadió a `tests/test_controlador_ac_real.py` el caso
+`test_mc01_cargar_descarta_descubrimientos_posteriores_y_permite_continuar`.
+Reutiliza la preparación offline DX con A/B/C/D reales y vista simulada.
+No cambia motor, conocimiento, formato ni activación de producción.
+
+| Etapa del caso sintético | Resultado actual |
+| --- | --- |
+| Entrar en 101; 102 avistada y 103 desconocida | Pasa por movimiento real. |
+| Guardar en ruta con espacios y leer v4 | El DTO completo leído coincide con el exportado; esto no demuestra que la historia incluya el mapa. |
+| Entrar en 102, atravesando K=2 | Pasa: 102 explorada y 103 avistada; mapa y estado distintos del guardado. |
+| Cargar por el controlador | Falla: `No se pudo cargar: La restauracion H3 no admite el mapa conocido activo.` |
+| Recuperar estado, historia/K, mapa y presentación guardados | Aserciones preparadas, aún no alcanzadas por el rechazo. |
+| Registrar una carga y repetir movimiento sin conservar el futuro | Aserciones de continuación preparadas, aún no alcanzadas. |
+
+Reproducción de la aceptación pendiente:
+
+```powershell
+python -B -X utf8 -m unittest tests.test_controlador_ac_real.ControladorACRealTest.test_mc01_cargar_descarta_descubrimientos_posteriores_y_permite_continuar -v
+```
+
+Una prueba, un fallo de aserción esperado por la integración pendiente, cero
+errores u omisiones, en 0.732 s. No usa skip ni expectedFailure: el fallo queda
+visible también en el descubrimiento general, además de los PD ya documentados.
+
+Regresión seleccionada con Python 3.14.6, Windows, `CRIPTA_SIN_AUDIO=1` y
+temporales en una carpeta escribible:
+
+```powershell
+python -B -X utf8 -m unittest tests.test_controlador_ac_real tests.test_persistencia_historia tests.test_presentacion_conocimiento tests.test_receptor_h3_d tests.test_fallos_transaccionales tests.test_restauracion_rutas tests.test_controlador_viaje tests.test_cambios_historicos_motor
+```
+
+**97 pruebas: 96 aprobadas y un fallo (MC-01); cero errores u omisiones**, en
+16.771 s. La selección incluye los nueve casos DX anteriores y las regresiones
+de binario, presentación, receptor H3, fallos transaccionales, restauración,
+viaje y cambios históricos. Registro local no versionado:
+`.cache/aceptacion-d-mc01-2026-11-13.log`. No se repitió la suite completa ni se
+renuevan mediciones de rendimiento por este incremento de pruebas.
+
+### Coordinación pendiente A/C/D
+
+- A: conectar la restauración del conocimiento con el estado físico y la nueva
+  historia, validando antes de modificar la partida viva. Levantar la
+  restricción solo al completar esa conexión; quitarla sola no satisface MC-01.
+- C: confirmar con A los datos reconstruibles del conocimiento y su aplicación.
+  Ya existen `campos_iniciales` y `convertir_cambios` en
+  `modelo/conocimiento_historia.py`, con claves propuestas de C; su existencia
+  no implica un contrato aceptado ni que el motor los esté registrando.
+- D: aportar esta prueba y repetirla cuando llegue esa conexión. El formato v4
+  ya transporta historia, pero no se presume que cualquier guardado incluya el
+  conocimiento. Revisar persistencia si el contrato acordado lo exige.
+
+DX-06 conserva mientras tanto la evidencia negativa del rechazo sin publicación
+parcial. Al implementar A/C la carga válida, sustituir ese caso negativo por
+MC-01 y mantener las comprobaciones de cargas inválidas sin mutación. La
+preparación de D está hecha; T003/T010/T021 y la restauración conjunta siguen
+pendientes. No se afirma que el juego ya pueda cargar el mapa.

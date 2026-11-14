@@ -450,7 +450,7 @@ Para reproducir la comparación v4 y JSON de Parte I, usar
 python -B -X utf8 -m unittest tests.test_controlador_ac_real -v
 ```
 
-Nueve pruebas offline verifican comandos de historia, guardado/carga v4,
+Los nueve casos DX offline verifican comandos de historia, guardado/carga v4,
 continuación, pergamino y replay del log del controlador sin vistas ni archivo
 de guardado original. También comprueban mapa real de C y cancelación de viaje.
 Usan el motor de A con sus opciones explícitas de prueba; la aplicación normal
@@ -462,3 +462,12 @@ pruebas verifican la detención y el rechazo sin corrupción; no acreditan que
 esos flujos estén completos. La suite de puertas recíprocas preparada por D
 mantiene seis fallos de aceptación pendientes de A.
 [Resultados y alcance](specs/004-linea-tiempo/aceptacion.md).
+
+Actualización 2026-11-13: la misma suite incluye MC-01, una décima prueba que
+exige guardar, explorar/descubrir después y cargar recuperando el motor,
+historia y mapa originales; luego repetir el movimiento de forma determinista.
+**MC-01 falla actualmente por el bloqueo de carga con mapa activo de A**; no
+está omitida ni marcada expectedFailure. Los nueve casos DX siguen aprobados.
+Es aceptación TDD pendiente de la conexión A/C, no una restauración ya resuelta.
+La [evidencia y coordinación](specs/004-linea-tiempo/aceptacion.md#carga-conjunta-del-mapa-conocido-mc-01--2026-11-13)
+detallan qué aserciones aún no se alcanzan y cómo repetir el caso.

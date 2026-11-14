@@ -4,7 +4,7 @@ Las marcas completadas incluyen el núcleo y los consumidores de D. La aceptaci�
 
 ## Incremento de aceptación MC-01 — 2026-11-13
 
-- [ ] Preparar el caso MC-01 en `tests/test_controlador_ac_real.py`: guardar,
+- [x] Preparar el caso MC-01 en `tests/test_controlador_ac_real.py`: guardar,
   descubrir y explorar después, cargar recuperando motor/historia/mapa y
   continuar de forma determinista (FR-011, SC-004). Registrar el fallo actual
   sin skip ni expectedFailure y ejecutar la regresión seleccionada de D.
