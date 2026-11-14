@@ -1,7 +1,9 @@
 """T029/T033: retornos topológicos y validez de consultas de rutas reales."""
 
 import unittest
+from unittest.mock import patch
 
+from modelo.juego import crear_juego
 from modelo.rutas import ContextoRutasReales, EmparejamientoSalida, EstadoEmparejamiento, GrafoTerreno
 from modelo.tipos import Sala
 from tests.datos_terreno_cazador import motor_terreno
@@ -9,6 +11,38 @@ from tests.test_turno_cazador import partida_cazador
 
 
 class TestValidezConsultasReales(unittest.TestCase):
+    def test_t033_cierre_automatico_cambia_la_siguiente_decision_integrada(self):
+        def preparar(precarga, *args, **kwargs):
+            almacen = precarga.almacen
+            pagina = almacen.leer_pagina("prueba", "v1", 1)
+            for sala, direccion in zip(pagina["salas"][:2], ("E", "O")):
+                sala["salidas"][direccion].update(cerrada=False, llave="obj_0")
+            almacen.guardar_pagina("prueba", "v1", pagina)
+            return crear_juego(precarga, *args, partida_completa=True, **kwargs)
+
+        for tiempo_cierre, sala_final, turno_final in ((99, 100, 200), (101, 101, 350)):
+            with self.subTest(tiempo_cierre=tiempo_cierre), \
+                    patch("tests.test_turno_cazador.crear_juego", new=preparar), \
+                    partida_cazador(None) as (motor, cazador, _):
+                contexto = motor._rutas_reales
+                origen, vecino, destino = map(contexto.grafo.indice, (100, 101, 102))
+                puerta = motor.salas[100].salidas["E"]
+                opuesta = motor.salas[101].salidas["O"]
+                self.assertEqual(contexto.buscar(origen, destino, None),
+                                 (vecino, "E", 250, 350))
+                cierre = motor.programar_evento(
+                    tiempo_cierre, "cierre_puerta", (motor.salas[100], "E"))
+
+                for direccion in ("E", "E", None):
+                    resultado = motor.ejecutar("esperar") if direccion is None else motor.ejecutar("mover", direccion)
+                    self.assertTrue(resultado.ok, resultado.mensaje)
+
+                self.assertFalse(cierre.en_cola)
+                self.assertTrue(puerta["cerrada"])
+                self.assertTrue(opuesta["cerrada"])
+                self.assertEqual((cazador.sala_actual, cazador.evento_pendiente.tiempo),
+                                 (sala_final, turno_final))
+
     def test_t029_recalcula_con_cierre_apertura_y_cambio_de_objetivo(self):
         """T5/A6: las consultas reutilizadas leen el estado actual de cada arco."""
         este = {"sala": 20, "costo": 100}

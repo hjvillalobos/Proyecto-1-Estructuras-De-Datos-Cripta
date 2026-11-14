@@ -299,7 +299,21 @@ Las fechas de esta tabla identifican los commits publicados que respaldan la evi
 
 T003 conserva el [registro contractual vigente](contracts/integracion.md) como fuente del estado de cada acuerdo. La evidencia local o sintética de esta tabla no acredita aceptación externa. T049 espera el cierre de T047 y T048 para completar la trazabilidad de todos los criterios.
 
+**Evidencia adicional de T033 sobre `dff5882`.** En `tests.test_validez_rutas`, el motor de partida completa consulta primero una ruta abierta con un cazador sin tope. El cierre automático en t=99 invalida la ruta y el cazador espera en su turno de t=100. Con cierre en t=101, cruza en t=100 y queda en destino. Ambos casos comprueban el cierre de los dos extremos. Esta prueba cubre la decisión ante un cambio indirecto en la integración existente. T033 conserva la dependencia de T032.
+
 
 ## Consolidación compartida — 2026-11-14
 
-La autorización de la usuaria amplió el alcance a todas las partes. La integración de producción, las decisiones conservadoras de antorcha/puertas, los benchmarks de A conectados a la CLI y la aceptación del conjunto se documentan en [integracion-completa.md](../004-linea-tiempo/integracion-completa.md). Los balances, gates de autorización y pendientes de entregas anteriores son históricos; no se inventa una respuesta oficial para preguntas del profesor ni se cambian marcadores de checklists de revisión.
+El [informe de integración](../004-linea-tiempo/integracion-completa.md) documenta los cambios de producción, los criterios aplicados a antorchas y puertas, la conexión de los benchmarks de A a la CLI y los resultados de las pruebas del conjunto. Las dependencias y aceptaciones exigidas para cerrar cada tarea figuran en sus filas originales.
+
+### Estado funcional de Persona A sobre `dff5882`
+
+El conteo formal es de 20 tareas cerradas y 31 abiertas. Los estados siguientes describen el alcance verificado y el trabajo que aún falta para cada grupo.
+
+| Estado | Tareas y alcance |
+|---|---|
+| Implementada y verificada; cierre formal pendiente | **T025**, despacho con datos válidos. **T029–T031**, validez de rutas, orden de eventos y contexto real de A con descarte de derivados. **T032–T035**, puertas, conocimiento, decisión ante un cierre automático, restauración e historia en el alcance de la partida integrada. **T040–T044**, comparaciones sintéticas de rutas, caché y agenda. En estos grupos siguen aplicando las dependencias y aceptaciones indicadas en las filas originales. |
+| Integración existente; aceptación específica incompleta | **T023–T024 y T027**. El planificador filtrado ya consume el buscador de A. Queda acordar el modo y los resultados contractuales y validar la suite de aceptación prevista antes del cierre. **T036–T037** tienen evidencia de eventos y A13; falta la validación conjunta en el orden de sus dependencias. Las pruebas disponibles no demuestran un defecto de producción que requiera otro ajuste en T036. |
+| Pendiente documental, contractual o de medición | **T001–T004 y T018**, fuentes y políticas de Q1/Q2, verificación de entregas y designación oficial de Q3. **T028 y T038**, documentación final tras T027 y T037. **T045**, cierre de T044 y aceptación de la conexión de medición ya publicada por D. **T046**, referencia oficial y medición con mínimo, mediana y máximo. **T047–T050**, consolidación final con esos resultados y dependencias. |
+
+Las reglas vigentes de datos válidos, la decisión del cazador, el orden temporal y el retroceso tienen evidencia publicada. En la partida integrada también se verificaron mapa, viaje, historia y guardado/carga. El resultado de la medición sintética y la prueba funcional de cripta-06 no acreditan Q3. Los dos finales de prompts siguen pendientes de una fuente textual íntegra.
