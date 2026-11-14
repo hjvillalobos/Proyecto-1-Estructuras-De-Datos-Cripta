@@ -2,9 +2,8 @@
 
 Activación offline explícita de la entrega de A. Solo se simula la vista y
 se bloquean HTTP/constructores de vista; no se parchean reglas ni resultados.
-MC-01 exige la carga conjunta pendiente: su fallo TDD no se omite ni se marca
-expectedFailure. DX-06 conserva el rechazo de la entrega actual hasta recibir
-la conexión A/C; entonces deberá sustituirse por la aceptación positiva.
+MC-01 verifica la carga conjunta y DX-06 conserva la atomicidad ante una
+frontera incoherente. El viaje consume los hechos reales entregados por A.
 """
 from contextlib import contextmanager
 from pathlib import Path
@@ -176,14 +175,13 @@ class ControladorACRealTest(TestCase):
             self.assertIsNone(control.control_viaje.pendiente)
             vista.mostrar_error.assert_not_called()
 
-    def test_dx05_sin_hechos_del_motor_se_detiene_despues_del_paso_grabado(self):
+    def test_dx05_hechos_reales_detienen_tras_un_paso_con_enemigos(self):
         with self.partida(mapa=True, historia=False) as (motor, _, control, vista, __, ___):
             control.procesar_comando("mover E")
             control.procesar_comando("mover O")
             control.procesar_comando("ir a 101")
-            with self.assertRaisesRegex(ValueError, "no entrega los hechos"):
-                control._avanzar_viaje()
-            self.assertIsNone(control.ultimo_resultado_accion.hechos_paso)
+            control._avanzar_viaje()
+            self.assertTrue(control.ultimo_resultado_accion.hechos_paso.enemigos_al_entrar)
             self.assertEqual((motor.jugador.posicion_actual, motor.acciones_jugador), (101, 3))
             self.assertFalse(control._viaje_activo)
             self.assertIsNone(control.control_viaje.pendiente)

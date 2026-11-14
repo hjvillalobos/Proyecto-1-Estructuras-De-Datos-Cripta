@@ -668,3 +668,37 @@ Al repetir el descubrimiento con Pillow y seleccionar todos los casos salvo esa 
 ### Evidencia posterior de T030
 
 Sobre `53c9453`, con la prueba nueva en el árbol de trabajo, pasaron **172 pruebas seleccionadas**, sin fallos, errores ni omisiones. Los cinco casos de `tests/test_eventos_terreno.py` usan el motor ordinario con datos offline. A8 cubre el empate entre cierre, efecto y turno del cazador en ambos órdenes relativos de cierre y turno. A9 verifica la activación ordenada de enemigos dormidos y la conservación del turno del enemigo que ya llegó activo. A10 verifica el cierre tras cruzar, la conservación de la llave y el rechazo al volver a intentar el mismo arco. A11 verifica la curación y los pulsos reales de regeneración en `t=200` y `t=400`, con el siguiente pulso pendiente en `t=600`. T030 sigue abierta por su dependencia de T025.
+
+## Evidencia de A13 para T037
+
+Sobre `b1e78c8`, con las pruebas de A13 en el árbol de trabajo, pasaron 57 pruebas sin fallos, errores ni omisiones.
+
+```powershell
+.\.venv\Scripts\python.exe -B -m unittest tests.test_costos_terreno tests.test_eventos_terreno tests.test_validez_rutas tests.test_frontera_temporal tests.test_restauracion_rutas tests.test_rastro
+```
+
+Con el motor ordinario y un paquete sintético offline se verificaron el rastro inicial, su refresco al esperar, las marcas de origen y destino al moverse y la espera del guardián en su turno fuera de la sala del jugador. Para el rastreador, la prueba prepara las marcas de rastro y el estado de una salida, activa al enemigo y procesa su turno real en t=400 mediante `ejecutar_ciclo()` con el callback de producción. Comprueba que se desplaza hacia el menor ID con rastros empatados de 399 unidades, espera con rastros de 400 y elige la otra salida cuando la de menor ID está cerrada. En los tres casos se comprueba el siguiente turno en t=800. T037 sigue pendiente de T036. Esta ejecución no mide rendimiento.
+
+## Entradas verificadas de terreno y rango
+
+Para datos válidos, A consume costos enteros positivos y simétricos, con 100 si el campo está ausente. Un rango entero válido es inclusivo y un `null` explícito deja la búsqueda sin tope. Véanse las [aclaraciones de Q2](research.md#aclaración-del-profesor-sobre-q2) y [Q1](research.md#aclaración-del-profesor-sobre-q1). La validación y las pruebas de entrega de B conservan su alcance. La política para rango ausente o inválido, costo `null`, valores inválidos e inconsistencias sigue pendiente. T018 espera T001 y T002.
+
+## Evaluación sintética de rutas y agendas
+
+En `0396f60` quedó publicada la utilidad aislada. La matriz reproducible usa 40 salas, 78 arcos, 1 o 24 cazadores, rango 100 o ilimitado, puertas estables o cambiantes y semilla 20261113. La salida JSON informa equipo, Python, repeticiones y resultados por estrategia.
+
+```powershell
+.\.venv\Scripts\python.exe -B -m utilidades.bench_terreno_cazador --vertices 40 --semilla 20261113 --repeticiones 3
+```
+
+Leer por separado la preparación del grafo y de la estrategia, el tiempo de lote y la liberación final. El lote incluye las invalidaciones que ocurren durante sus consultas. El campo inverso informa preparación de arcos entrantes, reconstrucción y reutilización. Los costos de mantenimiento de caché se instrumentan en otra pasada. La extracción aislada de agenda se mide después de las reprogramaciones. El ciclo del motor ordinario usa una carga sintética en memoria con 24 cazadores y cambios de velocidad. Sus cifras son de evaluación local, sin referencia oficial Q3 ni certificación de T046.
+
+### Regresión de publicación
+
+Antes de crear `0396f60`, sobre `53d7367` con el contenido publicado de la utilidad y las pruebas, y con los tres casos de T029/T033, pasaron **90 pruebas**, sin fallos, errores ni omisiones. Para reproducir ese total se requieren los tres casos de [validez de rutas](../../tests/test_validez_rutas.py) incluidos en este mismo incremento documental.
+
+```powershell
+.\.venv\Scripts\python.exe -B -m unittest tests.test_bench_terreno_cazador tests.test_rutas_cazador tests.test_localidad_rutas tests.test_validez_rutas tests.test_eventos_terreno tests.test_frontera_temporal tests.test_restauracion_rutas tests.test_turno_cazador tests.test_velocidad_terreno tests.test_costos_terreno
+```
+
+T048 conserva pendientes la integración de rutas filtradas, la validación conjunta de T037, la conexión de medición con D y la medición oficial.

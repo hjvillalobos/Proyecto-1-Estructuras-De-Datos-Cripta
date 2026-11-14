@@ -14,6 +14,51 @@ from tests.datos_terreno_cazador import SIN_COSTO_DECLARADO, motor_terreno
 
 
 class PruebasCostosTerreno(unittest.TestCase):
+    def test_a13_refresca_rastro_al_actuar_y_al_entrar(self):
+        with motor_terreno(100) as motor:
+            rastro = motor.registro_rastro
+            self.assertEqual(rastro.tiempo_de(100), 0)
+            self.assertTrue(motor.ejecutar("esperar").ok)
+            self.assertEqual(motor.reloj, 100)
+            self.assertTrue(motor.ejecutar("esperar").ok)
+            self.assertEqual(rastro.tiempo_de(100), 100)
+            self.assertTrue(motor.ejecutar("mover", "E").ok)
+            self.assertEqual((motor.jugador.posicion_actual, motor.reloj), (101, 300))
+            self.assertEqual((rastro.tiempo_de(100), rastro.tiempo_de(101)), (200, 200))
+
+    def test_a13_turno_del_rastreador_filtra_salidas_y_desempata(self):
+        for marca, cerrada, destino in ((1, False, 100), (0, False, 101),
+                                        (1, True, 102)):
+            with self.subTest(marca=marca, cerrada=cerrada), motor_terreno(
+                    100, comportamiento="rastreador", velocidad_enemigo=25) as motor:
+                sala = motor.salas[101]
+                rastreador = motor.enemigos_por_sala[101][0]
+                motor.registro_rastro.marcar_visita(100, marca)
+                motor.registro_rastro.marcar_visita(102, marca)
+                if cerrada:
+                    sala.salidas["O"]["cerrada"] = True
+                motor.activar_enemigos_de_sala(101, motor.enemigos_por_sala[101])
+                turno = rastreador.evento_pendiente
+                self.assertEqual(turno.tiempo, 400)
+
+                # El turno del rastreador inicial precede al de la sala 101.
+                inicial = motor.enemigos_por_sala[100][0].evento_pendiente
+                self.assertIs(motor.ejecutar_ciclo(decidir_accion), inicial)
+                self.assertIs(motor.ejecutar_ciclo(decidir_accion), turno)
+                self.assertEqual(motor.reloj, 400)
+                self.assertFalse(turno.en_cola)
+                self.assertEqual(rastreador.sala_actual, destino)
+                self.assertEqual(rastreador.evento_pendiente.tiempo, 800)
+
+    def test_a13_turno_del_guardian_espera_fuera_de_la_sala_del_jugador(self):
+        with motor_terreno(100) as motor:
+            guardian = motor.enemigos_por_sala[100][0]
+            turno = guardian.evento_pendiente
+            self.assertTrue(motor.ejecutar("mover", "E").ok)
+            self.assertFalse(turno.en_cola)
+            self.assertEqual(guardian.sala_actual, 100)
+            self.assertEqual(guardian.evento_pendiente.tiempo, 200)
+
     def comprobar_movimiento_jugador(self, costo, velocidad, reloj, esperado):
         with motor_terreno(costo, velocidad) as motor:
             if reloj == 20:

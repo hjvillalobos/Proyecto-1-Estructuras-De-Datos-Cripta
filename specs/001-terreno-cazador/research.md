@@ -107,4 +107,20 @@ El motor conserva única autoridad de secuencias semánticas. Lee costo del arco
 
 ## Resultado de investigación
 
-R1–R5 son preferencias analíticas revisables; Q1–Q3 no resueltas, contratos no acordados y pruebas no ejecutadas. No se atribuyen datos medidos ni se declara gate final de Plan superado. La matriz de evidencia y pruebas está en [quickstart.md](quickstart.md).
+R1–R5 documentan las alternativas del plan. Q1 y Q2 tienen aclaraciones parciales registradas arriba. Q3 sigue pendiente. La evidencia posterior se recoge abajo y en [quickstart.md](quickstart.md).
+
+### Búsqueda individual y límites (T028)
+
+El contexto real prepara el grafo, el heap indexado y los arreglos una vez. Cada consulta usa una generación nueva, procesa etiquetas por costo total y primer ID, y descarta arcos cerrados o candidatos que excedan el límite inclusivo. El primer paso se obtiene al fijar la etiqueta del destino. Sin paso admisible, el resultado no distingue desconexión de distancia superior al límite. El contraste con enumeración de caminos simples consta en [T026](quickstart.md#validación-local-de-t026). Los conteos del fixture [T039](quickstart.md#validación-local-de-t039) son evidencia de localidad, sin equivalencia con una medición del ciclo completo. T028 espera el cierre de T027 y la evidencia de la fuente filtrada.
+
+### Efectos sobre rutas y agenda (T038)
+
+La tabla de R4 separa distancias de programación. La evidencia de T029/T033 confirma en pruebas locales que cambiar el objetivo o el estado de una salida cambia la consulta cuando corresponde, mientras que cambiar velocidad, ocupar una sala o matar al enemigo allí conserva las distancias si el grafo no cambia. T030 aporta el orden de eventos y T037 aporta A13. La aceptación bilateral y los cambios indirectos del mapa integrado siguen pendientes de T032.
+
+En producción el contexto reutiliza sus arreglos sin guardar resultados entre consultas. La invalidación conservadora avanza la generación para que una etiqueta de una búsqueda anterior quede inaccesible. En carga, retroceso y rollback la agenda, sus secuencias y el RNG son estado semántico, mientras que las marcas de búsqueda son infraestructura derivada. Las pruebas de T031 y T034 verifican restauración y consultas posteriores. El rollback de `b1e78c8` invalida las marcas tras los inversos, conserva la identidad del evento pendiente y permite repetir la acción. El primer productor H3 sigue bajo activación explícita de prueba. T038 espera la validación conjunta de T037.
+
+### Evaluación sintética y paquete local de entrega (T047/T050)
+
+La evaluación publicada en `0396f60` conserva el algoritmo individual de producción y compara alternativas aisladas. La referencia lineal implementada recorre V etiquetas por selección, por lo que su costo es O(V·Vr + Er) para Vr vértices expandidos y Er arcos examinados. En el campo inverso de rango 100, los mapas de 128, 512 y 2048 salas expandieron cinco vértices cada uno, pero inicializaron 256, 1024 y 4096 celdas por reconstrucción. Ese costo O(V) limita su localidad aunque la consulta reutilizada sea barata. Las cachés FIFO de una y cuatro entradas y la agenda indexada son candidatos medidos en cargas sintéticas. La corrida de 24 cazadores del ciclo sintético conservó los 94 eventos procesados y el mismo estado final en ambas agendas. La equivalencia observada corresponde a esa carga.
+
+Para el paquete local de entrega, las fuentes son [la especificación](spec.md), [el plan](plan.md), [la guía reproducible](quickstart.md#evaluación-sintética-de-rutas-y-agendas) y [la trazabilidad](tasks.md#evidencia-parcial-para-entrega). Quedan por incorporar el cierre de datos y contratos, la validación conjunta, la referencia Q3 y la medición oficial. T050 espera T047–T049 y la revisión de completitud previa a cualquier traslado autorizado.
