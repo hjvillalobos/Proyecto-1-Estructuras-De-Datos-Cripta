@@ -65,11 +65,11 @@ Los cuatro prefijos A/B/C/D identifican su carpeta de especificación. La cobert
 
 ## Cierre comprobado del fortalecimiento
 
-Regresión final: **815 pruebas en 220.346 s, cero fallos y cero errores**, dos omisiones opcionales con ejecución separada aprobada: comparación histórica (41 pruebas) y API oficial (cinco criptas, caché fría/caliente dentro de presupuesto). Copia limpia de fuentes sin datos locales mediante `python -m utilidades.verificar_copia_limpia`; no reinstala las dependencias.
+Regresión final: **818 pruebas en 181.531 s, cero fallos y cero errores**, dos omisiones opcionales con ejecución separada aprobada: comparación histórica (41 pruebas) y API oficial (cinco criptas, caché fría/caliente dentro de presupuesto). Copia limpia de fuentes sin datos locales mediante `python -m utilidades.verificar_copia_limpia`; no reinstala las dependencias.
 
 | Operación | Máximo final | Límite | Excesos |
 |---|---:|---:|---:|
-| Ciclo con 30 cazadores e historia/mapa | 14.017 ms | 20 ms | 0/60 |
+| Ciclo con 30 cazadores e historia/mapa, RC-01 | 11.931 ms | 20 ms | 0/600 |
 | Paso de viaje conocido | 2.501 ms | 5 ms | 0/60 |
 | Verificador completo | 7.855 ms | 200 ms | 0/10 |
 | Historia K=50, 5.000 acciones | 0.9363 ms | 50 ms | 0/185 |
@@ -81,3 +81,6 @@ El heap redujo su mediana pareada de 4.3523 a 2.2538 ms, con decisiones iguales.
 Dos finales de prompts de A no se conservan íntegros y el commit histórico `33d97ac` reunió aclaración y código. No se inventan textos ni se reescribe ese hecho. El PDF original local de Parte I está vacío; se conserva la extracción previa. Las mediciones no garantizan una calificación o cero bugs futuros. Resultados de fortalecimiento y reproducción en DECISIONES.md y README.md.
 
 Actualización de publicación con A dff5882: suite 815, OK; integración específica 44, OK. El benchmark posterior registró un ciclo de 20.282 ms (1/60 sobre 20); repetido aisladamente dio 19.783 ms (0/60). Paso conocido 4.208 ms y repetición 2.341 ms, ambos bajo 5. Se conserva la variación como límite de rendimiento, sin ocultar la muestra excedida.
+
+
+Estado posterior RC-01: eliminados los ordenamientos redundantes de historia. Cinco series pareadas de 120 ciclos por productor, historia/estado/azar iguales: mediana 11.436 → 4.435 ms; máximo optimizado 11.931 ms y 0/600 sobre 20 ms. Suite 818, cero fallos/errores, dos opciones con evidencia separada previa. Copia limpia 20 pruebas, OK. La advertencia de ciclo de la publicación anterior queda como antecedente medido; la optimización aporta margen en estas nuevas muestras, sin garantía absoluta de latencia bajo cualquier carga. El viaje no fue modificado y sus muestras auxiliares, incluida una de 5.168 ms, permanecen en [el registro completo](specs/004-linea-tiempo/ciclo-historia-mediciones.json).

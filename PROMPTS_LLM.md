@@ -1515,3 +1515,11 @@ Herramienta: Codex desktop. Prompts textuales:
 > dame un checklist por aca del proyecto
 
 Uso: publicar exclusivamente 004-linea-tiempo y presentar checklist sin defensa. El remoto había avanzado a dff5882 con a2a72fc/ec77cc9 de A; se integra sin force push, conservando claves retenidas y la reducción de comparaciones de A, además del marcador de salas avistadas. Se verifican rutas/presentación y regresión antes de publicar.
+
+## 2026-11-14 — mayor margen del ciclo de eventos
+
+Herramienta: Codex desktop. Prompt textual:
+
+> mejora ese rendimiento que dices
+
+Uso: perfilar el ciclo integrado, especificar RC-01 antes de código (5972e3d), reducir ordenamientos y conversiones redundantes de historia sin cambiar registros, contrastar por evento con d43ded2, medir cinco series pareadas de 120 ciclos y ejecutar regresión. Se conservan muestras excedidas del anterior y del viaje auxiliar; no se promete tiempo absoluto bajo cualquier carga del sistema. Defensa excluida.

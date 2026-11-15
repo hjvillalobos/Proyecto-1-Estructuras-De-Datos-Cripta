@@ -59,12 +59,15 @@ python -B -X utf8 -m unittest discover -s tests -t . -v
 python -B -X utf8 -m utilidades.verificar_conocimiento_rutas
 python -B -X utf8 -m utilidades.verificar_copia_limpia
 python main.py --bench --subsistemas parte-dos --paquete .cache/entrega --cripta cripta-06 --repeticiones 60
+python main.py --bench --subsistemas ciclo-historia --paquete .cache/entrega --cripta cripta-06 --repeticiones 5
 python main.py --bench --subsistemas terreno-cazador --salas 40 --repeticiones 3
 python main.py --bench --subsistemas resolubilidad --paquete .cache/entrega --cripta cripta-06 --repeticiones 10
 python main.py --bench --subsistemas historia --operaciones 5000 --salas 100 --repeticiones 5
 ```
 
 `parte-dos` incluye comparación pareada del heap anterior/optimizado con decisiones iguales, estrategias de rutas, puertas estables/cambiantes, ciclo con 30 cazadores y pasos sobre mapa conocido completo. La preparación queda fuera del intervalo medido. Las inyecciones sintéticas se identifican; no se presentan como población natural de la cripta. Los benchmarks no usan HTTP ni renderizado.
+
+`ciclo-historia` compara el productor histórico anterior y el optimizado, alternando el orden de ejecución: cinco series de 120 ciclos completos por versión, incluyendo combate y checkpoints. Comprueba igualdad del estado final, historia y azar. RC-01 redujo la mediana de ciclo de 11.436 a 4.435 ms; máximo optimizado 11.931 ms, 0/600 sobre 20 ms. [Muestras y límites](specs/004-linea-tiempo/ciclo-historia-mediciones.json).
 
 Opciones con preparación explícita:
 
@@ -78,7 +81,7 @@ python -B -X utf8 -m unittest tests.test_criptas_api.TestPaqueteOficial -v
 
 El segundo comando requiere el paquete histórico completo de cuatro criptas; la API actual no garantiza conservar esos mapas. La suite ordinaria declara las omisiones cuando falta preparación. TEMP/TMP deben apuntar a una carpeta escribible. Las pruebas gráficas necesitan una sesión con Tk disponible.
 
-Resultado final del fortalecimiento: **815 pruebas, cero fallos/errores**, dos omisiones opcionales verificadas aparte (comparación histórica y API real). El verificador de copia limpia prepara fuentes sin datos locales y reutiliza el intérprete/dependencias instalados. [Muestras completas y entorno](specs/004-linea-tiempo/fortalecimiento-mediciones.json).
+Resultado final del fortalecimiento: **818 pruebas, cero fallos/errores**, dos omisiones opcionales verificadas aparte (comparación histórica y API real). El verificador de copia limpia prepara fuentes sin datos locales y reutiliza el intérprete/dependencias instalados. [Muestras completas y entorno](specs/004-linea-tiempo/fortalecimiento-mediciones.json).
 
 ## Proceso y documentación
 
