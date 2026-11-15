@@ -65,7 +65,7 @@ Los cuatro prefijos A/B/C/D identifican su carpeta de especificación. La cobert
 
 ## Cierre comprobado del fortalecimiento
 
-Regresión final: **814 pruebas en 183.269 s, cero fallos y cero errores**, dos omisiones opcionales con ejecución separada aprobada: comparación histórica (41 pruebas) y API oficial (cinco criptas, caché fría/caliente dentro de presupuesto). Copia limpia de fuentes sin datos locales mediante `python -m utilidades.verificar_copia_limpia`; no reinstala las dependencias.
+Regresión final: **815 pruebas en 220.346 s, cero fallos y cero errores**, dos omisiones opcionales con ejecución separada aprobada: comparación histórica (41 pruebas) y API oficial (cinco criptas, caché fría/caliente dentro de presupuesto). Copia limpia de fuentes sin datos locales mediante `python -m utilidades.verificar_copia_limpia`; no reinstala las dependencias.
 
 | Operación | Máximo final | Límite | Excesos |
 |---|---:|---:|---:|
@@ -79,3 +79,5 @@ El heap redujo su mediana pareada de 4.3523 a 2.2538 ms, con decisiones iguales.
 ## Salvedades históricas conservadas
 
 Dos finales de prompts de A no se conservan íntegros y el commit histórico `33d97ac` reunió aclaración y código. No se inventan textos ni se reescribe ese hecho. El PDF original local de Parte I está vacío; se conserva la extracción previa. Las mediciones no garantizan una calificación o cero bugs futuros. Resultados de fortalecimiento y reproducción en DECISIONES.md y README.md.
+
+Actualización de publicación con A dff5882: suite 815, OK; integración específica 44, OK. El benchmark posterior registró un ciclo de 20.282 ms (1/60 sobre 20); repetido aisladamente dio 19.783 ms (0/60). Paso conocido 4.208 ms y repetición 2.341 ms, ambos bajo 5. Se conserva la variación como límite de rendimiento, sin ocultar la muestra excedida.

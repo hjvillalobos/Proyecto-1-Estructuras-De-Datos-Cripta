@@ -1504,3 +1504,14 @@ Herramienta: Codex desktop; modelo exacto no expuesto. Prompts textuales:
 > todo lo que puedas cambiar hazlo de la mejor manera, no importa que sea parte de A,B,C o D lo que necesito es que mejores el rendimiento, tambien si ya hay cosas en la documentacion que dicen pendientes y asi, cambialo, prueba todo, que no hayan bugs y que el rendimiento sea excelente, documentacion excelente y todo acorde a punto por punto del enunciado
 
 Uso: aplicar speckit-implement al fortalecimiento RF-01..03. Requisitos previos/checklist de D 8/8, sin hooks de extensión; especificación/plan/tareas confirmados en 5bccc94 antes de código. Optimizar comparaciones del heap, eliminar reserva por maxID en el motor, consolidar documentación y matriz de 23 casos, probar regresiones, datos oficiales, copia limpia y rendimiento. La prueba nueva detectó una reserva involuntaria de list() por longitud virtual; se corrigió con longitud real y límite separado. El índice disperso final es radix propio para preservar el costo del rastro independiente de V. No se inventan antecedentes ni aprobación humana; defensa excluida. Evidencia en DECISIONES y ESTADO_ENTREGA.
+
+
+## 2026-11-14 — publicación y checklist
+
+Herramienta: Codex desktop. Prompts textuales:
+
+> publica los cambios en mi rama
+
+> dame un checklist por aca del proyecto
+
+Uso: publicar exclusivamente 004-linea-tiempo y presentar checklist sin defensa. El remoto había avanzado a dff5882 con a2a72fc/ec77cc9 de A; se integra sin force push, conservando claves retenidas y la reducción de comparaciones de A, además del marcador de salas avistadas. Se verifican rutas/presentación y regresión antes de publicar.

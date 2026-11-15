@@ -78,7 +78,7 @@ python -B -X utf8 -m unittest tests.test_criptas_api.TestPaqueteOficial -v
 
 El segundo comando requiere el paquete histórico completo de cuatro criptas; la API actual no garantiza conservar esos mapas. La suite ordinaria declara las omisiones cuando falta preparación. TEMP/TMP deben apuntar a una carpeta escribible. Las pruebas gráficas necesitan una sesión con Tk disponible.
 
-Resultado final del fortalecimiento: **814 pruebas, cero fallos/errores**, dos omisiones opcionales verificadas aparte (comparación histórica y API real). El verificador de copia limpia prepara fuentes sin datos locales y reutiliza el intérprete/dependencias instalados. [Muestras completas y entorno](specs/004-linea-tiempo/fortalecimiento-mediciones.json).
+Resultado final del fortalecimiento: **815 pruebas, cero fallos/errores**, dos omisiones opcionales verificadas aparte (comparación histórica y API real). El verificador de copia limpia prepara fuentes sin datos locales y reutiliza el intérprete/dependencias instalados. [Muestras completas y entorno](specs/004-linea-tiempo/fortalecimiento-mediciones.json).
 
 ## Proceso y documentación
 

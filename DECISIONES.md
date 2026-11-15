@@ -1059,3 +1059,10 @@ Repetición final offline sin la suite concurrente, mismo equipo/versión/semill
 Los cuatro benchmarks terminaron correctamente y sus salidas completas están en [fortalecimiento-mediciones.json](specs/004-linea-tiempo/fortalecimiento-mediciones.json), junto con entorno, semilla y resumen de suite. La preparación/disco/red no se incluyó en las consultas; el verificador sí incluye normalización/diagnóstico/reporte. No se promete una calificación, aceptación humana ni ausencia absoluta de bugs.
 
 La aceptación final de copia limpia con el índice definitivo se repitió mediante `python -m utilidades.verificar_copia_limpia`: **20 pruebas en 6.775 s, OK**, sin reutilizar cachés ni partidas. El intérprete y las dependencias son los instalados; no se simula una instalación nueva de paquetes.
+
+
+### Publicación con novedades remotas de A
+
+Se integró dff5882 (a2a72fc y ec77cc9): conservar claves retenidas, ascenso/descenso con menos comparaciones de A y marcador (?) para salas avistadas. Pruebas específicas 44, OK; suite conjunta **815 en 220.346 s, cero fallos/errores, dos omisiones opcionales**. El push inicial rechazó el avance remoto y se resolvió mediante fusión normal, sin sobrescribirlo.
+
+Benchmark posterior: mediana sin/con claves retenidas 3.8838/2.3941 ms; decisiones iguales. Ciclo máximo 20.282 ms, 1/60 sobre 20; paso 4.208 ms, 0/60 sobre 5. Repetición aislada del ciclo: máximo 19.783 ms, media 7.614 ms, 0/60 sobre 20; paso 2.341 ms, 0/60 sobre 5. Se conserva el exceso inicial: el margen de ciclo fluctúa con la carga del equipo y no se declara cumplimiento absoluto en todas las muestras. Los resultados anteriores de otras operaciones siguen correspondiendo a sus cargas documentadas.

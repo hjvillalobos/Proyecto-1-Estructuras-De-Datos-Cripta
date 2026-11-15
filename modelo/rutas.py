@@ -186,21 +186,26 @@ class HeapRutas:
         self.espacio._posiciones[self._nodos[segunda]] = segunda
 
     def _subir(self, posicion):
+        clave = self._clave(self._nodos[posicion])
         while posicion > 0:
             padre = (posicion - 1) // 2
-            if self._clave(self._nodos[padre]) <= self._clave(self._nodos[posicion]):
+            if self._clave(self._nodos[padre]) <= clave:
                 break
             self._intercambiar(posicion, padre)
             posicion = padre
 
     def _bajar(self, posicion):
         cantidad = len(self._nodos)
+        clave = self._clave(self._nodos[posicion])
         while posicion * 2 + 1 < cantidad:
             hijo = posicion * 2 + 1
-            if hijo + 1 < cantidad and (
-                    self._clave(self._nodos[hijo + 1]) < self._clave(self._nodos[hijo])):
-                hijo += 1
-            if self._clave(self._nodos[posicion]) <= self._clave(self._nodos[hijo]):
+            clave_hijo = self._clave(self._nodos[hijo])
+            if hijo + 1 < cantidad:
+                clave_derecha = self._clave(self._nodos[hijo + 1])
+                if clave_derecha < clave_hijo:
+                    hijo += 1
+                    clave_hijo = clave_derecha
+            if clave <= clave_hijo:
                 break
             self._intercambiar(posicion, hijo)
             posicion = hijo
