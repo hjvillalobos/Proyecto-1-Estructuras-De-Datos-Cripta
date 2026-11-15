@@ -1,5 +1,8 @@
 # Investigación técnica provisional
 
+> **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
+
+
 **Fecha:** 2026-11-02. **Estado:** análisis sin implementación ni benchmarks; Q1–Q3 no resueltas. Producir borradores condicionados fue autorizado expresamente.
 
 ## Fuentes
@@ -29,11 +32,19 @@ La ausencia reportada de restricciones en un esquema no deroga las reglas del ju
 
 ## Aclaración del profesor sobre Q2
 
-**Registro del 2026-11-09.** El usuario comunicó que el profesor confirmó dos reglas de Parte II §3.1: si falta el campo `costo`, se usa 100, y se asume el mismo costo en ambos sentidos de una puerta entre salas adyacentes. Sigue pendiente cómo tratar `costo=null`, valores inválidos y contradicciones entre descriptores. La simetría del costo no acredita que el estado abierto o cerrado esté sincronizado entre extremos. E-B-COSTOS sigue pendiente de que B demuestre el suministro versionado de costos válidos hasta el motor de A. Q1 (rango ausente o inválido) y Q3 (referencia de rendimiento) siguen abiertas.
+**Registro del 2026-11-09.** El usuario comunicó que el profesor confirmó dos reglas de Parte II §3.1: si falta el campo `costo`, se usa 100, y se asume el mismo costo en ambos sentidos de una puerta entre salas adyacentes. Sigue pendiente cómo tratar `costo=null`, valores inválidos y contradicciones entre descriptores. La aclaración posterior del usuario ratifica que la simetría es una condición de los datos de entrada. El motor consume el costo de la salida recorrida. La prueba `test_movimiento_reciproco_costo_250` verifica ambos sentidos con datos válidos; la evidencia de suministro figura en [E-B-COSTOS](contracts/integracion.md).
 
 ## Aclaración del profesor sobre Q1
 
-**Procedencia:** aclaración del profesor comunicada por el usuario. Un valor `rango=null` explícito indica que el cazador busca sin tope de costo. Un entero válido conserva el límite inclusivo. Los casos de campo ausente y de valor inválido siguen pendientes. E-B-RANGO debe preservar la distinción entre esos estados y acreditar el acceso del motor al dato versionado sin HTTP durante la búsqueda. Su aceptación sigue pendiente.
+**Procedencia:** aclaración del profesor comunicada por el usuario. Un valor `rango=null` explícito indica que el cazador busca sin tope de costo. Un entero válido conserva el límite inclusivo. Los casos de campo ausente y de valor inválido siguen pendientes. E-B-RANGO debe preservar la distinción entre esos estados y acreditar el acceso del motor al dato versionado sin HTTP durante la búsqueda. El registro integrado de [E-B-RANGO](contracts/integracion.md) acredita el acceso para entradas válidas. La prueba de turno con ruta de costo 400 verifica el caso ilimitado.
+
+## Alcance oficial de Q1 y Q2
+
+Parte II §3.2 (p. 4) exige el campo de rango en la ficha del cazador. La aclaración del profesor comunicada por el usuario establece el significado del valor `null` explícito. El enunciado no prescribe que A acepte fichas sin el campo ni define un valor de reemplazo para datos inválidos (T001, FR-007/FR-009).
+
+Parte II §3.1 (p. 4) permite omitir el costo y fija 100 en ese caso. Cuando se declara, exige un entero ≥1 y el mismo costo en ambos sentidos. La aclaración comunicada por el usuario confirma esa simetría. Un costo `null`, inválido o contradictorio queda fuera de las entradas conformes. El enunciado no prescribe una reparación o un rechazo del motor para esas entradas (T002, FR-001).
+
+El reparto oficial (§Persona A, p. 3) sitúa la validación y normalización de datos en la coordinación A/B. El [registro de integración](contracts/integracion.md) delimita los datos que entrega B y consume A. Las preguntas originales de GB1/GB2 quedan registradas como casos de robustez fuera de la aceptación funcional de A. La [guía](quickstart.md#entradas-verificadas-de-terreno-y-rango) documenta las reglas y las pruebas para T018.
 
 ## Notación
 
@@ -107,4 +118,82 @@ El motor conserva única autoridad de secuencias semánticas. Lee costo del arco
 
 ## Resultado de investigación
 
-R1–R5 son preferencias analíticas revisables; Q1–Q3 no resueltas, contratos no acordados y pruebas no ejecutadas. No se atribuyen datos medidos ni se declara gate final de Plan superado. La matriz de evidencia y pruebas está en [quickstart.md](quickstart.md).
+R1–R5 documentan las alternativas del plan. Q1 y Q2 tienen aclaraciones parciales registradas arriba. Q3 sigue pendiente. La evidencia posterior se recoge abajo y en [quickstart.md](quickstart.md).
+
+### Búsqueda individual y límites (T028)
+
+El contexto real prepara el grafo, el heap indexado y los arreglos una vez. Cada consulta usa una generación nueva, procesa etiquetas por costo total y primer ID, y descarta arcos cerrados o candidatos que excedan el límite inclusivo. El primer paso se obtiene al fijar la etiqueta del destino. Sin paso admisible, el resultado no distingue desconexión de distancia superior al límite. El contraste con enumeración de caminos simples consta en [T026](quickstart.md#validación-local-de-t026). Los conteos del fixture [T039](quickstart.md#validación-local-de-t039) son evidencia de localidad, sin equivalencia con una medición del ciclo completo. T028 espera el cierre de T027 y la evidencia de la fuente filtrada.
+
+### Efectos sobre rutas y agenda (T038)
+
+La tabla de R4 separa distancias de programación. La evidencia de T029/T033 confirma en pruebas locales que cambiar el objetivo o el estado de una salida cambia la consulta cuando corresponde, mientras que cambiar velocidad, ocupar una sala o matar al enemigo allí conserva las distancias si el grafo no cambia. T030 aporta el orden de eventos y T037 aporta A13. La aceptación bilateral y los cambios indirectos del mapa integrado siguen pendientes de T032.
+
+En producción el contexto reutiliza sus arreglos sin guardar resultados entre consultas. La invalidación conservadora avanza la generación para que una etiqueta de una búsqueda anterior quede inaccesible. En carga, retroceso y rollback la agenda, sus secuencias y el RNG son estado semántico, mientras que las marcas de búsqueda son infraestructura derivada. Las pruebas de T031 y T034 verifican restauración y consultas posteriores. El rollback de `b1e78c8` invalida las marcas tras los inversos, conserva la identidad del evento pendiente y permite repetir la acción. El primer productor H3 se verificó bajo activación explícita de prueba. La conexión en la partida ordinaria y la regresión conjunta de T037/T038 constan en [la entrega integrada](tasks.md#cierre-de-la-entrega-integrada-de-a).
+
+### Evaluación sintética y paquete local de entrega (T047/T050)
+
+La evaluación publicada en `0396f60` conserva el algoritmo individual de producción y compara alternativas aisladas. La referencia lineal implementada recorre V etiquetas por selección, por lo que su costo es O(V·Vr + Er) para Vr vértices expandidos y Er arcos examinados. En el campo inverso de rango 100, los mapas de 128, 512 y 2048 salas expandieron cinco vértices cada uno, pero inicializaron 256, 1024 y 4096 celdas por reconstrucción. Ese costo O(V) limita su localidad aunque la consulta reutilizada sea barata. Las cachés FIFO de una y cuatro entradas y la agenda indexada son candidatos medidos en cargas sintéticas. La corrida de 24 cazadores del ciclo sintético conservó los 94 eventos procesados y el mismo estado final en ambas agendas. La equivalencia observada corresponde a esa carga.
+
+Para el paquete local de entrega, las fuentes son [la especificación](spec.md), [el plan](plan.md), [la guía reproducible](quickstart.md#evaluación-sintética-de-rutas-y-agendas) y [la trazabilidad](tasks.md#evidencia-parcial-para-entrega). El índice local identifica los materiales para el traslado: la [reproducción de la partida integrada](quickstart.md#reproducción-de-la-entrega-integrada-de-a) para README.md y los análisis de alternativas, la [medición candidata](#ciclo-integrado-en-cripta-06-evidencia-para-t046) y las [interfaces verificadas](#interfaces-de-la-entrega-integrada) para DECISIONES.md. T050 registra el cierre interno tras T047–T049 y la revisión del inventario. El alcance de entradas válidas Q1/Q2 ya quedó cerrado.
+
+### Decisiones técnicas para DECISIONES.md
+
+| Decisión | Alternativa evaluada y motivo | Evidencia y límite |
+|---|---|---|
+| Dijkstra individual con heap indexado y desempate por primer ID | La referencia lineal puede recorrer V etiquetas por extracción. El heap con obsoletos agrega registros y costo de descarte. El indexado limita la frontera a un registro por vértice y usa O(log V) por ajuste. | `0396f60` compara alternativas y comprueba decisiones. `a2a72fc` reduce comparaciones del heap sin cambiar su orden. |
+| Reutilizar auxiliares y separar rutas reales del mapa conocido | El campo inverso compartido puede amortizar trabajo con objetivos comunes, pero reconstruye O(V). La generación de búsqueda invalida etiquetas derivadas sin restaurar sus resultados. El mapa conocido conserva sus filtros propios. | `f318757`, `b1e78c8` y `980168a` respaldan invalidación y aceptación del filtro. La localidad medida corresponde al fixture descrito arriba. |
+| Mantener la agenda de producción | La agenda indexada aislada evita obsoletos a cambio de mantener índices. La ejecución sintética controlada conservó la secuencia de 94 eventos y el estado final. | `0396f60`. La comparación sobre esa carga no decide un reemplazo de la agenda del motor. |
+| Restaurar estado semántico y descartar derivados | Reloj, agenda, secuencia y RNG se restauran junto al mundo. La integración de mapa e historia publica la carga tras validarla. | `f31662c` y la evidencia A12/MC-01/DX-06. Las marcas de búsqueda son infraestructura y el pergamino consumido no se recupera. |
+
+### Inventario local para la entrega de A
+
+| Material | Fuente para entregar |
+|---|---|
+| Requisitos y decisiones | [Especificación](spec.md), [plan](plan.md), decisiones R1–R5 y tabla anterior. |
+| Implementación y evidencia | [Matriz ejecutada](tasks.md#matriz-de-evidencia-de-entrega) y [constancia de interfaces](#interfaces-de-la-entrega-integrada). |
+| Reproducción para README.md | [Regresión integrada y evaluación sintética](quickstart.md#reproducción-de-la-entrega-integrada-de-a) y [corrida candidata](quickstart.md#medición-candidata-y-referencia-q3). |
+| Rendimiento para DECISIONES.md | Carga, versión, entorno y resultado histórico en el apartado siguiente. El cierre formal espera la referencia oficial y su medición. |
+| Registro de uso de herramientas | [Registro local de prompts](prompts-registro-local.md), con los vacíos textuales declarados. |
+
+**Entrega técnica interna de Persona A completada.** El inventario local reúne las decisiones de T047, la guía de T048, la matriz de T049 y los materiales de T050 para su incorporación a la entrega. Los resultados de rendimiento enlazan el commit medido, la versión de la cripta, la carga y el procedimiento. El resultado de la referencia interna se puede entregar con este paquete. La [decisión de cierre interno](tasks.md#decisión-de-cierre-interno) conserva los criterios anteriores y la nota de alcance.
+
+### Ciclo integrado en cripta-06 (evidencia para T046)
+
+El 2026-11-14, sobre `af979bb`, se descargó `cripta-06@f9ed9afa683d` (300 salas) a un paquete temporal. Se cargó su esqueleto con `ClienteOffline` antes de medir. Se usó `medir_integracion(salas, 20261001, 30)` de la utilidad integrada con 30 cazadores inyectados, puertas abiertas para la carga y mapa completo. Entorno de medición: Python 3.14.5, Windows NT 10.0.19045, Intel64 Family 6 Model 165 Stepping 5.
+
+Se registraron en memoria las lecturas de `perf_counter_ns` de la utilidad y se calcularon mínimo, mediana y máximo de los primeros 30 pares, que miden el ciclo completo. Los 30 pares siguientes corresponden a consultas de viaje y se excluyeron. Sin renderizado y con cero solicitudes HTTP durante la medición, el ciclo obtuvo **0,1343 / 1,4549 / 5,0997 ms** (mínimo, mediana y máximo). Los 30 ciclos observados quedaron por debajo de 20 ms. La corrida acredita esa carga y versión. T045 está cerrado con la conexión de medición integrada. T046 requiere T004 y una medición con la referencia y condiciones oficiales Q3.
+
+### Medición interna de la última integración
+
+El 2026-11-14 se midió `d43ded23bd537ca76c6c97c8445f21ebb41fa3ae` en un worktree separado. Incluye `a416d6c` (rutas e índices de salas dispersas) y las mejoras de heap de A conservadas por el merge. La API lista `cripta-06` como «Cripta de referencia». Persona A adopta `cripta-06@f9ed9afa683d` como referencia interna de entrega. Su esqueleto real de 300 salas permite ejercitar el ciclo integrado con decenas de cazadores, agenda, historia y mapa completo. Fijar la versión del paquete, la semilla y la carga permite repetir el escenario offline y comparar tiempos bajo las mismas condiciones. La denominación de la API identifica la cripta y no acredita una designación oficial de Q3.
+
+| Dato | Corrida interna |
+|---|---|
+| Paquete | `cripta-06@f9ed9afa683d`, 300 salas, catálogo `4b9e75a42be5`. Descargado de la API de Cripta con `main.py --cripta cripta-06 --descargar-todo` en un directorio temporal. Se reabrió con `ClienteOffline` y se verificaron la versión y el tamaño del esqueleto antes de medir. |
+| Carga | Semilla 20261001, 30 ciclos de espera, 30 cazadores inyectados con rango ilimitado, puertas abiertas, mapa completo e historia activa. |
+| Equipo | Python 3.14.5, Windows 10 10.0.19045, Intel64 Family 6 Model 165 Stepping 5. |
+| Ciclo completo | **0,1328 / 1,3990 / 4,0637 ms** (mínimo / mediana / máximo). **30/30** por debajo de 20 ms. |
+| Paso conocido | Máximo **1,278 ms** y **30/30** por debajo de 5 ms. Muestras excluidas del resultado del ciclo. |
+
+El paquete se descargó antes de medir. La preparación del motor y del mapa quedó fuera del intervalo. La corrida se ejecutó offline y sin vista con el [comando de reproducción](quickstart.md#medición-candidata-y-referencia-q3). El resultado acredita esta carga interna y no justifica corregir rendimiento de A para este escenario. La ficha y el resultado acreditan T004 y T046 en el seguimiento interno.
+
+La regresión focalizada sobre el mismo commit aprobó 30 pruebas de almacenamiento de salas, heap, turnos del cazador y controlador real. El [procedimiento](quickstart.md#verificación-de-la-integración-actualizada) incluye el comando.
+
+### Revisión del paquete para traslado
+
+- **README.md:** trasladar los [comandos de regresión integrada](quickstart.md#reproducción-de-la-entrega-integrada-de-a), la [verificación de d43ded2](quickstart.md#verificación-de-la-integración-actualizada) y la [reproducción de la referencia interna](quickstart.md#medición-candidata-y-referencia-q3). El paquete offline se obtiene y verifica por separado.
+- **DECISIONES.md:** trasladar las [decisiones y alternativas](#decisiones-técnicas-para-decisionesmd) y los estadísticos de la [medición interna](#medición-interna-de-la-última-integración). El resultado corresponde a 30 ciclos de espera en la carga descrita y el paquete temporal se obtuvo de la API.
+- **Evidencia de revisión:** conservar la [matriz](tasks.md#matriz-de-evidencia-de-entrega), las [interfaces](#interfaces-de-la-entrega-integrada) y el [registro de cierre interno](tasks.md#decisión-de-cierre-interno) como referencias de entrega. El inventario está completo para la referencia interna.
+
+### Interfaces de la entrega integrada
+
+Constancia técnica sobre `980168a`, con la integración de D incorporada en `dff5882`. Las responsabilidades corresponden al reparto recogido en la [especificación](spec.md). Las pruebas acreditan el comportamiento descrito.
+
+| Entrega | Interfaz y comportamiento verificable | Evidencia |
+|---|---|---|
+| E-C-RUTA (A/C) | C aporta `PlanificadorConocido.consultar(origen, destino)`, que entrega `ConsultaRuta` sobre salas exploradas y puertas recordadas abiertas. A aporta `buscar_ruta(grafo, espacio, frontera, origen_indice, destino_indice, limite)`. Un límite entero es inclusivo y `None` como resultado acotado indica que no se encontró paso admisible. | [Aceptación T023/T027](../../tests/test_contrato_rutas_c.py), `980168a`. |
+| E-C-DESPACHO (A/C) | A despacha al cazador en `Motor._ejecutar_turno_enemigo(enemigo, decidir_accion_enemigo)`. Los otros enemigos conservan el callback de C con enemigo, sala, coincidencia con jugador, rastro, RNG y reloj. | [Turnos del cazador](../../tests/test_turno_cazador.py), `5c67c8d`. |
+| E-BC-PUERTA (B/C/A; conexión integrada por D) | `Motor.extremos_puerta(sala, direccion)` comparte el cambio físico ante retorno único en ambos sentidos. A aportó el resolver topológico y D conectó apertura, cierre único y reversión bilateral. | [PD-01–PD-04](../../tests/test_puertas_reciprocas_d.py), `5494d79` y `f31662c`. |
+| E-C-OBS y E-C-UNDO (C/A) | A emite entrada y observaciones en el flujo del motor. C produce lotes con `entrar(sala_id)` y `observar_puerta(sala_id, puerta_id, cerrada)`; el historial del turno conserva inversos que llaman a `revertir(cambios)`. D conectó la observación y los deltas a la partida ordinaria. | [Partida completa](../../tests/test_partida_completa.py) y [controlador real](../../tests/test_controlador_ac_real.py), `f31662c`. |
+| E-D-CAMBIOS y E-D-RESTAURA (A/D) | A entrega los cambios del turno y descarta derivados de rutas al restaurar. D integra el productor sobre la frontera de eventos y `MotorPartida.restaurar_estado_con_historia(estado, historia)` prepara y valida estado, mapa e historia antes de publicar la carga. | [Receptor H3](../../tests/test_receptor_h3_d.py), [MC-01 y DX-06](../../tests/test_controlador_ac_real.py), `7daf808` y `f31662c`. |
+| E-D-MEDICION (A/D) | A entrega la utilidad sintética de rutas y agenda; D conecta sus funciones `medir_rutas`, `medir_localidad`, `medir_agendas` y `medir_ciclo_motor` al subsistema sin vista `terreno-cazador`. | [Punto de entrada](../../bench.py), [pruebas](../../tests/test_bench_terreno_cazador.py) y [comandos integrados](../004-linea-tiempo/integracion-completa.md#reproducción). |

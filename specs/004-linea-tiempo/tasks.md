@@ -1,12 +1,23 @@
 # Tareas — línea de tiempo
 
+> **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
+
+
 Las marcas completadas incluyen el núcleo y los consumidores de D. La aceptación con productores reales de A, B y C se registra por separado.
+
+## Incremento de aceptación MC-01 — 2026-11-13
+
+- [x] Preparar el caso MC-01 en `tests/test_controlador_ac_real.py`: guardar,
+  descubrir y explorar después, cargar recuperando motor/historia/mapa y
+  continuar de forma determinista (FR-011, SC-004). Registrar el fallo actual
+  sin skip ni expectedFailure y ejecutar la regresión seleccionada de D.
+- [x] Repetir MC-01 con la conexión completa y sustituir DX-06 por carga incoherente sin publicación parcial. Cierre de T003/T010/T021 documentado en integracion-completa.md; los pendientes anteriores se conservan como historial.
 
 ## Preparación y fundamento
 
 - [x] T001 Registrar y clasificar la base de pruebas en specs/004-linea-tiempo/baseline.md, sin confundir fallos heredados con cambios nuevos (FR-011, FR-017).
 - [x] T002 Implementar contratos tipados serializables en modelo/snapshots.py: tiempo entero >=0, secuencia estable, acción desde 1, K >=1, registros independientes del estado vivo (FR-002, FR-003, FR-008, FR-010).
-- [ ] T003 Incorporar captura por evento y frontera de acción en modelo/juego.py y modelo/historial.py; conservar retroceso de cinco acciones y cerrar lote temporal antes de publicar decisión (FR-002, FR-006, FR-010).
+- [x] T003 Incorporar captura por evento y frontera de acción en modelo/juego.py y modelo/historial.py; conservar retroceso de cinco acciones y cerrar lote temporal antes de publicar decisión (FR-002, FR-006, FR-010).
 
 ## US1 — consultar el pasado (P1)
 
@@ -19,7 +30,7 @@ Las marcas completadas incluyen el núcleo y los consumidores de D. La aceptaci�
 
 - [x] T008 [US2] Crear pruebas H2,H6,EX04,EX07 en tests/test_persistencia_historia.py; verificar inventario de pergaminos, recorte, nueva rama y corrupción (FR-007, FR-011, FR-012).
 - [x] T009 [US2] Recortar sufijo y registrar corrección persistente de pergaminos en modelo/linea_tiempo.py; liberar bloques descartados sin recorrer prefijo (FR-006, FR-007, FR-009).
-- [ ] T010 [US2] Conectar cambios de conocimiento e inventario mediante modelo/snapshots.py y productores del motor; incluir mapa recordado (FR-004, FR-007, FR-011).
+- [x] T010 [US2] Conectar cambios de conocimiento e inventario mediante modelo/snapshots.py y productores del motor; incluir mapa recordado (FR-004, FR-007, FR-011).
 
 Avance parcial de T010/T017/T018 (2026-11-10): el consumidor de D presenta la
 proyección estructurada y los campos históricos reales de C. El inventario
@@ -86,7 +97,7 @@ conserva los límites de integración y rendimiento; no completa T003/T010/T021.
 
 - [x] T019 Comparar K=10,50,100 y sin checkpoints; dirección, búsqueda, reconstrucción, memoria y recorte con >=5000 acciones en bench.py (FR-009, FR-010, NFR-001, NFR-002, NFR-003, SC-003).
 - [x] T020 Añadir pruebas de igualdad del estado tras consulta, carga y continuación en tests/test_persistencia_historia.py (NFR-004, SC-004).
-- [ ] T021 Actualizar README.md, PROMPTS_LLM.md y DECISIONES.md con comandos, trazabilidad, mediciones reales y elección final de K; ejecutar regresiones y aceptación (FR-001–FR-020, NFR-001–NFR-004, SC-001, SC-002).
+- [x] T021 Actualizar README.md, PROMPTS_LLM.md y DECISIONES.md con comandos, trazabilidad, mediciones reales y elección final de K; ejecutar regresiones y aceptación (FR-001–FR-020, NFR-001–NFR-004, SC-001, SC-002).
 
 ## Dependencias y estrategia
 
@@ -132,3 +143,93 @@ Se midió AC-20 en la mayor cripta publicada, con un máximo incremental
 de 16.140 ms. T021 conserva los pendientes de integración de A/C y las
 mediciones de Parte I con la carga nueva.
 [Pruebas y medición de referencia](aceptacion.md#resolubilidad-de-referencia-2026-11-09).
+
+Actualización tras integrar main en `2b347da` (2026-11-10). La revisión conjunta
+de B y D ya cerró T025/T026/T030/T031/T034 de la especificación de resolubilidad;
+las notas anteriores de revisión pendiente describen estados históricos.
+El detalle está en el apartado «Cierre de la integración B y D» de
+`specs/001-verificador-resolubilidad/tasks.md`. Se repitió la regresión de
+integración en este árbol: 92 pruebas, 89 aprobadas y tres omisiones opcionales.
+El comando de `cripta-06` reconoce 300 salas, diez muestras por estrategia y
+cero solicitudes.
+
+Avance parcial de T003: `controlador/receptor_h3.py` consume el lote optativo
+que A ya entrega para sala/jugador. Cuatro pruebas nuevas de D usan el motor
+real, validan frontera/ordinal/orden, consultan 99/100/#2, recargan el fragmento
+histórico y rechazan lotes inválidos sin publicación parcial. La integración
+completa del motor y el guardado de partida siguen pendientes; no se elimina
+la omisión de esos casos ni se completa T003 por este ensayo acotado.
+
+Aceptación posterior al merge de main y al receptor de D: 709 pruebas,
+703 aprobadas, seis omitidas y ningún fallo/error. Se hizo independiente de la
+caché de trabajo la prueba de reinicio de D; conserva sus comprobaciones.
+[Evidencia y límites](aceptacion.md#main-integrado-y-receptor-h3-de-d-2026-11-10).
+
+Preparación A–D del 2026-11-12: siete pruebas de aceptación PD-01..04 para
+puertas recíprocas, guardado/carga, cierre único, retroceso y continuación.
+Una pasa y seis fallan por entrega bilateral/exportación todavía pendientes
+del motor; no se omiten ni se marcan como fallos esperados. Las comprobaciones
+de retroceso posteriores a la precondición bilateral aún no se alcanzan.
+La regresión seleccionada conserva 48 aprobaciones y dos omisiones conocidas.
+[Resultados y pendientes](aceptacion.md#preparación-de-puertas-recíprocas-ad-2026-11-12).
+T003/T010/T021 permanecen abiertas; no hay modificación de producción ni formato.
+
+Incremento DX-01..06 del 2026-11-12: nueve pruebas de D con controlador,
+productor histórico real de A activado offline, datos B y mapa/control de viaje
+reales de C. Pasan consultas puras, guardar/cargar/continuar v4, rechazo de
+archivos inválidos, pergamino, replay sin vistas y sin archivo de carga original,
+mapa tras entradas físicas y cancelación. También se verifican los límites
+del productor: ausencia de hechos de viaje y rechazo de carga con mapa activo.
+No se activan opciones de prueba en producción. Se actualizan README, plan y
+DECISIONES con comandos/alcance reales. T003/T010/T021 siguen abiertas por
+captura completa, inventario/mapa histórico, persistencia conjunta y aceptación
+de producción/mediciones; este incremento sustituye parte de la evidencia con
+dobles por evidencia de integración real, sin declarar cierre global.
+
+
+## Integración completa — 2026-11-14
+
+## Fortalecimiento RF-01..03 — trabajo vigente
+
+## RC-01 — margen del ciclo integrado
+
+- [x] RC-T01 Conservar referencia anterior y comprobar igualdad de proyecciones/deltas en movimiento, llegada, daño, muerte, inventario, efectos, reversión y carga (RC-01).
+- [x] RC-T02 Reutilizar solo orden de referencias vigente; comparar campos fijos y enemigos sin reordenar por evento (RC-01).
+- [x] RC-T03 Benchmark pareado de ciclos completos antes/después con estados finales iguales, repeticiones independientes y checkpoints. Regresión completa, documentación y prompts (RC-01).
+
+- [x] RF-T01 Comparar heap/rutas antes y después sobre las mismas entradas, comprobar orden total y generaciones (RF-01).
+- [x] RF-T02 Implementar almacenamiento compacto propio para IDs dispersos, conectar motor/mapa/rastro, probar persistencia, historia y replay sin renumeración (RF-02).
+- [x] RF-T03 Consolidar estado actual y matriz de trazabilidad de los 23 casos obligatorios; preservar antecedentes y faltantes reales (RF-03).
+- [x] RF-T04 Ejecutar regresión completa, comparaciones, benchmarks offline y arranque desde copia limpia; registrar muestras y límites en DECISIONES y prompts (RF-01..03).
+
+Orden: especificación confirmada antes de código; RF-T01/RF-T02 antes de regresión final; RF-T03 antes de cierre RF-T04. La autorización actual permite cambios en A/B/C/D; no requiere consultas adicionales sobre decisiones técnicas deducibles.
+
+- [x] IC-01 Puertas recíprocas y exportación de extremos no visitados (IA-04, PD-01..04).
+- [x] IC-02 Mapa de producción, observaciones, antorcha e inversos (IA-01/05).
+- [x] IC-03 Productor completo y carga conjunta validada (IA-02/03, FR-011, MC-01).
+- [x] IC-04 Hechos reales y conexión de viaje/replay/CLI (IA-01/06).
+- [x] IC-05 Regresiones, benchmarks comparativos, documentación y publicación (IA-07..09).
+
+
+Cierre técnico 2026-11-14: IC-01..04 y T003/T010/T021 implementados y validados. La documentación histórica no constituye el estado actual; ver integracion-completa.md. IC-05 conserva el paso de publicación hasta verificar el remoto.
+
+Publicación verificada 2026-11-14: integración y documentación 1c35819 enviadas mediante push ordinario a origin/004-linea-tiempo, incorporando f8e10ef de A. IC-05 completada.
+
+## Aceptación adicional sin defensa — 2026-11-14
+
+- [x] QA-01 Repetir comparación aislada de rutas con revisiones reales (41 pruebas).
+- [x] QA-02 Completar copia compatible de datos históricos y verificar cuatro victorias/replays, salas y persistencia (dos pruebas).
+- [x] QA-03 Verificar todas las criptas publicadas con caché fría/caliente, presupuesto y procesos independientes.
+- [x] QA-04 Añadir partidas inéditas completas con tres semillas y replay sin archivo de guardado.
+- [x] QA-05 Inspeccionar guardar/cargar, mapa, equipo e historia en GUI nativa.
+- [x] QA-06 Documentar fuentes externas faltantes, consultas de interpretación, decisiones y prompts; excluir defensa y envío de mensajes.
+- [x] QA-07 Cerrar regresión conjunta y verificar publicación ordinaria en 004-linea-tiempo.
+
+Publicación comprobada: acd84db enviado mediante push ordinario a origin/004-linea-tiempo; suite 810, OK (skipped=2), opciones omitidas aprobadas por separado. Sin cambios en main ni ramas ajenas. La defensa queda excluida.
+
+La recuperación del PDF original y de dos finales de prompts, así como las respuestas del profesor, requieren fuentes externas; no se marcan como resueltas por documentación. Ver qa-adicional-2026-11-14.md.
+
+
+Cierre RF-01..03: especificación 5bccc94; suite final 814, cero fallos/errores, dos opciones aprobadas por separado. Copia limpia final: 20 pruebas en 6.775 s, OK. Las cuatro cargas de bench finales terminan correctamente, con muestras en fortalecimiento-mediciones.json; trazabilidad vigente en ESTADO_ENTREGA.md. Se conservan los faltantes históricos y no se afirma revisión humana ni nota.
+
+RC-01 cerrado: 818 pruebas en 181.531 s, cero fallos/errores y dos opciones omitidas identificadas. Contraste exacto por evento y cinco series pareadas de 120 ciclos, estados/historia/azar iguales; máximo optimizado 11.931 ms, 0/600 sobre 20. Copia limpia 20 pruebas OK y CLI sintética ejecutada. Referencia y muestras versionadas; ver DECISIONES.md.

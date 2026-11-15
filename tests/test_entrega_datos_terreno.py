@@ -8,6 +8,7 @@ from urllib.parse import urlsplit
 from datos.almacen import AlmacenLocal
 from datos.offline import ClienteOffline
 from modelo.cazador import decidir_cazador
+from modelo.juego import crear_juego
 from modelo.rutas import EspacioBusqueda, GrafoTerreno, HeapRutas, buscar_ruta
 from red.cache import CacheCatalogoOrdenado
 from red.catalogo import GestorCatalogo
@@ -80,6 +81,68 @@ class PruebasEntregaTerreno(unittest.TestCase):
             cripta, _ = self.preparar(offline, historica=True)
             self.comprobar_costos(cripta)
         self.assertEqual(offline.solicitudes_realizadas, 0)
+
+    def test_T013_movimiento_del_motor_con_costos_reabiertos_offline(self):
+        """FR-001/002/003/016: el paquete de B llega a la agenda real del jugador."""
+        almacen = AlmacenLocal(self.carpeta)
+        catalogo = GestorCatalogo(self.cliente, CacheCatalogoOrdenado(), almacen)
+        precarga = GestorPrecarga(self.cliente, catalogo)
+        self.addCleanup(precarga.cerrar)
+        precarga.preparar_cripta("prueba")
+        # Completar el paquete para que la segunda entrada pueda leerse offline.
+        precarga.preparar_entrada(102, [])
+        solicitudes_previas = self.cliente.solicitudes_realizadas
+        llamadas_previas = self.transporte.get.call_count
+        self.assertGreater(solicitudes_previas, 0)
+
+        offline = ClienteOffline(self.carpeta, "v1")
+        self.addCleanup(offline.cerrar)
+        catalogo_offline = GestorCatalogo(offline, CacheCatalogoOrdenado(), AlmacenLocal(self.carpeta))
+        precarga_offline = GestorPrecarga(offline, catalogo_offline)
+        with patch("requests.sessions.Session.request", side_effect=AssertionError("HTTP durante T013")) as http:
+            try:
+                motor = crear_juego(precarga_offline, "prueba", semilla=42,
+                                    version_cripta="v1", version_catalogo="cat1")
+                self.assertEqual((motor.meta.cripta_id, motor.meta.cripta_version, motor.meta.catalogo_version),
+                                 ("prueba", "v1", "cat1"))
+                self.assertEqual((motor.jugador.posicion_actual, motor.jugador.velocidad, motor.reloj), (100, 100, 0))
+                self.assertEqual(motor.salas[100].salidas["E"]["costo"], 250)
+                self.assertNotIn("costo", motor.salas[101].salidas["E"])
+                mover_real = motor.mover
+                turnos = []
+
+                def observar_movimiento(*args, **kwargs):
+                    resultado = mover_real(*args, **kwargs)
+                    if resultado[0]:
+                        turno = motor.jugador.evento_pendiente
+                        self.assertTrue(turno.en_cola)
+                        self.assertIn(turno, motor.cola.pendientes())
+                        self.assertIs(turno.referencia, motor.jugador)
+                        self.assertTrue(motor.contenido_cargado[motor.jugador.posicion_actual])
+                        turnos.append((motor.reloj, motor.jugador.posicion_actual, turno))
+                    return resultado
+
+                with patch.object(motor, "mover", side_effect=observar_movimiento):
+                    for numero, (origen, destino, inicio, fin) in enumerate(
+                            ((100, 101, 0, 250), (101, 102, 250, 350)), start=1):
+                        self.assertEqual((motor.jugador.posicion_actual, motor.reloj), (origen, inicio))
+                        resultado = motor.ejecutar("mover", "E")
+                        self.assertTrue(resultado.ok, resultado.mensaje)
+                        self.assertEqual(len(turnos), numero)
+                        instante, sala, turno = turnos[-1]
+                        self.assertEqual((instante, sala, turno.tipo, turno.tiempo),
+                                         (inicio, destino, "turno_jugador", fin))
+                        self.assertEqual((motor.jugador.posicion_actual, motor.reloj), (destino, fin))
+                        self.assertFalse(turno.en_cola)
+                        self.assertIsNone(motor.jugador.evento_pendiente)
+                self.assertLess(turnos[0][2].secuencia, turnos[1][2].secuencia)
+                self.assertEqual((motor.acciones_jugador, motor.historial.cantidad_turnos()), (2, 2))
+            finally:
+                precarga_offline.cerrar()
+            http.assert_not_called()
+        self.assertEqual(offline.solicitudes_realizadas, 0)
+        self.assertEqual(self.cliente.solicitudes_realizadas, solicitudes_previas)
+        self.assertEqual(self.transporte.get.call_count, llamadas_previas)
 
     def comprobar_cazadores(self, cripta, catalogo):
         grafo = GrafoTerreno(cripta.salas)

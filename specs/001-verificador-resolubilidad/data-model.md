@@ -1,5 +1,8 @@
 # Modelo de datos del verificador
 
+> **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
+
+
 Diseño propuesto, todavía sin implementación. El resultado usa alcanzabilidad acumulada, según AC-21.
 
 ## Registros de entrada

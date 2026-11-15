@@ -1,5 +1,8 @@
 # Comprobar el incremento I1
 
+> **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
+
+
 ## I7: inventario e historia
 
 Ejecutar `python -B -m utilidades.verificar_inventario_historia`: 40 pruebas con D 02da6b6, sin omisiones. La copia queda en .cache y no modifica ramas.

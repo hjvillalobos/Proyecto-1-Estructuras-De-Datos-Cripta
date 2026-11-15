@@ -5,6 +5,7 @@ Movimiento ponderado y demás costos verificados con datos válidos, sin expecte
 
 import unittest
 from random import Random
+from unittest.mock import patch
 
 from modelo.enemigos import decidir_accion
 from modelo.juego import calcular_intervalo
@@ -13,6 +14,51 @@ from tests.datos_terreno_cazador import SIN_COSTO_DECLARADO, motor_terreno
 
 
 class PruebasCostosTerreno(unittest.TestCase):
+    def test_a13_refresca_rastro_al_actuar_y_al_entrar(self):
+        with motor_terreno(100) as motor:
+            rastro = motor.registro_rastro
+            self.assertEqual(rastro.tiempo_de(100), 0)
+            self.assertTrue(motor.ejecutar("esperar").ok)
+            self.assertEqual(motor.reloj, 100)
+            self.assertTrue(motor.ejecutar("esperar").ok)
+            self.assertEqual(rastro.tiempo_de(100), 100)
+            self.assertTrue(motor.ejecutar("mover", "E").ok)
+            self.assertEqual((motor.jugador.posicion_actual, motor.reloj), (101, 300))
+            self.assertEqual((rastro.tiempo_de(100), rastro.tiempo_de(101)), (200, 200))
+
+    def test_a13_turno_del_rastreador_filtra_salidas_y_desempata(self):
+        for marca, cerrada, destino in ((1, False, 100), (0, False, 101),
+                                        (1, True, 102)):
+            with self.subTest(marca=marca, cerrada=cerrada), motor_terreno(
+                    100, comportamiento="rastreador", velocidad_enemigo=25) as motor:
+                sala = motor.salas[101]
+                rastreador = motor.enemigos_por_sala[101][0]
+                motor.registro_rastro.marcar_visita(100, marca)
+                motor.registro_rastro.marcar_visita(102, marca)
+                if cerrada:
+                    sala.salidas["O"]["cerrada"] = True
+                motor.activar_enemigos_de_sala(101, motor.enemigos_por_sala[101])
+                turno = rastreador.evento_pendiente
+                self.assertEqual(turno.tiempo, 400)
+
+                # El turno del rastreador inicial precede al de la sala 101.
+                inicial = motor.enemigos_por_sala[100][0].evento_pendiente
+                self.assertIs(motor.ejecutar_ciclo(decidir_accion), inicial)
+                self.assertIs(motor.ejecutar_ciclo(decidir_accion), turno)
+                self.assertEqual(motor.reloj, 400)
+                self.assertFalse(turno.en_cola)
+                self.assertEqual(rastreador.sala_actual, destino)
+                self.assertEqual(rastreador.evento_pendiente.tiempo, 800)
+
+    def test_a13_turno_del_guardian_espera_fuera_de_la_sala_del_jugador(self):
+        with motor_terreno(100) as motor:
+            guardian = motor.enemigos_por_sala[100][0]
+            turno = guardian.evento_pendiente
+            self.assertTrue(motor.ejecutar("mover", "E").ok)
+            self.assertFalse(turno.en_cola)
+            self.assertEqual(guardian.sala_actual, 100)
+            self.assertEqual(guardian.evento_pendiente.tiempo, 200)
+
     def comprobar_movimiento_jugador(self, costo, velocidad, reloj, esperado):
         with motor_terreno(costo, velocidad) as motor:
             if reloj == 20:
@@ -117,6 +163,58 @@ class PruebasCostosTerreno(unittest.TestCase):
 
     def test_rastreador_costo_250(self):
         self.comprobar_movimiento_enemigo("rastreador", 250, 100, 0, 250)
+
+    def test_T014_rastreador_reprograma_dos_movimientos_con_costos_offline(self):
+        """FR-002/003/011/016: activación y dos turnos ordinarios del mismo rastreador."""
+        with patch("requests.sessions.Session.request", side_effect=AssertionError("HTTP durante T014")) as http:
+            with motor_terreno(comportamiento="rastreador", costo_primera_conexion=250) as motor:
+                offline = motor.gestor_precarga.cliente
+                enemigo = motor.enemigos_por_sala[100][0]
+                self.assertEqual((motor.reloj, enemigo.velocidad, enemigo.sala_actual), (0, 100, 100))
+                for sala, direccion in ((100, "E"), (101, "O")):
+                    self.assertEqual(motor.salas[sala].salidas[direccion]["costo"], 250)
+                for sala, direccion in ((101, "E"), (102, "O")):
+                    self.assertNotIn("costo", motor.salas[sala].salidas[direccion])
+                inicial = enemigo.evento_pendiente
+                self.assertEqual(inicial.tiempo, 100)
+                self.assertIs(inicial.referencia, enemigo)
+                self.assertTrue(inicial.en_cola)
+                procesados, movimientos = [], []
+                ciclo_real = motor.ejecutar_ciclo
+
+                def observar_ciclo(*args, **kwargs):
+                    evento = ciclo_real(*args, **kwargs)
+                    if evento is not None:
+                        procesados.append((evento.tiempo, evento.secuencia))
+                        if evento.referencia is enemigo and evento.tipo == "turno_enemigo":
+                            movimientos.append((evento, enemigo.sala_actual, enemigo.evento_pendiente))
+                    return evento
+
+                with patch.object(motor, "ejecutar_ciclo", side_effect=observar_ciclo):
+                    # Cada paso deja un rastro fresco para el siguiente turno enemigo.
+                    self.assertTrue(motor.ejecutar("mover", "E").ok)
+                    self.assertEqual((motor.reloj, motor.jugador.posicion_actual), (250, 101))
+                    self.assertEqual(len(movimientos), 1)
+                    self.assertTrue(motor.ejecutar("mover", "E").ok)
+                    self.assertEqual((motor.reloj, motor.jugador.posicion_actual), (350, 102))
+
+                self.assertEqual(len(movimientos), 2)
+                primero, segundo = movimientos
+                self.assertIs(primero[0], inicial)
+                self.assertIs(segundo[0], primero[2])
+                self.assertIs(segundo[2], enemigo.evento_pendiente)
+                self.assertEqual(enemigo.tiempo_siguiente, 450)
+                for (evento, destino, siguiente), esperado in zip(movimientos, ((100, 101, 350), (350, 102, 450))):
+                    self.assertEqual((evento.tiempo, destino, siguiente.tiempo), esperado)
+                    self.assertIs(siguiente.referencia, enemigo)
+                    self.assertEqual(siguiente.tipo, "turno_enemigo")
+                    self.assertFalse(evento.en_cola)
+                    self.assertFalse(evento.cancelado)
+                    self.assertLess(evento.secuencia, siguiente.secuencia)
+                self.assertTrue(segundo[2].en_cola)
+                self.assertTrue(all(anterior < posterior for anterior, posterior in zip(procesados, procesados[1:])))
+            http.assert_not_called()
+        self.assertEqual(offline.solicitudes_realizadas, 0)
 
     def test_errante_minimo_uno_en_t20(self):
         self.comprobar_movimiento_enemigo("errante", 1, 1000, 20, 21)

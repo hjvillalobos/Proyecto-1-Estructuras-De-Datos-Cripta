@@ -1,10 +1,11 @@
-"""Fundamentos y búsqueda limitada de A (T008/T010/T021), sin integración.
+"""Fundamentos, búsqueda limitada y contexto de rutas reales de A.
 
 Precondición del grafo: salas/IDs únicos y destinos existentes, costos válidos
 positivos y simétricos. No define políticas de datos inválidos de B (Q1/Q2).
 """
 
 from dataclasses import dataclass
+from enum import Enum
 
 
 @dataclass(frozen=True, slots=True)
@@ -14,6 +15,18 @@ class ArcoTerreno:
     direccion: str
     costo: int
     puerta: object
+
+
+class EstadoEmparejamiento(Enum):
+    EMPAREJADA = "emparejada"
+    SIN_RETORNO = "sin_retorno"
+    AMBIGUA = "ambigua"
+
+
+@dataclass(frozen=True, slots=True)
+class EmparejamientoSalida:
+    estado: EstadoEmparejamiento
+    retorno: tuple[int, str] | None = None
 
 
 def _ordenar_salas(salas):
@@ -73,6 +86,28 @@ class GrafoTerreno:
             raise LookupError("El ID no pertenece al grafo preparado")
         return izquierda
 
+    def resolver_retorno(self, sala_id, direccion):
+        """Resuelve extremos por topología, sin inferir una identidad de puerta.
+
+        Exige unicidad en ambos sentidos. No usa la dirección opuesta, el
+        costo, la llave ni el estado de apertura para decidir entre candidatas.
+        """
+        origen = self.indice(sala_id)
+        salidas = self.adyacencias[origen]
+        arco = next((salida for salida in salidas if salida.direccion == direccion), None)
+        if arco is None:
+            raise LookupError("La dirección no pertenece a la sala indicada")
+
+        retornos = [salida for salida in self.adyacencias[arco.destino]
+                    if salida.destino == origen and salida is not arco]
+        if not retornos:
+            return EmparejamientoSalida(EstadoEmparejamiento.SIN_RETORNO)
+        if (origen == arco.destino or len(retornos) != 1
+                or sum(salida.destino == arco.destino for salida in salidas) != 1):
+            return EmparejamientoSalida(EstadoEmparejamiento.AMBIGUA)
+        return EmparejamientoSalida(EstadoEmparejamiento.EMPAREJADA,
+                                   (self.ids[arco.destino], retornos[0].direccion))
+
 
 class EspacioBusqueda:
     """Auxiliares O(V) reservados una vez; una generación habilita cada valor.
@@ -124,6 +159,7 @@ class HeapRutas:
     def __init__(self, espacio):
         self.espacio = espacio
         self._nodos = []
+        self._claves = [None] * len(espacio.ids)
 
     def __len__(self):
         return len(self._nodos)
@@ -140,8 +176,7 @@ class HeapRutas:
         return distancia, primero
 
     def _clave(self, indice):
-        distancia, primero = self.espacio.etiqueta(indice)
-        return self._clave_etiqueta(distancia, primero) + (self.espacio.ids[indice],)
+        return self._claves[indice]
 
     def _intercambiar(self, primera, segunda):
         self._nodos[primera], self._nodos[segunda] = (
@@ -151,21 +186,26 @@ class HeapRutas:
         self.espacio._posiciones[self._nodos[segunda]] = segunda
 
     def _subir(self, posicion):
+        clave = self._clave(self._nodos[posicion])
         while posicion > 0:
             padre = (posicion - 1) // 2
-            if self._clave(self._nodos[padre]) <= self._clave(self._nodos[posicion]):
+            if self._clave(self._nodos[padre]) <= clave:
                 break
             self._intercambiar(posicion, padre)
             posicion = padre
 
     def _bajar(self, posicion):
         cantidad = len(self._nodos)
+        clave = self._clave(self._nodos[posicion])
         while posicion * 2 + 1 < cantidad:
             hijo = posicion * 2 + 1
-            if hijo + 1 < cantidad and (
-                    self._clave(self._nodos[hijo + 1]) < self._clave(self._nodos[hijo])):
-                hijo += 1
-            if self._clave(self._nodos[posicion]) <= self._clave(self._nodos[hijo]):
+            clave_hijo = self._clave(self._nodos[hijo])
+            if hijo + 1 < cantidad:
+                clave_derecha = self._clave(self._nodos[hijo + 1])
+                if clave_derecha < clave_hijo:
+                    hijo += 1
+                    clave_hijo = clave_derecha
+            if clave <= clave_hijo:
                 break
             self._intercambiar(posicion, hijo)
             posicion = hijo
@@ -183,6 +223,7 @@ class HeapRutas:
             return False
         posicion = espacio.posicion(indice)
         espacio._registrar(indice, distancia, primer_id)
+        self._claves[indice] = self._clave_etiqueta(distancia, primer_id) + (espacio.ids[indice],)
         if posicion == -1:
             posicion = len(self._nodos)
             self._nodos.append(indice)
@@ -211,6 +252,23 @@ class HeapRutas:
         """
         while self._nodos:
             self.espacio._posiciones[self._nodos.pop()] = -1
+
+
+class ContextoRutasReales:
+    """Grafo de la partida y auxiliares reutilizables, sin guardar resultados."""
+
+    def __init__(self, salas):
+        self.grafo = GrafoTerreno(salas)
+        self._espacio = EspacioBusqueda(self.grafo.ids)
+        self._frontera = HeapRutas(self._espacio)
+
+    def buscar(self, origen_indice, destino_indice, limite):
+        return buscar_ruta(self.grafo, self._espacio, self._frontera,
+                           origen_indice, destino_indice, limite)
+
+    def descartar_derivados(self):
+        """Invalida las marcas en O(1) entre consultas, conservando los arreglos."""
+        self._frontera.iniciar()
 
 
 def buscar_ruta(grafo, espacio, frontera, origen_indice, destino_indice, limite):
@@ -253,3 +311,32 @@ def buscar_ruta(grafo, espacio, frontera, origen_indice, destino_indice, limite)
         return None
     finally:
         frontera.finalizar()
+
+
+class ContextoRutasCompartidas(ContextoRutasReales):
+    """Comparte rangos ilimitados; los rangos pequeños mantienen localidad."""
+    def __init__(self, salas):
+        super().__init__(salas)
+        from modelo.rutas_compartidas import RutasCompartidas
+        self._compartido = RutasCompartidas(self.grafo)
+        self.frontera_activa = False
+        self._firma = None
+
+    def invalidar_puertas(self):
+        self._firma = None
+        self._compartido.clave = None
+
+    def buscar(self, origen_indice, destino_indice, limite):
+        if limite is not None:
+            return super().buscar(origen_indice, destino_indice, limite)
+        puertas = self._firma if self.frontera_activa else None
+        if puertas is None:
+            puertas = tuple(a.puerta.get('cerrada', False)
+                            for fila in self.grafo.adyacencias for a in fila)
+            if self.frontera_activa:
+                self._firma = puertas
+        return self._compartido.buscar(origen_indice, destino_indice, limite, puertas)
+
+    def descartar_derivados(self):
+        super().descartar_derivados()
+        self.invalidar_puertas()

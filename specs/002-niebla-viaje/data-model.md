@@ -1,5 +1,8 @@
 # Datos del incremento I1
 
+> **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
+
+
 Diseño local de C; no modifica tipos compartidos. Python 3.11+, dataclasses inmutables y tuplas de datos. Sin red, vista, archivos ni azar.
 
 - `SalidaConocible(direccion, destino, costo, puerta=None)`: dirección no vacía, ID de destino entero no negativo, costo entero positivo, puerta opcional entera no negativa. None significa conexión sin puerta, no puerta sin observar.

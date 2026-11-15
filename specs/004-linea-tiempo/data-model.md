@@ -1,5 +1,8 @@
 # Modelo de datos propuesto
 
+> **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
+
+
 Los nombres son orientativos hasta acordarlos con motor y conocimiento; no son APIs existentes.
 
 | Entidad | Campos mínimos | Invariantes |

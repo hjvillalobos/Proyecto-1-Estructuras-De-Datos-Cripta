@@ -46,7 +46,7 @@ class HistoriaMotorTest(unittest.TestCase):
                          estado.jugador.vida)
 
     def test_fr002_fr003_h3_frontera_del_motor_real(self):
-        with motor_terreno() as motor:
+        with motor_terreno(completa=True) as motor:
             motor.cola.fijar_contador(10)
             partida = integrar_historia(motor, 2)
             if partida is motor:
@@ -112,9 +112,9 @@ class HistoriaMotorTest(unittest.TestCase):
             self._comprobar_historia_guardado_replay(ProductorPrueba(), Path(tmp), opciones, 250)
 
     def test_fr002_fr011_fr013_historia_guardado_replay_con_motor_real(self):
-        if not callable(getattr(Motor, "conectar_historia", None)):
+        if not callable(getattr(__import__("modelo.partida", fromlist=["MotorPartida"]).MotorPartida, "conectar_historia", None)):
             self.skipTest("Falta el productor de cambios históricos del motor.")
-        if not callable(getattr(Motor, "restaurar_estado_con_historia", None)):
+        if not callable(getattr(__import__("modelo.partida", fromlist=["MotorPartida"]).MotorPartida, "restaurar_estado_con_historia", None)):
             self.skipTest("Falta la restauración conjunta de estado e historia.")
         with TemporaryDirectory() as tmp:
             raiz = Path(tmp)
@@ -126,7 +126,7 @@ class HistoriaMotorTest(unittest.TestCase):
             try:
                 sesion.abrir()
                 sesion.preparar()
-                motor = crear_juego(sesion.precarga, "prueba", semilla=20261105)
+                motor = crear_juego(sesion.precarga, "prueba", semilla=20261105, partida_completa=True)
                 self._comprobar_historia_guardado_replay(motor, raiz, opciones, 100)
             finally:
                 sesion.cerrar()

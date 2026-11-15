@@ -13,7 +13,6 @@ from datos.guardado_binario import guardar_estado, cargar_estado
 from modelo.juego import crear_juego
 from red.cache import CacheCatalogoOrdenado
 from red.catalogo import GestorCatalogo
-from red.cliente_api import ClienteApi
 from red.precarga import GestorPrecarga
 from tests.datos_prueba import ServidorFalso, crear_paquete
 from controlador.controlador import ControladorJuego
@@ -217,32 +216,25 @@ class TestCriptaDesconocida(unittest.TestCase):
 
 @unittest.skipUnless(os.environ.get("CRIPTA_API_REAL") == "1", "API real: habilitacion explicita requerida")
 class TestApiRealEntrega(unittest.TestCase):
-    def test_cuatro_criptas_cache_fria_y_caliente_dentro_de_presupuesto(self):
-        for cripta in ("cripta-01", "cripta-02", "cripta-03", "cripta-04"):
-            with self.subTest(cripta=cripta), tempfile.TemporaryDirectory() as carpeta:
-                conteos = []
-                for caliente in (False, True):
-                    cliente = ClienteApi()
-                    catalogo = GestorCatalogo(cliente, CacheCatalogoOrdenado(25), AlmacenLocal(carpeta))
-                    precarga = GestorPrecarga(cliente, catalogo)
-                    try:
-                        # Incluye la consulta que hace el menu de seleccion.
-                        lista = cliente.listar_criptas()
-                        self.assertTrue(any(c["id"] == cripta for c in lista["criptas"]))
-                        motor = crear_juego(precarga, cripta, 20)
-                        precarga.cargar_contenido([s.id for s in precarga.salas])
-                        for _ in range(3):
-                            self.assertTrue(motor.ejecutar("esperar").ok)
-                        precarga.cerrar()
-                        reporte = catalogo.reporte()
-                        self.assertLessEqual(reporte["solicitudes_realizadas"], reporte["presupuesto_solicitudes"])
-                        self.assertLessEqual(reporte["fichas_en_memoria"], 25)
-                        conteos.append(reporte["solicitudes_realizadas"])
-                        print(f"API {cripta} {'caliente' if caliente else 'fria'}: "
-                              f"{conteos[-1]}/{reporte['presupuesto_solicitudes']} solicitudes", flush=True)
-                    finally:
-                        try:
-                            precarga.cerrar()
-                        finally:
-                            cliente.cerrar()
-                self.assertLess(conteos[1], conteos[0])
+    def test_criptas_publicadas_cache_fria_y_caliente_dentro_de_presupuesto(self):
+        import json
+        def ejecutar(*argumentos):
+            proceso = subprocess.run([sys.executable, '-B', '-X', 'utf8',
+                '-m', 'tests.api_publicada', *argumentos], capture_output=True,
+                encoding='utf-8', timeout=120)
+            self.assertEqual(proceso.returncode, 0, proceso.stderr)
+            return json.loads(proceso.stdout)
+        lista = ejecutar()['criptas']
+        self.assertTrue(lista)
+        for cripta in lista:
+            with self.subTest(cripta=cripta['id']), tempfile.TemporaryDirectory() as carpeta:
+                fases = []
+                for nombre in ('fria', 'caliente'):
+                    reporte = ejecutar(cripta['id'], carpeta)
+                    self.assertLessEqual(reporte['solicitudes_realizadas'], reporte['presupuesto_solicitudes'])
+                    self.assertLessEqual(reporte['fichas_en_memoria'], 25)
+                    fases.append(reporte)
+                    print(f"API {cripta['id']} {nombre}: {json.dumps(reporte, ensure_ascii=False)}", flush=True)
+                self.assertEqual(fases[0]['version'], fases[1]['version'])
+                self.assertEqual(fases[0]['version_catalogo'], fases[1]['version_catalogo'])
+                self.assertLess(fases[1]['solicitudes_realizadas'], fases[0]['solicitudes_realizadas'])

@@ -1,5 +1,8 @@
 # Manejo de errores — núcleo histórico y persistencia independiente
 
+> **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
+
+
 Fecha: 2026-11-02. Requisitos: FR-005, FR-011, FR-012 y FR-020.
 
 El núcleo señala fallos mediante excepciones con mensajes en español; no imprime, no abre ventanas y no registra acciones por sí mismo. El controlador las capturará al integrar los comandos. Por ahora se comprueba este contrato mediante pruebas independientes.

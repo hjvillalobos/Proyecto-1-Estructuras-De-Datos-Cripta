@@ -109,7 +109,9 @@ class TestReplayReinicio(unittest.TestCase):
                 patch("controlador.aplicacion.verificar", return_value=reporte_prueba()), \
                 patch("controlador.controlador.ControladorJuego", side_effect=controlador), \
                 redirect_stdout(io.StringIO()):
-            self.assertEqual(main.main(["--gui", "--offline", ".cache/cripta", "--cripta", "cripta-01",
+            from tests.datos_prueba import crear_paquete
+            crear_paquete(carpeta, salas=4)
+            self.assertEqual(main.main(["--gui", "--offline", carpeta, "--cripta", "prueba",
                                         "--datos-dir", carpeta, "--semilla", "42"]), 0)
         self.assertEqual(len(motores), 2)
         self.assertIsNot(motores[0].gestor_precarga, motores[1].gestor_precarga)

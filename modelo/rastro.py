@@ -1,5 +1,7 @@
 # modelo/rastro.py
 
+from modelo.almacen_salas import TablaPorId, limite_ids
+
 RASTRO_FRESCURA_MAX = 400  # unidades de tiempo virtual (§2.9)
 
 
@@ -8,17 +10,21 @@ class RegistroRastro:
     Guarda, por sala, el instante del reloj virtual en el que el jugador
     estuvo ahí por última vez (§2.9).
 
-    Un valor por sala es suficiente. Se usa un arreglo indexado
-    directamente por el id de sala (list, almacenamiento contiguo de bajo
-    nivel permitido por §7) en vez de un dict, para que "¿hay rastro aquí?"
-    sea O(1) y sin tabla de búsqueda.
+    Un valor por sala es suficiente. Con IDs densos usa acceso directo; con
+    IDs dispersos usa el índice radix propio del almacenamiento compacto.
+    Para IDs uint32 la consulta necesita como máximo ocho niveles, sin
+    depender de la cantidad de salas. La decisión examina solo sus vecinas.
     """
 
-    def __init__(self, salas_total: int = 0):
+    def __init__(self, salas_total: int = 0, *, ids=None):
         # +1 porque en el enunciado los ids de sala empiezan en 1
-        self._tiempos = [None] * (salas_total + 1)
+        from modelo.almacen_salas import crear_almacen
+        self._tiempos = ([None] * (salas_total + 1) if ids is None
+                         else crear_almacen(ids, lambda: None))
 
     def _asegurar_capacidad(self, sala_id: int):
+        if isinstance(self._tiempos, TablaPorId):
+            return
         if sala_id >= len(self._tiempos):
             faltan = sala_id + 1 - len(self._tiempos)
             self._tiempos.extend([None] * faltan)
@@ -28,7 +34,7 @@ class RegistroRastro:
         self._tiempos[sala_id] = tiempo
 
     def tiempo_de(self, sala_id: int):
-        if sala_id < 0 or sala_id >= len(self._tiempos):
+        if sala_id < 0 or sala_id >= limite_ids(self._tiempos):
             return None
         return self._tiempos[sala_id]
 

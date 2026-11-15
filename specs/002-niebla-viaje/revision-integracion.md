@@ -1,5 +1,15 @@
 # Revisión conjunta — 10 de noviembre de 2026
 
+## Actualización del 12 de noviembre
+
+La rama de C se actualizó de 62e457c a d796dae mediante avance directo desde `origin/004-linea-tiempo`, sin conflictos ni cambios en main. Incluye main a895d85 y los avances de A integrados por D hasta 53c9453. Los commits posteriores de A, 0b6f1c4 y f318757, no se incorporaron. Los módulos centrales de conocimiento, rutas, viaje e inventario histórico de C conservaron su contenido. Los puntajes locales se respaldaron y su SHA-256 permaneció igual.
+
+Verificación en una exportación limpia de d796dae, Python 3.12.10 y `CRIPTA_SIN_AUDIO=1`: `python -B -m unittest discover -s tests -v` terminó con **753 pruebas en 100.664 s, OK, seis omisiones**. Dos requieren paquete oficial, una API real, dos el productor histórico completo del motor normal y una corresponde al conjunto de comparación de revisiones de C. Ese último conjunto se comprobó aparte con `utilidades.verificar_conocimiento_rutas`: **41 pruebas, OK, sin omisiones**. La selección de conocimiento, inventario histórico, controlador de viaje, presentación, entrada al motor, receptor H3 y restauración aprobó **90 pruebas**. Los conjuntos se solapan; no sumar sus conteos. Logs locales: `.cache/revision-integrada-20261112.log`, `.cache/revision-c-integrada-20261112.log` y `.cache/revision-rutas-20261112.log`.
+
+La compatibilidad probada no equivale a viaje completo habilitado. D consume `ControlViaje` y `ResultadoPaso`; el motor normal aún no entrega `control_viaje` ni los hechos generales de movimiento. El conocimiento/historia de A sigue bajo activación explícita de prueba, y su preparación de conocimiento rechaza salidas con puertas. Identidad de puertas, observaciones, integración general y Q1 siguen pendientes de sus acuerdos. No se modificaron esos contratos ni código de compañeros durante esta revisión.
+
+## Revisión anterior
+
 Se ensayó la unión en `.cache/revision-integracion-20261110`, una copia local separada. No se modificaron main ni las ramas de los compañeros.
 
 | Parte | Rama | Commit revisado |

@@ -1,6 +1,9 @@
 # Feature Specification: historia, persistencia y comandos de integración
 
-Responsabilidad: línea de tiempo e integración. Fuentes: enunciado §§3.6, 5.5, 6.1 y 7.3; reparto página 6. Estado: especificada; implementación pendiente. Rama: `004-linea-tiempo`. Creada: 2026-11-02.
+> **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
+
+
+Responsabilidad: línea de tiempo e integración. Fuentes: enunciado §§3.6, 5.5, 6.1 y 7.3; reparto página 6. Estado: integrada en producción; aceptación y límites del cierre en integracion-completa.md. Rama: `004-linea-tiempo`. Creada: 2026-11-02.
 
 ## Objetivo y alcance
 
@@ -89,3 +92,92 @@ Decisiones adoptadas a partir del enunciado y el motor existente, sin atribuirla
 
 K=1, controles exactos, t entre eventos, #0, negativos, acción inexistente, partida sin acciones, final anticipado, retroceso cruzando checkpoint, nueva rama, archivo corrupto y carga fallida. Resultados en `aceptacion.md` y contratos.
 
+## Aceptación propuesta A–D: puertas recíprocas (2026-11-12)
+
+Preparación de pruebas solicitada por D a partir de la propuesta comunicada de A;
+no acredita una entrega del motor ni resuelve la compatibilidad de guardados antiguos.
+Se conserva el formato binario actual y el objetivo de evento `sala:dirección`.
+
+- PD-01: abrir una puerta recíproca abre ambos extremos y deja un solo cierre
+  vigente. Guardar/cargar preserva ambos extremos incluso si la sala opuesta no
+  tiene contenido cargado ni rastro, sin convertirla en explorada o cargarla.
+- PD-02: guardar/cargar un cierre pendiente conserva tiempo, secuencia y contador;
+  el evento restaurado cierra ambos extremos una sola vez.
+- PD-03: retroceder la apertura restaura ambos extremos cerrados y elimina su
+  cierre; retroceder un turno que contiene el cierre restaura ambos abiertos y
+  el mismo evento pendiente. El pergamino conserva la excepción de Parte I.
+- PD-04: continuar desde el archivo produce el mismo estado y azar que continuar
+  sin cargar, comprobando además explícitamente el cierre de ambos extremos.
+
+Pruebas de D con salas sintéticas, motor, historial y binario reales, sin HTTP.
+No se sustituyen métodos de apertura/cierre para hacer pasar la aceptación.
+Los fallos se registran como pendientes de A, sin omisiones ni expectedFailure.
+
+## Aceptación D con entregas reales offline A/C (2026-11-12)
+
+Incremento de aceptación de T003/T010/T021, sin activar en producción las
+opciones `historia_para_pruebas` o `conocimiento_para_pruebas` del motor de A.
+
+- DX-01: el controlador procesa movimiento y consultas temporales/ordinales con
+  el productor histórico real, sin que consultar altere estado, azar o replay.
+- DX-02: los comandos guardar/cargar usan v4, recuperan historia y permiten
+  continuar; los archivos corruptos o P1 se rechazan sin registrar carga ni
+  mutar la partida. Se conserva la excepción de pergaminos al retroceder.
+- DX-03: el log generado por el controlador reproduce la rama posterior a una
+  carga, incluso después de eliminar el archivo original, sin construir vistas
+  ni realizar HTTP. La fábrica offline selecciona explícitamente el productor
+  entregado por A; no sustituye la ejecución del motor.
+- DX-04: el controlador presenta el mapa real de C actualizado por entradas
+  físicas del motor. No revela salas desconocidas. El control de viaje real de
+  C se inyecta por la interfaz existente de D sobre ese mapa.
+- DX-05: cancelar antes de un paso no mueve ni graba una acción. Si el motor
+  acepta un paso pero no entrega `hechos_paso`, D conserva el movimiento real
+  grabado, cancela la continuación y no repite pasos; no deduce daño/enemigos.
+- DX-06: el rechazo explícito de A al restaurar con mapa activo se presenta al
+  usuario y conserva estado, mapa, historia y log. Esa prueba negativa no
+  certifica persistencia conjunta ni completa T010.
+
+La vista de prueba solo recibe la presentación; modelo, conocimiento, rutas,
+control de viaje, historial, binario y replay son los componentes reales.
+
+## Aceptación pendiente de carga conjunta del mapa — 2026-11-13
+
+MC-01 concreta FR-011 y SC-004 desde D, dentro de T003/T010/T021. Usa la
+activación offline de A/C existente; no agrega una capacidad ni habilita el
+flujo de producción.
+
+- Tras entrar físicamente en una sala, guardar por el controlador en formato
+  v4 y comprobar que el lector real devuelve el estado y la historia guardados.
+- Entrar en otra sala después del guardado: una sala avistada pasa a explorada
+  y otra, antes desconocida, pasa a avistada. Verificar ambos cambios antes de
+  intentar cargar, sin modificar directamente el conocimiento.
+- Cargar por el controlador debe tener éxito y recuperar el estado físico,
+  la historia vigente, K y el mapa exactos del guardado. La sala descubierta
+  después debe volver a desconocida y la explorada después, a avistada; el
+  comando `mapa` debe mostrar el mismo contenido que al guardar.
+- El log debe registrar una sola carga aceptada. Repetir el movimiento desde
+  lo cargado debe producir el mismo estado, historia y conocimiento que antes
+  de cargar, descartando la rama posterior al guardado.
+
+La prueba usa motor, conocimiento, controlador y archivo reales, sin HTTP ni
+parches de reglas/restauración. El bloqueo actual de A debe producir un fallo
+visible de MC-01, sin skip ni expectedFailure. DX-06 documenta el rechazo de la
+entrega actual, no una regla permanente: al conectar A/C la carga válida, su
+prueba negativa deberá sustituirse por MC-01; conservar las pruebas de carga
+inválida sin mutación. Preparar esta aceptación no completa T010.
+
+
+
+## Integración completa autorizada — 2026-11-14
+
+### Fortalecimiento autorizado — RF-01..03
+
+### RC-01 — margen del ciclo integrado
+
+Optimizar el registro de cambios históricos sin cambiar las proyecciones, valores, tiempos, secuencias, consumo de azar, decisiones o formato persistido. Una reutilización del orden de enemigos debe detectar cambios de sala, identidad, pertenencia u orden de la colección; muerte, aparición, reversión, restauración y fallo de acción deben conservar resultados equivalentes al registro anterior. Medir ciclos completos con 30 cazadores e historia/mapa completos, incluyendo llegada de enemigos, combate y checkpoints; conservar máximos y excesos, no solo promedios.
+
+- RF-01: conservar resultados, costos, secuencias y desempates al optimizar búsquedas. Comparar primeras consultas y reutilización con la misma entrada y semilla, incluyendo puertas cambiantes, antes de aceptar una mejora.
+- RF-02: salas con identificadores no negativos muy separados deben permitir jugar, consultar historia, retroceder, guardar, cargar y reproducir sin reservar memoria proporcional al mayor identificador. Conservar los identificadores externos en la interfaz y los archivos; no renumerar la cripta observable.
+- RF-03: la documentación vigente identifica cada caso obligatorio de Parte II, su requisito, tarea, implementación y prueba; separa evidencia actual de registros históricos y mantiene explícitos los faltantes auténticos. No se certifica ausencia absoluta de errores ni calificación.
+
+La usuaria autoriza completar todas las partes y publicar en su rama. IA-01: mapa, viaje, historia y guardado disponibles desde consola/GUI y replay normales. IA-02: toda acción aceptada y sus eventos producen cambios históricos, incluyendo inventario, efectos y conocimiento; retroceso recorta y conserva la excepción de pergaminos. IA-03: cargar valida y recupera conjuntamente físico, historia, conocimiento y cursor, sin publicar parcialmente. IA-04: una puerta física recíproca abre/cierra ambos extremos con un cierre pendiente; exportar conserva extremos modificados sin explorar su contenido. IA-05: antorcha revela vecinas y sus salidas sin activar contenido; observación de puertas solo desde la posición ocupada. Esta última elección sobre puertas remotas es decisión conservadora del equipo, no aclaración atribuida al profesor. IA-06: cada movimiento entrega hechos reales de daño y enemigos presentes al entrar para detener viaje. IA-07: benchmarks reproducibles comparan rutas individuales/compartidas, reutilización/recálculo y mapa/viaje, además de la carga integrada; publican máximos e incumplimientos. IA-08: pruebas antiguas de ausencia de capacidades se sustituyen por aceptación positiva, conservando corrupción/atomicidad. IA-09: documentación, tareas y prompts reflejan resultados reales y pendientes externos, sin garantía de nota.

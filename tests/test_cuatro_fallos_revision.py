@@ -112,7 +112,7 @@ class TestCuatroFallosRevision(unittest.TestCase):
                         patch("controlador.controlador.ControladorJuego"):
                     self.assertEqual(main.main(args + (["--gui"] if gui else [])), 0)
                 crear.assert_called_once_with(sesion.precarga, "prueba", 42,
-                                              version_cripta="v1", version_catalogo="cat1")
+                                              partida_completa=True, version_cripta="v1", version_catalogo="cat1")
 
     def test_error_de_precarga_en_cierre_reportado_sin_excepcion(self):
         sesion = SesionDatos(SimpleNamespace(datos_dir=".cache/cripta"))

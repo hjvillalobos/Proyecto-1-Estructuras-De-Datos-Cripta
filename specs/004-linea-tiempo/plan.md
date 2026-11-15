@@ -1,5 +1,8 @@
 # Plan técnico propuesto
 
+> **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
+
+
 Python >= 3.11; MVC existente; sin dependencias nuevas para estructuras evaluadas. Este documento pertenece al diseño, no a las reglas de juego de spec.md.
 
 ## Constitución
@@ -71,6 +74,22 @@ Comparar K 10/50/100 y reconstrucción desde inicio sin checkpoints solo como al
 
 ## Dependencias y límites
 
+### Preparación MC-01 desde D — 2026-11-13
+
+Ampliar `tests/test_controlador_ac_real.py` con un caso positivo de FR-011
+reutilizando su fixture offline real. Guardar después de la primera entrada,
+avanzar a otra sala y cargar. Comparar el DTO leído del binario, el estado
+exportado, la historia exportada (incluido K), el mapa estructurado y su
+presentación; repetir el movimiento para comprobar continuación determinista.
+El caso atraviesa un checkpoint y exige olvidar descubrimientos posteriores.
+
+Solo se agregan aceptación y documentación de D. A conserva la conexión de
+`restaurar_estado_con_historia`; con C debe incorporar el conocimiento inicial,
+sus deltas y la reconstrucción validada. No se decide un nuevo esquema de
+persistencia ni se quita la restricción del motor en este incremento. Un fallo
+real se documenta como pendiente, conforme al criterio de puertas recíprocas.
+No se añaden índices ni estructuras de producción, dependencias o agentes.
+
 Contratos en `contracts/interfaces.md`; datos en `data-model.md`; tareas y pruebas en sus documentos. No está verificada la captura exhaustiva actual de motor y conocimiento. No se promete determinismo hasta probar restauración de agenda, secuencias, azar y conocimiento completos. No se ejecutaron pruebas de P1 ni benchmarks en esta preparación.
 
 
@@ -112,3 +131,35 @@ con inicio, acción completa, recorte y restauración. La adhesión al protocolo
 se comprueba con dobles de prueba y se declara separada de la aceptación con
 los productores reales. La CLI puede señalar que el verificador aún no está
 disponible en esta rama, sin sustituir el algoritmo de B.
+
+### Aceptación integrada offline de D — 2026-11-12
+
+Los párrafos anteriores describen la preparación original. El verificador B
+ya está integrado; se mantienen sus comprobaciones. Ahora se usa además el
+productor histórico real de A bajo activación explícita offline, el mapa real
+de C conectado por A y el control de viaje de C inyectado por la interfaz de D.
+La fábrica de prueba se limita a elegir las opciones existentes de A; no
+reemplaza acciones, eventos ni restauración. Se reutiliza el paquete sintético
+de B con cliente offline y se bloquea HTTP. Solo la vista receptora se simula.
+
+`tests/test_controlador_ac_real.py` verifica DX-01..06, incluidos comandos,
+archivos v4, log generado por el controlador, replay sin vistas, consultas
+puras y cancelación. Prueba por separado los límites actuales: `hechos_paso`
+ausente y rechazo de restauración con conocimiento activo. No se habilitan
+opciones de prueba en la aplicación normal ni se atribuye a esta aceptación
+persistencia del mapa/inventario histórico o viaje automático completo.
+
+
+## Plan de integración completa — 2026-11-14
+
+### Fortalecimiento RF-01..03
+
+### RC-01 — registro histórico de baja latencia
+
+Perfil del ciclo de 120 acciones: ordenar proyecciones y enemigos ocupa gran parte del costo. Conservar solo un orden de referencias de enemigos de la sala actual, con comparación por identidad de la secuencia antes de reutilizar; no almacenar sus vidas ni valores mutables en el derivado. Proyectar valores nuevos cada vez y filtrar muertos al producirlos. Comparar los tres campos fijos por posición y fusionar las colas de enemigos ya ordenadas; devolver triples directamente, sin construir cambios tipados que el receptor vuelve a construir. Inventario/mapa conservan sus deltas y el comparador general para cambios estructurales infrecuentes. Referencia anterior conservada para comprobar igualdad por evento y benchmark pareado. Auxiliar O(enemigos de la sala), sin tablas hash. Sin cambios de reglas ni esquema; el perfil instrumentado no certifica tiempos reales.
+
+Decisión final RF-02: usar índice radix propio sobre dígitos de cuatro bits en los almacenes dispersos, en lugar de búsqueda binaria por acceso. Motivo: mantener la consulta de rastro independiente de V, con hasta ocho niveles para los IDs uint32 persistibles. Cada colección conserva su índice y valores compactos para una copia/restauración independiente sencilla; no se afirma compartir un único índice mutable. El caso denso conserva listas con un máximo de cuatro posiciones por sala. Longitud/iteración representan valores existentes; `limite_ids` expone por separado el límite lógico. Las pruebas de listas/deepcopy/IDs extremos y partida completa verifican este contrato.
+
+Mantener el heap indexado propio y almacenar su clave total al mejorar una etiqueta; evitar reconstruir tuplas en cada comparación. Mantener las generaciones y limpiar solo la frontera tocada. Para IDs dispersos usar un almacenamiento propio con IDs ordenados, búsqueda binaria y valores compactos, compartiendo el índice entre colecciones del motor y rastro. En mapas densos conservar el acceso directo; elegir por densidad al preparar, nunca por una cripta particular. Recorrer IDs existentes en exportación/restauración. Validar equivalencia con la referencia previa, datos de IDs grandes y persistencia/replay reales. Consolidar estado documental al principio y añadir matriz de los 23 casos del Apéndice B. Análisis previo: RF-01 preserva FR de rutas; RF-02 no cambia reglas ni binario; RF-03 atiende §2.5/2.6/7.1. Sin estructuras prohibidas ni dependencia de vista/red. No se alteran checklists de revisión humana.
+
+Reutilizar Motor y sus inversos; un productor de producción amplía la proyección H3 con inventario y conocimiento de C y genera diferencias ordenadas propias. No persistir copias físicas por acción. Compartir identidad de puerta por pareja de extremos recíprocos; no inventar conexiones inversas en salidas dirigidas. La antorcha procesa solo vecinos revelados; los recuerdos remotos quedan desconocidos. Preparar conocimiento fuera del vivo al cargar; validar proyección contra frontera histórica antes de restaurar. Mantener el formato v4 mediante campos históricos puros; ausencia de campos requeridos causa incompatibilidad explícita. Hechos de daño se capturan cuando ocurre, no comparando vida inicial/final. Pruebas primero con aceptación ya fallida MC/PD y nuevas pruebas de producción. Comparar alternativas en benchmarks sin activar optimizaciones sin evidencia. Ningún índice dict/set ni biblioteca restringida. Revisión de consistencia: IA-01..09 enlazan FR-004/007/011/013/018/019; las pruebas se ejecutarán con motor real y los límites se reportarán por carga.
