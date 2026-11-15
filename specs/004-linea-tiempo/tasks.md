@@ -193,6 +193,16 @@ dobles por evidencia de integración real, sin declarar cierre global.
 
 ## RC-01 — margen del ciclo integrado
 
+## VI-01..05 — presentación autorizada
+
+- [ ] VI-T01 Crear sprite de cazador y mapa nativo con privacidad, disposición determinista y controles accesibles (VI-01/02/04).
+- [ ] VI-T02 Conectar la proyección filtrada a GUI y viaje ordinario, manteniendo consola y reglas (VI-02/03/04).
+- [ ] VI-T03 Auditar contrato y datos API, casos desconocidos/futuros, presupuesto y versiones (VI-05).
+- [ ] VI-T04 Probar privacidad/inmutabilidad, GUI real, regresiones y medir motor sin render; documentar prompts/evidencia (VI-01..05).
+- [ ] VI-T05 Confirmar cambios y publicar exclusivamente en 004-linea-tiempo (VI-01..05).
+
+Análisis previo: incremento de presentación sobre FR-018/019. No cambia reglas ni formato binario, no introduce rutas de búsqueda de biblioteca, ni activa contenido para dibujar. La usuaria autoriza diseño visual a criterio del agente y publicación en su rama.
+
 - [x] RC-T01 Conservar referencia anterior y comprobar igualdad de proyecciones/deltas en movimiento, llegada, daño, muerte, inventario, efectos, reversión y carga (RC-01).
 - [x] RC-T02 Reutilizar solo orden de referencias vigente; comparar campos fijos y enemigos sin reordenar por evento (RC-01).
 - [x] RC-T03 Benchmark pareado de ciclos completos antes/después con estados finales iguales, repeticiones independientes y checkpoints. Regresión completa, documentación y prompts (RC-01).

@@ -174,6 +174,14 @@ inválida sin mutación. Preparar esta aceptación no completa T010.
 
 ### RC-01 — margen del ciclo integrado
 
+### VI-01..05 — mapa ilustrado y cazador
+
+- VI-01: distinguir visualmente el cazador mediante ilustración coherente con el juego, incluida una representación por comportamiento cuando un tipo nuevo carezca de PNG específico. Conservar nombre/tipo/instancia y datos del catálogo; la ilustración no modifica entidades.
+- VI-02: el botón Mapa de la GUI abre una cartografía gráfica de la proyección conocida: exploradas con nombre/salidas/costos y puertas recordadas, avistadas sin nombre ni contenido, desconocidas sin nodos, cantidad ni posición. Mostrar niebla decorativa sin inferir salas. IDs y topologías arbitrarias, incluidas salidas dirigidas y conexiones no geométricas, deben seguir representables.
+- VI-03: seleccionar sala explorada permite emitir la orden ordinaria `ir a`, sin ejecutar movimiento desde el dibujo ni precalcular rutas con información real. Marcar posición y destino activo si son conocidos; no inventar un itinerario.
+- VI-04: abrir, seleccionar, desplazar, ampliar y cerrar el mapa no cambia reloj, azar, eventos, conocimiento, inventario, historia ni log. La consola conserva su presentación textual. El mapa no solicita HTTP ni contenido; no se añade trabajo por evento del motor. Conservar acceso textual para mapas grandes y accesibilidad.
+- VI-05: contrastar rutas/campos del servicio vigente con adaptadores y ejecutar API fría/caliente. No traer información a la vista por estar disponible en el servicio ni alterar presupuestos para completar decoración. Registrar resultados, diferencias y límites, sin afirmar igualdad temporal exacta en cualquier carga del sistema.
+
 Optimizar el registro de cambios históricos sin cambiar las proyecciones, valores, tiempos, secuencias, consumo de azar, decisiones o formato persistido. Una reutilización del orden de enemigos debe detectar cambios de sala, identidad, pertenencia u orden de la colección; muerte, aparición, reversión, restauración y fallo de acción deben conservar resultados equivalentes al registro anterior. Medir ciclos completos con 30 cazadores e historia/mapa completos, incluyendo llegada de enemigos, combate y checkpoints; conservar máximos y excesos, no solo promedios.
 
 - RF-01: conservar resultados, costos, secuencias y desempates al optimizar búsquedas. Comparar primeras consultas y reutilización con la misma entrada y semilla, incluyendo puertas cambiantes, antes de aceptar una mejora.
