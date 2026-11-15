@@ -497,7 +497,14 @@ class ControladorJuego:
         mapa = getattr(self.modelo, "mapa_conocido", None)
         if not callable(mapa):
             return self.vista.mostrar_error("El mapa conocido todavía no está disponible.")
-        return self._mostrar_informe("Mapa conocido", "\n".join(lineas_mapa(mapa())) or "El mapa está vacío.")
+        proyeccion = tuple(mapa())
+        mostrar = getattr(type(self.vista), 'mostrar_mapa', None)
+        if callable(mostrar) and all(not isinstance(r, str) for r in proyeccion):
+            jugador = getattr(self.modelo, 'jugador', None)
+            actual = getattr(jugador, 'posicion_actual', None)
+            destino = self.control_viaje.destino if self._viaje_activo and self.control_viaje is not None else None
+            return self.vista.mostrar_mapa(proyeccion, actual, destino)
+        return self._mostrar_informe("Mapa conocido", "\n".join(lineas_mapa(proyeccion)) or "El mapa está vacío.")
 
     def _viaje(self, argumentos):
         if len(argumentos) != 2 or argumentos[0].lower() != "a":

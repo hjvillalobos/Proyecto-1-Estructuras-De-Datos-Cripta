@@ -55,6 +55,12 @@ class RecursosGraficos:
         imagen = self.imagen(nombre, ancho, alto)
         return imagen if imagen is not None else self.imagen_neutra(ancho, alto)
 
+    def imagen_enemigo(self, tipo, comportamiento, ancho, alto):
+        imagen = self.imagen(tipo, ancho, alto)
+        if imagen is None and comportamiento == 'cazador':
+            imagen = self.imagen('cazador_ilustrado', ancho, alto)
+        return imagen if imagen is not None else self.imagen_neutra(ancho, alto)
+
     def imagen_neutra(self, ancho, alto):
         """Signo neutro nativo, compartido por tamano; no necesita PNG ni Pillow."""
         tamano = max(8, min(96, int(ancho), int(alto)))

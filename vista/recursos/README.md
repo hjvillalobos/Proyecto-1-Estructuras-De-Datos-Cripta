@@ -1,5 +1,17 @@
 # Recursos visuales
 
+## Enemigos VI-01 — 2026-11-14
+
+Generados con ImageGen integrado, con fondo transparente real, sin sobrescribir recursos anteriores:
+
+- `cazador_ilustrado.png`: sabueso óseo, hueso sepia, collar de cuero y ojos verdes; representación de respaldo por comportamiento cazador.
+- `ent_espectro_acechador.png`: espectro con capucha burdeos y jirones de niebla verde.
+- `ent_carcelero_errante.png`: carcelero esquelético con llaves y farol ámbar.
+
+Tinta y gouache de fantasía oscura, orientación hacia el jugador y silueta legible, en el estilo del guardián y el fondo existentes. Se resuelven por tipo antes del respaldo y reutilizan la cache por tamaño. La API aporta nombres/atributos, sin endpoint de imágenes. Prompts literales y procedencia en la entrada VI-01..05 de [PROMPTS_LLM.md](../../PROMPTS_LLM.md); auditoría y pruebas en [visual-api-2026-11-14.md](../../specs/004-linea-tiempo/visual-api-2026-11-14.md).
+
+Las 152 composiciones del personaje se regeneraron únicamente para actualizar su firma tras agregar el selector de enemigos a `recursos_graficos.py`. Se verificaron tamaño, modo y bytes de píxeles idénticos contra Git. Permanecen preparadas para evitar recomponerlas al jugar.
+
 ## Agarre de antorcha
 
 `jugador_antorcha.png` es una variante RGBA creada con ImageGen integrado el

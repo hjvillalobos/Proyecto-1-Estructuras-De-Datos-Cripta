@@ -4,6 +4,8 @@ Rama `004-linea-tiempo`. Este documento distingue la entrega integrada de los re
 
 ## Reglas e interpretaciones vigentes
 
+Actualización VI-01..05: mapa gráfico con niebla que respeta conocimiento, selección/zoom/listado/viaje ordinario, y dibujos nuevos de sabueso, espectro y carcelero. **828 pruebas en 214.910 s, cero fallos/errores**, dos opciones separadas; API real repetida en cinco criptas, fría/caliente y dentro del presupuesto, OK en 87.563 s. Sin cambios en motor, red o datos; 152 composiciones con píxeles idénticos y firmas actualizadas. [Auditoría, trazabilidad y límites](specs/004-linea-tiempo/visual-api-2026-11-14.md). Las cifras RC-01/RF posteriores son antecedentes de sus respectivos incrementos.
+
 - Terreno: costo ausente 100; datos declarados válidos positivos. El motor consume el contrato de datos; no inventa normalizaciones de valores malformados ni salidas inversas. Un `rango=null` explícito es ilimitado según la aclaración comunicada por el usuario; no se inventa un rango por defecto para un cazador sin ese campo.
 - Antorcha: explora vecinas y revela nombre/salidas; las puertas solo se observan desde la posición ocupada. No hay observación de puertas remotas ni activación de contenido remoto. Q1 de C deja de ser un bloqueo técnico por la autorización e interpretación documentadas en IA-05.
 - Resolubilidad: acumulación de llaves sin trayectoria única aceptada según aclaración registrada del 2026-11-02; se informa esa limitación. Normalización O(N log N), recorrido/diagnóstico lineales más reporte; evidencia empírica para el crecimiento aproximadamente lineal, sin afirmar O(N) total estricto.

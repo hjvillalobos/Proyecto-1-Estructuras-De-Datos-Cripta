@@ -36,6 +36,12 @@ python main.py --offline .cache/entrega --cripta ID --forzar
 python main.py --offline .cache/entrega --cripta ID --checkpoint-cada 50
 ```
 
+## Presentación del mapa y enemigos
+
+El botón **Mapa** abre una cartografía con niebla, salas conocidas, puertas recordadas y costos. Selecciona una sala para ver el detalle; usa `+`/`−`, barras de desplazamiento, **Centrar en ti** o **Ver listado / Ver mapa**. **Viajar a esta sala** está disponible para otra sala explorada y usa el viaje habitual. El mapa no revela contenido oculto ni avanza el tiempo al consultarlo; su disposición representa conexiones, no coordenadas geográficas.
+
+Sabueso óseo, espectro acechador y carcelero errante tienen nuevas ilustraciones que acompañan los recursos existentes. Los PNG son locales y se cargan mediante la cache visual. No se modifican reglas, tiempos virtuales, guardados ni algoritmos del motor. [Auditoría de API y validación visual](specs/004-linea-tiempo/visual-api-2026-11-14.md).
+
 ## Acciones y archivos
 
 En consola: `mover N` (también S/E/O), `abrir E`, `atacar INSTANCIA`, `esperar`, `recoger INSTANCIA`, `usar INSTANCIA`, `equipar INSTANCIA`, `soltar INSTANCIA`, `inventario`, `mapa`, `ir a SALA`, `cancelar`, `retroceso`, `historia T`, `historia #K`, `guardar "archivo.bin"`, `cargar "archivo.bin"` y `salir`. La GUI ofrece los controles correspondientes y navegación del inventario. Cada enemigo/objeto se identifica por instancia.
@@ -81,7 +87,7 @@ python -B -X utf8 -m unittest tests.test_criptas_api.TestPaqueteOficial -v
 
 El segundo comando requiere el paquete histórico completo de cuatro criptas; la API actual no garantiza conservar esos mapas. La suite ordinaria declara las omisiones cuando falta preparación. TEMP/TMP deben apuntar a una carpeta escribible. Las pruebas gráficas necesitan una sesión con Tk disponible.
 
-Resultado final del fortalecimiento: **818 pruebas, cero fallos/errores**, dos omisiones opcionales verificadas aparte (comparación histórica y API real). El verificador de copia limpia prepara fuentes sin datos locales y reutiliza el intérprete/dependencias instalados. [Muestras completas y entorno](specs/004-linea-tiempo/fortalecimiento-mediciones.json).
+Resultado de presentación VI-01..05: **828 pruebas en 214.910 s, cero fallos/errores**, dos opciones omitidas (comparación histórica, aprobada previamente, y API real, repetida aparte: cinco criptas fría/caliente, 87.563 s, OK). Las 152 composiciones regeneradas conservan exactamente los píxeles anteriores y su carga preparada. [Auditoría y evidencia vigente](specs/004-linea-tiempo/visual-api-2026-11-14.md). Los resultados del fortalecimiento anterior se conservan en [sus muestras completas](specs/004-linea-tiempo/fortalecimiento-mediciones.json).
 
 ## Proceso y documentación
 

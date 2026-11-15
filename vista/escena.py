@@ -318,7 +318,15 @@ class EscenaCripta:
             rata = getattr(enemigo, "tipo", "") == "ent_rata_gigante"
             if rata:
                 altura *= .54
-            imagen = self._imagen(getattr(enemigo, "tipo", ""), min(145 if rata else 205, celda - 16), altura, generica=True)
+            recursos = getattr(v, 'recursos', None)
+            cargar_enemigo = getattr(type(recursos), 'imagen_enemigo', None)
+            if callable(cargar_enemigo):
+                imagen = recursos.imagen_enemigo(getattr(enemigo, 'tipo', ''), enemigo.comportamiento,
+                                                 int(min(145 if rata else 205, celda - 16)), int(altura))
+                if imagen is not None:
+                    self.imagenes.append(imagen)
+            else:
+                imagen = self._imagen(getattr(enemigo, "tipo", ""), min(145 if rata else 205, celda - 16), altura, generica=True)
             sombra = min(celda * .32, imagen.width() * .35 if imagen is not None else altura * .35)
             c.create_oval(x - sombra, y - 6, x + sombra, y + 6, fill="#211a13", outline="", tags=(etiqueta,))
             if imagen is not None:

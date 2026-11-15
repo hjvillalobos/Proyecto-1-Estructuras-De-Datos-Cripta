@@ -655,6 +655,14 @@ class VistaGrafica:
         ventana.grab_set()
         self.root.wait_window(ventana)
 
+    def mostrar_mapa(self, proyeccion, actual=None, destino=None):
+        if self._cerrada:
+            return
+        from vista.mapa_visual import VentanaMapa
+        comando = VentanaMapa(self.root, proyeccion, actual, destino).mostrar()
+        if comando:
+            self._enviar(comando)
+
     def mostrar_info(self, texto):
         self._aviso(texto, AMARILLO)
 
