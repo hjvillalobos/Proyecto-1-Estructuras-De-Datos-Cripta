@@ -1,5 +1,8 @@
 # Tasks: Verificador de resolubilidad
 
+> **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
+
+
 **Fecha:** 2026-11-01. **Rama:** `codex/verificador-resolubilidad`.
 
 **Entrada:** [spec.md](spec.md), [plan.md](plan.md), [research.md](research.md), [data-model.md](data-model.md), [contrato](contracts/verificador.md) y [quickstart.md](quickstart.md).

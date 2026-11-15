@@ -13,7 +13,8 @@ from utilidades.ordenamiento import ordenar
 
 def conectar_mapa(motor):
     """Identidad estable por extremos recíprocos; no inventa salidas inversas."""
-    referencias = [[] for _ in motor.salas]
+    from modelo.almacen_salas import crear_almacen
+    referencias = crear_almacen(motor._ids_salas, list)
     puertas, salas = [], []
     for sala in motor.salas:
         if sala is None:

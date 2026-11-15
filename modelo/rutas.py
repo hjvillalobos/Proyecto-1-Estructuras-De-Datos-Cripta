@@ -159,6 +159,7 @@ class HeapRutas:
     def __init__(self, espacio):
         self.espacio = espacio
         self._nodos = []
+        self._claves = [None] * len(espacio.ids)
 
     def __len__(self):
         return len(self._nodos)
@@ -175,8 +176,7 @@ class HeapRutas:
         return distancia, primero
 
     def _clave(self, indice):
-        distancia, primero = self.espacio.etiqueta(indice)
-        return self._clave_etiqueta(distancia, primero) + (self.espacio.ids[indice],)
+        return self._claves[indice]
 
     def _intercambiar(self, primera, segunda):
         self._nodos[primera], self._nodos[segunda] = (
@@ -218,6 +218,7 @@ class HeapRutas:
             return False
         posicion = espacio.posicion(indice)
         espacio._registrar(indice, distancia, primer_id)
+        self._claves[indice] = self._clave_etiqueta(distancia, primer_id) + (espacio.ids[indice],)
         if posicion == -1:
             posicion = len(self._nodos)
             self._nodos.append(indice)

@@ -1,5 +1,8 @@
 # Guía de validación prevista — provisional
 
+> **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
+
+
 **Comandos portables:** ejecutar desde la raíz del proyecto con el entorno y dependencias preparados. Las ejecuciones originales registradas utilizaron Python 3.12.14 del runtime auxiliar de Codex; los comandos se muestran como `python -B -m unittest ...` para no depender de una ruta personal. Esta corrección editorial conserva todos los resultados históricos.
 
 **Fecha:** 2026-11-02. No se ejecutó ningún test ni benchmark durante Plan. No hay implementación nueva ni suites T1–T7 creadas. Esta guía separa comandos existentes de escenarios futuros para no afirmar ejecutabilidad inexistente.

@@ -1,5 +1,8 @@
 # Modelo de datos propuesto — provisional
 
+> **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
+
+
 **Fecha:** 2026-11-02. Derivado de [spec.md](spec.md); Q1/Q2 condicionan validación. No se modifica tipos.py ni snapshots.py. Estas entidades no son clases creadas.
 
 **Actualización documental 2026-11-05:** E-B-COSTOS y E-B-RANGO separan suministro/acceso para integraciones, sin alterar estas entidades ni acreditar entregas. El [reporte de B sobre OpenAPI 1.1.0](research.md#comunicación-reportada-de-b-sobre-openapi-110) describe campos opcionales/nullables y valores enteros ≥1 cuando existen; no disponemos de fuente primaria verificable. Los invariantes de juego siguientes provienen del enunciado. Q1/Q2 siguen pendientes: no se convierte un null de rango/costo en un valor por defecto ni se inventa rechazo/normalización de inconsistencias. El mínimo reportado para rango es evidencia indirecta, no una regla nueva aprobada.

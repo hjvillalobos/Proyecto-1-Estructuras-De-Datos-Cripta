@@ -1,5 +1,8 @@
 # Feature Specification: historia, persistencia y comandos de integración
 
+> **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
+
+
 Responsabilidad: línea de tiempo e integración. Fuentes: enunciado §§3.6, 5.5, 6.1 y 7.3; reparto página 6. Estado: integrada en producción; aceptación y límites del cierre en integracion-completa.md. Rama: `004-linea-tiempo`. Creada: 2026-11-02.
 
 ## Objetivo y alcance

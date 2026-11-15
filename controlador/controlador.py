@@ -179,7 +179,8 @@ class ControladorJuego:
     def _mostrar_estado(self):
         estado = self.modelo.estado_vista()
         salas = getattr(self.modelo, "salas", None)
-        if isinstance(salas, list) and 0 <= estado.sala_id < len(salas):
+        from modelo.almacen_salas import TablaPorId, limite_ids
+        if isinstance(salas, (list, TablaPorId)) and 0 <= estado.sala_id < limite_ids(salas):
             sala = salas[estado.sala_id]
             if sala is not None:
                 for salida in estado.salidas:

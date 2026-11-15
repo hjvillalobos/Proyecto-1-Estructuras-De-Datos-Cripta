@@ -1,5 +1,8 @@
 # Alternativas y decisiones a validar mediante mediciones
 
+> **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
+
+
 | Problema | Alternativas | Propuesta y motivo | Evidencia necesaria |
 |---|---|---|---|
 | Reconstrucción | Reejecutar acciones, aplicar deltas, invertir deltas desde presente | Deltas hacia adelante: evita red y volver a decidir reglas; exige captura exhaustiva | Comparar dirección, igualdad de estados y tiempo |

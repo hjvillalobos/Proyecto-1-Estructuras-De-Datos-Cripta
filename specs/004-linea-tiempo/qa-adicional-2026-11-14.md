@@ -67,15 +67,15 @@ No se observaron controles recortados ni errores de disposición en estas pantal
 
 La regresión conjunta detectó además una prueba de teclado intermitente: `test_cancelar_escape_y_cerrar_devuelven_vacio` podía quedar esperando el diálogo. El diagnóstico de pila situó la espera en `wait_window`; los cinco casos aislados pasaban. Antes de inyectar Escape/Enter, la prueba ahora procesa la transferencia de foco de Tk con `root.update()`. Se mantienen los eventos y sus aserciones reales; no se cierra el diálogo por un atajo que falsee el resultado. Los logs de diagnóstico se conservan como ejecuciones interrumpidas, no como aprobaciones.
 
-## Fuentes y aclaraciones externas pendientes
+## Fuentes incompletas y decisiones revisadas
 
 - **PDF original de Parte I:** el archivo local en Descargas pesa cero bytes; el ZIP disponible del repositorio no contiene un PDF del enunciado. Se conserva el texto extraído previamente como referencia de auditoría, pero no puede autenticarse contra el PDF vacío. Hace falta un original íntegro del aula/profesor.
 - **Dos finales de prompts de A:** Git `934eaff` y el registro actual contienen los mismos fragmentos incompletos. Se preservan literalmente en [Vacíos históricos](../001-terreno-cazador/prompts-registro-local.md#vacíos-históricos). Se necesita la conversación original íntegra para recuperar los finales. Las 77 entradas completas siguen conservadas.
-- **Resolubilidad dirigida:** confirmar si se permite acumular llaves de regiones alcanzables aunque no exista un único itinerario que regrese entre ellas. Ese es el modelo declarado por la implementación; una respuesta negativa exigiría revisar contrato y pruebas.
-- **Complejidad:** confirmar si la normalización O(N log N), separada del recorrido aproximadamente lineal, cumple la interpretación de la rúbrica. Los tiempos no prueban linealidad estricta.
-- **Antorcha/puertas remotas:** confirmar si revelar una sala vecina debe mostrar estados de puertas no observados desde una sala ocupada. Se conserva la interpretación conservadora del equipo, sin activar contenido remoto.
+- **Resolubilidad dirigida, resuelta:** la sesión 2026-11-02 de `specs/001-verificador-resolubilidad/spec.md` ya registra la respuesta afirmativa del profesor comunicada por la usuaria. Se permite acumular llaves sin exigir una trayectoria única; AC-21 prueba ese alcance. Volver a pedir esta confirmación era redundante.
+- **Complejidad, evaluación técnica:** Parte II §5.4 exige crecimiento aproximadamente lineal y prohíbe repetir el recorrido por llave. La implementación procesa la región incrementalmente y compara contra la alternativa repetitiva. Se conserva la cota total O(N log N + salida), incluida normalización, y la evidencia de escalamiento de DECISIONES.md. Esa evidencia respalda la decisión para las cargas medidas; no demuestra O(N) estricto ni garantiza una calificación. No se requiere una consulta previa para continuar con este diseño.
+- **Antorcha/puertas remotas, decisión del equipo:** Parte II §3.3 distingue explorar vecinas de observar una puerta desde una de las salas que conecta. Se mantiene la observación desde la sala ocupada: la antorcha revela nombre y salidas de las vecinas, sin actualizar puertas remotas ni activar contenido. Es una interpretación documentada y comprobada, no una respuesta atribuida al profesor.
 
-Estas preguntas están preparadas para revisión del equipo; no fueron enviadas ni se presentan como respuestas oficiales. No se prepararon materiales de defensa.
+Revisión del 2026-11-14 a petición de la usuaria: no quedan estas tres cuestiones como consultas obligatorias al profesor. El PDF íntegro de Parte II en Descargas se volvió a extraer (13 páginas) y coincide con el texto previo. Los dos faltantes de fuentes anteriores siguen siendo hechos documentales: no pueden reconstruirse literalmente mediante una decisión lógica. No se enviaron mensajes a terceros ni se prepararon materiales de defensa.
 
 ## Evidencia local
 

@@ -120,4 +120,6 @@ def medir(cantidad, semilla, repeticiones, paquete=None, cripta=None):
         print('Parte II: carga sintética determinista; no sustituye la referencia oficial.')
         salas = cadena(max(3, cantidad), semilla)
     medir_rutas(salas, semilla, repeticiones)
+    from utilidades.bench_heap_claves import medir as medir_claves
+    medir_claves(salas, repeticiones)
     medir_integracion(salas, semilla, repeticiones)

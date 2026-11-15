@@ -1,5 +1,8 @@
 # Plan técnico propuesto
 
+> **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
+
+
 Python >= 3.11; MVC existente; sin dependencias nuevas para estructuras evaluadas. Este documento pertenece al diseño, no a las reglas de juego de spec.md.
 
 ## Constitución
@@ -150,6 +153,8 @@ persistencia del mapa/inventario histórico o viaje automático completo.
 ## Plan de integración completa — 2026-11-14
 
 ### Fortalecimiento RF-01..03
+
+Decisión final RF-02: usar índice radix propio sobre dígitos de cuatro bits en los almacenes dispersos, en lugar de búsqueda binaria por acceso. Motivo: mantener la consulta de rastro independiente de V, con hasta ocho niveles para los IDs uint32 persistibles. Cada colección conserva su índice y valores compactos para una copia/restauración independiente sencilla; no se afirma compartir un único índice mutable. El caso denso conserva listas con un máximo de cuatro posiciones por sala. Longitud/iteración representan valores existentes; `limite_ids` expone por separado el límite lógico. Las pruebas de listas/deepcopy/IDs extremos y partida completa verifican este contrato.
 
 Mantener el heap indexado propio y almacenar su clave total al mejorar una etiqueta; evitar reconstruir tuplas en cada comparación. Mantener las generaciones y limpiar solo la frontera tocada. Para IDs dispersos usar un almacenamiento propio con IDs ordenados, búsqueda binaria y valores compactos, compartiendo el índice entre colecciones del motor y rastro. En mapas densos conservar el acceso directo; elegir por densidad al preparar, nunca por una cripta particular. Recorrer IDs existentes en exportación/restauración. Validar equivalencia con la referencia previa, datos de IDs grandes y persistencia/replay reales. Consolidar estado documental al principio y añadir matriz de los 23 casos del Apéndice B. Análisis previo: RF-01 preserva FR de rutas; RF-02 no cambia reglas ni binario; RF-03 atiende §2.5/2.6/7.1. Sin estructuras prohibidas ni dependencia de vista/red. No se alteran checklists de revisión humana.
 

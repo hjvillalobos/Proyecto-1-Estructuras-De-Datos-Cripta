@@ -1486,3 +1486,21 @@ Interpretación comunicada: realizar las validaciones y documentación restantes
 La primera ejecución del bot histórico llenó el inventario; se corrigió el bot preservando capacidad y reglas. La API se descubre por listado y se prueba en procesos separados para no reiniciar artificialmente su presupuesto. Se preservan los dos fragmentos históricos de A sin inventar sus finales. Detalle y reproducción en specs/004-linea-tiempo/qa-adicional-2026-11-14.md.
 
 La suite conjunta se bloqueó en una prueba que inyectaba teclas antes de completar la transferencia de foco. Se conservó el diagnóstico, se procesó el foco con root.update() antes de los eventos y se aprobaron tres repeticiones aisladas (15 casos). Resultado conjunto final: 810 pruebas, OK (skipped=2), cero fallos/errores en 217.145 s. Las dos opciones omitidas tienen evidencia separada aprobada; no se suman conjuntos ni se ocultan las ejecuciones interrumpidas.
+
+## 2026-11-14 — revisión de la rama y resolución lógica de decisiones
+
+Herramienta: Codex desktop; modelo exacto no expuesto. Prompt textual:
+
+> estas seguro que le debo preguntar cosas a mi profesor? no las puedes hacer tu con sentido logico? tambien A hizo algo y ya esta en mi rama revisa que todo este bien y cumpla con el enunciado
+
+Uso: contrastar el PDF íntegro de Parte II con la rama `004-linea-tiempo`, comprobar la incorporación de A, repetir la regresión y medir rendimiento. Se corrige la consulta redundante sobre llaves, ya respondida según el registro del 2026-11-02; se documentan las decisiones de antorcha y evaluación de complejidad sin atribuir respuestas nuevas al profesor. Se conservan vacíos históricos y el incumplimiento previo de separación de commits. No se cambia producción ni se preparan materiales de defensa. Resultados y límites en `specs/004-linea-tiempo/revision-rama-2026-11-14.md`.
+
+## 2026-11-14 — fortalecimiento autorizado de toda la entrega
+
+Herramienta: Codex desktop; modelo exacto no expuesto. Prompts textuales:
+
+> que falta para ganarnos un 100, deja la defensa por aparte
+
+> todo lo que puedas cambiar hazlo de la mejor manera, no importa que sea parte de A,B,C o D lo que necesito es que mejores el rendimiento, tambien si ya hay cosas en la documentacion que dicen pendientes y asi, cambialo, prueba todo, que no hayan bugs y que el rendimiento sea excelente, documentacion excelente y todo acorde a punto por punto del enunciado
+
+Uso: aplicar speckit-implement al fortalecimiento RF-01..03. Requisitos previos/checklist de D 8/8, sin hooks de extensión; especificación/plan/tareas confirmados en 5bccc94 antes de código. Optimizar comparaciones del heap, eliminar reserva por maxID en el motor, consolidar documentación y matriz de 23 casos, probar regresiones, datos oficiales, copia limpia y rendimiento. La prueba nueva detectó una reserva involuntaria de list() por longitud virtual; se corrigió con longitud real y límite separado. El índice disperso final es radix propio para preservar el costo del rastro independiente de V. No se inventan antecedentes ni aprobación humana; defensa excluida. Evidencia en DECISIONES y ESTADO_ENTREGA.

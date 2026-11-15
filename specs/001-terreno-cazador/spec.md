@@ -1,5 +1,8 @@
 # Feature Specification: Terreno, cazador y validez de rutas
 
+> **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
+
+
 **Feature Branch**: `feature/motor-eventos`
 
 **Feature ID**: `001-terreno-cazador` (independiente del nombre de rama)
@@ -193,12 +196,12 @@ Como jugador, quiero que el procesamiento entre mis decisiones siga siendo ágil
 
 Los contratos nuevos no se consideran implementados ni aceptados. Las ubicaciones de código y archivos nuevos están propuestas en plan.md y tasks.md, sujetas a sus permisos de ejecución y límites de propiedad.
 
-### Ambigüedades pendientes para Clarify
+### Registro histórico de ambigüedades de Clarify
 
 Clarify está autorizado. Las respuestas se revisan una por una antes de incorporarse; una consulta pendiente a B o al profesor no resuelve la regla de juego.
 
-1. **Q1 — Rango del cazador**: aclaración parcial. El profesor confirmó, según el usuario, que `rango=null` explícito significa rango ilimitado. [NEEDS CLARIFICATION: tratamiento del campo ausente o de un valor inválido. Confirmar el contrato con B y, si no lo resuelve, con el profesor; no asignar valor por defecto.]
-2. **Q2 — Costos inconsistentes**: [NEEDS CLARIFICATION: dependencia externa pendiente de confirmación con B, según respuesta del usuario del 2026-11-02. Confirmar en la fuente oficial el tratamiento de costos inválidos, diferentes por sentido o declarados solo en uno de los extremos. Se mantiene la exigencia de simetría sin definir normalización ni rechazo inventados.]
-3. **Q3 — Referencia de rendimiento**: [NEEDS CLARIFICATION: información externa pendiente de confirmación oficial sobre identificación y versión de la cripta de referencia y posibles enmiendas. Se mantiene NFR-001, menos de 20 ms con las condiciones oficiales; no se afirma cumplimiento sin mediciones ni se selecciona una referencia ficticia.]
+1. **Q1 — Rango del cazador**: aclaración parcial. El profesor confirmó, según el usuario, que `rango=null` explícito significa rango ilimitado. Decisión/alcance vigente documentado en ESTADO_ENTREGA.md; el texto fechado de esta sección conserva el contexto histórico.
+2. **Q2 — Costos inconsistentes**: Decisión/alcance vigente documentado en ESTADO_ENTREGA.md; el texto fechado de esta sección conserva el contexto histórico.
+3. **Q3 — Referencia de rendimiento**: Decisión/alcance vigente documentado en ESTADO_ENTREGA.md; el texto fechado de esta sección conserva el contexto histórico.
 
 La mención del rastro por acción en P1 Apéndice B se conserva como exigencia adicional a §2.9, no como una regla que se elimina. P2 remite a una enmienda en §2.7 que no aparece en el documento recibido; se requiere verificar si existen aclaraciones posteriores antes de cerrar la referencia de rendimiento.

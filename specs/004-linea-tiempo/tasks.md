@@ -1,5 +1,8 @@
 # Tareas — línea de tiempo
 
+> **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
+
+
 Las marcas completadas incluyen el núcleo y los consumidores de D. La aceptación con productores reales de A, B y C se registra por separado.
 
 ## Incremento de aceptación MC-01 — 2026-11-13
@@ -188,10 +191,10 @@ dobles por evidencia de integración real, sin declarar cierre global.
 
 ## Fortalecimiento RF-01..03 — trabajo vigente
 
-- [ ] RF-T01 Comparar heap/rutas antes y después sobre las mismas entradas, comprobar orden total y generaciones (RF-01).
-- [ ] RF-T02 Implementar almacenamiento compacto propio para IDs dispersos, conectar motor/mapa/rastro, probar persistencia, historia y replay sin renumeración (RF-02).
-- [ ] RF-T03 Consolidar estado actual y matriz de trazabilidad de los 23 casos obligatorios; preservar antecedentes y faltantes reales (RF-03).
-- [ ] RF-T04 Ejecutar regresión completa, comparaciones, benchmarks offline y arranque desde copia limpia; registrar muestras y límites en DECISIONES y prompts (RF-01..03).
+- [x] RF-T01 Comparar heap/rutas antes y después sobre las mismas entradas, comprobar orden total y generaciones (RF-01).
+- [x] RF-T02 Implementar almacenamiento compacto propio para IDs dispersos, conectar motor/mapa/rastro, probar persistencia, historia y replay sin renumeración (RF-02).
+- [x] RF-T03 Consolidar estado actual y matriz de trazabilidad de los 23 casos obligatorios; preservar antecedentes y faltantes reales (RF-03).
+- [x] RF-T04 Ejecutar regresión completa, comparaciones, benchmarks offline y arranque desde copia limpia; registrar muestras y límites en DECISIONES y prompts (RF-01..03).
 
 Orden: especificación confirmada antes de código; RF-T01/RF-T02 antes de regresión final; RF-T03 antes de cierre RF-T04. La autorización actual permite cambios en A/B/C/D; no requiere consultas adicionales sobre decisiones técnicas deducibles.
 
@@ -219,3 +222,6 @@ Publicación verificada 2026-11-14: integración y documentación 1c35819 enviad
 Publicación comprobada: acd84db enviado mediante push ordinario a origin/004-linea-tiempo; suite 810, OK (skipped=2), opciones omitidas aprobadas por separado. Sin cambios en main ni ramas ajenas. La defensa queda excluida.
 
 La recuperación del PDF original y de dos finales de prompts, así como las respuestas del profesor, requieren fuentes externas; no se marcan como resueltas por documentación. Ver qa-adicional-2026-11-14.md.
+
+
+Cierre RF-01..03: especificación 5bccc94; suite final 814, cero fallos/errores, dos opciones aprobadas por separado. Copia limpia final: 20 pruebas en 6.775 s, OK. Las cuatro cargas de bench finales terminan correctamente, con muestras en fortalecimiento-mediciones.json; trazabilidad vigente en ESTADO_ENTREGA.md. Se conservan los faltantes históricos y no se afirma revisión humana ni nota.
