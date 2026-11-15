@@ -199,11 +199,13 @@ dobles por evidencia de integración real, sin declarar cierre global.
 - [x] VI-T02 Conectar la proyección filtrada a GUI y viaje ordinario, manteniendo consola y reglas (VI-02/03/04).
 - [x] VI-T03 Auditar contrato y datos API, casos desconocidos/futuros, presupuesto y versiones (VI-05).
 - [x] VI-T04 Probar privacidad/inmutabilidad, GUI real, regresiones y medir motor sin render; documentar prompts/evidencia (VI-01..05).
-- [ ] VI-T05 Confirmar cambios y publicar exclusivamente en 004-linea-tiempo (VI-01..05).
+- [x] VI-T05 Confirmar cambios y publicar exclusivamente en 004-linea-tiempo (VI-01..05).
 
 Análisis previo: incremento de presentación sobre FR-018/019. No cambia reglas ni formato binario, no introduce rutas de búsqueda de biblioteca, ni activa contenido para dibujar. La usuaria autoriza diseño visual a criterio del agente y publicación en su rama.
 
-VI-T01..04 comprobadas: siete pruebas nuevas, suite 828 en 214.910 s sin fallos/errores (dos opciones identificadas), API real cinco criptas fría/caliente OK, copia limpia de fuentes 20 pruebas en 6.476 s OK. Tres ilustraciones nuevas y 152 composiciones con píxeles idénticos. Benchmark aislado con estado/historia/azar iguales: motor máximo 9.1013 ms y 0/600 sobre 20; conservar pico auxiliar de viaje 5.5273 ms, 1/600 sobre 5. Evidencia y límites en visual-api-2026-11-14.md y visual-mediciones.json. VI-T05 se cierra al comprobar el remoto.
+VI-T01..04 comprobadas: siete pruebas nuevas, suite 828 en 214.910 s sin fallos/errores (dos opciones identificadas), API real cinco criptas fría/caliente OK, copia limpia de fuentes 20 pruebas en 6.476 s OK. Tres ilustraciones nuevas y 152 composiciones con píxeles idénticos. Benchmark aislado con estado/historia/azar iguales: motor máximo 9.1013 ms y 0/600 sobre 20; conservar pico auxiliar de viaje 5.5273 ms, 1/600 sobre 5. Evidencia y límites en visual-api-2026-11-14.md y visual-mediciones.json.
+
+VI-T05 comprobada: push ordinario de 51bf7fa a origin/004-linea-tiempo; ls-remote confirma 51bf7fafc55913191630e235495202774d0a301a. Main permanece en 049a990413ab536ba98acf948903cb57b30d17fc. Los cambios previos de A están incluidos, sin sobrescritura ni force-push.
 
 - [x] RC-T01 Conservar referencia anterior y comprobar igualdad de proyecciones/deltas en movimiento, llegada, daño, muerte, inventario, efectos, reversión y carga (RC-01).
 - [x] RC-T02 Reutilizar solo orden de referencias vigente; comparar campos fijos y enemigos sin reordenar por evento (RC-01).
