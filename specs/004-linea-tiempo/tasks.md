@@ -186,6 +186,15 @@ dobles por evidencia de integración real, sin declarar cierre global.
 
 ## Integración completa — 2026-11-14
 
+## Fortalecimiento RF-01..03 — trabajo vigente
+
+- [ ] RF-T01 Comparar heap/rutas antes y después sobre las mismas entradas, comprobar orden total y generaciones (RF-01).
+- [ ] RF-T02 Implementar almacenamiento compacto propio para IDs dispersos, conectar motor/mapa/rastro, probar persistencia, historia y replay sin renumeración (RF-02).
+- [ ] RF-T03 Consolidar estado actual y matriz de trazabilidad de los 23 casos obligatorios; preservar antecedentes y faltantes reales (RF-03).
+- [ ] RF-T04 Ejecutar regresión completa, comparaciones, benchmarks offline y arranque desde copia limpia; registrar muestras y límites en DECISIONES y prompts (RF-01..03).
+
+Orden: especificación confirmada antes de código; RF-T01/RF-T02 antes de regresión final; RF-T03 antes de cierre RF-T04. La autorización actual permite cambios en A/B/C/D; no requiere consultas adicionales sobre decisiones técnicas deducibles.
+
 - [x] IC-01 Puertas recíprocas y exportación de extremos no visitados (IA-04, PD-01..04).
 - [x] IC-02 Mapa de producción, observaciones, antorcha e inversos (IA-01/05).
 - [x] IC-03 Productor completo y carga conjunta validada (IA-02/03, FR-011, MC-01).
