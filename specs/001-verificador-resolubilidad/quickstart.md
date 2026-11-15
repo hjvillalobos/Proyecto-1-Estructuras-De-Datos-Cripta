@@ -1,5 +1,8 @@
 # Guía de validación del verificador
 
+> **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
+
+
 Implementación de B realizada el 2026-11-02, después del commit de preparación `17dc4bc`. Están disponibles el análisis, la preparación HTTP/offline y las funciones de medición. D conectó el inicio y el benchmark en `004-linea-tiempo`.
 
 ## Entorno

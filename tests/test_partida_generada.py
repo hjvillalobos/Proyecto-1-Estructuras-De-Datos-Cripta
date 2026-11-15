@@ -23,7 +23,9 @@ class PartidaGeneradaTest(TestCase):
                 raiz = Path(carpeta)
                 almacen = crear_paquete(raiz / 'paquete', salas=6)
                 azar = Random(semilla)
-                ids = azar.sample(range(500, 4000), 6)
+                # RF-02: IDs de 32 bits muy separados, sin reserva por maxID.
+                ids = azar.sample(range(1_000_000_000, 4_000_000_000) if semilla == 821
+                                  else range(500, 4000), 6)
                 costos = [azar.randint(15, 90) for _ in range(5)]
                 version = f'generada-{semilla}'
                 generales = almacen.leer_generales('prueba', 'v1')

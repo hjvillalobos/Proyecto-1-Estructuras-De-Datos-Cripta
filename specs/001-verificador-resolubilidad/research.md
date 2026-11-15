@@ -1,5 +1,8 @@
 # Investigación del verificador de resolubilidad
 
+> **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
+
+
 Fecha: 2026-11-01. Estado: decisiones documentadas y recomendaciones aplicadas; C1 cerrado con aclaración del profesor comunicada por el usuario el 2026-11-02. No se implementó ni se midió el verificador.
 
 ## Reutilizar red y persistencia

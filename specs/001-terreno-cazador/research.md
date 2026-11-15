@@ -1,5 +1,8 @@
 # Investigación técnica provisional
 
+> **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
+
+
 **Fecha:** 2026-11-02. **Estado:** análisis sin implementación ni benchmarks; Q1–Q3 no resueltas. Producir borradores condicionados fue autorizado expresamente.
 
 ## Fuentes

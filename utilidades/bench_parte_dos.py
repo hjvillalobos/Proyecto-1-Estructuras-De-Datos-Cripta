@@ -60,7 +60,7 @@ def medir_rutas(salas, semilla, repeticiones):
                           f'{estrategia}: total={total:.3f} ms consultas={actores * repeticiones}')
 
 
-def medir_integracion(salas, semilla, repeticiones):
+def medir_integracion(salas, semilla, repeticiones, *, tipo_motor=None):
     from modelo.partida import MotorPartida, conectar_mapa
     from modelo.inventario import Inventario
     from modelo.snapshots import MetaPartida
@@ -70,7 +70,7 @@ def medir_integracion(salas, semilla, repeticiones):
         tiempo_siguiente=0, inventario=Inventario(10), posicion_actual=salas[0].id, llaves_obtenidas=[])
     for sala in salas:
         for salida in sala.salidas.values(): salida['cerrada'] = False
-    motor = MotorPartida(jugador, salas, semilla)
+    motor = (tipo_motor or MotorPartida)(jugador, salas, semilla)
     motor.meta = MetaPartida('sintetica', 'bench', 'bench', semilla)
     ficha = FichaCatalogo('cazador-bench', 'enemigo', 'Cazador sintético', {'rango': None})
     catalogo = SimpleNamespace(ficha_preparada=lambda _: ficha,
@@ -104,6 +104,7 @@ def medir_integracion(salas, semilla, repeticiones):
           f'media={sum(tiempos)/len(tiempos):.3f} ms sobre20={sum(t > 20 for t in tiempos)}/{len(tiempos)}')
     print(f'Paso conocido: máximo={max(pasos):.3f} ms media={sum(pasos)/len(pasos):.3f} ms '
           f'sobre5={sum(t > 5 for t in pasos)}/{len(pasos)}')
+    return tiempos, pasos, juego.exportar_estado()
 
 
 def medir(cantidad, semilla, repeticiones, paquete=None, cripta=None):
@@ -120,4 +121,6 @@ def medir(cantidad, semilla, repeticiones, paquete=None, cripta=None):
         print('Parte II: carga sintética determinista; no sustituye la referencia oficial.')
         salas = cadena(max(3, cantidad), semilla)
     medir_rutas(salas, semilla, repeticiones)
+    from utilidades.bench_heap_claves import medir as medir_claves
+    medir_claves(salas, repeticiones)
     medir_integracion(salas, semilla, repeticiones)

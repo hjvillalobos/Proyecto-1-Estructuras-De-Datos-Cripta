@@ -13,6 +13,7 @@ from modelo.rastro import RegistroRastro
 from modelo.historial import HistorialRetroceso
 from modelo.coleccion_enemigos import EnemigosSala
 from modelo.rutas import ContextoRutasReales
+from modelo.almacen_salas import crear_almacen, limite_ids
 
 
 _COSTO_MOVER = 100
@@ -48,30 +49,25 @@ class Motor:
         self._conocimiento = None
         self._captura_paso = None
 
-        salas_total = 0
-        for sala in salas_lista:
-            if sala.id > salas_total:
-                salas_total = sala.id
-
-        self.salas = [None] * (salas_total + 1)
+        self._rutas_reales = ContextoRutasReales(salas_lista)
+        self._ids_salas = tuple(self._rutas_reales.grafo.ids)
+        self.salas = crear_almacen(self._ids_salas, lambda: None)
         for sala in salas_lista:
             self.salas[sala.id] = sala
         self._puertas_iniciales = [
             (sala.id, direccion, "cerrada" in salida, salida.get("cerrada", False))
             for sala in salas_lista for direccion, salida in sala.salidas.items()
         ]
-        self._rutas_reales = ContextoRutasReales(salas_lista)
-
         self.cola = ColaEventos()
         self.azar = random.Random(semilla)
         self.reloj = 0
 
-        self.enemigos_por_sala = [EnemigosSala() for _ in range(salas_total + 1)]
-        self.objetos_en_suelo = [[] for _ in range(salas_total + 1)]
-        self.contenido_cargado = [False] * (salas_total + 1)
+        self.enemigos_por_sala = crear_almacen(self._ids_salas, EnemigosSala)
+        self.objetos_en_suelo = crear_almacen(self._ids_salas, list)
+        self.contenido_cargado = crear_almacen(self._ids_salas, lambda: False)
 
         self.efectos = GestorEfectos(self)
-        self.registro_rastro = RegistroRastro()
+        self.registro_rastro = RegistroRastro(ids=self._ids_salas)
         self.registro_rastro.marcar_visita(self.jugador.posicion_actual, 0)
         self.historial = HistorialRetroceso(self.registro_rastro, self.cola)
 
@@ -669,7 +665,7 @@ class Motor:
         j = self.jugador
         codigo = 1 if self.resultado == "victoria" else (2 if self.resultado == "derrota" else 0)
         extras = [1 if self.terminado else 0, codigo]
-        for id_sala in range(len(self.salas)):
+        for id_sala in self._ids_salas:
             if self.contenido_cargado[id_sala]:
                 extras.append(id_sala)
 
@@ -685,7 +681,7 @@ class Motor:
             if guardado is not None:
                 eventos.append(guardado)
 
-        puertas_modificadas = [None] * len(self.salas)
+        puertas_modificadas = crear_almacen(self._ids_salas, lambda: None)
         for id_sala, direccion, tenia_campo, cerrada in self._puertas_iniciales:
             salida = self.salas[id_sala].salidas.get(direccion)
             if salida is None or "cerrada" not in salida:
@@ -698,7 +694,7 @@ class Motor:
                     PuertaGuardada(direccion, bool(salida["cerrada"]), acreditada))
 
         salas = []
-        for id_sala in range(len(self.salas)):
+        for id_sala in self._ids_salas:
             sala = self.salas[id_sala]
             if sala is None:
                 continue
@@ -793,7 +789,7 @@ class Motor:
                     raise ValueError(f"Guardado incompatible: {campo} no coincide con la partida.")
         ids = [estado.jugador.sala_id] + estado.jugador.extras[2:] + [s.sala_id for s in estado.salas]
         if len(estado.jugador.extras) < 2 or any(
-                type(i) is not int or not 0 <= i < len(self.salas) or self.salas[i] is None
+                type(i) is not int or not 0 <= i < limite_ids(self.salas) or self.salas[i] is None
                 for i in ids):
             raise ValueError("Guardado incompatible: salas o indicadores invalidos.")
 
@@ -839,7 +835,7 @@ class Motor:
                 try:
                     sala, direccion = evento.objetivo.split(":")
                     sala = int(sala)
-                    valido = 0 <= sala < len(self.salas) and self.salas[sala] is not None and direccion in self.salas[sala].salidas
+                    valido = 0 <= sala < limite_ids(self.salas) and self.salas[sala] is not None and direccion in self.salas[sala].salidas
                 except (ValueError, AttributeError):
                     valido = False
             elif evento.tipo == "rearmar_trampa":
@@ -866,7 +862,8 @@ class Motor:
             preparado._restaurar_estado_validado(estado)
         preparado.gestor_precarga = self.gestor_precarga
         # Conservar las referencias publicas del jugador, salas y puertas.
-        for i, sala in enumerate(self.salas):
+        for i in self._ids_salas:
+            sala = self.salas[i]
             if sala is None:
                 continue
             nueva = preparado.salas[i]
@@ -898,7 +895,6 @@ class Motor:
             fijar = getattr(self.gestor_precarga.catalogo, "fijar_referencias", None)
             if fijar is not None:
                 fijar([])
-        n = len(self.salas)
         self.cola = ColaEventos()
         self.efectos = GestorEfectos(self)
         self.reloj = estado.reloj
@@ -906,9 +902,9 @@ class Motor:
         self.azar.setstate(estado.rng_estado)
         self.acciones_jugador = estado.acciones_jugador
         self.enemigos_derrotados = estado.enemigos_derrotados
-        self.enemigos_por_sala = [EnemigosSala() for _ in range(n)]
-        self.objetos_en_suelo = [[] for _ in range(n)]
-        self.contenido_cargado = [False] * n
+        self.enemigos_por_sala = crear_almacen(self._ids_salas, EnemigosSala)
+        self.objetos_en_suelo = crear_almacen(self._ids_salas, list)
+        self.contenido_cargado = crear_almacen(self._ids_salas, lambda: False)
         self.puertas_abiertas_con_llave = []
         for id_sala, direccion, tenia_campo, cerrada in self._puertas_iniciales:
             salida = self.salas[id_sala].salidas[direccion]
@@ -919,7 +915,7 @@ class Motor:
         for sala in self.salas:
             if sala is not None:
                 sala.trampa = None
-        for id_sala in range(n):
+        for id_sala in self._ids_salas:
             self.registro_rastro.importar(id_sala, -1)
 
         # jugador (se modifica el mismo objeto, otros módulos pueden tener referencia)
@@ -1438,7 +1434,7 @@ class _MotorConHistoriaDePrueba(Motor):
 
         # La restauracion base valida la existencia de la sala y el resto del estado.
         sala_id = jugador.sala_id
-        sala = self.salas[sala_id] if type(sala_id) is int and 0 <= sala_id < len(self.salas) else None
+        sala = self.salas[sala_id] if type(sala_id) is int and 0 <= sala_id < limite_ids(self.salas) else None
         if sala is None or sala_historica != (sala_id, sala.nombre) or jugador_historico != estadisticas:
             raise CambioHistoriaIncoherente("La sala o las estadisticas no coinciden con la historia.")
 

@@ -1,5 +1,8 @@
 # Feature Specification: historia, persistencia y comandos de integración
 
+> **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
+
+
 Responsabilidad: línea de tiempo e integración. Fuentes: enunciado §§3.6, 5.5, 6.1 y 7.3; reparto página 6. Estado: integrada en producción; aceptación y límites del cierre en integracion-completa.md. Rama: `004-linea-tiempo`. Creada: 2026-11-02.
 
 ## Objetivo y alcance
@@ -166,5 +169,15 @@ inválida sin mutación. Preparar esta aceptación no completa T010.
 
 
 ## Integración completa autorizada — 2026-11-14
+
+### Fortalecimiento autorizado — RF-01..03
+
+### RC-01 — margen del ciclo integrado
+
+Optimizar el registro de cambios históricos sin cambiar las proyecciones, valores, tiempos, secuencias, consumo de azar, decisiones o formato persistido. Una reutilización del orden de enemigos debe detectar cambios de sala, identidad, pertenencia u orden de la colección; muerte, aparición, reversión, restauración y fallo de acción deben conservar resultados equivalentes al registro anterior. Medir ciclos completos con 30 cazadores e historia/mapa completos, incluyendo llegada de enemigos, combate y checkpoints; conservar máximos y excesos, no solo promedios.
+
+- RF-01: conservar resultados, costos, secuencias y desempates al optimizar búsquedas. Comparar primeras consultas y reutilización con la misma entrada y semilla, incluyendo puertas cambiantes, antes de aceptar una mejora.
+- RF-02: salas con identificadores no negativos muy separados deben permitir jugar, consultar historia, retroceder, guardar, cargar y reproducir sin reservar memoria proporcional al mayor identificador. Conservar los identificadores externos en la interfaz y los archivos; no renumerar la cripta observable.
+- RF-03: la documentación vigente identifica cada caso obligatorio de Parte II, su requisito, tarea, implementación y prueba; separa evidencia actual de registros históricos y mantiene explícitos los faltantes auténticos. No se certifica ausencia absoluta de errores ni calificación.
 
 La usuaria autoriza completar todas las partes y publicar en su rama. IA-01: mapa, viaje, historia y guardado disponibles desde consola/GUI y replay normales. IA-02: toda acción aceptada y sus eventos producen cambios históricos, incluyendo inventario, efectos y conocimiento; retroceso recorta y conserva la excepción de pergaminos. IA-03: cargar valida y recupera conjuntamente físico, historia, conocimiento y cursor, sin publicar parcialmente. IA-04: una puerta física recíproca abre/cierra ambos extremos con un cierre pendiente; exportar conserva extremos modificados sin explorar su contenido. IA-05: antorcha revela vecinas y sus salidas sin activar contenido; observación de puertas solo desde la posición ocupada. Esta última elección sobre puertas remotas es decisión conservadora del equipo, no aclaración atribuida al profesor. IA-06: cada movimiento entrega hechos reales de daño y enemigos presentes al entrar para detener viaje. IA-07: benchmarks reproducibles comparan rutas individuales/compartidas, reutilización/recálculo y mapa/viaje, además de la carga integrada; publican máximos e incumplimientos. IA-08: pruebas antiguas de ausencia de capacidades se sustituyen por aceptación positiva, conservando corrupción/atomicidad. IA-09: documentación, tareas y prompts reflejan resultados reales y pendientes externos, sin garantía de nota.

@@ -13,7 +13,8 @@ from utilidades.ordenamiento import ordenar
 
 def conectar_mapa(motor):
     """Identidad estable por extremos recíprocos; no inventa salidas inversas."""
-    referencias = [[] for _ in motor.salas]
+    from modelo.almacen_salas import crear_almacen
+    referencias = crear_almacen(motor._ids_salas, list)
     puertas, salas = [], []
     for sala in motor.salas:
         if sala is None:
@@ -61,6 +62,29 @@ def diferencias(antes, despues):
     return tuple(cambios)
 
 
+def deltas_ordenados(antes, despues):
+    """RC-01: fusionar campos únicos ya ordenados, sin ordenar ni tipar dos veces."""
+    i = j = 0
+    cambios = []
+    while i < len(antes) and j < len(despues):
+        clave, valor = antes[i]
+        nueva, posterior = despues[j]
+        if clave < nueva:
+            cambios.append((clave, valor, None))
+            i += 1
+        elif nueva < clave:
+            cambios.append((nueva, None, posterior))
+            j += 1
+        else:
+            if valor != posterior:
+                cambios.append((clave, valor, posterior))
+            i += 1
+            j += 1
+    cambios.extend((clave, valor, None) for clave, valor in antes[i:])
+    cambios.extend((clave, None, valor) for clave, valor in despues[j:])
+    return tuple(cambios)
+
+
 class MotorPartida(_MotorConHistoriaDePrueba):
     _partida_completa = True
     _acciones_h3 = ('mover', 'esperar', 'atacar', 'recoger', 'soltar', 'equipar', 'usar', 'abrir')
@@ -79,7 +103,24 @@ class MotorPartida(_MotorConHistoriaDePrueba):
         return tuple(self.proyeccion_h3()) + (campos_mapa(self._conocimiento) if self._conocimiento is not None else ())
 
     def proyeccion_h3(self):
-        basicos = super().proyeccion_h3()
+        sala = self.jugador.posicion_actual
+        actuales = tuple(self.enemigos_por_sala[sala])
+        anteriores = getattr(self, '_coleccion_proyectada', ())
+        if (getattr(self, '_sala_proyectada', None) != sala
+                or len(actuales) != len(anteriores)
+                or any(a is not b or a.id_instancia != identidad
+                       for a, b, identidad in zip(actuales, anteriores,
+                           getattr(self, '_ids_enemigos_proyectados', ())))):
+            self._enemigos_ordenados = tuple(ordenar(actuales,
+                clave=lambda e: e.id_instancia, algoritmo='fusion'))
+            self._coleccion_proyectada = actuales
+            self._ids_enemigos_proyectados = tuple(e.id_instancia for e in actuales)
+            self._sala_proyectada = sala
+        basicos = (Motor.proyeccion_h3(self)
+                   + (("efectos", tuple(self._efectos_activos())),)
+                   + tuple((f'enemigo:{e.id_instancia}',
+                            (e.tipo_catalogo, e.vida, e.vida_max, e.comportamiento))
+                           for e in self._enemigos_ordenados if e.vida > 0))
         inventario = campos_inventario(self.jugador.inventario)
         if inventario == getattr(self, '_inventario_proyectado', None):
             inventario = self._inventario_proyectado
@@ -89,20 +130,28 @@ class MotorPartida(_MotorConHistoriaDePrueba):
     def _cambios_h3(self, anterior):
         posterior = self.proyeccion_h3()
         if isinstance(anterior, Proyeccion) and isinstance(posterior, Proyeccion):
-            cambios = diferencias(anterior.basicos, posterior.basicos)
+            # El esquema fijo y el orden por ID de la cola son invariantes del
+            # productor. No cambian el orden previo de las claves emitidas.
+            cambios = (self._comparar_campos_fijos_h3(anterior.basicos[2:3], posterior.basicos[2:3])
+                       + deltas_ordenados(anterior.basicos[3:], posterior.basicos[3:])
+                       + self._comparar_campos_fijos_h3(anterior.basicos[1::-1], posterior.basicos[1::-1]))
             inventario_anterior = getattr(self, '_inventario_inicio', None)
             if inventario_anterior is None:
                 inventario_anterior = anterior.inventario
             if inventario_anterior is not posterior.inventario:
-                cambios += diferencias(inventario_anterior, posterior.inventario)
+                cambios += self._triples(diferencias(inventario_anterior, posterior.inventario))
             self._inventario_inicio = None
             if anterior.mapa is not posterior.mapa:
-                cambios += diferencias(anterior.mapa, posterior.mapa)
+                cambios += self._triples(diferencias(anterior.mapa, posterior.mapa))
         else:
-            cambios = diferencias(anterior, posterior)
+            cambios = self._triples(diferencias(anterior, posterior))
         from modelo.conocimiento_historia import convertir_cambios
-        cambios += convertir_cambios(tuple(self._deltas_conocimiento))
+        cambios += self._triples(convertir_cambios(tuple(self._deltas_conocimiento)))
         self._deltas_conocimiento.clear()
+        return cambios
+
+    @staticmethod
+    def _triples(cambios):
         return tuple((c.clave, c.anterior.valor if c.anterior.presente else None,
                       c.nuevo.valor if c.nuevo.presente else None)
                      for c in cambios)

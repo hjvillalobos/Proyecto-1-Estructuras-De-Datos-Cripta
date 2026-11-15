@@ -11,7 +11,7 @@ from utilidades.bench_juego import (
 
 SUBSISTEMAS_BASE = ("cache", "agenda", "inventario", "historial", "ordenamiento",
                    "guardado", "ciclo", "historia")
-SUBSISTEMAS = SUBSISTEMAS_BASE + ("guardado-historia", "resolubilidad", "parte-dos", "terreno-cazador")
+SUBSISTEMAS = SUBSISTEMAS_BASE + ("guardado-historia", "resolubilidad", "parte-dos", "terreno-cazador", "ciclo-historia")
 
 
 def entero_positivo(texto: str) -> int:
@@ -153,6 +153,9 @@ def main(argv=None):
                     args.paquete, args.cripta)
     if "parte-dos" in args.subsistemas:
         from utilidades.bench_parte_dos import medir
+        medir(args.salas, args.semilla, args.repeticiones, args.paquete, args.cripta)
+    if "ciclo-historia" in args.subsistemas:
+        from utilidades.bench_ciclo_historia import medir
         medir(args.salas, args.semilla, args.repeticiones, args.paquete, args.cripta)
     if "terreno-cazador" in args.subsistemas:
         import json

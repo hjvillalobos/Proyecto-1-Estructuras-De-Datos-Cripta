@@ -1,5 +1,8 @@
 # Feature Specification: Terreno, cazador y validez de rutas
 
+> **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
+
+
 **Feature Branch**: `feature/motor-eventos`
 
 **Feature ID**: `001-terreno-cazador` (independiente del nombre de rama)
@@ -193,12 +196,13 @@ Como jugador, quiero que el procesamiento entre mis decisiones siga siendo ágil
 
 Los contratos nuevos no se consideran implementados ni aceptados. Las ubicaciones de código y archivos nuevos están propuestas en plan.md y tasks.md, sujetas a sus permisos de ejecución y límites de propiedad.
 
-### Ambigüedades pendientes para Clarify
+### Registro histórico de ambigüedades de Clarify
 
 Clarify está autorizado. Las respuestas se revisan una por una antes de incorporarse; una consulta pendiente a B o al profesor no resuelve la regla de juego.
 
 1. **Q1 — Rango del cazador**: aclaración parcial. El profesor confirmó, según el usuario, que `rango=null` explícito significa rango ilimitado. El campo ausente o inválido queda fuera de las entradas conformes de §3.2. No se define un valor por defecto.
 2. **Q2 — Costos inconsistentes**: el profesor confirmó, según la aclaración comunicada por el usuario, que el costo de una conexión entre cuartos adyacentes es el mismo en ambas direcciones. Los costos `null`, inválidos o contradictorios quedan fuera de las entradas conformes de §3.1. No se define una normalización.
 3. **Q3 — Referencia de rendimiento**: [NEEDS CLARIFICATION: información externa pendiente de confirmación oficial sobre identificación y versión de la cripta de referencia y posibles enmiendas. Se mantiene NFR-001, menos de 20 ms con las condiciones oficiales; no se afirma cumplimiento sin mediciones ni se selecciona una referencia ficticia.]
+El [estado de entrega integrado](../../ESTADO_ENTREGA.md) documenta las decisiones de integración. El [cierre interno de Persona A](tasks.md#decisión-de-cierre-interno) registra el alcance de la evaluación de rendimiento.
 
 La mención del rastro por acción en P1 Apéndice B se conserva como exigencia adicional a §2.9, no como una regla que se elimina. P2 remite a una enmienda en §2.7 que no aparece en el documento recibido; se requiere verificar si existen aclaraciones posteriores antes de cerrar la referencia de rendimiento.

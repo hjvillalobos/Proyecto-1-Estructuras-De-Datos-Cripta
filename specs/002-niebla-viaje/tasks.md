@@ -1,5 +1,8 @@
 # Tareas de I1: conocimiento independiente
 
+> **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
+
+
 ## I10: rechazo local de origen sin salida
 
 - [x] T038 Probar C42 antes de implementar, verificando localidad y recuperación por apertura, exploración y reversión (FR-008/010/012/014/017).

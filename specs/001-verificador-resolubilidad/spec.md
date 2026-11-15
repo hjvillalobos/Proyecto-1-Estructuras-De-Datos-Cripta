@@ -1,10 +1,13 @@
 # Feature Specification: Verificador de resolubilidad
 
+> **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
+
+
 **Feature Branch**: `codex/verificador-resolubilidad`
 
 **Created**: 2026-10-30
 
-**Status**: Preparación documental revisada; C1 cerrado por aclaración del profesor comunicada por el usuario el 2026-11-02. Pendiente commit de especificación antes del código.
+**Status**: Implementado e integrado; aceptación y límites vigentes en ESTADO_ENTREGA.md.
 
 **Input**: User description: "Y genera la especificacion de mi nueva parte, el verificador de resolubilidad, definiendo primero que debe hacer y como se acepta, despues seguiriamos con las declaraciones, plan, tareas y codigo"
 

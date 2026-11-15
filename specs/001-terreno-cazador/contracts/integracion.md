@@ -1,5 +1,8 @@
 # Contratos de integración y frontera temporal A–D
 
+> **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
+
+
 **Fecha:** 2026-11-02. Documentación de Plan, no interfaces implementadas. [Modelo](../data-model.md), [requisitos](../spec.md). Nombres descriptivos revisables; ningún componente de B/C/D se considera disponible por aparecer aquí.
 
 **Adenda 2026-11-06.** Persona A adoptó la frontera temporal para compatibilidad con `historia <t>`. El alcance verificado posteriormente en la partida integrada consta en el registro siguiente.

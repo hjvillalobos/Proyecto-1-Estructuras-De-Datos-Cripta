@@ -1,5 +1,8 @@
 # Implementation Plan: Terreno, cazador y validez de rutas
 
+> **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
+
+
 **Branch**: `feature/motor-eventos` | **Date**: 2026-11-02 | **Spec**: [spec.md](spec.md)
 
 **Corte histórico del 2026-11-05 (plan provisional).** Plan y 51 tareas generados; dos revisiones Analyze realizadas. Tras las primeras correcciones I1/C1/I2/I3/I4/D1, se incorporan las correcciones documentales I1/I5/C2 de la segunda revisión. Q1–Q3 y contratos externos siguen pendientes. No hay autorización de código, pruebas ni nuevas ejecuciones de habilidades. Estas últimas correcciones requieren revisión posterior autorizada antes de liberar implementación.
