@@ -172,6 +172,10 @@ inválida sin mutación. Preparar esta aceptación no completa T010.
 
 ### Fortalecimiento autorizado — RF-01..03
 
+### RC-01 — margen del ciclo integrado
+
+Optimizar el registro de cambios históricos sin cambiar las proyecciones, valores, tiempos, secuencias, consumo de azar, decisiones o formato persistido. Una reutilización del orden de enemigos debe detectar cambios de sala, identidad, pertenencia u orden de la colección; muerte, aparición, reversión, restauración y fallo de acción deben conservar resultados equivalentes al registro anterior. Medir ciclos completos con 30 cazadores e historia/mapa completos, incluyendo llegada de enemigos, combate y checkpoints; conservar máximos y excesos, no solo promedios.
+
 - RF-01: conservar resultados, costos, secuencias y desempates al optimizar búsquedas. Comparar primeras consultas y reutilización con la misma entrada y semilla, incluyendo puertas cambiantes, antes de aceptar una mejora.
 - RF-02: salas con identificadores no negativos muy separados deben permitir jugar, consultar historia, retroceder, guardar, cargar y reproducir sin reservar memoria proporcional al mayor identificador. Conservar los identificadores externos en la interfaz y los archivos; no renumerar la cripta observable.
 - RF-03: la documentación vigente identifica cada caso obligatorio de Parte II, su requisito, tarea, implementación y prueba; separa evidencia actual de registros históricos y mantiene explícitos los faltantes auténticos. No se certifica ausencia absoluta de errores ni calificación.
