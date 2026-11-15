@@ -714,3 +714,61 @@ $interprete = if (Test-Path '..\.venv\Scripts\python.exe') { '..\.venv\Scripts\p
 ```
 
 La primera corrida registró **99 pruebas aprobadas** y cubre aceptación funcional sobre paquetes temporales y la búsqueda sin red. La segunda ejecuta la carga sintética de evaluación vía la CLI conectada por D. Usar [la constancia de interfaces](research.md#interfaces-de-la-entrega-integrada) para trazar el alcance de cada entrega. La [medición separada de cripta-06](research.md#ciclo-integrado-en-cripta-06-evidencia-para-t046) conserva sus valores y condiciones. La designación oficial de Q3 sigue pendiente.
+
+## Medición candidata y referencia Q3
+
+Usar un paquete offline archivado con `cripta-06@f9ed9afa683d` y 300 salas. Una descarga actual puede corresponder a otra versión. Para reproducir la corrida interna más reciente, usar el worktree aislado en `d43ded2`. Para repetir la corrida candidata anterior, usar una copia de `af979bb`. El paquete puede prepararse con `python -B main.py --cripta cripta-06 --descargar-todo --datos-dir RUTA_AL_PAQUETE_OFFLINE`. La descarga se hace antes del benchmark y el script comprueba la versión. Con el entorno del proyecto activo, ejecutar desde la raíz:
+
+```powershell
+$env:CRIPTA_BENCH_PAQUETE = 'RUTA_AL_PAQUETE_OFFLINE'
+@"
+import os
+from statistics import median
+from time import perf_counter_ns
+from unittest.mock import patch
+
+from datos.offline import ClienteOffline
+from red.precarga import validar_pagina_esqueleto
+from utilidades import bench_parte_dos
+
+cripta, version = "cripta-06", "f9ed9afa683d"
+cliente = ClienteOffline(os.environ["CRIPTA_BENCH_PAQUETE"], version)
+datos = cliente.obtener_datos_generales(cripta)
+assert datos["version"] == version, datos["version"]
+paginas = datos["paginas"]
+salas = [
+    sala
+    for pagina in range(1, paginas + 1)
+    for sala in validar_pagina_esqueleto(cliente.obtener_esqueleto(cripta, pagina), pagina, paginas)
+]
+assert len(salas) == 300, len(salas)
+
+instantes = []
+def registrar_reloj():
+    instante = perf_counter_ns()
+    instantes.append(instante)
+    return instante
+
+with patch.object(bench_parte_dos, "perf_counter_ns", registrar_reloj):
+    bench_parte_dos.medir_integracion(salas, 20261001, 30)
+
+assert len(instantes) == 120, len(instantes)
+ciclos = [(fin - inicio) / 1e6 for inicio, fin in zip(instantes[:60:2], instantes[1:60:2])]
+print(f"Ciclo (ms), min/mediana/max: {min(ciclos):.4f} / {median(ciclos):.4f} / {max(ciclos):.4f}")
+print(f"Ciclos por debajo de 20 ms: {sum(t < 20 for t in ciclos)}/{len(ciclos)}")
+"@ | python -B -
+```
+
+Los primeros 30 pares corresponden al ciclo con historia, mapa y 30 cazadores. Los 30 pares siguientes corresponden a consultas de viaje. La [corrida candidata registrada](research.md#ciclo-integrado-en-cripta-06-evidencia-para-t046) conserva el resultado histórico y el equipo. La [corrida sobre la integración actualizada](research.md#medición-interna-de-la-última-integración) conserva el resultado más reciente. Los tiempos pueden variar al reproducirla.
+
+Para Q3, registrar fuente de designación, ID y versión, equipo, carga y enmiendas aplicables. Ajustar la preparación solo según esa fuente. Medir el ciclo completo sin red ni renderizado y registrar mínimo, mediana, máximo, cantidad de ciclos bajo el umbral y cumplimiento o incumplimiento. T004 acredita la referencia. T046 acredita el resultado.
+
+## Verificación de la integración actualizada
+
+Desde la raíz de una copia de `d43ded2`, con el entorno del proyecto activo:
+
+```powershell
+python -B -m unittest tests.test_almacen_salas tests.test_heap_rutas tests.test_turno_cazador tests.test_controlador_ac_real
+```
+
+Resultado registrado el 2026-11-14: 30 aprobadas, cero fallos, errores u omisiones. El paquete offline de rendimiento es independiente de esta regresión.

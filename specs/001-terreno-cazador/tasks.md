@@ -340,15 +340,28 @@ Las reglas vigentes de datos válidos, la decisión del cazador, el orden tempor
 
 **Cierre de T001, T002 y T018.** El [contraste con el enunciado](research.md#alcance-oficial-de-q1-y-q2) delimita los gates GB1/GB2 originales. Las políticas generales de rechazo o normalización eran preguntas de planificación. Sus casos quedan fuera del cierre de A para entradas conformes. T017 ya estaba cerrada y la [guía de entradas](quickstart.md#entradas-verificadas-de-terreno-y-rango) registra consumo en A y validación en B. Se conservan las filas originales como trazabilidad.
 
+### Matriz de evidencia de entrega
+
+Complementa la matriz inicial de requisitos. Los comandos de regresión y sus resultados están en la [reproducción integrada](quickstart.md#reproducción-de-la-entrega-integrada-de-a) y en las secciones US1 de la guía.
+
+| Requisitos y escenarios | Implementación y commits | Prueba o medición y alcance |
+|---|---|---|
+| FR-001–FR-004, FR-011 · T6, A1–A2 | Movimiento ponderado en [juego.py](../../modelo/juego.py). Cierre US1 documentado en `9d84564`. | [Costos](../../tests/test_costos_terreno.py) y regresión US1 de 114 pruebas; incluye costo ausente, costo por salida y recorridos recíprocos. |
+| FR-005–FR-006, FR-014, FR-016–FR-017, FR-020 · T7, A7–A12, A14–A18 | Agenda del motor, aceptación de terreno `0b6f1c4`, descarte de derivados en rollback `b1e78c8` e integración `f31662c`. | [Eventos](../../tests/test_eventos_terreno.py), [frontera](../../tests/test_frontera_temporal.py) y [restauración](../../tests/test_restauracion_rutas.py). T7 se prueba en cronologías separadas; la cadena ilustrativa 250→150→225 conserva cobertura parcial. |
+| FR-007–FR-010, FR-012 · T1–T4, A3–A5 | [Cazador](../../modelo/cazador.py) y [rutas](../../modelo/rutas.py), despacho `5c67c8d`, heap `a2a72fc` y contrato de rutas `980168a`. | [Turno ordinario](../../tests/test_turno_cazador.py), [rutas](../../tests/test_rutas_cazador.py) y [filtro de conocimiento](../../tests/test_contrato_rutas_c.py), incluidos en la regresión de 99. T025 conserva la excepción formal indicada abajo. |
+| FR-013, FR-015, FR-018 · T5, A6, A8, A10, A12 | Contexto real `f318757`, resolver topológico `5494d79`, mapa y restauración conjunta `f31662c`. | [Validez](../../tests/test_validez_rutas.py), [puertas bilaterales](../../tests/test_puertas_reciprocas_d.py), [controlador real](../../tests/test_controlador_ac_real.py) y [receptor H3](../../tests/test_receptor_h3_d.py) en la regresión de 99. |
+| FR-019 · A13 | Rastro y decisiones de enemigos existentes, evidencia de aceptación publicada en `53d7367`. | [Turnos reales de guardián y rastreador](../../tests/test_costos_terreno.py). El comando acotado de costos y turnos registró 25 aprobadas. |
+| NFR-001–NFR-006 · P1–P3 | Evaluación `0396f60`, conexión integrada en [bench.py](../../bench.py), entrega documental `7755d31`. | [Regresión de benchmark](../../tests/test_bench_terreno_cazador.py), ejecución sintética por CLI y [corrida candidata](research.md#ciclo-integrado-en-cripta-06-evidencia-para-t046). NFR-001 en la referencia oficial y la evidencia final asociada esperan Q3/T046. |
+
 ### Tareas abiertas para la entrega
 
-**Excepción formal de T025.** E-C-DESPACHO se usa en la integración y las pruebas de turnos reales verifican el despacho con datos válidos y la conservación del callback de C. El criterio original pide confirmación de Juan y no consta una confirmación expresa verificable. Se conservan las demás casillas y su evidencia; las dependencias formales que pasan por T025 conservan esa salvedad.
+**Excepción formal de T025.** Persona A continuará usando E-C-DESPACHO tal como quedó integrado. El código de `5c67c8d` y las pruebas de turnos reales en `d43ded2` acreditan el despacho con datos válidos y la conservación del callback de C. El criterio original pide confirmación de Juan y no consta una confirmación expresa verificable. Se conservan las demás casillas y su evidencia; las dependencias formales que pasan por T025 conservan esa salvedad.
 
 | Tarea | Criterio pendiente |
 |---|---|
 | T004 | Designación oficial de cripta/versión y enmiendas aplicables (Q3). |
 | T025 | Confirmación específica exigida por la fila original. La integración y su evidencia técnica constan en E-C-DESPACHO. |
-| T046 | T004 y evidencia de medición sobre la referencia Q3. Existe una medición candidata de cripta-06 con mínimo, mediana y máximo. |
+| T046 | T004 y evidencia de medición sobre la referencia Q3. La [medición interna en d43ded2](research.md#medición-interna-de-la-última-integración) completa el trabajo técnico provisional con mínimo, mediana y máximo. |
 | T047 | T004 y T046. |
 | T048 | T046. La guía de reproducción integrada está preparada. |
 | T049 | T047 y T048. |
