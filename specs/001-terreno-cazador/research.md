@@ -131,7 +131,7 @@ En producción el contexto reutiliza sus arreglos sin guardar resultados entre c
 
 La evaluación publicada en `0396f60` conserva el algoritmo individual de producción y compara alternativas aisladas. La referencia lineal implementada recorre V etiquetas por selección, por lo que su costo es O(V·Vr + Er) para Vr vértices expandidos y Er arcos examinados. En el campo inverso de rango 100, los mapas de 128, 512 y 2048 salas expandieron cinco vértices cada uno, pero inicializaron 256, 1024 y 4096 celdas por reconstrucción. Ese costo O(V) limita su localidad aunque la consulta reutilizada sea barata. Las cachés FIFO de una y cuatro entradas y la agenda indexada son candidatos medidos en cargas sintéticas. La corrida de 24 cazadores del ciclo sintético conservó los 94 eventos procesados y el mismo estado final en ambas agendas. La equivalencia observada corresponde a esa carga.
 
-Para el paquete local de entrega, las fuentes son [la especificación](spec.md), [el plan](plan.md), [la guía reproducible](quickstart.md#evaluación-sintética-de-rutas-y-agendas) y [la trazabilidad](tasks.md#evidencia-parcial-para-entrega). El índice local identifica los materiales para el traslado: la [reproducción de la partida integrada](quickstart.md#reproducción-de-la-entrega-integrada-de-a) para README.md y los análisis de alternativas, la [medición candidata](#ciclo-integrado-en-cripta-06-evidencia-para-t046) y las [interfaces verificadas](#interfaces-de-la-entrega-integrada) para DECISIONES.md. T050 espera T047–T049 y la revisión de completitud, incluida la medición oficial Q3. El alcance de entradas válidas Q1/Q2 ya quedó cerrado.
+Para el paquete local de entrega, las fuentes son [la especificación](spec.md), [el plan](plan.md), [la guía reproducible](quickstart.md#evaluación-sintética-de-rutas-y-agendas) y [la trazabilidad](tasks.md#evidencia-parcial-para-entrega). El índice local identifica los materiales para el traslado: la [reproducción de la partida integrada](quickstart.md#reproducción-de-la-entrega-integrada-de-a) para README.md y los análisis de alternativas, la [medición candidata](#ciclo-integrado-en-cripta-06-evidencia-para-t046) y las [interfaces verificadas](#interfaces-de-la-entrega-integrada) para DECISIONES.md. T050 registra el cierre interno tras T047–T049 y la revisión del inventario. El alcance de entradas válidas Q1/Q2 ya quedó cerrado.
 
 ### Decisiones técnicas para DECISIONES.md
 
@@ -152,6 +152,8 @@ Para el paquete local de entrega, las fuentes son [la especificación](spec.md),
 | Rendimiento para DECISIONES.md | Carga, versión, entorno y resultado histórico en el apartado siguiente. El cierre formal espera la referencia oficial y su medición. |
 | Registro de uso de herramientas | [Registro local de prompts](prompts-registro-local.md), con los vacíos textuales declarados. |
 
+**Entrega técnica interna de Persona A completada.** El inventario local reúne las decisiones de T047, la guía de T048, la matriz de T049 y los materiales de T050 para su incorporación a la entrega. Los resultados de rendimiento enlazan el commit medido, la versión de la cripta, la carga y el procedimiento. El resultado de la referencia interna se puede entregar con este paquete. La [decisión de cierre interno](tasks.md#decisión-de-cierre-interno) conserva los criterios anteriores y la nota de alcance.
+
 ### Ciclo integrado en cripta-06 (evidencia para T046)
 
 El 2026-11-14, sobre `af979bb`, se descargó `cripta-06@f9ed9afa683d` (300 salas) a un paquete temporal. Se cargó su esqueleto con `ClienteOffline` antes de medir. Se usó `medir_integracion(salas, 20261001, 30)` de la utilidad integrada con 30 cazadores inyectados, puertas abiertas para la carga y mapa completo. Entorno de medición: Python 3.14.5, Windows NT 10.0.19045, Intel64 Family 6 Model 165 Stepping 5.
@@ -160,19 +162,25 @@ Se registraron en memoria las lecturas de `perf_counter_ns` de la utilidad y se 
 
 ### Medición interna de la última integración
 
-El 2026-11-14 se midió `d43ded23bd537ca76c6c97c8445f21ebb41fa3ae` en un worktree separado. Incluye `a416d6c` (rutas e índices de salas dispersas) y las mejoras de heap de A conservadas por el merge. La API lista `cripta-06` como «Cripta de referencia». En esta entrega se usa como referencia interna provisional, a falta de una designación oficial documentada para Q3.
+El 2026-11-14 se midió `d43ded23bd537ca76c6c97c8445f21ebb41fa3ae` en un worktree separado. Incluye `a416d6c` (rutas e índices de salas dispersas) y las mejoras de heap de A conservadas por el merge. La API lista `cripta-06` como «Cripta de referencia». Persona A adopta `cripta-06@f9ed9afa683d` como referencia interna de entrega. Su esqueleto real de 300 salas permite ejercitar el ciclo integrado con decenas de cazadores, agenda, historia y mapa completo. Fijar la versión del paquete, la semilla y la carga permite repetir el escenario offline y comparar tiempos bajo las mismas condiciones. La denominación de la API identifica la cripta y no acredita una designación oficial de Q3.
 
 | Dato | Corrida interna |
 |---|---|
-| Paquete | `cripta-06@f9ed9afa683d`, 300 salas, catálogo `4b9e75a42be5`. |
+| Paquete | `cripta-06@f9ed9afa683d`, 300 salas, catálogo `4b9e75a42be5`. Descargado de la API de Cripta con `main.py --cripta cripta-06 --descargar-todo` en un directorio temporal. Se reabrió con `ClienteOffline` y se verificaron la versión y el tamaño del esqueleto antes de medir. |
 | Carga | Semilla 20261001, 30 ciclos de espera, 30 cazadores inyectados con rango ilimitado, puertas abiertas, mapa completo e historia activa. |
 | Equipo | Python 3.14.5, Windows 10 10.0.19045, Intel64 Family 6 Model 165 Stepping 5. |
 | Ciclo completo | **0,1328 / 1,3990 / 4,0637 ms** (mínimo / mediana / máximo). **30/30** por debajo de 20 ms. |
 | Paso conocido | Máximo **1,278 ms** y **30/30** por debajo de 5 ms. Muestras excluidas del resultado del ciclo. |
 
-El paquete se descargó antes de medir. La preparación del motor y del mapa quedó fuera del intervalo. La corrida se ejecutó offline y sin vista con el [comando de reproducción](quickstart.md#medición-candidata-y-referencia-q3). El resultado acredita esta carga interna y no justifica corregir rendimiento de A para este escenario. T004 conserva el requisito de fuente oficial para Q3 y T046 conserva la medición sobre esa referencia.
+El paquete se descargó antes de medir. La preparación del motor y del mapa quedó fuera del intervalo. La corrida se ejecutó offline y sin vista con el [comando de reproducción](quickstart.md#medición-candidata-y-referencia-q3). El resultado acredita esta carga interna y no justifica corregir rendimiento de A para este escenario. La ficha y el resultado acreditan T004 y T046 en el seguimiento interno.
 
 La regresión focalizada sobre el mismo commit aprobó 30 pruebas de almacenamiento de salas, heap, turnos del cazador y controlador real. El [procedimiento](quickstart.md#verificación-de-la-integración-actualizada) incluye el comando.
+
+### Revisión del paquete para traslado
+
+- **README.md:** trasladar los [comandos de regresión integrada](quickstart.md#reproducción-de-la-entrega-integrada-de-a), la [verificación de d43ded2](quickstart.md#verificación-de-la-integración-actualizada) y la [reproducción de la referencia interna](quickstart.md#medición-candidata-y-referencia-q3). El paquete offline se obtiene y verifica por separado.
+- **DECISIONES.md:** trasladar las [decisiones y alternativas](#decisiones-técnicas-para-decisionesmd) y los estadísticos de la [medición interna](#medición-interna-de-la-última-integración). El resultado corresponde a 30 ciclos de espera en la carga descrita y el paquete temporal se obtuvo de la API.
+- **Evidencia de revisión:** conservar la [matriz](tasks.md#matriz-de-evidencia-de-entrega), las [interfaces](#interfaces-de-la-entrega-integrada) y el [registro de cierre interno](tasks.md#decisión-de-cierre-interno) como referencias de entrega. El inventario está completo para la referencia interna.
 
 ### Interfaces de la entrega integrada
 

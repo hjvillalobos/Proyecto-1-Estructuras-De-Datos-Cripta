@@ -701,7 +701,7 @@ Antes de crear `0396f60`, sobre `53d7367` con el contenido publicado de la utili
 .\.venv\Scripts\python.exe -B -m unittest tests.test_bench_terreno_cazador tests.test_rutas_cazador tests.test_localidad_rutas tests.test_validez_rutas tests.test_eventos_terreno tests.test_frontera_temporal tests.test_restauracion_rutas tests.test_turno_cazador tests.test_velocidad_terreno tests.test_costos_terreno
 ```
 
-Las rutas filtradas y la conexión de medición forman parte de la entrega integrada. La [regresión conjunta](#reproducción-de-la-entrega-integrada-de-a) aporta evidencia para T037 y T048. El cierre de T048 queda sujeto a T046, incluida la referencia oficial para la medición. T027, T037 y T045 ya constan en el cierre integrado de A.
+Las rutas filtradas y la conexión de medición forman parte de la entrega integrada. La [regresión conjunta](#reproducción-de-la-entrega-integrada-de-a) aporta evidencia para T037 y T048. T048 queda cerrado para el seguimiento interno con la medición reproducible de T046. T027, T037 y T045 ya constan en el cierre integrado de A.
 
 ## Reproducción de la entrega integrada de A
 
@@ -713,9 +713,11 @@ $interprete = if (Test-Path '..\.venv\Scripts\python.exe') { '..\.venv\Scripts\p
 & $interprete -B main.py --bench --subsistemas terreno-cazador --salas 40 --semilla 20261113 --repeticiones 3
 ```
 
-La primera corrida registró **99 pruebas aprobadas** y cubre aceptación funcional sobre paquetes temporales y la búsqueda sin red. La segunda ejecuta la carga sintética de evaluación vía la CLI conectada por D. Usar [la constancia de interfaces](research.md#interfaces-de-la-entrega-integrada) para trazar el alcance de cada entrega. La [medición separada de cripta-06](research.md#ciclo-integrado-en-cripta-06-evidencia-para-t046) conserva sus valores y condiciones. La designación oficial de Q3 sigue pendiente.
+La primera corrida registró **99 pruebas aprobadas** y cubre aceptación funcional sobre paquetes temporales y la búsqueda sin red. La segunda ejecuta la carga sintética de evaluación vía la CLI conectada por D. Usar [la constancia de interfaces](research.md#interfaces-de-la-entrega-integrada) para trazar el alcance de cada entrega. La [medición separada de cripta-06](research.md#ciclo-integrado-en-cripta-06-evidencia-para-t046) conserva sus valores y condiciones. El alcance de la referencia consta en la [decisión de cierre interno](tasks.md#decisión-de-cierre-interno).
 
 ## Medición candidata y referencia Q3
+
+La referencia interna adoptada para la entrega es `cripta-06@f9ed9afa683d`. El [resultado de d43ded2](research.md#medición-interna-de-la-última-integración) satisface el umbral de 20 ms en los 30 ciclos de la carga interna. Véase la [nota de alcance](tasks.md#decisión-de-cierre-interno).
 
 Usar un paquete offline archivado con `cripta-06@f9ed9afa683d` y 300 salas. Una descarga actual puede corresponder a otra versión. Para reproducir la corrida interna más reciente, usar el worktree aislado en `d43ded2`. Para repetir la corrida candidata anterior, usar una copia de `af979bb`. El paquete puede prepararse con `python -B main.py --cripta cripta-06 --descargar-todo --datos-dir RUTA_AL_PAQUETE_OFFLINE`. La descarga se hace antes del benchmark y el script comprueba la versión. Con el entorno del proyecto activo, ejecutar desde la raíz:
 
@@ -759,7 +761,7 @@ print(f"Ciclos por debajo de 20 ms: {sum(t < 20 for t in ciclos)}/{len(ciclos)}"
 "@ | python -B -
 ```
 
-Los primeros 30 pares corresponden al ciclo con historia, mapa y 30 cazadores. Los 30 pares siguientes corresponden a consultas de viaje. La [corrida candidata registrada](research.md#ciclo-integrado-en-cripta-06-evidencia-para-t046) conserva el resultado histórico y el equipo. La [corrida sobre la integración actualizada](research.md#medición-interna-de-la-última-integración) conserva el resultado más reciente. Los tiempos pueden variar al reproducirla.
+El script mide 30 ciclos con historia, mapa y 30 cazadores. Como comprobación de la entrada, exige 300 salas y la versión exacta. Los primeros 30 pares corresponden a esos ciclos. Los 30 pares siguientes corresponden a consultas de viaje. La [corrida candidata registrada](research.md#ciclo-integrado-en-cripta-06-evidencia-para-t046) conserva el resultado histórico y el equipo. La [corrida sobre la integración actualizada](research.md#medición-interna-de-la-última-integración) conserva el resultado más reciente. Los tiempos pueden variar al reproducirla.
 
 Para Q3, registrar fuente de designación, ID y versión, equipo, carga y enmiendas aplicables. Ajustar la preparación solo según esa fuente. Medir el ciclo completo sin red ni renderizado y registrar mínimo, mediana, máximo, cantidad de ciclos bajo el umbral y cumplimiento o incumplimiento. T004 acredita la referencia. T046 acredita el resultado.
 
