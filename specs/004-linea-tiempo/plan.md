@@ -1,5 +1,9 @@
 # Plan técnico propuesto
 
+## Seguimiento UX-01..03
+
+Diálogo Tk local modal sin acceso al modelo, con _en_menu para bloquear entradas nuevas y conservar las ya encoladas al cancelar. Controlador consulta antes de cancelar viaje o cambiar ejecutando; comunica reinicio explícito a aplicación. Aplicación reutiliza renovación de sesión y política de semilla, sin pasar por selector ni guardar automáticamente. EstadoVista añade campos opcionales de presentación (ID/objetivo), sin tocar binario/historia; objetivo deriva del conocimiento y de las salidas observadas. Pruebas de cancelación con log/guardado/viaje iguales, cuatro elecciones, cierre/Escape, aplicación con motores nuevos, regresiones cercanas de menú/replay/viaje, población/daño/victoria reales. Análisis: no cambia reglas, azar, agenda, rutas ni benchmarks del motor; no requiere repetir benchmarks sin señal de regresión.
+
 ## Revisión RE-01..04 (2026-11-15)
 
 Resolver extremos con el emparejamiento propio ya existente, una vez por apertura. Leer llave/cierre del descriptor usado y, solo si falta el atributo, del único retorno físico. No copiar ni normalizar descriptores, alterar búsqueda de rutas o agregar índices hash. Imputar el trabajo O(grado) a abrir, no a cada evento. Pruebas negativas sin llave, ciclo real de cierre/reapertura, binario/retroceso y conexiones no emparejables. Validar contenido nuevo con fábrica/controlador/vista reales, backend de audio espía y WAV reales desde CWD ajeno, y animación por coordenadas sin cambios de modelo. Matriz de Parte I/II y auditoría independiente de mapas, separando asimetrías del servicio de defectos propios. Ejecutar regresión, opciones separadas y benchmarks aislados antes del push ordinario a 004-linea-tiempo. El análisis previo conserva reglas IA-04 y las restricciones de estructuras/MVC; no atribuye la decisión de puertas remotas al profesor.

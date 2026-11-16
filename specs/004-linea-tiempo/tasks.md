@@ -1,5 +1,12 @@
 # Tareas — línea de tiempo
 
+## Seguimiento UX
+
+- [ ] UX-T01 Reproducir replay local, población/daño y victoria de mapas resolubles (UX-03).
+- [ ] UX-T02 Restaurar elección cancelable y reinicio de partida activa con pruebas de vista/controlador/aplicación (UX-01).
+- [ ] UX-T03 Mostrar ID y objetivo sin filtrar conocimiento; comprobar salida y regreso desde cámara secundaria (UX-02).
+- [ ] UX-T04 Ejecutar regresiones pertinentes, documentar evidencia/limitaciones y publicar en 004-linea-tiempo (UX-01..03).
+
 ## Revisión de entrega RE (2026-11-15)
 
 - [x] RE-T01 Reproducir apertura inversa sin metadatos, respetar llave/cierre y validar binario/retroceso y ausencia/ambigüedad de retorno (RE-01, IA-04).

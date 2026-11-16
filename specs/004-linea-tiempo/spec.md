@@ -7,6 +7,12 @@ Responsabilidad: línea de tiempo e integración. Fuentes: enunciado §§3.6, 5.
 
 ## Objetivo y alcance
 
+### UX-01..03 — abandonar y comprender el objetivo (seguimiento 2026-11-15)
+
+- UX-01: Salir durante una partida gráfica ofrece Continuar, Reiniciar la misma cripta, Volver al menú y Cerrar el juego. Escape/cierre del diálogo equivale a Continuar. Cancelar conserva estado, viaje, cola, reloj, azar, guardado y replay; no es una acción del jugador. Reiniciar requiere elección explícita y prepara motor/precarga nuevos, misma cripta y política de semilla existente, sin sobrescribir guardados. El cierre de la ventana durante una partida activa usa esa elección; menú/replay/fin conservan sus cierres propios.
+- UX-02: mostrar identidad de cripta y objetivo comprensible sin revelar salas desconocidas ni contenido remoto. Una cámara secundaria o el mayor ID no implica victoria. Si la sala de salida ya es conocida, puede identificarse; frente a su acceso explicar abrir con llave y luego cruzar. Llegar a una salida sin apertura acreditada explica cómo regresar al acceso, sin conceder victoria gratis.
+- UX-03: contrastar población, activación y daño con datos reales y replay local de la usuaria sin modificar sus archivos. Comprobar victoria por llave/cruce en mapas resolubles y ambos extremos de una puerta recíproca cuando corresponda. No añadir enemigos ni aumentar daño/dificultad fuera del contrato. La comprobación automática y la inspección visual se reportan por separado.
+
 El jugador puede consultar el pasado de su partida conservando intacto el presente y puede guardar y recuperar esa historia. Esta capacidad incorpora las entradas y presentaciones de capacidades realizadas por motor, verificador y conocimiento, sin duplicar sus reglas.
 
 Queda fuera de esta capacidad implementar las rutas del cazador, el conocimiento del jugador, el viaje ni el algoritmo de resolubilidad. Sus interfaces y presentaciones sí forman parte de la trabajo de integración.
