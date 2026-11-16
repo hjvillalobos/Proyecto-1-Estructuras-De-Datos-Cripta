@@ -213,6 +213,8 @@ Las copias temporales corresponden a cargar, no al historial, que usa solo delta
 
 ## Parte B: red, catálogo, precarga y caché
 
+**Alcance temporal de esta sección:** los apartados originales siguientes conservan las mediciones y pendientes del corte de B anterior a la integración. Los acuerdos A/C/D, pruebas integradas y mediciones de ciclo ya se completaron y están registrados en las actualizaciones de integración y en ESTADO_ENTREGA.md. Los datos de la API y paquetes descargados no equivalen a certificar un paquete externo del curso que no se haya recibido. Las frecuencias de los escenarios medidos no se extrapolan a todas las partidas posibles.
+
 Actualización: 2026-10-03.
 
 Se utiliza la restricción adicional de no usar tablas hash en la lógica estructural. Los diccionarios se conservan únicamente como representación de respuestas JSON, atributos y reportes; no se usan como índices. La deduplicación y los registros de trabajo usan listas.
@@ -356,7 +358,7 @@ El contenido descargado describe el estado inicial de una sala. Al revisitarla, 
 
 Queda por acordar con las partes A, C y D cuándo anticipar salas, confirmar entradas y actualizar referencias. Los componentes deben soltar las referencias a fichas que ya no utilizan para permitir liberar memoria.
 
-### Pendiente de agregar
+### Pendientes del corte histórico de B
 
 - Frecuencias de consulta, inserción y desalojo observadas en partidas reales.
 - Medición del ciclo completo del juego y verificación del límite de 20 ms.

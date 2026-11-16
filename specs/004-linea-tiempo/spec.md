@@ -72,7 +72,7 @@ US4, prioridad 2: como jugador quiero ver mi mapa conocido y utilizar viaje e hi
 | FR-014 | Si ese t excede el final del replay, presentar estado final y avisar que terminó antes. |
 | FR-015 | `--verificar <cripta>` ejecuta únicamente la verificación y presenta el reporte sin instanciar vista. |
 | FR-016 | Antes de jugar, presentar la verificación; si no es resoluble, impedir inicio salvo `--forzar`. |
-| FR-017 | `--bench` y todo replay funcionan sin instanciar vista, conforme a la constitución. |
+| FR-017 | `--bench` y el modo CLI `--replay` (incluido `--hasta`) funcionan sin instanciar vista. `--replay-grafico` es un modo separado de presentación, según RP-04. |
 | FR-018 | Presentar solo el mapa conocido entregado por la capacidad de conocimiento; mostrar costos de salidas actuales y distinguir cazadores. |
 | FR-019 | Aceptar `ir a <sala>`, delegar sus reglas y mostrar motivo de detención; cada paso consta como movimiento individual y la orden como comentario de depuración. |
 | FR-020 | Rechazar sintaxis o referencias históricas inexistentes con mensaje claro y sin efectos sobre la partida. |
