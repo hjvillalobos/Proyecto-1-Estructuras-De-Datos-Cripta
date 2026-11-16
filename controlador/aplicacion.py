@@ -118,7 +118,8 @@ def ejecutar_juego(args, sesion, lanzador_replay):
                         if not elegir_inicio():
                             return 0
                         continue
-                    vista.mostrar_informe("Verificación de resolubilidad", texto)
+                    if not args.gui:
+                        vista.mostrar_informe("Verificación de resolubilidad", texto)
                     if args.gui and getattr(vista, "_cerrada", False) is True:
                         return 0
                     if reporte.version is not None:

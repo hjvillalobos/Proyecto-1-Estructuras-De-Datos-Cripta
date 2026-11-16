@@ -96,12 +96,14 @@ class VistaGrafica:
         cabecera.grid(row=0, column=0, columnspan=2, sticky="ew", padx=22, pady=(14, 8))
         self._etiqueta(cabecera, "CRIPTA", color=AMARILLO, tamano=24, fuente="Georgia").pack(side="left", padx=(0, 30))
         for texto, comando in (("Guardar", "guardar"), ("Cargar", "cargar"), ("Replay", "replay"),
-                               ("Puntajes", "puntajes"), ("Ayuda", "ayuda"), ("Salir", "salir")):
+                               ("Puntajes", "puntajes")):
             ttk.Button(cabecera, text=texto, command=lambda c=comando: self._enviar(c)).pack(side="left", padx=3)
         for texto, accion in (
             ("Historia", lambda: self._pedir_comando("historia", "Instante o #acción")),
             ("Mapa", lambda: self._enviar("mapa")),
             ("Viajar", lambda: self._enviar('viajar')),
+            ("Ayuda", lambda: self._enviar("ayuda")),
+            ("Salir", lambda: self._enviar("salir")),
         ):
             ttk.Button(cabecera, text=texto, command=accion).pack(side="left", padx=3)
         izq = tk.Frame(self.root, bg=FONDO)
