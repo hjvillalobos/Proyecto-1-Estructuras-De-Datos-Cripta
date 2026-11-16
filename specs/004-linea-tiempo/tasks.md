@@ -1,5 +1,10 @@
 # Tareas — línea de tiempo
 
+## Recuperación de almacenamiento — ERR-01
+
+- [ ] ERR-T01 Reproducir reemplazo+limpieza fallidos y verificar causa original y destino anterior; cubrir serialización inválida y escritura correcta (ERR-01; tests/test_almacen_errores.py).
+- [ ] ERR-T02 Corregir limpieza del temporal propio sin ocultar excepción principal; ejecutar regresiones de datos, persistencia e integración y registrar resultados (ERR-01).
+
 ## Consolidación de presentación — 2026-11-16
 
 - [x] UI-T01 Alinear diálogo, texto y validación de historia por tiempo/acción; probar rechazo y cancelación sin encolar (UI-01, FR-003/005/020; tests/test_consulta_historia.py).

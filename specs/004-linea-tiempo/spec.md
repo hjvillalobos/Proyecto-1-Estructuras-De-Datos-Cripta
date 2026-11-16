@@ -7,6 +7,10 @@ Responsabilidad: línea de tiempo e integración. Fuentes: enunciado §§3.6, 5.
 
 ## Objetivo y alcance
 
+### ERR-01 — causa de fallos al persistir datos locales
+
+Si guardar datos locales falla antes de reemplazar el destino, conservar el archivo anterior e informar la causa original. Si también falla la limpieza del temporal creado por esa operación, conservar el error principal y agregar el diagnóstico de limpieza; no eliminar otros archivos ni presentar éxito. Una escritura correcta no deja temporales de esa llamada. Este requisito precisa la recuperación de errores de datos; no modifica reglas del juego ni formato de persistencia.
+
 ### UI-01..03 — presentación de consultas y mapa
 
 - UI-01: Historia ofrece consulta por tiempo entero no negativo o número de acción desde 1. Explica que la consulta ordinal muestra el estado justo antes de la acción. Rechazar entradas inválidas con mensaje local; cancelar conserva partida y cola (FR-003/005/020).

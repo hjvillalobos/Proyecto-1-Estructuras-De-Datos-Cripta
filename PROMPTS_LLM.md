@@ -1,5 +1,15 @@
 # Bitácora de uso de LLM
 
+## 2026-11-16 — cierre adicional sin modificar constitución ni main
+
+- **Herramienta/modelo:** Codex (GPT-6), PowerShell, Git y Python/unittest; habilidad PDF para consultar checklist local.
+- **Prompt textual:**
+
+> no quiero subir las cosas al main hazta que este listo, haz lo que falte pero no pongas cosas nuevas en constitucion
+
+- **Uso:** revisar pendientes corregibles en 004-linea-tiempo; conservar constitución y main; mantener informe privado fuera del repositorio. Se detectó limpieza de caché que podía ocultar el error principal y se especificó ERR-01 antes de modificar código, con plan y tareas.
+- **Análisis previo ERR-01:** contrato de datos existente con defecto de recuperación; no modifica reglas ni formatos. Tres escenarios verificables; excepción pública con causa y nota de limpieza; sin estructuras/dependencias prohibidas ni vista en datos. Constitución intacta. La aprobación cruzada y las fuentes históricas incompletas no se dan por resueltas.
+
 ## 2026-11-16 — consolidar entrega y aclarar constitución
 
 - **Herramienta/modelo:** Codex (GPT-6), habilidad local speckit-analyze de lectura, PowerShell/Python/Git.

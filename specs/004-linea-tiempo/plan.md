@@ -2,6 +2,8 @@
 
 ## Estado técnico vigente — 2026-11-16
 
+ERR-01: adaptar AlmacenLocal al patrón de limpieza ya usado por la persistencia histórica. Conservar una excepción pública DatosNoDisponibles con causa original; añadir notas Python 3.11 si unlink falla durante recuperación. Tras os.replace exitoso, retirar la referencia al temporal. Probar reemplazo fallido más limpieza fallida, serialización inválida y éxito sin residuos usando archivos reales y fallos inyectados. Trabajo O(tamaño del JSON), sin nueva estructura evaluada, dependencia, vista o cambio de red.
+
 Las cuatro capacidades están integradas. Los apartados fechados conservan las alternativas y entregas parciales de su momento; sus expresiones «propuesto», «pendiente» o «sin medir» no sustituyen este estado actual. La fuente de resultados finales es DECISIONES.md.
 
 UI-01 usa el diálogo local ConsultaHistoria y delega al comando ordinario; valida tiempo >=0 y acción >=1 antes de encolar. UI-02 usa NieblaMapa sobre Canvas con geometría decorativa fija respecto del conocimiento; temporizador de presentación de 50 ms, opción sin movimiento y cancelación al destruir/cerrar. UI-03 consulta primero la caché de acciones, conserva como máximo ocho resultados y usa el respaldo de secuencias cuando falta atlas válido. Las firmas obligan a regenerar las composiciones al modificar sus fuentes; comparar píxeles contra la revisión anterior. Sin cambios de algoritmo evaluado, formato binario o dependencias. Consolidación posterior de cambios locales, no prueba retrospectiva del orden spec→código.
