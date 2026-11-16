@@ -2,6 +2,8 @@
 
 ## Seguimiento 2026-11-15 — enemigos, objetivo y salir/reiniciar
 
+Publicación de seguimiento verificada: `d88c856` en `origin/004-linea-tiempo`, hash completo idéntico entre HEAD y `git ls-remote`; especificaciones previas0a98158/d95a58a. Cierre documental posterior, sin cambios adicionales de producción.
+
 Solicitud transmitida desde otro chat, citas de la usuaria: «en cualquier cripta casi no salen enemigos y si salen no me baja tanto la vida», «no me deja salir de la cripta cuando llego al final», «el botón de salir se sale al menú principal y ya no pregunta si quiero salir o reiniciar la partida, qué pasó?». Dato posterior transmitido: menciona Osario menor y sala 20. Alcance resumido: investigar/corregir con reglas/API intactas, mantener autorización de commit/push en 004-linea-tiempo y no repetir toda la suite/bench sin justificación.
 
 Uso: inspección causal de controlador/aplicación, condición de victoria y datos; replay local de 23 acciones identifica cripta 02@52532a77ee04, sala 20 secundaria, salida 18, vida 30, ningún enemigo activado ni llave negra obtenida. Osario histórico tiene 6 salas/salida 6. Se especifica UX-01..03 antes del código; no se atribuyen comandos spec-kit no ejecutados. No se modifica el log/guardado de la usuaria ni la dificultad del servicio.

@@ -5,7 +5,9 @@
 - [x] UX-T01 Reproducir replay local, población/daño y victoria de mapas resolubles (UX-03).
 - [x] UX-T02 Restaurar elección cancelable y reinicio de partida activa con pruebas de vista/controlador/aplicación (UX-01).
 - [x] UX-T03 Mostrar ID y objetivo sin filtrar conocimiento; comprobar salida y regreso desde cámara secundaria (UX-02).
-- [ ] UX-T04 Ejecutar regresiones pertinentes, documentar evidencia/limitaciones y publicar en 004-linea-tiempo (UX-01..03).
+- [x] UX-T04 Ejecutar regresiones pertinentes, documentar evidencia/limitaciones y publicar en 004-linea-tiempo (UX-01..03).
+
+Publicación UX comprobada: `d88c85656610dfffc4b98431fdbfba93e1d870ec` coincide con `refs/heads/004-linea-tiempo` en `git ls-remote`; avance ordinario, sin cambios en main ni ramas ajenas. Este registro documental se confirma después.
 
 ## Revisión de entrega RE (2026-11-15)
 
