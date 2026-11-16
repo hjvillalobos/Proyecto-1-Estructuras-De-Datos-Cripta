@@ -1,5 +1,13 @@
 # Decisiones de diseño
 
+## RE-01..04 — revisión de entrega y metadatos de puerta (2026-11-15)
+
+Problema: una puerta recíproca podía declarar llave/cierre solo en un lado, como ocurre en mapas publicados. El cierre existente afectaba ambos extremos, pero reabrir desde el descriptor sin esos campos omitía la llave y no programaba otro cierre. Alternativas: conservar la lectura unilateral (rechazada por dos pruebas que reproducen el fallo), copiar/normalizar los descriptores al cargar (descartada porque modifica los estados iniciales del servicio) o resolver los atributos faltantes con el emparejamiento propio de extremos inequívocos ya existente. Se elige la tercera; un campo explícito del lado usado tiene prioridad, y sin retorno único no se hereda nada. No se agregan índices hash, dependencia ni formato nuevo. Trabajo O(grado) al abrir o presentar una salida, sin barrer la cripta ni añadirlo a todos los eventos. Carga y acreditación de llave usan la misma consulta. Coincide con [plan RE](specs/004-linea-tiempo/plan.md) y [especificación RE](specs/004-linea-tiempo/spec.md), confirmados en 6309e20 antes del código.
+
+Evidencia: nuevas pruebas negativas sin llave/sin mutación, apertura/cierre desde el lado sin campos, carga/retroceso y una partida con historia/binario reales; conexiones sin retorno o ambiguas conservan independencia. Revisión final: 834 pruebas en 244.140 s, cero fallos/errores, dos opciones con aprobación separada; comparación histórica 41 y API real de cinco criptas fría/caliente, OK. El ajuste de los fixtures de transición reconstruye el grafo tras cambiar sus direcciones; no se silencian excepciones ni se eliminan aserciones.
+
+Medición posterior aislada con --bench, referencia 06 de 300 salas y 30 cazadores inyectados/mapa completo, semilla20261001: ciclo máximo 9.275 ms,0/120 sobre 20; paso máximo 2.342 ms,0/120 sobre 5; verificador completo máximo 12.586 ms,120 muestras, bajo 200; historia 5000 acciones/K50 máximo 0.5745 ms,0/111 sobre 50 y 5.673.260 B. Los valores anteriores a la corrección fueron14.595/2.558/12.602 ms; la variación no se atribuye a una optimización de algoritmos. El [informe completo](specs/004-linea-tiempo/revision-entrega-2026-11-15.md) contiene matriz de Parte I/II, mapas, fuentes, animación y audio. Se conservan los picos históricos de viaje, PDF de P1 vacío, prompts históricos incompletos y limitaciones de audición/evaluación humana; no se certifican latencias absolutas ni cero bugs.
+
 ## Actualizacion tecnica: 2026-10-16
 
 Esta seccion sustituye el pendiente de implementar --bench indicado en las

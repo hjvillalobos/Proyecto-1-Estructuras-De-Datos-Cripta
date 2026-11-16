@@ -4,6 +4,7 @@ from dataclasses import replace
 from unittest.mock import Mock, patch
 
 from tests import test_regresiones_juego as base
+from modelo.rutas import ContextoRutasReales
 from vista.animacion import AnimacionEscena
 from vista.grafica import VistaGrafica
 from vista.recursos_graficos import Image
@@ -33,6 +34,9 @@ class TestTransicionSalas(unittest.TestCase):
         motor, vista = self.datos.motor, self.vista
         motor.salas[1].salidas.clear()
         motor.salas[1].salidas[direccion] = {"sala": 2}
+        # La prueba cambia la topología estática después de construir el motor.
+        # Reconstruir su índice conserva la misma precondición que una carga real.
+        motor._rutas_reales = ContextoRutasReales([s for s in motor.salas if s is not None])
         vista.mostrar_estado(motor.estado_vista(), [])
         self.assertTrue(motor.ejecutar("mover", direccion).ok)
         vista.preparar_animacion("mover")
@@ -47,6 +51,7 @@ class TestTransicionSalas(unittest.TestCase):
                 v.reiniciar_presentacion()
                 m.sala_salida = None
                 m.salas[1].salidas = {"N": {"sala": 2}}
+                m._rutas_reales = ContextoRutasReales([s for s in m.salas if s is not None])
                 next(f for f in self.datos.fichas if f.id == "antorcha").atributos["duracion"] = 100
                 self.datos._inventario("antorcha")
                 self.datos._accion("usar", "antorcha")

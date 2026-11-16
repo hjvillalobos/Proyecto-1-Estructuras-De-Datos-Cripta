@@ -6,6 +6,8 @@ Herramienta: Codex. Solicitud inicial literal disponible en este chat: «como pr
 
 Uso: revisar rama limpia 004-linea-tiempo@7686b64, PDF íntegro de Parte II y extracción conservada de Parte I (PDF local vacío), suite y benchmarks; consultar API oficial mediante el cliente del proyecto y observar GUI nativa. Hallazgo a reproducir: apertura inversa de puerta recíproca con llave/cierre declarados en un solo extremo. Se especifica RE-01..04 antes de modificar producción; sin invocar comandos spec-kit que no se ejecutaron. Resultados finales se incorporarán a la auditoría de entrega, sin afirmar audición, revisión humana, fuentes faltantes recuperadas ni cero bugs.
 
+Resultado: especificación 6309e20; corregida llave/cierre en apertura inversa, presentación/carga y acreditación coherentes. Nuevos casos de contenido inédito/WAV reales desde otro CWD, animación común sin mutación y puertas con historia/binario/retroceso; fixtures de transición reconstruyen sus índices tras cambiar direcciones. Regresión final 834 en 244.140 s, OK, dos opciones aprobadas separadamente (comparación 41; API de cinco criptas fría/caliente88.555 s). Bench final aislado: ciclo 9.275/20 ms, paso 2.342/5, verificador 12.586/200, historia 5000 acciones/K50 0.5745/50, cero excesos en 120/120/120/111 muestras, respectivamente. Matriz y límites en specs/004-linea-tiempo/revision-entrega-2026-11-15.md. Nueva autorización transmitida literal: «Perdón, súbela, súbela»; incluye notas honestas de fuentes/registros faltantes. La verificación del push se registra al completar la publicación.
+
 Este archivo registra los prompts relacionados con el proyecto, conforme al apartado 10.3 del enunciado. Cada integrante debe agregar su propia entrada en el momento de usar un LLM.
 
 ## 2026-09-17

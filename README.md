@@ -40,7 +40,15 @@ python main.py --offline .cache/entrega --cripta ID --checkpoint-cada 50
 
 El botón **Mapa** abre una cartografía con niebla, salas conocidas, puertas recordadas y costos. Selecciona una sala para ver el detalle; usa `+`/`−`, barras de desplazamiento, **Centrar en ti** o **Ver listado / Ver mapa**. **Viajar a esta sala** está disponible para otra sala explorada y usa el viaje habitual. El mapa no revela contenido oculto ni avanza el tiempo al consultarlo; su disposición representa conexiones, no coordenadas geográficas.
 
-Sabueso óseo, espectro acechador y carcelero errante tienen nuevas ilustraciones que acompañan los recursos existentes. Los PNG son locales y se cargan mediante la cache visual. No se modifican reglas, tiempos virtuales, guardados ni algoritmos del motor. [Auditoría de API y validación visual](specs/004-linea-tiempo/visual-api-2026-11-14.md).
+Sabueso óseo, espectro acechador y carcelero errante tienen ilustraciones que acompañan los recursos existentes. Los PNG son locales y se cargan mediante la cache visual. Ese incremento visual conservó las reglas, tiempos virtuales, guardados y algoritmos del motor. [Auditoría de API y validación visual](specs/004-linea-tiempo/visual-api-2026-11-14.md).
+
+Los cazadores usan movimiento suave en reposo y reacción al daño; no tienen secuencias propias de caminar/atacar. Los objetos de catálogo nuevos sin imagen local conservan el signo **?** en suelo, inventario y equipo; sus estadísticas y acciones siguen viniendo del servicio.
+
+El sonido de la GUI depende de la acción, no del ID de cripta/objeto. Activa **Sonido** para oír pasos, objetos, combate y resultados; la consola no reproduce audio. Si ejecutaste pruebas silenciosas en la misma terminal, restaura el arranque normal con `Remove-Item Env:CRIPTA_SIN_AUDIO -ErrorAction SilentlyContinue` antes de lanzar la GUI. Las esperas no tienen un efecto sonoro propio. La reproducción también depende de Windows y del dispositivo de salida.
+
+Al consultar el servicio el 15 de noviembre se publicaban cripta-02–06. Las dos nuevas son **Cripta sellada** (un sabueso cazador, no resoluble salvo entrada con `--forzar`) y **Cripta de referencia** (25 sabuesos y 11 espectros cazadores). La niebla funciona en cualquier cripta. **Osario menor** corresponde a un paquete histórico y ya no aparece en ese listado. El selector usa la respuesta del servicio o el listado del paquete offline elegido.
+
+[Revisión completa del enunciado, mapas, corrección de puertas y límites de evidencia](specs/004-linea-tiempo/revision-entrega-2026-11-15.md).
 
 ## Acciones y archivos
 
@@ -69,6 +77,7 @@ python main.py --bench --subsistemas ciclo-historia --paquete .cache/entrega --c
 python main.py --bench --subsistemas terreno-cazador --salas 40 --repeticiones 3
 python main.py --bench --subsistemas resolubilidad --paquete .cache/entrega --cripta cripta-06 --repeticiones 10
 python main.py --bench --subsistemas historia --operaciones 5000 --salas 100 --repeticiones 5
+Remove-Item Env:CRIPTA_SIN_AUDIO -ErrorAction SilentlyContinue
 ```
 
 `parte-dos` incluye comparación pareada del heap anterior/optimizado con decisiones iguales, estrategias de rutas, puertas estables/cambiantes, ciclo con 30 cazadores y pasos sobre mapa conocido completo. La preparación queda fuera del intervalo medido. Las inyecciones sintéticas se identifican; no se presentan como población natural de la cripta. Los benchmarks no usan HTTP ni renderizado.

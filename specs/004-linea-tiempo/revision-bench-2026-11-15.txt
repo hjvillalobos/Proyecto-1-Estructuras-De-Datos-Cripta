@@ -1,0 +1,70 @@
+Python 3.14.6 | Windows-11-10.0.26200-SP0
+Operaciones/carga=10000, repeticiones=120, semilla=20261001
+Tiempos en us/operacion: promedio [min, max]. Sin red ni vista.
+Paquete offline: cripta-06@f9ed9afa683d | salas=300
+Preparación offline (lectura y validación): 17.348 ms [16.040, 23.220] desv. estándar=1.192 ms muestras=120 solicitudes=0
+  Muestras (ms): 16.717, 17.174, 16.819, 18.084, 16.734, 16.744, 16.416, 17.028, 17.089, 17.258, 16.764, 16.652, 17.014, 17.681, 16.556, 16.578, 16.414, 16.609, 16.911, 17.550, 16.914, 17.146, 16.855, 16.639, 16.988, 17.117, 17.169, 16.807, 17.085, 17.065, 17.182, 17.400, 17.336, 17.281, 17.669, 17.168, 17.432, 18.944, 17.405, 17.137, 16.849, 19.584, 16.844, 17.492, 17.091, 18.544, 16.854, 17.845, 17.094, 17.884, 17.222, 23.220, 20.652, 16.952, 16.303, 17.197, 16.040, 21.746, 16.696, 20.287, 22.111, 18.887, 18.636, 18.066, 19.396, 17.479, 18.151, 18.885, 18.560, 19.818, 17.924, 17.929, 16.226, 16.452, 16.297, 16.711, 16.281, 16.550, 18.652, 16.815, 18.543, 17.430, 16.523, 16.702, 16.462, 16.881, 16.197, 17.497, 16.232, 16.720, 16.727, 17.072, 16.308, 17.258, 16.493, 16.870, 16.127, 16.503, 16.519, 17.221, 18.907, 17.271, 16.332, 16.716, 16.290, 17.001, 16.114, 16.928, 16.438, 17.154, 16.605, 18.600, 17.786, 16.586, 16.932, 16.273, 16.842, 17.079, 16.835, 17.088
+Análisis de resolubilidad (normalización, recorrido, diagnóstico y reporte).
+Resolubilidad paquete incremental N=1068 7.178 ms [6.540, 12.586] desv. estándar=0.850 ms muestras=120 resoluble
+  Muestras (ms): 6.965, 7.506, 6.753, 7.106, 6.794, 7.739, 12.586, 7.169, 6.923, 7.526, 6.748, 6.923, 6.823, 6.884, 7.413, 6.686, 7.402, 6.834, 7.259, 7.149, 7.014, 6.787, 6.918, 7.342, 6.709, 8.806, 11.916, 6.948, 7.209, 7.122, 7.041, 7.128, 6.794, 8.184, 6.949, 6.945, 6.796, 7.293, 6.773, 6.814, 6.993, 6.746, 8.312, 6.843, 7.294, 6.802, 7.281, 6.953, 7.025, 7.589, 7.999, 9.098, 6.929, 7.708, 6.990, 7.019, 6.731, 7.486, 6.725, 6.622, 6.911, 6.763, 7.415, 6.668, 7.589, 6.764, 7.265, 9.355, 7.013, 6.869, 7.014, 9.783, 6.604, 6.931, 6.669, 7.283, 6.586, 7.083, 6.903, 6.704, 7.251, 6.567, 7.357, 6.728, 7.918, 6.774, 6.790, 6.702, 6.752, 7.305, 6.765, 6.995, 6.772, 6.960, 7.509, 6.672, 6.984, 6.708, 7.263, 7.392, 6.949, 6.713, 6.919, 7.328, 6.557, 6.844, 6.743, 7.378, 6.836, 6.665, 6.689, 6.668, 7.382, 6.587, 7.462, 6.676, 6.579, 6.719, 6.540, 6.939
+Resolubilidad paquete repetitivo N=1068 7.520 ms [7.201, 14.279] desv. estándar=0.718 ms muestras=120 resoluble
+  Muestras (ms): 7.344, 7.375, 7.358, 7.441, 7.296, 7.427, 7.529, 7.365, 7.340, 7.393, 7.437, 7.284, 7.396, 7.530, 7.635, 7.813, 7.307, 7.313, 7.863, 14.279, 7.802, 7.291, 7.704, 7.284, 10.581, 7.365, 7.466, 7.230, 7.317, 7.239, 7.422, 7.441, 7.447, 7.265, 8.037, 8.188, 8.902, 7.552, 7.883, 7.315, 7.371, 7.244, 7.258, 7.707, 7.267, 7.612, 7.259, 7.369, 7.338, 7.315, 7.276, 7.382, 7.430, 7.280, 7.357, 7.464, 7.466, 7.272, 7.435, 7.265, 7.449, 7.358, 7.405, 7.333, 7.480, 7.350, 7.302, 7.775, 7.374, 7.432, 7.269, 7.420, 7.253, 7.497, 7.445, 7.717, 7.418, 7.425, 7.519, 7.541, 7.331, 7.206, 7.499, 7.201, 7.322, 7.218, 7.435, 7.268, 7.370, 7.411, 7.368, 7.651, 7.218, 7.519, 7.202, 7.429, 7.271, 7.460, 7.277, 7.550, 7.302, 7.353, 7.362, 7.589, 7.359, 7.247, 7.432, 7.270, 7.937, 7.319, 7.433, 7.371, 7.398, 7.405, 7.304, 7.700, 7.315, 7.651, 7.311, 7.545
+Referencia cripta-06@f9ed9afa683d: 300 salas, 30 cazadores inyectados para carga, cero HTTP.
+Rutas V=300 H=1 rango=100 puertas=estables individual: total=2.339 ms consultas=120
+Rutas V=300 H=1 rango=100 puertas=estables reutilizacion: total=0.120 ms consultas=120
+Rutas V=300 H=1 rango=100 puertas=estables compartido: total=3.886 ms consultas=120
+Rutas V=300 H=1 rango=100 puertas=inestables individual: total=2.342 ms consultas=120
+Rutas V=300 H=1 rango=100 puertas=inestables reutilizacion: total=2.336 ms consultas=120
+Rutas V=300 H=1 rango=100 puertas=inestables compartido: total=222.481 ms consultas=120
+Rutas V=300 H=1 rango=None puertas=estables individual: total=214.883 ms consultas=120
+Rutas V=300 H=1 rango=None puertas=estables reutilizacion: total=3.744 ms consultas=120
+Rutas V=300 H=1 rango=None puertas=estables compartido: total=3.987 ms consultas=120
+Rutas V=300 H=1 rango=None puertas=inestables individual: total=215.664 ms consultas=120
+Rutas V=300 H=1 rango=None puertas=inestables reutilizacion: total=212.932 ms consultas=120
+Rutas V=300 H=1 rango=None puertas=inestables compartido: total=216.060 ms consultas=120
+Rutas V=300 H=30 rango=100 puertas=estables individual: total=35.072 ms consultas=3600
+Rutas V=300 H=30 rango=100 puertas=estables reutilizacion: total=1.645 ms consultas=3600
+Rutas V=300 H=30 rango=100 puertas=estables compartido: total=5.829 ms consultas=3600
+Rutas V=300 H=30 rango=100 puertas=inestables individual: total=35.050 ms consultas=3600
+Rutas V=300 H=30 rango=100 puertas=inestables reutilizacion: total=35.483 ms consultas=3600
+Rutas V=300 H=30 rango=100 puertas=inestables compartido: total=216.733 ms consultas=3600
+Rutas V=300 H=30 rango=None puertas=estables individual: total=4731.033 ms consultas=3600
+Rutas V=300 H=30 rango=None puertas=estables reutilizacion: total=82.565 ms consultas=3600
+Rutas V=300 H=30 rango=None puertas=estables compartido: total=10.838 ms consultas=3600
+Rutas V=300 H=30 rango=None puertas=inestables individual: total=4684.594 ms consultas=3600
+Rutas V=300 H=30 rango=None puertas=inestables reutilizacion: total=4751.451 ms consultas=3600
+Rutas V=300 H=30 rango=None puertas=inestables compartido: total=227.250 ms consultas=3600
+Heap anterior: mediana=3.0676 ms máximo=4.8567 ms muestras=120
+Heap claves retenidas: mediana=1.8939 ms máximo=3.1070 ms muestras=120
+Razón medianas anterior/nuevo=1.620; decisiones iguales.
+Ciclo integrado H=30 historia+mapa completo: máximo=9.275 ms media=3.549 ms sobre20=0/120
+Paso conocido: máximo=2.342 ms media=0.047 ms sobre5=0/120
+
+
+Python 3.14.6 | Windows-11-10.0.26200-SP0
+Operaciones/carga=5000, repeticiones=3, semilla=20261001
+Tiempos en us/operacion: promedio [min, max]. Sin red ni vista.
+Historia K=10 | controles=501 memoria=6991764 B pico=7228132 B CRLH=587534 B máx. acciones=10
+  búsqueda        ms media=0.0136 mediana=0.0133 p95=0.0209 máx=0.0378 >50 ms=0/111
+  reconstrucción  ms media=0.0869 mediana=0.0922 p95=0.1387 máx=0.1691 >50 ms=0/111
+  total           ms media=0.0735 mediana=0.0779 p95=0.1255 máx=0.1435 >50 ms=0/111
+  inversa         ms media=31.4624 mediana=31.9025 p95=67.1728 máx=70.6404 >50 ms=27/111
+  recorte         ms media=0.0550 mediana=0.0429 p95=0.1173 máx=0.1173 >50 ms=0/9
+Historia K=50 | controles=101 memoria=5673260 B pico=5983228 B CRLH=587534 B máx. acciones=50
+  búsqueda        ms media=0.0123 mediana=0.0119 p95=0.0203 máx=0.0401 >50 ms=0/111
+  reconstrucción  ms media=0.2956 mediana=0.2867 p95=0.5837 máx=0.6727 >50 ms=0/111
+  total           ms media=0.2728 mediana=0.2710 p95=0.5466 máx=0.5745 >50 ms=0/111
+  inversa         ms media=31.2052 mediana=31.5192 p95=67.2532 máx=67.9221 >50 ms=27/111
+  recorte         ms media=0.1930 mediana=0.0292 p95=0.5325 máx=0.5325 >50 ms=0/9
+Historia K=100 | controles=51 memoria=5349420 B pico=5659388 B CRLH=587534 B máx. acciones=100
+  búsqueda        ms media=0.0122 mediana=0.0122 p95=0.0193 máx=0.0269 >50 ms=0/111
+  reconstrucción  ms media=0.5889 mediana=0.6083 p95=1.1036 máx=1.7957 >50 ms=0/111
+  total           ms media=0.5520 mediana=0.5506 p95=1.0456 máx=1.6278 >50 ms=0/111
+  inversa         ms media=31.8950 mediana=31.9625 p95=68.3509 máx=70.6593 >50 ms=28/111
+  recorte         ms media=0.5696 mediana=0.5754 p95=1.0879 máx=1.0879 >50 ms=0/9
+Historia K=sin controles | controles=1 memoria=4773004 B pico=5083300 B CRLH=587534 B máx. acciones=5000
+  búsqueda        ms media=0.0120 mediana=0.0116 p95=0.0193 máx=0.0231 >50 ms=0/111
+  reconstrucción  ms media=30.7756 mediana=30.2402 p95=56.9737 máx=60.0311 >50 ms=24/111
+  total           ms media=30.9127 mediana=30.5181 p95=57.8081 máx=63.8869 >50 ms=25/111
+  inversa         ms media=32.1037 mediana=32.4062 p95=68.8953 máx=72.7873 >50 ms=30/111
+  recorte         ms media=33.0964 mediana=28.2387 p95=56.9889 máx=56.9889 >50 ms=3/9

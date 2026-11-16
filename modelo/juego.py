@@ -185,17 +185,22 @@ class Motor:
         salida = sala_actual.salidas.get(direccion)
         if salida is None:
             return False, "No hay puerta en esa dirección"
+        # Una puerta física puede declarar sus atributos en un solo extremo.
+        # El descriptor usado tiene prioridad; no se alteran los datos iniciales
+        # ni se heredan atributos si el retorno no es inequívoco.
+        extremos = self.extremos_puerta(sala_actual, direccion)
+        llave_necesaria = next((extremo['llave'] for _, _, extremo in extremos
+                                if 'llave' in extremo), None)
         apertura = (sala_actual.id, direccion)
         acreditar_salida = (salida["sala"] == self.sala_salida
-                            and salida.get("llave") == self.llave_salida
+                            and llave_necesaria == self.llave_salida
                             and apertura not in self.puertas_abiertas_con_llave)
         if not salida.get("cerrada", False) and not acreditar_salida:
             return False, "La puerta ya esta abierta"
-        llave_necesaria = salida.get("llave")
         if llave_necesaria and not self._tiene_llave(llave_necesaria):
             return False, "No tenés la llave correcta"
 
-        for _, _, extremo in self.extremos_puerta(sala_actual, direccion):
+        for _, _, extremo in extremos:
             if 'cerrada' in extremo:
                 self.historial.registrar_puerta(extremo, "cerrada", extremo['cerrada'])
             else:
@@ -209,8 +214,10 @@ class Motor:
             self.historial.registrar_cambio(lambda: self.puertas_abiertas_con_llave.remove(apertura))
         self._avanzar_actor(self.jugador, _COSTO_ABRIR_PUERTA)
 
-        if "cierre_automatico" in salida:
-            tiempo_cierre = self.reloj + salida["cierre_automatico"]
+        cierre = next((extremo for _, _, extremo in extremos
+                       if 'cierre_automatico' in extremo), None)
+        if cierre is not None:
+            tiempo_cierre = self.reloj + cierre["cierre_automatico"]
             self.programar_evento(tiempo_cierre, "cierre_puerta", (sala_actual, direccion))
 
         return True, None
@@ -225,6 +232,11 @@ class Motor:
             destino = self.salas[identificador]
             extremos.append((destino, inversa, destino.salidas[inversa]))
         return extremos
+
+    def llave_puerta(self, sala, direccion):
+        """RE-01: la misma llave para abrir, presentar, acreditar y cargar."""
+        return next((extremo['llave'] for _, _, extremo in self.extremos_puerta(sala, direccion)
+                     if 'llave' in extremo), None)
 
     def _actualizar_conocimiento(self, revelar=False):
         conocimiento = self._conocimiento
@@ -299,7 +311,7 @@ class Motor:
             self.efectos.activar_trampa(trampa)
 
         if (not self.terminado and id_destino == self.sala_salida
-                and salida.get("llave") == self.llave_salida
+                and self.llave_puerta(self.salas[pos_anterior], direccion) == self.llave_salida
                 and (pos_anterior, direccion) in self.puertas_abiertas_con_llave):
             self.historial.registrar_atributo(self, "terminado")
             self.historial.registrar_atributo(self, "resultado")
@@ -519,9 +531,9 @@ class Motor:
 
         salidas = [
             SalidaVista(direccion=d, destino=info["sala"],
-                        cerrada=info.get("cerrada", False), llave=info.get("llave"),
+                        cerrada=info.get("cerrada", False), llave=self.llave_puerta(sala, d),
                         apertura_pendiente=info["sala"] == self.sala_salida
-                        and info.get("llave") == self.llave_salida
+                        and self.llave_puerta(sala, d) == self.llave_salida
                         and (sala.id, d) not in self.puertas_abiertas_con_llave)
             for d, info in sala.salidas.items()
         ]
@@ -947,7 +959,7 @@ class Motor:
                 if p.direccion in sala.salidas:
                     sala.salidas[p.direccion]["cerrada"] = p.cerrada
                     if p.abierta_con_llave:
-                        if not sala.salidas[p.direccion].get("llave"):
+                        if not self.llave_puerta(sala, p.direccion):
                             raise ValueError("Guardado invalido: apertura sin llave declarada.")
                         self.puertas_abiertas_con_llave.append((sg.sala_id, p.direccion))
             for eg in sg.enemigos:

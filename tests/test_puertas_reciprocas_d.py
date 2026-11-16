@@ -46,6 +46,106 @@ class PuertasReciprocasDTest(unittest.TestCase):
         resultado = motor.ejecutar(nombre, argumento)
         self.assertTrue(resultado.ok, resultado.mensaje)
 
+    def puerta_con_metadatos_unilaterales(self, con_llave=False):
+        """RE-01: forma publicada por la API, sin IDs de una cripta real."""
+        motor = self.motor()
+        motor.salas[1].salidas['E']['llave'] = 'llave-prueba'
+        motor.salas[2].salidas['O'].pop('cierre_automatico')
+        motor.jugador.posicion_actual = 2
+        motor.gestor_precarga.catalogo.obtener_fichas = lambda ids: [
+            FichaCatalogo(i, 'llave' if i == 'llave-prueba' else 'pergamino_retroceso', i, {})
+            for i in ids]
+        if con_llave:
+            motor.jugador.inventario.recoger(ObjetoInstancia('llave-1', 'llave-prueba', 'inventario'))
+        return motor
+
+    def test_re01_extremo_sin_metadatos_rechaza_sin_llave_sin_mutacion(self):
+        motor = self.puerta_con_metadatos_unilaterales()
+        antes = motor.exportar_estado()
+        resultado = motor.ejecutar('abrir', 'O')
+        self.assertFalse(resultado.ok)
+        self.assertIn('llave', resultado.mensaje)
+        self.assertEqual(motor.exportar_estado(), antes)
+        self.assertEqual(self.cierres(motor), [])
+
+    def test_re01_reapertura_inversa_conserva_autocierre_tras_carga(self):
+        motor = self.puerta_con_metadatos_unilaterales(con_llave=True)
+        self.accion(motor, 'abrir', 'O')
+        self.assertEqual(self.cierres(motor)[0][0], 250)
+        self.assertNotIn('llave', motor.salas[2].salidas['O'])
+        self.assertNotIn('cierre_automatico', motor.salas[2].salidas['O'])
+        self.cargar_archivo(motor)
+        for _ in range(3):
+            self.accion(motor, 'esperar')
+        self.assertEqual(self.extremos(motor), (True, True))
+        instante = motor.reloj
+        self.accion(motor, 'abrir', 'O')
+        self.assertEqual(self.extremos(motor), (False, False))
+        self.assertEqual(self.cierres(motor)[0][0], instante + 250)
+        self.accion(motor, 'retroceso')
+        self.assertEqual(self.extremos(motor), (True, True))
+        self.assertEqual(self.cierres(motor), [])
+        self.assertEqual(motor.reloj, instante)
+
+    def test_re01_no_hereda_de_retorno_ausente_o_ambiguo(self):
+        from modelo.rutas import ContextoRutasReales
+        for ambiguo in (False, True):
+            with self.subTest(ambiguo=ambiguo):
+                motor = self.puerta_con_metadatos_unilaterales()
+                if ambiguo:
+                    motor.salas[1].salidas['N'] = {'sala': 2, 'llave': 'otra-llave'}
+                else:
+                    motor.salas[1].salidas.pop('E')
+                motor._rutas_reales = ContextoRutasReales([s for s in motor.salas if s is not None])
+                self.assertIsNone(motor.llave_puerta(motor.salas[2], 'O'))
+                self.accion(motor, 'abrir', 'O')
+                self.assertEqual(self.cierres(motor), [])
+
+    def test_re01_historia_y_binario_con_extremo_sin_metadatos(self):
+        from tests.datos_prueba import crear_paquete
+        from datos.offline import ClienteOffline
+        from datos.guardado_binario import cargar_estado_partida
+        from red.cache import CacheCatalogoOrdenado
+        from red.catalogo import GestorCatalogo
+        from red.precarga import GestorPrecarga
+        from modelo.juego import crear_juego
+        from controlador.partida_historica import integrar_historia
+        with tempfile.TemporaryDirectory() as carpeta:
+            almacen = crear_paquete(carpeta, salas=3)
+            generales = almacen.leer_generales('prueba', 'v1')
+            generales['sala_inicial'] = 101
+            almacen.guardar_generales(generales)
+            pagina = almacen.leer_pagina('prueba', 'v1', 1)
+            pagina['salas'][0]['salidas']['E'].update(cerrada=True, llave='obj_0', cierre_automatico=250)
+            pagina['salas'][1]['salidas']['O']['cerrada'] = True
+            almacen.guardar_pagina('prueba', 'v1', pagina)
+            for sala in pagina['salas']:
+                almacen.guardar_contenido('prueba', 'v1', dict(sala=sala['id'], enemigos=[],
+                    objetos=['obj_0'] if sala['id']==101 else [], trampas=[]))
+            cliente = ClienteOffline(carpeta)
+            precarga = GestorPrecarga(cliente, GestorCatalogo(cliente, CacheCatalogoOrdenado(25), almacen))
+            try:
+                motor = crear_juego(precarga, 'prueba', 42, partida_completa=True)
+                juego = integrar_historia(motor, 2)
+                llave = motor.objetos_en_suelo[101][0]
+                self.assertTrue(juego.ejecutar('recoger', llave.id_instancia).ok)
+                self.assertTrue(juego.ejecutar('abrir', 'O').ok)
+                self.assertEqual(motor.estado_vista().salidas[0].llave, 'obj_0')
+                esperado = juego.exportar_estado()
+                ruta = str(Path(carpeta)/'completa.bin')
+                guardar_estado(esperado, ruta)
+                self.assertTrue(juego.ejecutar('esperar').ok)
+                juego.restaurar_estado(cargar_estado_partida(ruta))
+                self.assertEqual(juego.exportar_estado(), esperado)
+                self.assertEqual(motor.llave_puerta(motor.salas[101], 'O'), 'obj_0')
+                for _ in range(3):
+                    self.assertTrue(juego.ejecutar('esperar').ok)
+                self.assertTrue(motor.salas[100].salidas['E']['cerrada'])
+                self.assertTrue(motor.salas[101].salidas['O']['cerrada'])
+                self.assertEqual(cliente.solicitudes_realizadas, 0)
+            finally:
+                precarga.cerrar()
+
     def extremos(self, motor):
         return (motor.salas[1].salidas["E"]["cerrada"],
                 motor.salas[2].salidas["O"]["cerrada"])
