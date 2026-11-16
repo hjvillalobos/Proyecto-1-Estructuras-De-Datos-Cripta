@@ -1,5 +1,9 @@
 # Plan técnico propuesto
 
+## Revisión RE-01..04 (2026-11-15)
+
+Resolver extremos con el emparejamiento propio ya existente, una vez por apertura. Leer llave/cierre del descriptor usado y, solo si falta el atributo, del único retorno físico. No copiar ni normalizar descriptores, alterar búsqueda de rutas o agregar índices hash. Imputar el trabajo O(grado) a abrir, no a cada evento. Pruebas negativas sin llave, ciclo real de cierre/reapertura, binario/retroceso y conexiones no emparejables. Validar contenido nuevo con fábrica/controlador/vista reales, backend de audio espía y WAV reales desde CWD ajeno, y animación por coordenadas sin cambios de modelo. Matriz de Parte I/II y auditoría independiente de mapas, separando asimetrías del servicio de defectos propios. Ejecutar regresión, opciones separadas y benchmarks aislados antes del push ordinario a 004-linea-tiempo. El análisis previo conserva reglas IA-04 y las restricciones de estructuras/MVC; no atribuye la decisión de puertas remotas al profesor.
+
 > **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
 
 

@@ -1,5 +1,11 @@
 # Bitácora de uso de LLM
 
+## 2026-11-15 — revisión completa y correcciones de entrega
+
+Herramienta: Codex. Solicitud inicial literal disponible en este chat: «como pruebo el cazador y la niebla y eso? intente pero no pude». Las ampliaciones llegaron mediante coordinación desde otro chat; se identifican como comunicación resumida, sin inventar la conversación original: revisar íntegramente Parte I/II, mapas y rendimiento; comprobar animación, niebla, objetos de catálogo inéditos con signo de pregunta y sonido en criptas nuevas. Se transmitieron estas autorizaciones literales de la usuaria: «Revisa absolutamente todo y si hay algo que haya que arreglar, hazlo», «Te doy permiso de que lo subas a mi rama, lo que cambies» y rama «la línea de tiempo». También pregunta por las dos criptas nuevas y si contienen cazadores/niebla.
+
+Uso: revisar rama limpia 004-linea-tiempo@7686b64, PDF íntegro de Parte II y extracción conservada de Parte I (PDF local vacío), suite y benchmarks; consultar API oficial mediante el cliente del proyecto y observar GUI nativa. Hallazgo a reproducir: apertura inversa de puerta recíproca con llave/cierre declarados en un solo extremo. Se especifica RE-01..04 antes de modificar producción; sin invocar comandos spec-kit que no se ejecutaron. Resultados finales se incorporarán a la auditoría de entrega, sin afirmar audición, revisión humana, fuentes faltantes recuperadas ni cero bugs.
+
 Este archivo registra los prompts relacionados con el proyecto, conforme al apartado 10.3 del enunciado. Cada integrante debe agregar su propia entrada en el momento de usar un LLM.
 
 ## 2026-09-17

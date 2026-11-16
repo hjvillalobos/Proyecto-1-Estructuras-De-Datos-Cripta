@@ -174,6 +174,15 @@ inválida sin mutación. Preparar esta aceptación no completa T010.
 
 ### RC-01 — margen del ciclo integrado
 
+### RE-01..04 — revisión de entrega del 15 de noviembre
+
+- RE-01: al reabrir desde cualquiera de los dos extremos de una puerta física recíproca inequívoca, respetar la llave y el intervalo de cierre automático publicados aunque esos atributos estén declarados únicamente en el otro extremo. No inventar retornos ni modificar los datos iniciales de salidas dirigidas o ambiguas. Si ambos extremos declaran un atributo, conservar el valor explícito del extremo usado; no normalizar datos contradictorios. Abrir sin llave se rechaza sin tiempo, historia o eventos; abrir con llave, cerrar, guardar/cargar y retroceder conservan la regla bilateral existente.
+- RE-02: en una cripta con identificadores de catálogo inéditos, los objetos sin arte local mantienen el signo de pregunta en suelo, inventario y equipo. Sus acciones y sonidos dependen de clase/acción y no de identificadores conocidos; buscar recursos desde otro directorio de trabajo debe funcionar. Distinguir despacho de WAV válido y reproducción audible efectivamente comprobada.
+- RE-03: sabueso y espectro usan la animación visual común (reposo y reacción al daño) sin modificar la simulación; desactivar animaciones conserva sus imágenes. No se exige inventar secuencias de fotogramas que el programa no tiene.
+- RE-04: contrastar Parte II original y texto conservado de Parte I, mapas publicados y contenido, regresión y cuatro límites de procesamiento. Entregar una matriz con evidencia, límites y faltantes históricos. No certificar fuentes vacías, defensa humana, latencias absolutas o ausencia total de errores.
+
+Escenarios RE-01: (a) sin llave y desde el extremo sin metadatos, rechazar sin mutación; (b) con llave, reabrir desde ese extremo y programar un cierre que cierre ambos lados; (c) cargar/revertir conserva estado y agenda; (d) sin retorno o con retorno ambiguo no hereda metadatos de una salida distinta. RE-02/03 se verifican sobre una cripta sintética nueva mediante fábrica, controlador y vista reales.
+
 ### VI-01..05 — mapa ilustrado y cazador
 
 - VI-01: distinguir visualmente el cazador mediante ilustración coherente con el juego, incluida una representación por comportamiento cuando un tipo nuevo carezca de PNG específico. Conservar nombre/tipo/instancia y datos del catálogo; la ilustración no modifica entidades.
