@@ -7,7 +7,9 @@
 - [x] RP-T01 Reconectar lanzador GUI y modo independiente, conservando CLI/hasta sin vista (RP-01/03/04).
 - [x] RP-T02 Fábrica completa/historia, cargas/retroceso, costos/animaciones y errores/cierre (RP-01/02/03).
 - [x] RP-T03 Probar menú/controlador, aislamiento de archivos/estado/sesión, controles y modos CLI; registrar evidencia/límites (RP-01..04).
-- [ ] RP-T04 Publicar cambios validados en004-linea-tiempo y verificar remoto (RP-01..04).
+- [x] RP-T04 Publicar cambios validados en 004-linea-tiempo y verificar remoto (RP-01..04).
+
+RP/VD publicados: push ordinario de 442d2b1; `ls-remote` confirmó 442d2b165068b94373c459ee51208dbae52c28ed en origin/004-linea-tiempo. 112 pruebas dirigidas, OK, e inspección nativa aislada; ver replay-viaje-2026-11-15.md. Puntajes locales excluidos.
 
 ## Seguimiento UX
 
