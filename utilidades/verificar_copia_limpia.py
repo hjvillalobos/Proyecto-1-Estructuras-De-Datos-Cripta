@@ -29,7 +29,9 @@ def main():
              'tests.test_almacen_salas', '-v'], cwd=destino,
             capture_output=True, text=True, encoding='utf-8', timeout=120)
         texto = resultado.stdout + resultado.stderr
-        (cache / 'fortalecimiento-copia-limpia.log').write_text(texto, encoding='utf-8')
+        evidencias = cache / 'revisiones'
+        evidencias.mkdir(exist_ok=True)
+        (evidencias / 'fortalecimiento-copia-limpia.log').write_text(texto, encoding='utf-8')
         print(texto)
         return resultado.returncode
 

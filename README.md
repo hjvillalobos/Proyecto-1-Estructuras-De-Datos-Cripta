@@ -62,6 +62,8 @@ El viaje usa solo conocimiento del jugador y se detiene por llegada, enemigos, d
 
 Los datos descargados están en `--datos-dir` (por defecto `.cache/cripta`, excluida de Git). Partidas, log de reproducción y puntajes normales están bajo `datos_generados/`; los nombres de guardado explícitos respetan la ruta indicada. `datos_generados/` se excluye de nuevas entregas Git: los guardados y puntajes son archivos personales creados al jugar. Conserva tus archivos antes de reemplazarlos. No borrar la copia de datos compatible necesaria para reproducir una partida.
 
+Los logs, mediciones y scripts auxiliares de revisiones locales se agrupan en `.cache/revisiones/`, fuera de Git. `INDICE.md` y `traslado-20261116.json` dentro de esa carpeta conservan la correspondencia de las rutas anteriores. Los paquetes de criptas conservan sus ubicaciones habituales.
+
 ```powershell
 python main.py --offline .cache/entrega --replay datos_generados/partida.log
 python main.py --offline .cache/entrega --replay datos_generados/partida.log --hasta 250

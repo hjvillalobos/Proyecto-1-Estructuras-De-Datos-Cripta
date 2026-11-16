@@ -12,7 +12,7 @@ Selección, detalle de nombre completo, zoom, desplazamiento, centrado y listado
 
 ## Contrato vigente
 
-Inspección directa del [OpenAPI oficial](https://cripta-api.kad06a0zhgs84.us-east-2.cs.amazonlightsail.com/openapi.json), versión **1.1.0**, contrastado con cliente/precarga/catálogo. Copia consultada local: `.cache/api-visual-openapi.json`.
+Inspección directa del [OpenAPI oficial](https://cripta-api.kad06a0zhgs84.us-east-2.cs.amazonlightsail.com/openapi.json), versión **1.1.0**, contrastado con cliente/precarga/catálogo. Copia consultada local: `.cache/revisiones/api-visual-openapi.json`.
 
 | GET publicado | Integración existente |
 |---|---|
@@ -32,7 +32,7 @@ OpenAPI permite algunos opcionales/nulos más amplios que los datos conformes de
 
 ## API y contenido reales
 
-`CRIPTA_API_REAL=1 python -B -X utf8 -m unittest tests.test_verificacion_entrega.TestApiRealEntrega -v`: **una prueba, 87.563 s, OK**, UUID por proceso, fases fría/caliente y presupuesto sin cambios. Catálogo `4b9e75a42be5`. Log local `.cache/mapa-visual-api.log`.
+`CRIPTA_API_REAL=1 python -B -X utf8 -m unittest tests.test_verificacion_entrega.TestApiRealEntrega -v`: **una prueba, 87.563 s, OK**, UUID por proceso, fases fría/caliente y presupuesto sin cambios. Catálogo `4b9e75a42be5`. Log local `.cache/revisiones/mapa-visual-api.log`.
 
 | Cripta | Versión | Fría / límite | Caliente | Dictamen |
 |---|---|---:|---:|---|
@@ -50,9 +50,9 @@ Siete casos en `tests/test_mapa_visual.py`: privacidad ante información oculta 
 
 Inspección nativa: arranque offline normal, verificador, Jugar, botón Mapa y cierre sin avanzar t=0 ni añadir acciones al log. Una segunda ventana titulada **revisión de arte, sin partida** permitió ver juntos los tres enemigos y un mapa preparado de seis salas: selección, detalle, puertas, destino, zoom, listado y cierre. Esa preparación no se presenta como partida natural.
 
-La primera regresión detectó la firma inválida de las composiciones tras modificar recursos (828 casos, dos fallos/nueve errores de composiciones, dos opciones omitidas). Log preservado `.cache/mapa-visual-suite.log`. Se regeneraron 152 composiciones con `python -m utilidades.preparar_visuales` para conservar su carga preparada. Comparadas contra Git: tamaño, modo y bytes de píxeles idénticos en las 152; cambia la firma de procedencia. Después pasaron los 14 casos de composiciones y mapa. No se debilitaron las pruebas ni la validación de firmas.
+La primera regresión detectó la firma inválida de las composiciones tras modificar recursos (828 casos, dos fallos/nueve errores de composiciones, dos opciones omitidas). Log preservado `.cache/revisiones/mapa-visual-suite.log`. Se regeneraron 152 composiciones con `python -m utilidades.preparar_visuales` para conservar su carga preparada. Comparadas contra Git: tamaño, modo y bytes de píxeles idénticos en las 152; cambia la firma de procedencia. Después pasaron los 14 casos de composiciones y mapa. No se debilitaron las pruebas ni la validación de firmas.
 
-Regresión final: **828 pruebas en 214.910 s, cero fallos/errores, OK (skipped=2)**. Log local `.cache/mapa-visual-suite-final.log`. Opciones: comparación de revisiones históricas (ejecución anterior separada, 41 pruebas OK) y API real (repetida arriba). El paquete oficial histórico también se habilitó mediante `CRIPTA_PAQUETE_API`; sus pruebas pasaron. No se promete igualdad temporal exacta bajo cualquier carga del sistema.
+Regresión final: **828 pruebas en 214.910 s, cero fallos/errores, OK (skipped=2)**. Log local `.cache/revisiones/mapa-visual-suite-final.log`. Opciones: comparación de revisiones históricas (ejecución anterior separada, 41 pruebas OK) y API real (repetida arriba). El paquete oficial histórico también se habilitó mediante `CRIPTA_PAQUETE_API`; sus pruebas pasaron. No se promete igualdad temporal exacta bajo cualquier carga del sistema.
 
 ## Copia limpia y rendimiento
 

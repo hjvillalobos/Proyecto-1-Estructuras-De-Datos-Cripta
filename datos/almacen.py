@@ -25,6 +25,7 @@ class AlmacenLocal:
 
     def _guardar(self, ruta, datos):
         temporal = None
+        error_principal = None
         try:
             ruta.parent.mkdir(parents=True, exist_ok=True)
             with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=ruta.parent,
@@ -32,11 +33,20 @@ class AlmacenLocal:
                 temporal = Path(archivo.name)
                 json.dump(datos, archivo, ensure_ascii=False, allow_nan=False)
             os.replace(temporal, ruta)
+            temporal = None
         except (OSError, ValueError, TypeError) as error:
-            raise DatosNoDisponibles(f"No se puede guardar {ruta}: {error}") from error
+            error_principal = DatosNoDisponibles(f"No se puede guardar {ruta}: {error}")
+            raise error_principal from error
         finally:
-            if temporal is not None and temporal.exists():
-                temporal.unlink()
+            if temporal is not None:
+                try:
+                    temporal.unlink(missing_ok=True)
+                except OSError as error:
+                    mensaje = f"No se pudo eliminar el archivo temporal {temporal}: {error}"
+                    if error_principal is not None:
+                        error_principal.add_note(mensaje)
+                    else:
+                        raise DatosNoDisponibles(mensaje) from error
 
     def leer_lista(self):
         return self._leer(self.carpeta / "criptas.json")

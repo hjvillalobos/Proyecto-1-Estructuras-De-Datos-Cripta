@@ -62,7 +62,7 @@ Regresión posterior a estas mejoras de aceptación: **810 pruebas, OK (skipped=
 
 ## Resultado del cierre integrado
 
-Python 3.14.6, Windows 11. Suite completa posterior a integrar A: **809 pruebas, OK, cuatro omisiones y cero fallos/errores**, en 176.630 s. Log local `.cache/integracion-final-con-a.log`. Últimas comprobaciones después de aislar también los derivados de la carga y conectar la CLI del benchmark de A: **40 pruebas, OK** en 4.830 s; limpieza del identificador de pergamino predeterminado: **15 pruebas, OK**. Los conjuntos se solapan y no se suman.
+Python 3.14.6, Windows 11. Suite completa posterior a integrar A: **809 pruebas, OK, cuatro omisiones y cero fallos/errores**, en 176.630 s. Log local `.cache/revisiones/integracion-final-con-a.log`. Últimas comprobaciones después de aislar también los derivados de la carga y conectar la CLI del benchmark de A: **40 pruebas, OK** en 4.830 s; limpieza del identificador de pergamino predeterminado: **15 pruebas, OK**. Los conjuntos se solapan y no se suman.
 
 Omisiones: comparación opcional contra una revisión previa de C; dos pruebas con paquete antiguo de cuatro criptas no indicado; prueba opcional de API en vivo de esas cuatro criptas. No quedan omisiones del productor/restauración de producción. La comparación de C se había ejecutado separadamente con 41 casos aprobados durante la auditoría. No se altera una omisión para fingir éxito.
 

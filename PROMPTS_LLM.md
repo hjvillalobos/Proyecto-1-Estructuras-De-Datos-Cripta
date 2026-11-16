@@ -1,5 +1,15 @@
 # Bitácora de uso de LLM
 
+## 2026-11-16 — agrupar evidencias locales
+
+- **Herramienta/modelo:** Codex (GPT-6), PowerShell y Python.
+- **Prompt textual, con captura del explorador:**
+
+> todo esto no podria ir en una carpeta o algo? visualmente se ve feo
+
+- **Uso:** agrupar 92 logs, mediciones y scripts auxiliares de la raíz de .cache en .cache/revisiones; conservar hashes e índice, ajustar las rutas de cinco scripts y referencias documentales; mantener íntegros los textos históricos de prompts. Actualizar la salida de verificar_copia_limpia para no recrear archivos sueltos. No mover paquetes de criptas ni modificar constitución/main.
+- **Cierre técnico anterior ERR-01:** 59 pruebas dirigidas y 863 en la suite, cero fallos/errores; prueba de doble fallo reprodujo el defecto antes de corregirlo. Las opciones de API/comparación tienen evidencia separada previa; no se afirma una nueva ejecución HTTP en este incremento.
+
 ## 2026-11-16 — cierre adicional sin modificar constitución ni main
 
 - **Herramienta/modelo:** Codex (GPT-6), PowerShell, Git y Python/unittest; habilidad PDF para consultar checklist local.

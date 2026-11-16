@@ -2,8 +2,10 @@
 
 ## Recuperación de almacenamiento — ERR-01
 
-- [ ] ERR-T01 Reproducir reemplazo+limpieza fallidos y verificar causa original y destino anterior; cubrir serialización inválida y escritura correcta (ERR-01; tests/test_almacen_errores.py).
-- [ ] ERR-T02 Corregir limpieza del temporal propio sin ocultar excepción principal; ejecutar regresiones de datos, persistencia e integración y registrar resultados (ERR-01).
+- [x] ERR-T01 Reproducir reemplazo+limpieza fallidos y verificar causa original y destino anterior; cubrir serialización inválida y escritura correcta (ERR-01; tests/test_almacen_errores.py).
+- [x] ERR-T02 Corregir limpieza del temporal propio sin ocultar excepción principal; ejecutar regresiones de datos, persistencia e integración y registrar resultados (ERR-01).
+
+ERR-01: la prueba de doble fallo reprodujo PermissionError ocultando DatosNoDisponibles antes de la corrección. Tras corregir: 59 pruebas dirigidas en 8.457 s y suite de 863 en 239.241 s, cero fallos/errores. Dos opciones omitidas (API y comparación histórica) cuentan con evidencia separada previa; el paquete histórico sí se ejecutó en esta suite. No se suman los conteos solapados.
 
 ## Consolidación de presentación — 2026-11-16
 

@@ -235,7 +235,7 @@ Corrida final con Python 3.14.6, Windows y `CRIPTA_SIN_AUDIO=1`: **701 pruebas,
 695 aprobadas, 6 omisiones y cero fallos/errores**, en 147.274 s. Se usó un runner
 local de `unittest` con descubrimiento de `tests/`, salida por caso y un límite
 de diagnóstico de 45 s por caso. Registro local:
-`.cache/revision-d-viaje-suite-final.log`. Reproducción ordinaria:
+`.cache/revisiones/revision-d-viaje-suite-final.log`. Reproducción ordinaria:
 
 ```powershell
 $env:CRIPTA_SIN_AUDIO='1'
@@ -279,7 +279,7 @@ independientes. La regresión seleccionada posterior aprobó 28 pruebas.
 
 Corrida final con Python 3.14.6 y `CRIPTA_SIN_AUDIO=1`: **709 pruebas, 703
 aprobadas, seis omisiones y cero fallos/errores**, en 128.960 s. Registro local:
-`.cache/revision-d-main-h3.log`. Se usó el mismo runner de descubrimiento con
+`.cache/revisiones/revision-d-main-h3.log`. Se usó el mismo runner de descubrimiento con
 límite de diagnóstico por caso descrito en la sección anterior. Reproducción:
 
 ```powershell
@@ -403,7 +403,7 @@ atribuyen a la integración DX ni se presentan como aprobados. Las omisiones
 son: comparación opcional por revisiones de rutas (setUpClass), dos casos de
 paquete oficial no indicado, dos casos de historia del motor normal aún sin
 activación de producción y API real deshabilitada. Registro local reproducible:
-`.cache/aceptacion-d-ac-real-2026-11-12.log` (salida generada no versionada).
+`.cache/revisiones/aceptacion-d-ac-real-2026-11-12.log` (salida generada no versionada).
 No aparecieron fallos adicionales. Esta corrida no renueva mediciones de
 rendimiento ni cierra los contratos pendientes.
 
@@ -445,7 +445,7 @@ python -B -X utf8 -m unittest tests.test_controlador_ac_real tests.test_persiste
 16.771 s. La selección incluye los nueve casos DX anteriores y las regresiones
 de binario, presentación, receptor H3, fallos transaccionales, restauración,
 viaje y cambios históricos. Registro local no versionado:
-`.cache/aceptacion-d-mc01-2026-11-13.log`. No se repitió la suite completa ni se
+`.cache/revisiones/aceptacion-d-mc01-2026-11-13.log`. No se repitió la suite completa ni se
 renuevan mediciones de rendimiento por este incremento de pruebas.
 
 ### Coordinación pendiente A/C/D

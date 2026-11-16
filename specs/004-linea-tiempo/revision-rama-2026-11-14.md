@@ -18,7 +18,7 @@ Se extrajo nuevamente el PDF local íntegro `Cripta - Parte II.pdf`, 13 páginas
 
 ## Validación ejecutada en esta revisión
 
-Python 3.14.6, Windows 11, audio desactivado, TEMP/TMP escribibles y `CRIPTA_PAQUETE_API` apuntando a `.cache/qa-paquete-p1`. Regresión: **810 pruebas en 198.006 s, cero fallos, cero errores, dos omisiones opcionales**. Log: `.cache/revision-2026-11-14-suite.log`.
+Python 3.14.6, Windows 11, audio desactivado, TEMP/TMP escribibles y `CRIPTA_PAQUETE_API` apuntando a `.cache/qa-paquete-p1`. Regresión: **810 pruebas en 198.006 s, cero fallos, cero errores, dos omisiones opcionales**. Log: `.cache/revisiones/revision-2026-11-14-suite.log`.
 
 Las omisiones corresponden a la comparación con una revisión histórica y la API en vivo. Su evidencia separada anterior figura en `qa-adicional-2026-11-14.md`; no se afirma haberlas vuelto a ejecutar en esta revisión. Las cuatro criptas del paquete histórico y las partidas generadas sí quedaron incluidas en la suite actual.
 
@@ -31,7 +31,7 @@ Medición offline sin la suite concurrente, referencia local `cripta-06@f9ed9afa
 | Verificador completo | Normalización, recorrido, diagnóstico y reporte; diez muestras | 9.369 ms | 200 ms |
 | Historia K=50 | 5.000 acciones, 100 campos sintéticos, 111 consultas | 1.0117 ms | 50 ms |
 
-Ciclo: media 3.636 ms, 0/30 excesos. Viaje: media 0.157 ms, 0/30 excesos. Verificador: media 7.683 ms, cero HTTP; su alternativa repetitiva se midió y contrastó en la misma ejecución. Rutas: `.cache/revision-2026-11-14-rendimiento.log`.
+Ciclo: media 3.636 ms, 0/30 excesos. Viaje: media 0.157 ms, 0/30 excesos. Verificador: media 7.683 ms, cero HTTP; su alternativa repetitiva se midió y contrastó en la misma ejecución. Rutas: `.cache/revisiones/revision-2026-11-14-rendimiento.log`.
 
 Historia: tres repeticiones, semilla 20261001, K=10/50/100 y sin controles. Máximos de consulta total: 0.2912 / 1.0117 / 1.7798 / 82.1470 ms; memoria retenida: 6.208.572 / 5.422.292 / 5.126.900 / 4.808.436 bytes. K=50 conserva como máximo 50 acciones reconstruidas y 0/111 consultas sobre 50 ms; sin controles hay 18/111 excesos. Estos datos mantienen la justificación del valor por defecto sin confundir las alternativas descartadas con producción.
 

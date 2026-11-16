@@ -1,5 +1,9 @@
 # Decisiones de diseño
 
+## ERR-01 — recuperación de datos locales
+
+El guardado de JSON podía fallar al reemplazar y después al eliminar su temporal: el segundo error ocultaba el primero. Se adopta el patrón ya usado por la persistencia histórica: excepción pública DatosNoDisponibles con causa original y nota adicional de limpieza. Tras reemplazo exitoso se libera la referencia al temporal. No cambia formato, red, reglas ni estructuras evaluadas; costo O(tamaño del JSON). Alternativa descartada: propagar solamente el fallo de unlink, porque pierde la causa de la operación. Tres pruebas nuevas cubren doble fallo con destino intacto, JSON inválido con limpieza y escritura correcta sin residuos. Regresión dirigida 59 pruebas/8.457 s, suite 863/239.241 s, cero fallos/errores. La limpieza fallida puede dejar el temporal propio, que se identifica en la nota; no se afirma poder eliminar un archivo al que el sistema niega acceso.
+
 ## Auditoría integral — 2026-11-16
 
 Se conservan las estructuras y reglas existentes. Se corrige la reutilización de tuplas de animación en el respaldo sin atlas, manteniendo la caché de acciones acotada a ocho entradas; no se introduce índice hash en algoritmos evaluados. Se regeneran las 152 composiciones por invalidación de firmas tras cambios locales anteriores: sus píxeles son idénticos a HEAD. Historia aclara el estado anterior a la acción y rechaza #0 desde el diálogo, conforme a FR-003/020.
@@ -587,8 +591,8 @@ python -m unittest discover -v
 python -m tests.medir_rendimiento --paquete .cache/cripta
 ```
 
-Los datos completos estan en `.cache/rendimiento.json` y la salida de la suite
-en `.cache/pruebas-rendimiento.txt` (archivos locales ignorados por Git).
+Los datos completos estan en `.cache/revisiones/rendimiento.json` y la salida de la suite
+en `.cache/revisiones/pruebas-rendimiento.txt` (archivos locales ignorados por Git).
 El benchmark excluye Tk y audio. Un perfil previo con cache visual vacia
 dedico aproximadamente 0.82 s al primer dibujo, incluyendo la preparacion de
 ambas orientaciones del personaje; ese costo grafico inicial sigue existiendo.
@@ -649,8 +653,8 @@ limite estricto de 20 ms para la presentacion.
 Son mediciones de snapshots sinteticos con Python 3.14.6, no una medicion de HTTP
 ni del motor. No incluyen la pausa intencional de las animaciones; en movimiento
 se dibujan salida y llegada sin esa pausa. La cache del sistema operativo puede
-estar caliente. El detalle esta en `.cache/presentacion.json` y la suite en
-`.cache/pruebas-objetos.txt`. El script no genera partidas ni consume solicitudes.
+estar caliente. El detalle esta en `.cache/revisiones/presentacion.json` y la suite en
+`.cache/revisiones/pruebas-objetos.txt`. El script no genera partidas ni consume solicitudes.
 
 ## Medicion especifica de puerta a puerta
 
@@ -684,7 +688,7 @@ del sistema operativo. Los maximos de distintas columnas pueden ser casos distin
 
 Validacion de este ajuste: 31 pruebas aprobadas de animacion, cadencia, puertas,
 trampas y transicion de inicio; auditoria estatica sin hallazgos. El detalle de
-los recorridos posteriores esta en `.cache/puertas.json`.
+los recorridos posteriores esta en `.cache/revisiones/puertas.json`.
 
 
 ## Decisión de diseño: verificador de resolubilidad
@@ -1062,7 +1066,7 @@ Problema: cada ascenso/descenso reconstruía repetidamente etiquetas y tuplas pa
 
 Evidencia pareada: `--bench --subsistemas parte-dos --paquete .cache/entrega-completa --cripta cripta-06 --repeticiones 60`. Preparación excluida, mismo grafo y parejas, orden de ejecución alternado, igualdad de decisiones comprobada. Mediana anterior 4.1880 ms, nueva 2.1898 ms (razón 1.912; reducción aproximada del 47.7%); máximos 6.9196 y 3.0624 ms. La alternativa anterior permanece en `utilidades/bench_heap_claves.py`, solo para medición.
 
-En la misma ejecución: paso conocido máximo 2.567 ms, 0/60 sobre 5 ms; ciclo integrado con 30 cazadores máximo 14.264 ms, 0/60 sobre 20 ms. Medias 0.054 y 7.589 ms. La primera búsqueda está incluida. No se atribuye una mejora porcentual de ciclo frente a las antiguas 30 repeticiones: aquí son 60 y la población alcanza al jugador en momentos distintos. Log local `.cache/fortalecimiento-bench.log`. Los resultados corresponden a esa referencia/equipo y no garantizan tiempos bajo cualquier carga del sistema.
+En la misma ejecución: paso conocido máximo 2.567 ms, 0/60 sobre 5 ms; ciclo integrado con 30 cazadores máximo 14.264 ms, 0/60 sobre 20 ms. Medias 0.054 y 7.589 ms. La primera búsqueda está incluida. No se atribuye una mejora porcentual de ciclo frente a las antiguas 30 repeticiones: aquí son 60 y la población alcanza al jugador en momentos distintos. Log local `.cache/revisiones/fortalecimiento-bench.log`. Los resultados corresponden a esa referencia/equipo y no garantizan tiempos bajo cualquier carga del sistema.
 
 ### IDs dispersos, rastro y persistencia
 
@@ -1078,7 +1082,7 @@ README reescrito para instalación, modos, comandos, datos generados, pruebas y 
 
 La primera regresión de fortalecimiento aprobó 813 pruebas en 191.984 s, cero fallos/errores y dos omisiones opcionales. Las opciones se ejecutaron aparte: comparación histórica 41 pruebas, OK; API oficial cinco criptas en fases fría/caliente, una prueba en 88.736 s, OK, todos los presupuestos respetados (fría 13/23, 16/42, 17/52, 14/25 y 46/63; caliente tres solicitudes por cripta). La ejecución restringida inicial falló por DNS; el reintento autorizado con acceso de red aprobó, sin modificar el programa ni ocultar la ejecución fallida. Copia limpia de fuentes sin cachés/partidas: 19 pruebas de modos, IDs e integración, OK, 6.691 s, usando el intérprete/dependencias instalados; no se afirma haber reinstalado dependencias desde Internet. Después del índice radix final aprobaron 24 pruebas de almacenamiento, partidas, rastro y restauración; la regresión final se registra a continuación.
 
-Regresión final del índice definitivo: **814 pruebas en 183.269 s, OK (skipped=2), cero fallos/errores**. Log `.cache/fortalecimiento-suite-final.log`. Las dos opciones tienen las ejecuciones separadas aprobadas indicadas antes. Se ejecutaron además diez pruebas del benchmark/estrategias tras conectar la comparación de claves; cero fallos.
+Regresión final del índice definitivo: **814 pruebas en 183.269 s, OK (skipped=2), cero fallos/errores**. Log `.cache/revisiones/fortalecimiento-suite-final.log`. Las dos opciones tienen las ejecuciones separadas aprobadas indicadas antes. Se ejecutaron además diez pruebas del benchmark/estrategias tras conectar la comparación de claves; cero fallos.
 
 Repetición final offline sin la suite concurrente, mismo equipo/versión/semilla: mediana heap anterior/nuevo 4.3523/2.2538 ms, razón 1.931 (48.2% menos tiempo mediano), decisiones iguales. Viaje máximo 2.501 ms (0/60 sobre 5); ciclo 14.017 ms (0/60 sobre 20); verificador completo 7.855 ms (0/10 sobre 200). Historia, cinco repeticiones y 185 consultas por variante: máximos K=10/50/100/sin controles 0.2208/0.9363/1.8317/123.0777 ms; memorias retenidas 6.212.156/5.305.932/5.126.876/4.808.436 bytes. K=50 mantiene un máximo de 50 acciones reconstruidas y 0/185 excesos; sin controles hubo 72/185 excesos. Se conserva K=50.
 

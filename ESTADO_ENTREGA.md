@@ -1,6 +1,8 @@
 # Estado vigente y trazabilidad de entrega
 
-Estado técnico del 2026-11-16: 858 pruebas, cero fallos/errores; las cuatro omisiones opcionales se ejecutaron por separado y aprobaron. Resultados de procesamiento en DECISIONES.md. Las anotaciones fechadas de specs/planes/checklists conservan sus cortes históricos; los encabezados de estado identifican la integración posterior. No se cambió la constitución 1.1.0. La usuaria confirmó que no dispone de revisiones cruzadas del equipo: su acreditación continúa pendiente y no se sustituye por pruebas automáticas.
+Cierre posterior ERR-01: **863 pruebas en 239.241 s, cero fallos/errores, dos opciones omitidas con evidencia separada previa**. El paquete histórico se ejecutó en la suite. La comprobación de copia sin cachés pasó 20 pruebas en 9.357 s. Se corrigió la conservación del error principal al fallar guardado y limpieza de datos; se agruparon 92 evidencias y auxiliares locales en .cache/revisiones/. Constitución 1.1.0 y main intactos; no cambia el estado de los faltantes históricos.
+
+Corte anterior del 2026-11-16: 858 pruebas, cero fallos/errores; las cuatro omisiones opcionales se ejecutaron por separado y aprobaron. Resultados de procesamiento en DECISIONES.md. Las anotaciones fechadas de specs/planes/checklists conservan sus cortes históricos; los encabezados de estado identifican la integración posterior. No se cambió la constitución 1.1.0. La usuaria confirmó que no dispone de revisiones cruzadas del equipo: su acreditación continúa pendiente y no se sustituye por pruebas automáticas.
 
 Rama `004-linea-tiempo`. Este documento distingue la entrega integrada de los registros fechados de desarrollo. Defensa excluida. Las cuatro capacidades funcionan desde la aplicación normal, con historia, conocimiento y persistencia conjuntos. Las anotaciones antiguas de entregas parciales no representan capacidades ausentes.
 

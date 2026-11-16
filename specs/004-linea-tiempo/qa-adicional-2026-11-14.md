@@ -79,14 +79,14 @@ Revisión del 2026-11-14 a petición de la usuaria: no quedan estas tres cuestio
 
 ## Evidencia local
 
-Logs fuera de Git: `.cache/qa-final-comparacion-c.log`, `qa-final-preparacion-p1.log`, `qa-final-paquete-p1-corregido.log`, `qa-final-api-real.log`, `qa-final-partida-generada.log`, `qa-final-suite.log`. Las cifras/versiones relevantes se conservan aquí para revisión sin depender de temporales.
+Logs fuera de Git: `.cache/revisiones/qa-final-comparacion-c.log`, `qa-final-preparacion-p1.log`, `qa-final-paquete-p1-corregido.log`, `qa-final-api-real.log`, `qa-final-partida-generada.log`, `qa-final-suite.log`. Las cifras/versiones relevantes se conservan aquí para revisión sin depender de temporales.
 
 ## Regresión final
 
-Python 3.14.6, Windows 11: **810 pruebas en 217.145 s; OK (skipped=2), cero fallos/errores**. Ejecución con `CRIPTA_PAQUETE_API` apuntando al paquete histórico completo, `CRIPTA_SIN_AUDIO=1` y TEMP/TMP escribibles. Comando equivalente: `python -B -X utf8 -m unittest discover -s tests -t . -v`; se utilizó además un límite diagnóstico de 45 s por caso. Log: `.cache/qa-final-suite-corregida.log`.
+Python 3.14.6, Windows 11: **810 pruebas en 217.145 s; OK (skipped=2), cero fallos/errores**. Ejecución con `CRIPTA_PAQUETE_API` apuntando al paquete histórico completo, `CRIPTA_SIN_AUDIO=1` y TEMP/TMP escribibles. Comando equivalente: `python -B -X utf8 -m unittest discover -s tests -t . -v`; se utilizó además un límite diagnóstico de 45 s por caso. Log: `.cache/revisiones/qa-final-suite-corregida.log`.
 
 Las dos omisiones corresponden a la comparación contra otra revisión de C (preparada y aprobada por separado: 41 pruebas, incluyendo sus tres casos comparativos) y a la API real (aprobada por separado sobre las cinco criptas). No quedan escenarios opcionales identificados sin ejecución, aunque sus condiciones de preparación siguen siendo optativas en la suite normal. No se suman estos conjuntos solapados.
 
-La regresión de foco aislada pasó tres repeticiones: 15 pruebas, OK, 21.790 s; log `.cache/qa-final-dialogo-foco.log`. La primera suite y la repetición diagnóstica fueron interrumpidas por la prueba de foco, y se conservan como evidencia fallida/interrumpida, no como resultados verdes. No se eliminaron ni omitieron casos para obtener la aprobación final.
+La regresión de foco aislada pasó tres repeticiones: 15 pruebas, OK, 21.790 s; log `.cache/revisiones/qa-final-dialogo-foco.log`. La primera suite y la repetición diagnóstica fueron interrumpidas por la prueba de foco, y se conservan como evidencia fallida/interrumpida, no como resultados verdes. No se eliminaron ni omitieron casos para obtener la aprobación final.
 
 Publicación verificada: commit `acd84db`, push ordinario a `origin/004-linea-tiempo` el mismo día. No se modificaron main ni ramas de otras personas. Las fuentes/respuestas externas anteriores conservan su estado pendiente.
