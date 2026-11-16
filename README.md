@@ -52,6 +52,8 @@ Al consultar el servicio el 15 de noviembre se publicaban cripta-02–06. Las do
 
 ## Acciones y archivos
 
+En la GUI, **Replay** abre una ventana independiente con reproducción gráfica, pausa/continuar, velocidad y detener. Alternativa: `python main.py --offline .cache/entrega --replay-grafico datos_generados/partida.log` con datos compatibles. Lee el log al abrirlo; para incluir acciones posteriores hay que abrirlo de nuevo. `--replay` y `--hasta` conservan su modo sin vista. **Viajar** permite seleccionar una sala explorada o escribir su número en un diálogo temático; Cancelar, Escape o X conservan la partida. [Validación y límites](specs/004-linea-tiempo/replay-viaje-2026-11-15.md).
+
 Durante una partida gráfica, **Salir** permite continuar, reiniciar esa cripta, volver al menú o cerrar el juego. Escape o cerrar el diálogo conserva la partida; reiniciar requiere elección explícita y no sobrescribe guardados. El encabezado muestra el ID de cripta y una orientación del objetivo respetando el mapa conocido. La salida no tiene por qué ser la sala con mayor número: debes abrir su acceso con la llave correspondiente y atravesarlo. [Diagnóstico del recorrido por sala20, enemigos/daño y validación](specs/004-linea-tiempo/seguimiento-ux-2026-11-15.md).
 
 En consola: `mover N` (también S/E/O), `abrir E`, `atacar INSTANCIA`, `esperar`, `recoger INSTANCIA`, `usar INSTANCIA`, `equipar INSTANCIA`, `soltar INSTANCIA`, `inventario`, `mapa`, `ir a SALA`, `cancelar`, `retroceso`, `historia T`, `historia #K`, `guardar "archivo.bin"`, `cargar "archivo.bin"` y `salir`. La GUI ofrece los controles correspondientes y navegación del inventario. Cada enemigo/objeto se identifica por instancia.

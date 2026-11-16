@@ -13,15 +13,26 @@ class ReproductorReplay:
         self._precarga = gestor_precarga
         self._vista = vista
         self._crear_juego = crear_juego
+        self.fallo = False
 
     def reproducir(self, ruta):
-        self._error = (self._vista.mostrar_error_replay
+        self.fallo = False
+        informar_error = (self._vista.mostrar_error_replay
                        if callable(getattr(type(self._vista), "mostrar_error_replay", None))
                        else self._vista.mostrar_error)
+        def informar(texto):
+            self.fallo = True
+            informar_error(texto)
+        self._error = informar
+
+        def datos(funcion, *args, **kwargs):
+            if callable(getattr(type(self._vista), 'ejecutar_tarea', None)):
+                return self._vista.ejecutar_tarea(funcion, *args, **kwargs)
+            return funcion(*args, **kwargs)
         bitacora = BitacoraReplay(ruta)
         try:
             meta, acciones = bitacora.leer()
-        except ErrorReplay as e:
+        except (ErrorReplay, OSError) as e:
             self._error(str(e))
             return
 
@@ -50,7 +61,7 @@ class ReproductorReplay:
 
         # estado inicial
         try:
-            juego = self._crear_juego(
+            juego = datos(self._crear_juego,
                 self._precarga, meta.cripta_id, meta.semilla,
                 version_cripta=meta.version_cripta, version_catalogo=meta.version_catalogo)
             if (juego.meta.cripta_id != meta.cripta_id
@@ -68,8 +79,8 @@ class ReproductorReplay:
 
         for i, accion in enumerate(acciones, start=1):
             try:
-                resultado = aplicar_accion_replay(juego, accion)
-            except (ErrorReplay, ErrorCripta, OSError) as error:
+                resultado = datos(aplicar_accion_replay, juego, accion)
+            except (ErrorReplay, ErrorCripta, OSError, ValueError) as error:
                 self._error(f"Replay detenido en paso {i}: {error}")
                 return
             if not resultado.ok:

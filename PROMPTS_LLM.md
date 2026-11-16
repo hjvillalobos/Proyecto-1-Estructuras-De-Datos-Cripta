@@ -13031,3 +13031,13 @@ Uso: perfilar el ciclo integrado, especificar RC-01 antes de código (5972e3d), 
 
 - **Archivos entregados:** vista/recursos/cazador_ilustrado.png, vista/recursos/ent_espectro_acechador.png y vista/recursos/ent_carcelero_errante.png. Resultados del generador copiados sin edición; resolución de tipo/comportamiento y cache existentes. El resto del mapa se dibuja con Canvas para no añadir imágenes/red/animación por evento.
 - **Evidencia y límites:** Especificación defa0c4 previa al código. Primer intento completo: 828 pruebas con fallos por firma de composiciones; regeneración con la herramienta propia, 152/152 con píxeles idénticos. Suite final 828 en 214.910 s, cero fallos/errores, dos opciones omitidas identificadas. API real: cinco criptas fría/caliente dentro de presupuesto, una prueba en 87.563 s, OK. RC-01 repetido: estados/historia/azar iguales en cinco parejas, motor optimizado mediana 4.1807 ms/máximo 9.1013 ms y 0/600 sobre 20; auxiliar de viaje 5.5273 ms, 1/600 sobre 5, conservado sin ocultarlo ni cambiar el planificador. Revisión GUI normal y composición separada titulada sin partida. Auditoría y muestras en specs/004-linea-tiempo/visual-api-2026-11-14.md y visual-mediciones.json. No se afirma cero bugs futuros ni una nota.
+
+
+### 2026-11-15 — Persona D — cierre RP / VD
+
+- **Herramienta/modelo:** Codex GPT-6, Python/unittest, PowerShell y control visual nativo.
+- **Continuidad recibida (literal):**
+
+> Coordinación de continuidad: el objetivo activo NO es repetir las instrucciones antiguas para probar cazadores/niebla. Son las correcciones de Replay gráfico y diálogo de Viajar ya implementadas en tu árbol de trabajo. Tu validación ampliada ya pasó 112 pruebas según replay-viaje-validacion-corregida.log. Habías inspeccionado visualmente el diálogo y estabas ajustando la barra del replay para que no se recortara. La usuaria en el chat principal pide continuar con esas tareas hasta commit y push verificado a 004-linea-tiempo, sin reiniciar investigación. Termina revisión visual/documentación y publicación de estos cambios actuales, conservando las reglas y modos CLI. Comunica estado real final y enlace.
+
+- **Resultado:** replay gráfico independiente con fábrica completa/historia y controles visibles; Viajar temático con proyección explorada y cancelación sin mutación. 112 pruebas dirigidas en 41.511 s, OK. Inspección nativa con partida temporal aislada: selección/cancelación y replay pausado/continuación/pasos/resumen final. No se repitieron suite completa ni benchmarks; puntajes previos excluidos. Especificaciones previas fe87ebf/8b01f2e. Evidencia y límites en specs/004-linea-tiempo/replay-viaje-2026-11-15.md.

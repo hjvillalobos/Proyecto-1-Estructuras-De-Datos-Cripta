@@ -84,10 +84,11 @@ class ComandosIntegracionTest(unittest.TestCase):
         vista.root.withdraw()
         botones = [boton for marco in vista.root.winfo_children()
                    for boton in marco.winfo_children() if isinstance(boton, tk.ttk.Button)]
-        with patch("vista.grafica.simpledialog.askstring", side_effect=["#1", "2"]):
+        with patch("vista.grafica.simpledialog.askstring", return_value="#1") as pregunta:
             for etiqueta in ("Historia", "Mapa", "Viajar"):
                 next(b for b in botones if b.cget("text") == etiqueta).invoke()
-        self.assertEqual(vista._cola, ["historia #1", "mapa", "ir a 2"])
+        pregunta.assert_called_once()  # Viajar pide la proyección al controlador.
+        self.assertEqual(vista._cola, ["historia #1", "mapa", "viajar"])
         contenido = []
 
         def cerrar_informe():

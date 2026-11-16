@@ -1,12 +1,12 @@
 # Tareas — línea de tiempo
 
-- [ ] VD-T01 Diálogo temático, selección explorada/validación, Enter/Escape/X y controlador sin mutación al cancelar; pruebas y evidencia (VD-01).
+- [x] VD-T01 Diálogo temático, selección explorada/validación, Enter/Escape/X y controlador sin mutación al cancelar; pruebas y evidencia (VD-01).
 
 ## Replay gráfico RP
 
-- [ ] RP-T01 Reconectar lanzador GUI y modo independiente, conservando CLI/hasta sin vista (RP-01/03/04).
-- [ ] RP-T02 Fábrica completa/historia, cargas/retroceso, costos/animaciones y errores/cierre (RP-01/02/03).
-- [ ] RP-T03 Probar menú/controlador, aislamiento de archivos/estado/sesión, controles y modos CLI; registrar evidencia/límites (RP-01..04).
+- [x] RP-T01 Reconectar lanzador GUI y modo independiente, conservando CLI/hasta sin vista (RP-01/03/04).
+- [x] RP-T02 Fábrica completa/historia, cargas/retroceso, costos/animaciones y errores/cierre (RP-01/02/03).
+- [x] RP-T03 Probar menú/controlador, aislamiento de archivos/estado/sesión, controles y modos CLI; registrar evidencia/límites (RP-01..04).
 - [ ] RP-T04 Publicar cambios validados en004-linea-tiempo y verificar remoto (RP-01..04).
 
 ## Seguimiento UX

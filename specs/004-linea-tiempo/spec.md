@@ -7,11 +7,11 @@ Responsabilidad: línea de tiempo e integración. Fuentes: enunciado §§3.6, 5.
 
 ## Objetivo y alcance
 
-### RP-01..04 — replay gráfico independiente
-
 ### VD-01 — diálogo de destino de viaje
 
 El botón Viajar abre «Viajar a una sala», integrado con el tema oscuro/fantasía y botones Viajar/Cancelar. Ofrece únicamente salas exploradas de la proyección conocida; entrada numérica validada, mensaje claro sin revelar si un ID no permitido es avistado, desconocido o inexistente. Enter confirma solo un destino válido; Escape/X/cancelar conserva cola, viaje activo, estado, tiempo, archivos y log. La vista no busca rutas ni ejecuta movimiento: devuelve el ID al controlador, que conserva las reglas ordinarias de ir a. No se cambian diálogos de archivos ni la verificación inicial.
+
+### RP-01..04 — replay gráfico independiente
 
 - RP-01: Replay desde el menú o durante una partida gráfica abre otra ventana que reproduce los estados y acciones del log paso a paso, con inventario, mapa conocido, costos, efectos y animaciones ordinarias. Ofrecer pausa, velocidad y detener; no presentar el resumen textual de historia como repetición animada.
 - RP-02: reconstruir con la fábrica completa y receptor de historia, respetando versiones, cargas incluidas en el log y pergaminos/recorte del pasado. Leer el log una vez al comenzar la reproducción; las acciones añadidas después no forman una reproducción en vivo. No anotar acciones de replay ni registrar puntajes o sobrescribir log/guardado.

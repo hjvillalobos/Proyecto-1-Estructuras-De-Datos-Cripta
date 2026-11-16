@@ -28,6 +28,25 @@ def ejecutar_replay(args, gestor_precarga):
     return 0
 
 
+def ejecutar_replay_grafico(args, gestor_precarga):
+    from vista.grafica import VistaGrafica
+    from controlador.replay import ReproductorReplay
+    from controlador.partida_historica import integrar_historia
+    from modelo.juego import crear_juego
+
+    def fabrica(precarga, cripta, semilla, **versiones):
+        return integrar_historia(crear_juego(precarga, cripta, semilla,
+                                 partida_completa=True, **versiones), args.checkpoint_cada)
+
+    vista = VistaGrafica()
+    try:
+        reproductor = ReproductorReplay(None, gestor_precarga, vista, fabrica)
+        reproductor.reproducir(args.replay_grafico)
+        return 1 if reproductor.fallo else 0
+    finally:
+        vista.cerrar()
+
+
 def crear_lanzador_replay(args):
     """
     Función que abre un replay en un proceso aparte, con las mismas opciones
@@ -35,7 +54,12 @@ def crear_lanzador_replay(args):
     la partida en curso ni gasta su presupuesto de solicitudes.
     """
 
+    procesos = []
+
     def lanzar(ruta):
+        ruta = str(Path(ruta).resolve())
+        if not Path(ruta).is_file():
+            raise OSError(f'No existe el archivo de replay: {ruta}')
         comando = [sys.executable, os.path.abspath(__file__)]
 
         if args.offline is not None:
@@ -44,10 +68,18 @@ def crear_lanzador_replay(args):
         comando += [
             "--datos-dir", args.datos_dir,
             "--cache-size", str(args.cache_size),
-            "--replay", ruta,
+            "--replay-grafico" if args.gui else "--replay", ruta,
         ]
 
         comando += ["--checkpoint-cada", str(args.checkpoint_cada)]
+        if args.gui:
+            # Ventana, UUID y presupuesto propios; nunca iniciar un nuevo log.
+            procesos[:] = [p for p in procesos if p.poll() is None]
+            procesos.append(subprocess.Popen(comando, stdin=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0),
+                env={**os.environ, 'PYTHONIOENCODING': 'utf-8'}))
+            return None
         resultado = subprocess.run(
             comando, capture_output=True, text=True, encoding="utf-8",
             env={**os.environ, "PYTHONIOENCODING": "utf-8"},
@@ -72,6 +104,8 @@ def leer_argumentos(argumentos):
     parser.add_argument("--semilla", type=int, default=None)
     modos = parser.add_mutually_exclusive_group()
     modos.add_argument("--replay", metavar="ARCHIVO")
+    modos.add_argument('--replay-grafico', metavar='ARCHIVO',
+                       help='Abrir una repetición gráfica en una sesión independiente.')
     modos.add_argument("--verificar", metavar="CRIPTA")
     parser.add_argument("--checkpoint-cada", type=entero_positivo, default=50, metavar="K")
     parser.add_argument("--hasta", type=int, metavar="T")
@@ -81,7 +115,7 @@ def leer_argumentos(argumentos):
     args = parser.parse_args(argumentos)
     if args.hasta is not None and (args.hasta < 0 or not args.replay):
         parser.error("--hasta requiere --replay y un instante entero no negativo.")
-    if (args.replay or args.verificar) and (args.gui or args.cripta is not None
+    if (args.replay or args.replay_grafico or args.verificar) and (args.gui or args.cripta is not None
             or args.listar or args.descargar_todo or args.forzar or args.semilla is not None):
         parser.error("--verificar y --replay se ejecutan como modos independientes.")
     if args.forzar and (args.listar or args.descargar_todo or (args.cripta is None and not args.gui)):
@@ -116,15 +150,17 @@ def main(argv=None):
             reporte = verificar(sesion, args.verificar, args.version_cripta)
             print(texto_reporte(reporte))
             return 0 if reporte.estado == "resoluble" else 1
-        if args.listar or (args.cripta is None and not args.replay and not args.gui) or args.descargar_todo:
+        if args.listar or (args.cripta is None and not args.replay and not args.replay_grafico and not args.gui) or args.descargar_todo:
             listado = sesion.cliente.listar_criptas()
             sesion.almacen.guardar_lista(listado)
             print(json.dumps(listado, indent=2, ensure_ascii=False))
-        if args.cripta is None and not args.replay and not args.gui and not args.descargar_todo:
+        if args.cripta is None and not args.replay and not args.replay_grafico and not args.gui and not args.descargar_todo:
             print("Selecciona una cripta con --cripta ID.")
             return 0
 
         sesion.preparar()
+        if args.replay_grafico:
+            return ejecutar_replay_grafico(args, sesion.precarga)
         if args.replay:
             return ejecutar_replay(args, sesion.precarga)
         if args.descargar_todo:
@@ -167,7 +203,7 @@ def main(argv=None):
         return 1
     finally:
         try:
-            sesion.cerrar(reportar=not (args.verificar or args.replay))
+            sesion.cerrar(reportar=not (args.verificar or args.replay or args.replay_grafico))
         except (ErrorCripta, OSError) as error:
             print(f"Aviso al cerrar la sesion: {error}", file=sys.stderr)
 

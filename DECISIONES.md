@@ -1,5 +1,9 @@
 # Decisiones de diseño
 
+## RP / VD — replay independiente y destino conocido
+
+Se conserva `--replay` sin vista y se añade `--replay-grafico` para la GUI en proceso separado. La fábrica completa con historia permite cargas/retrocesos sin tocar la partida original. El log se lee al abrirse. El diálogo de Viajar recibe únicamente proyección conocida y delega al viaje ordinario; cancelar vuelve antes de cancelar un viaje activo. No se cambian estructuras del motor ni formatos. 112 pruebas dirigidas en 41.511 s, OK, e inspección nativa aislada; sin nuevas afirmaciones de rendimiento. [Informe](specs/004-linea-tiempo/replay-viaje-2026-11-15.md).
+
 ## UX-01..03 — salida cancelable y puerta física
 
 Problema: salir abandonaba inmediatamente y la aplicación solo admitía reiniciar tras derrota; el objetivo de salida no estaba explicado. Se descarta confirmar después de cancelar viaje o modificar estado porque cancelar ya no podría conservarlos. Se consulta primero en un diálogo local que bloquea entradas nuevas sin borrar cola, y el controlador comunica una elección explícita a la aplicación. Esta reutiliza la renovación de sesión y semilla, con motor nuevo para la misma cripta; guardados intactos. ID/objetivo son campos opcionales de vista, ajenos al binario/historia, derivados de salidas observadas y conocimiento (consulta O(log V), grado≤4).

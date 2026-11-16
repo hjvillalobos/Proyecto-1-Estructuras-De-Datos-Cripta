@@ -101,7 +101,7 @@ class VistaGrafica:
         for texto, accion in (
             ("Historia", lambda: self._pedir_comando("historia", "Instante o #acción")),
             ("Mapa", lambda: self._enviar("mapa")),
-            ("Viajar", lambda: self._pedir_comando("ir a", "Identificador de la sala")),
+            ("Viajar", lambda: self._enviar('viajar')),
         ):
             ttk.Button(cabecera, text=texto, command=accion).pack(side="left", padx=3)
         izq = tk.Frame(self.root, bg=FONDO)
@@ -656,6 +656,14 @@ class VistaGrafica:
         if texto is not None and texto.strip():
             self._enviar(f"{prefijo} {texto.strip()}")
 
+    def pedir_destino(self, proyeccion, actual):
+        from vista.destino_viaje import DestinoViaje
+        self._dialogo_destino = DestinoViaje(self, proyeccion, actual)
+        try:
+            return self._dialogo_destino.mostrar()
+        finally:
+            del self._dialogo_destino
+
     def mostrar_informe(self, titulo, texto):
         if self._cerrada:
             return
@@ -731,8 +739,11 @@ class VistaGrafica:
         self._en_replay = True
         self._replay_pausado = False
         self._replay_detener = False
+        if self.barra_botones.winfo_manager() == 'pack':
+            self.barra_replay.pack(fill='x', before=self.barra_botones)
+        else:
+            self.barra_replay.pack(fill='x')
         self.barra_botones.pack_forget()
-        self.barra_replay.pack(fill="x")
         self.root.title("REPLAY — CRIPTA")
 
     def establecer_titulo_replay(self, titulo):
@@ -774,6 +785,9 @@ class VistaGrafica:
     # Cierre
     # ------------------------------------------------------------------
     def _al_cerrar(self):
+        if getattr(self, '_dialogo_destino', None) is not None:
+            self._dialogo_destino.cancelar()
+            return
         if getattr(self, '_dialogo_salida', None) is not None:
             self._dialogo_salida.cancelar()
             return

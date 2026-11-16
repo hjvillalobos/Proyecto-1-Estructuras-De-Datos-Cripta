@@ -536,6 +536,7 @@ class Motor:
         salidas = [
             SalidaVista(direccion=d, destino=info["sala"],
                         cerrada=info.get("cerrada", False), llave=self.llave_puerta(sala, d),
+                        costo=info.get('costo', 100),
                         apertura_pendiente=info["sala"] == self.sala_salida
                         and self.llave_puerta(sala, d) == self.llave_salida
                         and (sala.id, d) not in self.puertas_abiertas_con_llave)

@@ -231,6 +231,17 @@ class ControladorJuego:
         else:
             argumentos = partes[1].split() if len(partes) > 1 else []
 
+        if comando == 'viajar':
+            if argumentos:
+                return self.vista.mostrar_error('Uso: viajar')
+            elegir = getattr(type(self.vista), 'pedir_destino', None)
+            mapa = getattr(self.modelo, 'mapa_conocido', None)
+            if not callable(elegir) or not callable(mapa):
+                return self.vista.mostrar_error('Usa ir a <sala> para viajar.')
+            destino = self.vista.pedir_destino(tuple(mapa()), self.modelo.jugador.posicion_actual)
+            if destino is not None:
+                return self._viaje(['a', str(destino)])
+            return
         if comando == "salir":
             if argumentos:
                 return self.vista.mostrar_error('Uso: salir')
