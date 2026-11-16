@@ -1,5 +1,11 @@
 # Decisiones de diseño
 
+## Auditoría integral — 2026-11-16
+
+Se conservan las estructuras y reglas existentes. Se corrige la reutilización de tuplas de animación en el respaldo sin atlas, manteniendo la caché de acciones acotada a ocho entradas; no se introduce índice hash en algoritmos evaluados. Se regeneran las 152 composiciones por invalidación de firmas tras cambios locales anteriores: sus píxeles son idénticos a HEAD. Historia aclara el estado anterior a la acción y rechaza #0 desde el diálogo, conforme a FR-003/020.
+
+Medición `--bench` aislada, semilla 20261001, referencia 06 de 300 salas, 30 cazadores inyectados y mapa completo: ciclo máximo 10.074 ms (0/60 >20), paso 2.767 ms (0/60 >5), verificación incremental completa 9.261 ms (0/60 >200), historia 5.000 acciones/K50 máximo total 1.0017 ms (0/111 >50). K50 retiene 5.673.220 B y reconstruye como máximo 50 acciones; sin controles alcanza 80.3071 ms (39/111 >50). Heap anterior/vigente: medianas 3.1867/1.9895 ms con decisiones iguales. No se atribuye la variación del motor a cambios de presentación ni se garantiza latencia absoluta. Estos resultados son locales, sin nueva publicación Git.
+
 ## RP / VD — replay independiente y destino conocido
 
 Se conserva `--replay` sin vista y se añade `--replay-grafico` para la GUI en proceso separado. La fábrica completa con historia permite cargas/retrocesos sin tocar la partida original. El log se lee al abrirse. El diálogo de Viajar recibe únicamente proyección conocida y delega al viaje ordinario; cancelar vuelve antes de cancelar un viaje activo. No se cambian estructuras del motor ni formatos. 112 pruebas dirigidas en 41.511 s, OK, e inspección nativa aislada; sin nuevas afirmaciones de rendimiento. [Informe](specs/004-linea-tiempo/replay-viaje-2026-11-15.md).

@@ -1,5 +1,7 @@
 # Implementation Plan: Terreno, cazador y validez de rutas
 
+**Decisión vigente al 2026-11-16:** heap indexado, búsqueda individual limitada, cálculo compartido donde procede y almacenamiento radix propio para IDs dispersos, integrados y medidos. Las propuestas y contratos pendientes de los cortes fechados siguientes se conservan como antecedentes; la entrega técnica actual figura en tasks.md y DECISIONES.md. No se afirma confirmación oficial de Q3 ni revisión humana del equipo.
+
 > **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
 
 

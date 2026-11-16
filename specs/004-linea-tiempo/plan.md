@@ -1,5 +1,11 @@
 # Plan técnico propuesto
 
+## Estado técnico vigente — 2026-11-16
+
+Las cuatro capacidades están integradas. Los apartados fechados conservan las alternativas y entregas parciales de su momento; sus expresiones «propuesto», «pendiente» o «sin medir» no sustituyen este estado actual. La fuente de resultados finales es DECISIONES.md.
+
+UI-01 usa el diálogo local ConsultaHistoria y delega al comando ordinario; valida tiempo >=0 y acción >=1 antes de encolar. UI-02 usa NieblaMapa sobre Canvas con geometría decorativa fija respecto del conocimiento; temporizador de presentación de 50 ms, opción sin movimiento y cancelación al destruir/cerrar. UI-03 consulta primero la caché de acciones, conserva como máximo ocho resultados y usa el respaldo de secuencias cuando falta atlas válido. Las firmas obligan a regenerar las composiciones al modificar sus fuentes; comparar píxeles contra la revisión anterior. Sin cambios de algoritmo evaluado, formato binario o dependencias. Consolidación posterior de cambios locales, no prueba retrospectiva del orden spec→código.
+
 ## VD-01 — destino con conocimiento parcial
 
 El controlador atiende la petición de elegir destino antes de cancelar el viaje activo; entrega proyección/posición al diálogo y solo una aceptación llama al flujo existente de ir a. La vista filtra estado explorado antes de formar lista/detalle, muestra entrada numérica y error local sin revelar ID oculto, y conserva _en_menu/foco/cola al cancelar. Reutilizar tema, fondo y patrones de NombrePuntaje/SalidaPartida, sin acceder a modelo/red. Pruebas de teclado/cancelación/validación, privacidad y estado/log/viaje intactos. RP y VD se prueban como incrementos acotados, sin rediseñar otros diálogos.

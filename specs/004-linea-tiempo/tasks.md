@@ -1,5 +1,14 @@
 # Tareas — línea de tiempo
 
+## Consolidación de presentación — 2026-11-16
+
+- [x] UI-T01 Alinear diálogo, texto y validación de historia por tiempo/acción; probar rechazo y cancelación sin encolar (UI-01, FR-003/005/020; tests/test_consulta_historia.py).
+- [x] UI-T02 Integrar niebla decorativa opcional con proyección conocida y ciclo de vida acotado a la ventana (UI-02, VI-02/04; tests/test_mapa_visual.py).
+- [x] UI-T03 Conservar caché acotada de acciones con respaldo sin atlas y regenerar recursos con píxeles iguales (UI-03, VI-01/04; tests/test_composiciones.py).
+- [x] UI-T04 Actualizar pruebas de puntos de entrada actuales de Historia/Ayuda y contrastar regresión completa (UI-01, FR-003/005/020; tests/test_comandos_integracion.py y tests/test_menu_inicio.py).
+
+Las cuatro tareas reflejan trabajo ya presente y comprobado; esta consolidación documental no altera sus fechas reales de implementación.
+
 - [x] VD-T01 Diálogo temático, selección explorada/validación, Enter/Escape/X y controlador sin mutación al cancelar; pruebas y evidencia (VD-01).
 
 ## Replay gráfico RP

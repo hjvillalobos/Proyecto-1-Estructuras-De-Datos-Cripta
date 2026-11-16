@@ -1,5 +1,11 @@
 # Specification Quality Checklist: Verificador de resolubilidad
 
+## Estado vigente — 2026-11-16
+
+El verificador existe, está integrado y sus pruebas y mediciones están en DECISIONES.md y ESTADO_ENTREGA.md. Las notas siguientes conservan el estado de la revisión documental inicial, anterior al código. La revisión cruzada humana continúa pendiente; esta actualización no la acredita.
+
+## Lista histórica de calidad inicial
+
 **Purpose**: Revisar la calidad de la especificación antes de las aclaraciones y el plan.
 
 **Created**: 2026-10-30

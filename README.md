@@ -60,7 +60,7 @@ En consola: `mover N` (también S/E/O), `abrir E`, `atacar INSTANCIA`, `esperar`
 
 El viaje usa solo conocimiento del jugador y se detiene por llegada, enemigos, daño o falta de ruta. Cada paso es un movimiento ordinario. Historia consulta sin alterar la partida. Guardado binario v4 conserva estado, azar, historia y conocimiento; versiones antiguas incompatibles se rechazan explícitamente.
 
-Los datos descargados están en `--datos-dir` (por defecto `.cache/cripta`). Partidas, log de reproducción y puntajes normales están bajo `datos_generados/`; los nombres de guardado explícitos respetan la ruta indicada. Son archivos locales excluidos de Git. No borrar la copia de datos compatible necesaria para reproducir una partida.
+Los datos descargados están en `--datos-dir` (por defecto `.cache/cripta`, excluida de Git). Partidas, log de reproducción y puntajes normales están bajo `datos_generados/`; los nombres de guardado explícitos respetan la ruta indicada. `datos_generados/` se excluye de nuevas entregas Git: los guardados y puntajes son archivos personales creados al jugar. Conserva tus archivos antes de reemplazarlos. No borrar la copia de datos compatible necesaria para reproducir una partida.
 
 ```powershell
 python main.py --offline .cache/entrega --replay datos_generados/partida.log

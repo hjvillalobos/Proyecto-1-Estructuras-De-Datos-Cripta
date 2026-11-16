@@ -7,6 +7,14 @@ Responsabilidad: línea de tiempo e integración. Fuentes: enunciado §§3.6, 5.
 
 ## Objetivo y alcance
 
+### UI-01..03 — presentación de consultas y mapa
+
+- UI-01: Historia ofrece consulta por tiempo entero no negativo o número de acción desde 1. Explica que la consulta ordinal muestra el estado justo antes de la acción. Rechazar entradas inválidas con mensaje local; cancelar conserva partida y cola (FR-003/005/020).
+- UI-02: la niebla decorativa puede animarse únicamente en la presentación, sin usar información de salas desconocidas ni avanzar tiempo virtual. Respetar la opción de movimiento; cerrar el mapa detiene su actividad (VI-02/04).
+- UI-03: las imágenes de acciones se reutilizan también cuando no hay recursos preparados válidos. Los recursos regenerados conservan los píxeles del arte anterior y no cambian reglas ni datos del catálogo (VI-01/04).
+
+Esta consolidación del 2026-11-16 describe cambios que ya estaban en el árbol local y correcciones de requisitos existentes. No se presenta como evidencia de que todos esos cambios fueron especificados antes de escribirse.
+
 ### VD-01 — diálogo de destino de viaje
 
 El botón Viajar abre «Viajar a una sala», integrado con el tema oscuro/fantasía y botones Viajar/Cancelar. Ofrece únicamente salas exploradas de la proyección conocida; entrada numérica validada, mensaje claro sin revelar si un ID no permitido es avistado, desconocido o inexistente. Enter confirma solo un destino válido; Escape/X/cancelar conserva cola, viaje activo, estado, tiempo, archivos y log. La vista no busca rutas ni ejecuta movimiento: devuelve el ID al controlador, que conserva las reglas ordinarias de ir a. No se cambian diálogos de archivos ni la verificación inicial.

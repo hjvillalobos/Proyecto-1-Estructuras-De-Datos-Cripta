@@ -1,5 +1,28 @@
 # Bitácora de uso de LLM
 
+## 2026-11-16 — consolidar entrega y aclarar constitución
+
+- **Herramienta/modelo:** Codex (GPT-6), habilidad local speckit-analyze de lectura, PowerShell/Python/Git.
+- **Prompt textual:**
+
+> puedes arreglar todo menos lo de la defensa? y dime porfa que se cambio en la constitucion y eso que dices que fue actualizado
+
+- **Restricción textual previa:** «no subas ese informe dejalo para mi».
+- **Aclaración textual sobre revisión cruzada:** «no, no tengo».
+- **Uso:** análisis de coherencia spec/plan/tasks y corrección documental autorizada; consolidar presentación de Historia/niebla/recursos, preparar entrega con archivos nuevos y excluir guardados/puntajes personales. Mantener el informe privado fuera del repositorio y excluir defensa. La revisión de interfaces hecha por Codex no se presenta como aprobación humana.
+- **Constitución:** no se modifica 1.1.0. La bitácora del 2026-10-27 registra separación de principios y elecciones tecnológicas, ubicación de documentación en planes/README y retiro de Amazon Q. Git conserva la incorporación en fd75e8d; no hay un diff confirmado de 1.0.0 a 1.1.0. No se reconstruyen finales de prompts ausentes ni se reescribe 33d97ac.
+- **Análisis de consistencia:** corregir deriva entre niebla estática prevista y animación local opcional, documentar requisitos UI-01..03 y tareas, y separar encabezados vigentes de cortes históricos. Persisten salvedades históricas de constitución IV y prompts no recuperados; el usuario confirmó ausencia de revisión humana. No hay imports/estructuras prohibidas propuestos ni modificación de reglas del juego.
+
+## 2026-11-16 — auditoría integral de Partes I y II
+
+- **Herramienta/modelo:** Codex (GPT-6), PowerShell, Python/unittest, Git de lectura y pruebas HTTP contra la API oficial.
+- **Prompt textual:**
+
+> Puedes comprobar si el proyecto cumple para ganarnos un 100 con la cripta parte 1 y 2, que funcione todo bien, que las excepciones esten bien, manejo de errores, documentacion excelente, el constitucion al pie de la letra, que no se caiga de ninguna forma, que el agente cumpla con los requisitos, revisa TODO
+
+- **Uso de la respuesta:** contraste de enunciados/constitución/historial, revisión de errores y cambios locales, correcciones de Historia/pruebas/caché visual, regeneración de recursos y ejecución de regresiones, API y benchmarks. No se invocaron comandos de spec-kit ni se crearon agentes auxiliares. Se conservan salvedades históricas; no se promete nota ni ausencia absoluta de errores.
+- **Resultado:** 858 pruebas, cero fallos/errores y cuatro omisiones cubiertas por ejecuciones separadas; 41 pruebas de comparación, 2 del paquete histórico, API de cinco criptas y 20 de copia sin cachés aprobadas. Cuatro límites de procesamiento dentro de umbral en las muestras. Cambios locales sin commit/push en esta auditoría.
+
 ## 2026-11-15 — reconexión de replay gráfico
 
 Ampliación transmitida: mejorar el diálogo básico «Identificador de la sala» de Viajar, título «Viajar a una sala», tema existente, botones españoles, validación y cancelación sin alterar partida/niebla; no cambiar selectores de archivos ni eliminar la verificación inicial. Mensaje posterior literal de la usuaria transmitido: «sigue con lo que estabas». Se conservan los cambios RP parciales y se especifica VD-01 antes de implementarlo.

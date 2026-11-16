@@ -1,5 +1,11 @@
 # Specification Quality Checklist: Niebla y viaje
 
+## Estado vigente — 2026-11-16
+
+N1–N6 están implementados y cubiertos por las pruebas de integración. La decisión vigente de Q1, adoptada por el equipo en IA-05, revela vecinas y sus salidas con antorcha y observa puertas solo desde la sala ocupada; no se atribuye una respuesta inexistente al profesor. Las cuatro casillas abiertas siguientes corresponden al corte histórico del 2026-11-09; la revisión cruzada humana continúa pendiente. Véanse spec.md, ESTADO_ENTREGA.md y DECISIONES.md para el cierre técnico posterior.
+
+## Lista histórica del 2026-11-09
+
 Fecha: 2026-11-08. Documento: [spec.md](../spec.md).
 
 - [x] Historias, requisitos, entidades y criterios de éxito definidos.

@@ -1,5 +1,7 @@
 # Feature Specification: Terreno, cazador y validez de rutas
 
+**Estado vigente al 2026-11-16:** implementado e integrado. FR-001–020 tienen código y pruebas; las aclaraciones Q1/Q2 finales delimitan entradas conformes. Q3 conserva la falta de confirmación oficial; la referencia interna y mediciones están en tasks.md y DECISIONES.md. Los estados Draft/permisos descritos abajo son cortes históricos, no bloqueos actuales. La constitución sigue en 1.1.0.
+
 > **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
 
 
