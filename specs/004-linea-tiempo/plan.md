@@ -1,5 +1,9 @@
 # Plan técnico propuesto
 
+## RP-01..04 — conexión de replay gráfico
+
+El lanzador de GUI usa Popen con modo explícito independiente y no devuelve stdout como informe; consola conserva subprocess.run con salida textual. El proceso hijo crea VistaGrafica y ReproductorReplay con fábrica completa más integrar_historia; todos los cierres liberan vista/precarga del hijo. Reutilizar ejecutar_tarea para carga/acciones de datos sin bloquear Tk y comprobar detener/cierre antes de presentar. No crear ControladorJuego ni BitacoraReplay.iniciar en reproducción. El archivo se lee una vez a memoria; no es streaming del log activo. Conservar controles/animación existentes y costos del descriptor en EstadoVista. Pruebas con partida completa y log de carga/pergamino, fábrica independiente, comparación exacta de estado e integridad de archivos; lanzador probado desde menú y controlador; CLI sin constructor de vista; widget Tk y captura nativa si la superficie permite inspección sin interferir con la usuaria. No modifica reglas o búsquedas ni justifica repetir todos los benchmarks.
+
 ## Seguimiento UX-01..03
 
 Diálogo Tk local modal sin acceso al modelo, con _en_menu para bloquear entradas nuevas y conservar las ya encoladas al cancelar. Controlador consulta antes de cancelar viaje o cambiar ejecutando; comunica reinicio explícito a aplicación. Aplicación reutiliza renovación de sesión y política de semilla, sin pasar por selector ni guardar automáticamente. EstadoVista añade campos opcionales de presentación (ID/objetivo), sin tocar binario/historia; objetivo deriva del conocimiento y de las salidas observadas. Pruebas de cancelación con log/guardado/viaje iguales, cuatro elecciones, cierre/Escape, aplicación con motores nuevos, regresiones cercanas de menú/replay/viaje, población/daño/victoria reales. Análisis: no cambia reglas, azar, agenda, rutas ni benchmarks del motor; no requiere repetir benchmarks sin señal de regresión.

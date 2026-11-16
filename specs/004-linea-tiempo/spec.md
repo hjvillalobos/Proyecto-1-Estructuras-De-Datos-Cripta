@@ -7,6 +7,13 @@ Responsabilidad: línea de tiempo e integración. Fuentes: enunciado §§3.6, 5.
 
 ## Objetivo y alcance
 
+### RP-01..04 — replay gráfico independiente
+
+- RP-01: Replay desde el menú o durante una partida gráfica abre otra ventana que reproduce los estados y acciones del log paso a paso, con inventario, mapa conocido, costos, efectos y animaciones ordinarias. Ofrecer pausa, velocidad y detener; no presentar el resumen textual de historia como repetición animada.
+- RP-02: reconstruir con la fábrica completa y receptor de historia, respetando versiones, cargas incluidas en el log y pergaminos/recorte del pasado. Leer el log una vez al comenzar la reproducción; las acciones añadidas después no forman una reproducción en vivo. No anotar acciones de replay ni registrar puntajes o sobrescribir log/guardado.
+- RP-03: proceso y sesión de datos separados de la partida original, con UUID/presupuesto propios y mismas opciones offline/caché/versiones. Cerrar o detener afecta solo la reproducción. Errores de versión, datos o acciones se informan en la ventana del replay, sin convertirlos en una partida distinta ni cerrar la original.
+- RP-04: `--replay` y `--replay ... --hasta T` siguen sin instanciar vistas. Un modo explícito separado `--replay-grafico ARCHIVO` sirve a los botones de la GUI; no admite `--hasta` ni se mezcla con inicio/verificación. Comprobar ambas entradas GUI, controles, estado final/cargas/retroceso y rechazo de incompatibilidades; separar pruebas automáticas de inspección visual efectivamente realizada.
+
 ### UX-01..03 — abandonar y comprender el objetivo (seguimiento 2026-11-15)
 
 - UX-01: Salir durante una partida gráfica ofrece Continuar, Reiniciar la misma cripta, Volver al menú y Cerrar el juego. Escape/cierre del diálogo equivale a Continuar. Cancelar conserva estado, viaje, cola, reloj, azar, guardado y replay; no es una acción del jugador. Reiniciar requiere elección explícita y prepara motor/precarga nuevos, misma cripta y política de semilla existente, sin sobrescribir guardados. El cierre de la ventana durante una partida activa usa esa elección; menú/replay/fin conservan sus cierres propios.
