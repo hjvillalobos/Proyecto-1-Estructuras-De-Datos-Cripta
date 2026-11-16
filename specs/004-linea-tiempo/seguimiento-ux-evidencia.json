@@ -1,0 +1,134 @@
+{
+  "fecha": "2026-11-15",
+  "pruebas_dirigidas": 188,
+  "segundos": 61.701,
+  "fallos": 0,
+  "errores": 0,
+  "repeticion_UX": {
+    "pruebas": 8,
+    "segundos": 4.042
+  },
+  "recorridos": [
+    {
+      "cripta": "cripta-02",
+      "version": "52532a77ee04",
+      "semilla": 20,
+      "inicio": [
+        1,
+        30
+      ],
+      "sala": 18,
+      "salida": 18,
+      "vida": 28,
+      "defensa": 4,
+      "resultado": "victoria",
+      "acciones_nuevas": 44,
+      "derrotados": 7,
+      "aplicaciones_dano_comprobadas": 10,
+      "dano_total": 20,
+      "rango_dano": [
+        1,
+        4
+      ],
+      "solicitudes": 0
+    },
+    {
+      "cripta": "cripta-03",
+      "version": "f9186ac25124",
+      "semilla": 20,
+      "inicio": [
+        1,
+        30
+      ],
+      "sala": 34,
+      "salida": 34,
+      "vida": 26,
+      "defensa": 4,
+      "resultado": "victoria",
+      "acciones_nuevas": 84,
+      "derrotados": 18,
+      "aplicaciones_dano_comprobadas": 29,
+      "dano_total": 48,
+      "rango_dano": [
+        1,
+        4
+      ],
+      "solicitudes": 0
+    },
+    {
+      "cripta": "cripta-04",
+      "version": "7074a17814ad",
+      "semilla": 20,
+      "inicio": [
+        1,
+        30
+      ],
+      "sala": 42,
+      "salida": 42,
+      "vida": 29,
+      "defensa": 4,
+      "resultado": "victoria",
+      "acciones_nuevas": 105,
+      "derrotados": 24,
+      "aplicaciones_dano_comprobadas": 37,
+      "dano_total": 61,
+      "rango_dano": [
+        1,
+        4
+      ],
+      "solicitudes": 0
+    },
+    {
+      "cripta": "cripta-06",
+      "version": "f9ed9afa683d",
+      "semilla": 42,
+      "inicio": [
+        141,
+        30
+      ],
+      "sala": 160,
+      "salida": 160,
+      "vida": 30,
+      "defensa": 4,
+      "resultado": "victoria",
+      "acciones_nuevas": 117,
+      "derrotados": 13,
+      "aplicaciones_dano_comprobadas": 18,
+      "dano_total": 36,
+      "rango_dano": [
+        1,
+        4
+      ],
+      "solicitudes": 0
+    },
+    {
+      "cripta": "cripta-02",
+      "version": "52532a77ee04",
+      "inicio": [
+        20,
+        30
+      ],
+      "sala": 18,
+      "salida": 18,
+      "vida": 30,
+      "defensa": 2,
+      "resultado": "victoria",
+      "acciones_nuevas": 48,
+      "derrotados": 7,
+      "aplicaciones_dano_comprobadas": 16,
+      "dano_total": 51,
+      "rango_dano": [
+        1,
+        7
+      ],
+      "solicitudes": 0,
+      "origen": "continuacion de copia local; log de usuaria no versionado"
+    }
+  ],
+  "metodo": "acciones ordinarias; bot QA usa conocimiento global; sin modificacion de estadisticas; dano observado en motor real",
+  "limites": [
+    "no repeticion de suite completa ni benchmarks",
+    "sin inspeccion visual manual completa del dialogo",
+    "sin garantia para todas las estrategias/semillas"
+  ]
+}

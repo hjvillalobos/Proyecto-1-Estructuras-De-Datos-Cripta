@@ -191,10 +191,13 @@ class Motor:
         extremos = self.extremos_puerta(sala_actual, direccion)
         llave_necesaria = next((extremo['llave'] for _, _, extremo in extremos
                                 if 'llave' in extremo), None)
-        apertura = (sala_actual.id, direccion)
-        acreditar_salida = (salida["sala"] == self.sala_salida
-                            and llave_necesaria == self.llave_salida
-                            and apertura not in self.puertas_abiertas_con_llave)
+        aperturas = [(sala.id, d) for sala, d, _ in extremos
+                     if llave_necesaria and self.llave_puerta(sala, d) == llave_necesaria]
+        acreditar_salida = (llave_necesaria == self.llave_salida
+                            and any(extremo['sala'] == self.sala_salida
+                                    and (sala.id, d) in aperturas
+                                    and (sala.id, d) not in self.puertas_abiertas_con_llave
+                                    for sala, d, extremo in extremos))
         if not salida.get("cerrada", False) and not acreditar_salida:
             return False, "La puerta ya esta abierta"
         if llave_necesaria and not self._tiene_llave(llave_necesaria):
@@ -209,9 +212,10 @@ class Motor:
         invalidar = getattr(self._rutas_reales, 'invalidar_puertas', None)
         if invalidar is not None:
             invalidar()
-        if llave_necesaria and apertura not in self.puertas_abiertas_con_llave:
-            self.puertas_abiertas_con_llave.append(apertura)
-            self.historial.registrar_cambio(lambda: self.puertas_abiertas_con_llave.remove(apertura))
+        for apertura in aperturas:
+            if apertura not in self.puertas_abiertas_con_llave:
+                self.puertas_abiertas_con_llave.append(apertura)
+                self.historial.registrar_cambio(lambda a=apertura: self.puertas_abiertas_con_llave.remove(a))
         self._avanzar_actor(self.jugador, _COSTO_ABRIR_PUERTA)
 
         cierre = next((extremo for _, _, extremo in extremos
@@ -628,7 +632,25 @@ class Motor:
                        if jug.inventario.arma_equipada_objeto is not None else None),
             armadura_tipo=(jug.inventario.armadura_equipada_objeto.tipo_catalogo
                            if jug.inventario.armadura_equipada_objeto is not None else None),
+            cripta_id=getattr(self.meta, 'cripta_id', '') if hasattr(self, 'meta') else '',
+            objetivo=self.objetivo_vista(salidas),
         )
+
+    def objetivo_vista(self, salidas):
+        if self.sala_salida is None:
+            return ''
+        if self.jugador.posicion_actual == self.sala_salida and not self.terminado:
+            return ('Estás en la sala de salida. Para escapar, vuelve a su acceso, '
+                    'ábrelo con la llave requerida y crúzalo.')
+        puerta = next((s for s in salidas if s.destino == self.sala_salida
+                       and s.llave == self.llave_salida), None)
+        if puerta is not None:
+            if puerta.cerrada or puerta.apertura_pendiente:
+                return f'Salida: abre {puerta.direccion} con {puerta.llave} y después cruza esa puerta.'
+            return f'Salida: cruza {puerta.direccion} para escapar de la cripta.'
+        if self._conocimiento is not None and self._conocimiento.estado_sala(self.sala_salida) != 0:
+            return f'Salida conocida: sala {self.sala_salida}. Abre su acceso con la llave requerida y crúzalo.'
+        return 'Explora para encontrar la puerta de salida y su llave. Las cámaras secundarias no son la salida.'
 
     def resumen(self):
         from modelo.snapshots import ResumenPartida

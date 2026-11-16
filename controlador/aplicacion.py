@@ -163,7 +163,9 @@ def ejecutar_juego(args, sesion, lanzador_replay):
                     return 0
                 sesion.renovar(tolerar_error=True)
                 continue
-            if not (args.gui and juego.resultado == "derrota" and vista.preguntar_reinicio()):
+            if not (args.gui and (juego.resultado == "derrota"
+                    or getattr(controlador, 'reiniciar_solicitado', False) is True)
+                    and vista.preguntar_reinicio()):
                 break
             while True:
                 try:

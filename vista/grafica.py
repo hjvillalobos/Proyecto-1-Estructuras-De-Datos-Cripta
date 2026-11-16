@@ -109,7 +109,10 @@ class VistaGrafica:
         der = tk.Frame(self.root, bg=FONDO, width=320)
         der.grid(row=1, column=1, sticky="ns", padx=(8, 22), pady=(0, 16))
         self.var_sala = tk.StringVar()
-        self._etiqueta(izq, variable=self.var_sala, tamano=18, fuente="Georgia").pack(fill="x", pady=(0, 10))
+        self._etiqueta(izq, variable=self.var_sala, tamano=18, fuente="Georgia").pack(fill="x", pady=(0, 4))
+        self.var_objetivo = tk.StringVar()
+        self._etiqueta(izq, variable=self.var_objetivo, color=AMARILLO,
+                       wraplength=850, tamano=10).pack(fill='x', pady=(0, 2))
         self.canvas = tk.Canvas(izq, width=self.ANCHO, height=350, bg=FONDO, highlightthickness=0)
         self.canvas.pack(fill="both", expand=True)
         self.canvas.bind("<Configure>", self._redimensionar)
@@ -530,7 +533,9 @@ class VistaGrafica:
                                      lambda _e, t=tipo, a=avance: self._cambiar_pagina(t, a))
 
     def _actualizar_stats(self, e):
-        self.var_sala.set(f"Sala {e.sala_id}  |  {e.sala_nombre}")
+        identidad = getattr(e, 'cripta_id', '')
+        self.var_sala.set((f'{identidad} · ' if identidad else '') + f"Sala {e.sala_id}  |  {e.sala_nombre}")
+        self.var_objetivo.set(getattr(e, 'objetivo', ''))
         self.var_tiempo.set(f"Tu decision: t={e.reloj}")
         self.var_stats.set(f"Ataque {e.ataque}   Defensa {e.defensa}   Velocidad {e.velocidad}")
         self.var_inv.set(f"Inventario   {e.inventario_usado}/{e.inventario_max}")
@@ -606,6 +611,17 @@ class VistaGrafica:
 
     def marcar_volver_menu(self):
         self._volver_menu_fin = True
+
+    def marcar_reinicio(self):
+        self._reinicio_fin = True
+
+    def preguntar_salida(self):
+        from vista.salida_partida import SalidaPartida
+        self._dialogo_salida = SalidaPartida(self)
+        try:
+            return self._dialogo_salida.mostrar()
+        finally:
+            del self._dialogo_salida
 
     def preguntar_menu_principal(self):
         respuesta = getattr(self, "_volver_menu_fin", False)
@@ -758,6 +774,14 @@ class VistaGrafica:
     # Cierre
     # ------------------------------------------------------------------
     def _al_cerrar(self):
+        if getattr(self, '_dialogo_salida', None) is not None:
+            self._dialogo_salida.cancelar()
+            return
+        if (self._estado is not None and not self._en_replay
+                and not getattr(self, '_en_menu', False)):
+            if 'salir' not in self._cola:
+                self._cola.append('salir')  # Consultar al terminar una carga en curso.
+            return
         self.cerrar()
 
     def cerrar(self):

@@ -58,6 +58,7 @@ class ControladorJuego:
         self.lanzador_replay = lanzador_replay
 
         self.ejecutando = True
+        self.reiniciar_solicitado = False
         self._puntaje_registrado = False
         self._grabacion_valida = True
         self.ultimo_resultado_accion = None
@@ -230,6 +231,10 @@ class ControladorJuego:
         else:
             argumentos = partes[1].split() if len(partes) > 1 else []
 
+        if comando == "salir":
+            if argumentos:
+                return self.vista.mostrar_error('Uso: salir')
+            return self._salir()
         if comando == "cancelar":
             if argumentos:
                 return self.vista.mostrar_error("Uso: cancelar")
@@ -460,12 +465,6 @@ class ControladorJuego:
         # SALIR
         # ---------------------------------------------
 
-        if comando == "salir":
-            self.ejecutando = False
-            if callable(getattr(type(self.vista), "marcar_volver_menu", None)):
-                self.vista.marcar_volver_menu()
-            return
-
         self.vista.mostrar_error(
             f"Comando desconocido: {comando}"
         )
@@ -473,6 +472,19 @@ class ControladorJuego:
     # ---------------------------------------------------------
     # EJECUTAR ACCIÓN DEL MODELO
     # ---------------------------------------------------------
+
+    def _salir(self):
+        accion = (self.vista.preguntar_salida()
+                  if callable(getattr(type(self.vista), 'preguntar_salida', None)) else 'terminar')
+        if accion not in ('menu', 'reiniciar', 'terminar'):
+            return  # Cancelar conserva también el viaje y el log.
+        self._cancelar_viaje(mostrar=False)
+        self.reiniciar_solicitado = accion == 'reiniciar'
+        if accion == 'menu':
+            self.vista.marcar_volver_menu()
+        elif accion == 'reiniciar':
+            self.vista.marcar_reinicio()
+        self.ejecutando = False
 
     def _mostrar_informe(self, titulo, texto):
         if callable(getattr(type(self.vista), "mostrar_informe", None)):

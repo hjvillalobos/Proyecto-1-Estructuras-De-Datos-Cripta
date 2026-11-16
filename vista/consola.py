@@ -77,6 +77,10 @@ class VistaConsola:
         s("")
         s("=" * 64)
         s(f" t={e.reloj}   Sala {e.sala_id}: {e.sala_nombre}")
+        if getattr(e, 'cripta_id', ''):
+            s(f'Cripta: {e.cripta_id}')
+        if getattr(e, 'objetivo', ''):
+            s(e.objetivo)
         s("=" * 64)
         if e.salidas:
             partes = []

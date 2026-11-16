@@ -52,6 +52,8 @@ Al consultar el servicio el 15 de noviembre se publicaban cripta-02–06. Las do
 
 ## Acciones y archivos
 
+Durante una partida gráfica, **Salir** permite continuar, reiniciar esa cripta, volver al menú o cerrar el juego. Escape o cerrar el diálogo conserva la partida; reiniciar requiere elección explícita y no sobrescribe guardados. El encabezado muestra el ID de cripta y una orientación del objetivo respetando el mapa conocido. La salida no tiene por qué ser la sala con mayor número: debes abrir su acceso con la llave correspondiente y atravesarlo. [Diagnóstico del recorrido por sala20, enemigos/daño y validación](specs/004-linea-tiempo/seguimiento-ux-2026-11-15.md).
+
 En consola: `mover N` (también S/E/O), `abrir E`, `atacar INSTANCIA`, `esperar`, `recoger INSTANCIA`, `usar INSTANCIA`, `equipar INSTANCIA`, `soltar INSTANCIA`, `inventario`, `mapa`, `ir a SALA`, `cancelar`, `retroceso`, `historia T`, `historia #K`, `guardar "archivo.bin"`, `cargar "archivo.bin"` y `salir`. La GUI ofrece los controles correspondientes y navegación del inventario. Cada enemigo/objeto se identifica por instancia.
 
 El viaje usa solo conocimiento del jugador y se detiene por llegada, enemigos, daño o falta de ruta. Cada paso es un movimiento ordinario. Historia consulta sin alterar la partida. Guardado binario v4 conserva estado, azar, historia y conocimiento; versiones antiguas incompatibles se rechazan explícitamente.

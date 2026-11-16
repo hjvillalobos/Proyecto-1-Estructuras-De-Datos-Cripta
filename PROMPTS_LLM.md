@@ -2,9 +2,11 @@
 
 ## Seguimiento 2026-11-15 — enemigos, objetivo y salir/reiniciar
 
-Solicitud transmitida desde otro chat, citas de la usuaria: «en cualquier cripta casi no salen enemigos y si salen no me baja tanto la vida», «no me deja salir de la cripta cuando llego al final», «el botón de salir se sale al menú principal y ya no pregunta si quiero salir o reiniciar la partida, qué pasó?». Dato posterior transmitido: menciona Osario menor y sala20. Alcance resumido: investigar/corregir con reglas/API intactas, mantener autorización de commit/push en004-linea-tiempo y no repetir toda la suite/bench sin justificación.
+Solicitud transmitida desde otro chat, citas de la usuaria: «en cualquier cripta casi no salen enemigos y si salen no me baja tanto la vida», «no me deja salir de la cripta cuando llego al final», «el botón de salir se sale al menú principal y ya no pregunta si quiero salir o reiniciar la partida, qué pasó?». Dato posterior transmitido: menciona Osario menor y sala 20. Alcance resumido: investigar/corregir con reglas/API intactas, mantener autorización de commit/push en 004-linea-tiempo y no repetir toda la suite/bench sin justificación.
 
-Uso: inspección causal de controlador/aplicación, condición de victoria y datos; replay local de23 acciones identifica cripta02@52532a77ee04, sala20 secundaria, salida18, vida30, ningún enemigo activado ni llave negra obtenida. Osario histórico tiene6 salas/salida6. Se especifica UX-01..03 antes del código; no se atribuyen comandos spec-kit no ejecutados. No se modifica el log/guardado de la usuaria ni la dificultad del servicio.
+Uso: inspección causal de controlador/aplicación, condición de victoria y datos; replay local de 23 acciones identifica cripta 02@52532a77ee04, sala 20 secundaria, salida 18, vida 30, ningún enemigo activado ni llave negra obtenida. Osario histórico tiene 6 salas/salida 6. Se especifica UX-01..03 antes del código; no se atribuyen comandos spec-kit no ejecutados. No se modifica el log/guardado de la usuaria ni la dificultad del servicio.
+
+Resultado: diálogo cancelable/reinicio activo y objetivo sin salas ocultas; corregida acreditación de puerta física desde ambos extremos.188 pruebas dirigidas en61,701 s, OK, y repetición posterior de8 casos UX en4,042 s, OK. Cuatro mapas actuales resolubles y una continuación de la copia local terminaron en victoria por acciones ordinarias; daño aplicado comprobado. No se sube el log de la usuaria, no se repiten toda la suite/bench ni se afirma inspección visual manual completa. Evidencia en specs/004-linea-tiempo/seguimiento-ux-2026-11-15.md y seguimiento-ux-evidencia.json.
 
 ## 2026-11-15 — revisión completa y correcciones de entrega
 
