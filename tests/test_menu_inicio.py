@@ -44,7 +44,7 @@ class TestMenuInicio(unittest.TestCase):
             self.skipTest(str(error))
         self.addCleanup(vista.cerrar)
         vista.root.withdraw()
-        with patch("vista.grafica.messagebox.showinfo") as dialogo:
+        with patch.object(vista, "mostrar_informe") as dialogo:
             vista.mostrar_ayuda()
             dialogo.assert_not_called()
             for _ in range(2):

@@ -84,7 +84,8 @@ class ComandosIntegracionTest(unittest.TestCase):
         vista.root.withdraw()
         botones = [boton for marco in vista.root.winfo_children()
                    for boton in marco.winfo_children() if isinstance(boton, tk.ttk.Button)]
-        with patch("vista.grafica.simpledialog.askstring", return_value="#1") as pregunta:
+        with patch("vista.consulta_historia.ConsultaHistoria") as pregunta:
+            pregunta.return_value.result = "#1"
             for etiqueta in ("Historia", "Mapa", "Viajar"):
                 next(b for b in botones if b.cget("text") == etiqueta).invoke()
         pregunta.assert_called_once()  # Viajar pide la proyección al controlador.

@@ -99,6 +99,23 @@ class MapaGUITest(TestCase):
         mapa.viajar()
         self.assertEqual(mapa.comando, 'ir a 9000')
 
+    def test_ui02_cerrar_cancela_temporizador_de_niebla(self):
+        mapa = self.crear()
+        tarea = mapa.niebla.tarea
+        self.assertIsNotNone(tarea)
+        mapa.cerrar()
+        self.assertIsNone(mapa.niebla.tarea)
+        self.assertNotIn(tarea, self.root.tk.call('after', 'info'))
+
+    def test_ui02_sin_movimiento_no_programa_niebla(self):
+        mapa = VentanaMapa(self.root, proyeccion(), 10, 9000, animada=False)
+        self.addCleanup(lambda: mapa.cerrar() if mapa.ventana.winfo_exists() else None)
+        self.root.update()
+        self.assertTrue(mapa.canvas.find_withtag('niebla'))
+        self.assertIsNone(mapa.niebla.tarea)
+        mapa.ampliar(.15)
+        self.assertIsNone(mapa.niebla.tarea)
+
     def test_cazador_tiene_alpha_cache_y_respaldo_por_comportamiento(self):
         from PIL import Image
         recursos = RecursosGraficos(self.root)

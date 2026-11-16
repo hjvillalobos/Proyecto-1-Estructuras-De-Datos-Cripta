@@ -30,8 +30,13 @@ BOTONES
   orden real del inventario.
 
 HISTORIA Y MAPA
-  Historia acepta un instante o #acción. Mapa muestra las salas conocidas.
-  Viajar solicita el identificador de la sala y muestra por qué se detuvo.
+  Historia permite consultar tu sala, vida e inventario en el pasado.
+  Elige un tiempo del reloj o un número de acción. Solo consulta:
+  para retroceder de verdad, usa un pergamino de retroceso.
+  Mapa muestra lo que has descubierto: verde indica una sala explorada;
+  ? indica una sala avistada, donde aún no has entrado.
+  Las salas desconocidas no aparecen hasta que las descubres.
+  Viajar permite elegir una sala explorada y caminar hasta ella.
   Replay reproduce la última grabación y muestra su resumen.
 """
 
@@ -84,6 +89,8 @@ class VistaGrafica:
                          padding=(10, 8), font=("Segoe UI", 10))
         estilo.map("TButton", background=[("active", "#31433b"), ("disabled", "#182020")],
                    foreground=[("disabled", "#82918a")])
+        estilo.configure("Historia.TButton", foreground=AMARILLO, bordercolor='#8b7955')
+        estilo.map("Historia.TButton", background=[('active', '#3c382b')])
         estilo.configure("TCombobox", fieldbackground=PANEL, background=PANEL, foreground=TEXTO,
                          arrowcolor=TEXTO, bordercolor=BORDE)
         estilo.map("TCombobox", fieldbackground=[("readonly", PANEL)], foreground=[("readonly", TEXTO)])
@@ -99,13 +106,14 @@ class VistaGrafica:
                                ("Puntajes", "puntajes")):
             ttk.Button(cabecera, text=texto, command=lambda c=comando: self._enviar(c)).pack(side="left", padx=3)
         for texto, accion in (
-            ("Historia", lambda: self._pedir_comando("historia", "Instante o #acción")),
+            ("Historia", self._pedir_historia),
             ("Mapa", lambda: self._enviar("mapa")),
             ("Viajar", lambda: self._enviar('viajar')),
             ("Ayuda", lambda: self._enviar("ayuda")),
             ("Salir", lambda: self._enviar("salir")),
         ):
-            ttk.Button(cabecera, text=texto, command=accion).pack(side="left", padx=3)
+            ttk.Button(cabecera, text=texto, command=accion,
+                       style='Historia.TButton' if texto == 'Historia' else 'TButton').pack(side="left", padx=3)
         izq = tk.Frame(self.root, bg=FONDO)
         izq.grid(row=1, column=0, sticky="nsew", padx=(22, 12), pady=(0, 16))
         der = tk.Frame(self.root, bg=FONDO, width=320)
@@ -658,6 +666,17 @@ class VistaGrafica:
         if texto is not None and texto.strip():
             self._enviar(f"{prefijo} {texto.strip()}")
 
+    def _pedir_historia(self):
+        from vista.consulta_historia import ConsultaHistoria
+        anterior = getattr(self, '_en_menu', False)
+        self._en_menu = True
+        try:
+            dialogo = ConsultaHistoria(self.root)
+        finally:
+            self._en_menu = anterior
+        if dialogo.result is not None:
+            self._enviar(f'historia {dialogo.result}')
+
     def pedir_destino(self, proyeccion, actual):
         from vista.destino_viaje import DestinoViaje
         self._dialogo_destino = DestinoViaje(self, proyeccion, actual)
@@ -671,12 +690,19 @@ class VistaGrafica:
             return
         ventana = tk.Toplevel(self.root)
         ventana.title(titulo)
+        ventana.configure(bg=FONDO)
+        ventana.geometry('720x480')
+        ventana.minsize(560, 380)
         ventana.transient(self.root)
-        cuerpo = ScrolledText(ventana, wrap="word", width=70, height=18)
-        cuerpo.pack(fill="both", expand=True, padx=12, pady=12)
+        tk.Label(ventana, text=titulo, bg=FONDO, fg=AMARILLO,
+                 font=('Georgia', 23)).pack(anchor='w', padx=24, pady=(20, 12))
+        cuerpo = ScrolledText(ventana, wrap="word", width=70, height=18,
+                              bg=PANEL, fg=TEXTO, relief='flat', padx=16, pady=14,
+                              font=('Segoe UI', 11), spacing3=8)
+        cuerpo.pack(fill="both", expand=True, padx=24, pady=(0, 16))
         cuerpo.insert("1.0", texto)
         cuerpo.configure(state="disabled")
-        ttk.Button(ventana, text="Cerrar", command=ventana.destroy).pack(pady=(0, 12))
+        ttk.Button(ventana, text="Volver a la partida", command=ventana.destroy).pack(anchor='e', padx=24, pady=(0, 20))
         ventana.bind("<Escape>", lambda _evento: ventana.destroy())
         ventana.grab_set()
         self.root.wait_window(ventana)
@@ -685,7 +711,8 @@ class VistaGrafica:
         if self._cerrada:
             return
         from vista.mapa_visual import VentanaMapa
-        comando = VentanaMapa(self.root, proyeccion, actual, destino).mostrar()
+        comando = VentanaMapa(self.root, proyeccion, actual, destino,
+                              animada=self._movimiento_activo).mostrar()
         if comando:
             self._enviar(comando)
 
@@ -701,7 +728,7 @@ class VistaGrafica:
                         "objeto amarillo para recogerlo. Botón «Ayuda» para ver los controles.",
                         AMARILLO)
             return
-        messagebox.showinfo("Ayuda", AYUDA_GRAFICA, parent=self.root)
+        self.mostrar_informe("Ayuda · Cómo jugar", AYUDA_GRAFICA)
 
     def mostrar_puntajes(self, registros):
         if self._cerrada:

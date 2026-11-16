@@ -5,6 +5,7 @@ from tkinter.scrolledtext import ScrolledText
 from dataclasses import dataclass
 from utilidades.ordenamiento import ordenar
 from vista.tema import FONDO, PANEL, TEXTO, TENUE, AMARILLO, VERDE, ROJO, BORDE
+from vista.niebla_mapa import NieblaMapa
 
 
 @dataclass(frozen=True)
@@ -87,7 +88,7 @@ def preparar_cartografia(proyeccion, actual=None):
 
 
 class VentanaMapa:
-    def __init__(self, padre, proyeccion, actual=None, destino=None):
+    def __init__(self, padre, proyeccion, actual=None, destino=None, animada=True):
         self.datos = preparar_cartografia(proyeccion, actual)
         self.actual, self.destino = actual, destino
         self.seleccion = next((i for i, r in enumerate(self.datos.registros) if r[0] == actual),
@@ -137,7 +138,7 @@ class VentanaMapa:
         self.boton_viajar = ttk.Button(lateral, text='Viajar a esta sala', command=self.viajar)
         self.boton_viajar.pack(fill='x')
         ttk.Button(lateral, text='Centrar en ti', command=self.centrar).pack(fill='x', pady=7)
-        self.leyenda = tk.Label(lateral, text='◉ Tu sala · ◇ Destino\nVerde: explorada · ?: avistada\nNiebla: aún desconocido\n\nPuertas (último recuerdo)\nVerde: abierta · rojo: cerrada\nGris: sin observar\nPueden haber cambiado.',
+        self.leyenda = tk.Label(lateral, text='◉ Tu sala · ◇ Destino\nVerde: ya entraste\n?: avistada, aún sin explorar\n\nLas salas desconocidas no aparecen hasta descubrirlas.\n\nPuertas (último recuerdo)\nVerde: abierta · rojo: cerrada\nGris: sin observar\nPueden haber cambiado.',
                                 fg=TENUE, bg=PANEL, font=('Segoe UI', 9), justify='left', wraplength=225)
         self.leyenda.pack(anchor='w', pady=(22, 0))
         area = tk.Frame(cuerpo, bg='#10191a', highlightbackground=BORDE, highlightthickness=1)
@@ -147,6 +148,7 @@ class VentanaMapa:
         self.cuadro.rowconfigure(0, weight=1)
         self.cuadro.columnconfigure(0, weight=1)
         self.canvas = tk.Canvas(self.cuadro, bg='#111c1c', highlightthickness=0)
+        self.niebla = NieblaMapa(self.canvas, animada)
         self.canvas.grid(row=0, column=0, sticky='nsew')
         barra_x = ttk.Scrollbar(self.cuadro, orient='horizontal', command=self.canvas.xview)
         barra_y = ttk.Scrollbar(self.cuadro, orient='vertical', command=self.canvas.yview)
@@ -180,14 +182,7 @@ class VentanaMapa:
         c.delete('all')
         ancho = max(740, max((p[0] for p in self.datos.posiciones), default=400) + 100) * z
         alto = max(500, max((p[1] for p in self.datos.posiciones), default=250) + 130) * z
-        # Niebla decorativa fija: no depende de salas ocultas ni del tamaño real.
-        tonos = ('#121e1e', '#13201f', '#142221', '#152422', '#162623', '#172724', '#182925', '#192a26')
-        for x, y, rx, ry in ((100, 70, 190, 80), (630, 100, 230, 100), (380, 390, 260, 120)):
-            for k, tono in enumerate(tonos):
-                escala = 1-k*.065
-                c.create_oval((x-rx*escala)*z, (y-ry*escala)*z,
-                              (x+rx*escala)*z, (y+ry*escala)*z,
-                              fill=tono, outline='', tags='niebla')
+        self.niebla.dibujar(z)
         c.create_text(ancho-90, 30, text='CONEXIONES', fill=AMARILLO, font=('Georgia', 9))
         for i, j, salida in self.datos.conexiones:
             x, y = self.datos.posiciones[i]
@@ -296,6 +291,7 @@ class VentanaMapa:
                 self.cerrar()
 
     def cerrar(self):
+        self.niebla.detener()
         self.ventana.destroy()
 
     def mostrar(self):
