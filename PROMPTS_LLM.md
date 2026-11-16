@@ -2,6 +2,8 @@
 
 ## 2026-11-15 — reconexión de replay gráfico
 
+Ampliación transmitida: mejorar el diálogo básico «Identificador de la sala» de Viajar, título «Viajar a una sala», tema existente, botones españoles, validación y cancelación sin alterar partida/niebla; no cambiar selectores de archivos ni eliminar la verificación inicial. Mensaje posterior literal de la usuaria transmitido: «sigue con lo que estabas». Se conservan los cambios RP parciales y se especifica VD-01 antes de implementarlo.
+
 Solicitud transmitida desde otro chat, resumen identificado: Replay de GUI muestra una ventana de texto con «Historia t=5235 | Sala 18» en lugar de la repetición gráfica esperada. Reconectar ambas entradas GUI con pausa/velocidad/detener y animación, preservar CLI/hasta sin vista, historia/cargas/retrocesos y aislamiento de partida/archivos/presupuesto; corregir y publicar en004-linea-tiempo bajo autorización vigente. Captura aportada como referencia del fallo. Se constata main.crear_lanzador_replay→subprocess.run→replay_sin_vista, mientras ReproductorReplay/VistaGrafica siguen disponibles pero desconectados. Árbol inicial tiene un cambio ajeno en datos_generados/puntajes.jsonl que se conservará fuera del commit.
 
 Uso: especificar RP-01..04 antes del código, conectar modo gráfico separado y realizar pruebas dirigidas, sin atribuir invocaciones spec-kit no ejecutadas ni inspección visual que no se observe. No se modifica dificultad ni se reescribe el log/guardado de la usuaria.

@@ -1,5 +1,7 @@
 # Tareas — línea de tiempo
 
+- [ ] VD-T01 Diálogo temático, selección explorada/validación, Enter/Escape/X y controlador sin mutación al cancelar; pruebas y evidencia (VD-01).
+
 ## Replay gráfico RP
 
 - [ ] RP-T01 Reconectar lanzador GUI y modo independiente, conservando CLI/hasta sin vista (RP-01/03/04).

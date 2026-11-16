@@ -1,5 +1,9 @@
 # Plan técnico propuesto
 
+## VD-01 — destino con conocimiento parcial
+
+El controlador atiende la petición de elegir destino antes de cancelar el viaje activo; entrega proyección/posición al diálogo y solo una aceptación llama al flujo existente de ir a. La vista filtra estado explorado antes de formar lista/detalle, muestra entrada numérica y error local sin revelar ID oculto, y conserva _en_menu/foco/cola al cancelar. Reutilizar tema, fondo y patrones de NombrePuntaje/SalidaPartida, sin acceder a modelo/red. Pruebas de teclado/cancelación/validación, privacidad y estado/log/viaje intactos. RP y VD se prueban como incrementos acotados, sin rediseñar otros diálogos.
+
 ## RP-01..04 — conexión de replay gráfico
 
 El lanzador de GUI usa Popen con modo explícito independiente y no devuelve stdout como informe; consola conserva subprocess.run con salida textual. El proceso hijo crea VistaGrafica y ReproductorReplay con fábrica completa más integrar_historia; todos los cierres liberan vista/precarga del hijo. Reutilizar ejecutar_tarea para carga/acciones de datos sin bloquear Tk y comprobar detener/cierre antes de presentar. No crear ControladorJuego ni BitacoraReplay.iniciar en reproducción. El archivo se lee una vez a memoria; no es streaming del log activo. Conservar controles/animación existentes y costos del descriptor en EstadoVista. Pruebas con partida completa y log de carga/pergamino, fábrica independiente, comparación exacta de estado e integridad de archivos; lanzador probado desde menú y controlador; CLI sin constructor de vista; widget Tk y captura nativa si la superficie permite inspección sin interferir con la usuaria. No modifica reglas o búsquedas ni justifica repetir todos los benchmarks.
