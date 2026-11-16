@@ -141,4 +141,6 @@ Historia K50 ocupa5.673.260 B en esta carga sintética de 300 campos y 101 contr
 
 Reproducción: `python main.py --bench --subsistemas parte-dos resolubilidad --paquete PAQUETE --cripta cripta-06 --repeticiones 120` y `python main.py --bench --subsistemas historia --operaciones 5000 --salas 300 --repeticiones 3`. PAQUETE debe contener esa versión compatible. [Salida completa de los benchmarks](revision-bench-2026-11-15.txt) y [resumen de evidencia/mapas](revision-evidencia-2026-11-15.json).
 
-Logs de trabajo fuera de Git en `New project/tmp/revision-20261115-*`; mediciones anteriores y sus excesos permanecen en los artefactos versionados previos. No se suman suites solapadas, no se descartan muestras lentas ni se certifica ausencia de bugs futuros. La publicación se confirma después de verificar el remoto.
+Logs de trabajo fuera de Git en `New project/tmp/revision-20261115-*`; mediciones anteriores y sus excesos permanecen en los artefactos versionados previos. No se suman suites solapadas, no se descartan muestras lentas ni se certifica ausencia de bugs futuros.
+
+Publicación comprobada: push ordinario de especificación `6309e20` y corrección/informe `10f5f78`. `git ls-remote` devuelve `10f5f78ebfeaab7fd65f1c0ae1f81fb097652b56` para `refs/heads/004-linea-tiempo`, idéntico a HEAD en esa comprobación. Este cierre documental se confirma después; main y ramas ajenas no se modificaron.

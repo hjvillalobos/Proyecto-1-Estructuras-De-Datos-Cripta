@@ -5,7 +5,9 @@
 - [x] RE-T01 Reproducir apertura inversa sin metadatos, respetar llave/cierre y validar binario/retroceso y ausencia/ambigüedad de retorno (RE-01, IA-04).
 - [x] RE-T02 Comprobar marcadores de objetos nuevos, sonidos con WAV reales y animación común de cazadores sin mutar el motor (RE-02/03, VI-01).
 - [x] RE-T03 Auditar datos publicados/mapas y cubrir Parte I/II en matriz de evidencia, faltantes y severidad; conservar fuentes y prompts (RE-04, RF-03).
-- [ ] RE-T04 Ejecutar regresión y mediciones aisladas, publicar resultados y enviar cambios validados a 004-linea-tiempo (RE-01..04).
+- [x] RE-T04 Ejecutar regresión y mediciones aisladas, publicar resultados y enviar cambios validados a 004-linea-tiempo (RE-01..04).
+
+Publicación RE verificada: `10f5f78ebfeaab7fd65f1c0ae1f81fb097652b56` coincide con `refs/heads/004-linea-tiempo` mediante `git ls-remote`; push ordinario, sin modificar main ni ramas ajenas. El commit documental posterior registra ese resultado.
 
 > **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
 
