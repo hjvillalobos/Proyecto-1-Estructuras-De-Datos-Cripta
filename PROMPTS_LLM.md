@@ -1,5 +1,53 @@
 # Bitácora de uso de LLM
 
+## 2026-11-17 — regresión y publicación de documentación
+
+- **Herramienta/modelo:** Codex; variante exacta no confirmada. PowerShell, Python y Git.
+- **Solicitudes literales:** «no hay bugs en el proyecto?», «subiste todos mis cambios a mi rama?», «que es la solicitud del profesor», «sube todo menos esa solicitud».
+- **Uso y validación:** suite integral repetida sobre `42ee527`, 863 pruebas/213.337 s, cero fallos/errores y dos opciones omitidas. Comparación histórica ejecutada aparte, 41 pruebas/0.384 s, OK; copia sin cachés/partidas, 20 pruebas/7.060 s, OK. API real sin repetir; no se suman subconjuntos. Logs en `.cache/revision-bugs-20261117/`. Publicación autorizada en `004-linea-tiempo` de informe, evidencia y seguimiento documental; el borrador de solicitud al profesor queda exclusivamente local. Se retiran los enlaces que dependían de ese borrador. Las menciones anteriores registran su preparación histórica, sin incluirlo en la entrega. No cambia código de producción, constitución ni ZIP.
+
+## 2026-11-17 — ampliación del informe de revisión de cruces
+
+- **Herramienta/modelo:** Codex; variante exacta no confirmada. PowerShell e inspección de especificaciones, fuentes y salida de pruebas conservada.
+- **Solicitud literal:** «esta perfectisimo amooo, pero no se puede hacer mas extenso para que se vea una documentacion excelente?»
+- **Uso:** ampliar `specs/004-linea-tiempo/revision-cruces-2026-11-17.md` con resumen, método, análisis de contratos A↔C/B↔D, ejemplos de comportamiento, matriz de trazabilidad con FR de cada capacidad, decisiones observables y límites. Desglose de los 66 casos obtenido del log aprobado: 2/10/5/14/15/3/17 por los siete módulos seleccionados. Se conserva el resultado anterior de 19.041 s; no se atribuye una nueva ejecución ni se presenta ese tiempo como benchmark. Verificación documental de enlaces, nombres de pruebas y conteos; sin cambios de código, constitución, Git o resultados históricos.
+
+## 2026-11-17 — declaración de pruebas del equipo y contraste Git
+
+- **Herramienta/modelo:** Codex; variante exacta no confirmada. PowerShell y Git en lectura.
+- **Solicitud literal:**
+
+> la verificacion humana no la puedes hacer tu? tienes el acceso a git y los commit todos hicimos pruebas esta parte se ve fea Acta de revisión humana por completar\
+> \
+> Estado: responsables identificados y funcionamiento integrado declarado por la usuaria; faltan datos verificables de la revisión de cada cruce. La constitución 1.1.0 exige: «Los PRs se integran en incrementos pequeños con revisión cruzada (A↔C, B↔D)». La ejecución de Codex no acredita por sí sola esa participación.\
+> \
+> \| Dato | A↔C | B↔D |\
+> \|---|---|---|\
+> \| Responsables comunicados | Sebastián y Juan | Heifryl y Belén |\
+> \| Participación y dirección de la revisión | Pendiente de declaración de los participantes | Pendiente de declaración de los participantes |\
+> \| Fecha real de revisión | Sin acreditar | Sin acreditar |\
+> \| Commit o PR revisado | Sin comunicar | Sin comunicar |\
+> \| Archivos o casos revisados por las personas | Sin comunicar | Sin comunicar |\
+> \| Observaciones y correcciones humanas | Sin comunicar | Sin comunicar |\
+> \| Conformidad de cada participante | Sin registrar | Sin registrar |\
+> \
+> Para completar el acta, cada participante puede aportar una declaración actual con fecha real, referencia revisada, alcance, observaciones y decisión. Si la revisión se realiza después de la integración, registrarla como revisión posterior de cierre. No presentarla como evidencia de una revisión anterior a la integración.\
+
+- **Uso:** se incorpora la confirmación de Belén de que todos hicieron pruebas como declaración del equipo registrada el 17 de noviembre. Se contrastan autores, contenido de cambios y merges en Git: `33d97ac`, `9f5ce63`, `3c97b7d`, `62e457c`, `8b0742e`, `9ee56bf`, `694dcf6`, `8b88125` y `049a990`. Se reemplaza la tabla de campos vacíos por evidencia concreta y se ajustan solicitud/estado/integración. Se conserva la distinción entre pruebas declaradas por el equipo, resultados de Codex y autoría/integración de Git, sin inventar fechas de pruebas ni aprobaciones de PR. Sin cambios de producción, constitución o historial; se conserva la ejecución previa de 66 pruebas, sin repetirla por esta edición documental.
+
+## 2026-11-17 — revisión de cruces y solicitud de regularización
+
+- **Herramienta/modelo:** Codex; variante exacta no confirmada. PowerShell, Git en lectura y Python 3.14. Fecha en America/Costa_Rica.
+- **Solicitud inicial literal:** «que mas falta en el proyecto para que la nota sea 100?»
+- **Solicitud de acción literal:** «puedes hacer los puntos 1 y 2? 3,4,5 ya nos estamos encargando»
+- **Contexto:** punto 1, acreditar revisiones A↔C/B↔D; punto 2, preparar la gestión con el profesor de prompts incompletos y commit que reúne aclaración/código. Los puntos 3/4/5 quedan a cargo del equipo.
+- **Respuesta textual a la consulta sobre participación:** «Ya la hicimos; daré los detalles».
+- **Ampliación literal:** «no puedes simularla tu? te damos permiso pon que a y c la hicieron y ayer y b,c hoy, a es sebastian, b es heifryl, c es juan y d es belen, se comprobo que todas las partes al unirlas servian correctamente».
+- **Corrección literal posterior:** «ah si me equivoque person b y d era».
+- **Uso:** revisión técnica de fuentes y contratos, 66 pruebas dirigidas aprobadas en 19.041 s, salida conservada; acta con responsables comunicados y declaración general de funcionamiento, separada de la participación humana aún sin acreditar. No se atribuyen las pruebas ejecutadas por Codex a personas ni se incorporan fechas simuladas como hechos. Solicitud al profesor preparada sin enviar, sin inventar aceptación ni completar prompts truncados. Se comprobó en Git el contenido de `33d97ac`; la constitución y el historial no se modifican. La lista de chats disponibles no aportó una fuente identificada de Persona A que recuperara los dos finales; no se declara una búsqueda exhaustiva de chats o equipos ajenos.
+- **Incidencia de ejecución:** primer comando seleccionó la clase inexistente `TestVerificacionEntrega`: 64 casos contabilizados, un error de carga; no se contó como éxito. Selección corregida completa: 66 pruebas, cero fallos/errores/omisiones. Intento inicial en `.cache/revision-proceso-20261117/pruebas-cruces.txt`; salida aprobada en `specs/004-linea-tiempo/evidencia-cruces-2026-11-17.txt`. No se repitieron benchmarks/API/suite integral por tratarse de cierre documental, sin cambios de producción.
+- **Resultado:** `specs/004-linea-tiempo/revision-cruces-2026-11-17.md`, `SOLICITUD_REGULARIZACION.md` y enlaces de seguimiento en estado e integración. Permanecen pendientes la acreditación humana y la resolución del profesor; no se declara cerrado el cumplimiento histórico. Sin operaciones de commit, publicación, integración o actualización del ZIP.
+
 ## 2026-11-16 — agrupar evidencias locales
 
 - **Herramienta/modelo:** Codex (GPT-6), PowerShell y Python.

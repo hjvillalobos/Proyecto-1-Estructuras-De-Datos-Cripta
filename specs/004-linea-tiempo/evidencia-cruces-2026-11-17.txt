@@ -1,0 +1,103 @@
+test_agotar_limite_no_certifica_distancia_fuera_de_rango (tests.test_contrato_rutas_c.PruebasContratoRutasC.test_agotar_limite_no_certifica_distancia_fuera_de_rango) ... ok
+test_llegada_ruta_valida_y_ausencia_en_fuente_filtrada (tests.test_contrato_rutas_c.PruebasContratoRutasC.test_llegada_ruta_valida_y_ausencia_en_fuente_filtrada) ... ok
+test_dx01_consultas_reales_son_puras_y_respetan_frontera (tests.test_controlador_ac_real.ControladorACRealTest.test_dx01_consultas_reales_son_puras_y_respetan_frontera) ... ok
+test_dx02_cargas_invalidas_no_mutan_ni_se_graban (tests.test_controlador_ac_real.ControladorACRealTest.test_dx02_cargas_invalidas_no_mutan_ni_se_graban) ... ok
+test_dx02_comandos_guardar_cargar_y_continuar_con_historia_real (tests.test_controlador_ac_real.ControladorACRealTest.test_dx02_comandos_guardar_cargar_y_continuar_con_historia_real) ... ok
+test_dx02_pergamino_recorta_historia_y_log_permite_nueva_rama (tests.test_controlador_ac_real.ControladorACRealTest.test_dx02_pergamino_recorta_historia_y_log_permite_nueva_rama) ... ok
+test_dx03_log_del_controlador_reproduce_carga_sin_archivo_ni_vista (tests.test_controlador_ac_real.ControladorACRealTest.test_dx03_log_del_controlador_reproduce_carga_sin_archivo_ni_vista) ... ok
+test_dx04_mapa_del_controlador_refleja_entradas_reales (tests.test_controlador_ac_real.ControladorACRealTest.test_dx04_mapa_del_controlador_refleja_entradas_reales) ... ok
+test_dx05_cancelar_viaje_real_no_ejecuta_ni_graba_paso (tests.test_controlador_ac_real.ControladorACRealTest.test_dx05_cancelar_viaje_real_no_ejecuta_ni_graba_paso) ... ok
+test_dx05_hechos_reales_detienen_tras_un_paso_con_enemigos (tests.test_controlador_ac_real.ControladorACRealTest.test_dx05_hechos_reales_detienen_tras_un_paso_con_enemigos) ... ok
+test_dx06_carga_incoherente_con_mapa_no_publica_estado_parcial (tests.test_controlador_ac_real.ControladorACRealTest.test_dx06_carga_incoherente_con_mapa_no_publica_estado_parcial) ... ok
+test_mc01_cargar_descarta_descubrimientos_posteriores_y_permite_continuar (tests.test_controlador_ac_real.ControladorACRealTest.test_mc01_cargar_descarta_descubrimientos_posteriores_y_permite_continuar)
+FR-011 / SC-004: recuperar motor, historia y mapa de la misma frontera. ... ok
+test_controlador_consume_entrada_y_ataque_en_la_frontera (tests.test_hechos_paso_motor.PruebasHechosPasoMotor.test_controlador_consume_entrada_y_ataque_en_la_frontera) ... ok
+test_dano_no_se_deduce_de_la_vida_final (tests.test_hechos_paso_motor.PruebasHechosPasoMotor.test_dano_no_se_deduce_de_la_vida_final) ... ok
+test_rechazo_sin_tiempo_y_movimiento_sin_enemigos (tests.test_hechos_paso_motor.PruebasHechosPasoMotor.test_rechazo_sin_tiempo_y_movimiento_sin_enemigos) ... ok
+test_trampa_registra_dano_antes_del_siguiente_turno (tests.test_hechos_paso_motor.PruebasHechosPasoMotor.test_trampa_registra_dano_antes_del_siguiente_turno) ... ok
+test_veneno_y_captura_se_descartan_si_falla_el_turno (tests.test_hechos_paso_motor.PruebasHechosPasoMotor.test_veneno_y_captura_se_descartan_si_falla_el_turno) ... ok
+test_aplicar_revertir_y_lote_fallido_invalidan_cache (tests.test_conocimiento_rutas.TestRutasConocidas.test_aplicar_revertir_y_lote_fallido_invalidan_cache)
+C38: no volver a una revisión que permita usar etiquetas viejas. ... ok
+test_atajo_desconocido_y_reversion_de_exploracion (tests.test_conocimiento_rutas.TestRutasConocidas.test_atajo_desconocido_y_reversion_de_exploracion)
+C22/C25: no filtrar después de buscar en mapa real. ... ok
+test_c42_explorar_habilita_salida_y_no_descarta_alternativa (tests.test_conocimiento_rutas.TestRutasConocidas.test_c42_explorar_habilita_salida_y_no_descarta_alternativa)
+FR-008/017: usar conocimiento, sin confundir falta de ruta con cierre. ... ok
+test_c42_origen_bloqueado_no_busca_y_reversion_lo_recupera (tests.test_conocimiento_rutas.TestRutasConocidas.test_c42_origen_bloqueado_no_busca_y_reversion_lo_recupera)
+FR-010/012/014: no recorrer el mapa para un origen sin salida. ... ok
+test_consultas_alternadas_no_mutan_ni_proyectan_todo_el_mapa (tests.test_conocimiento_rutas.TestRutasConocidas.test_consultas_alternadas_no_mutan_ni_proyectan_todo_el_mapa)
+C24/C25: ciclos, desconexión y reutilización de auxiliares. ... ok
+test_empate_menor_vecina_no_orden_de_entrada (tests.test_conocimiento_rutas.TestRutasConocidas.test_empate_menor_vecina_no_orden_de_entrada)
+C22: ambas rutas cuestan 4; gana primera vecina 20. ... ok
+test_fallo_de_busqueda_no_publica_cache_parcial (tests.test_conocimiento_rutas.TestRutasConocidas.test_fallo_de_busqueda_no_publica_cache_parcial)
+C39: el destino anterior tampoco reutiliza una generación dañada. ... ok
+test_grafo_dirigido_y_origen_fuera_de_region_cerrada (tests.test_conocimiento_rutas.TestRutasConocidas.test_grafo_dirigido_y_origen_fuera_de_region_cerrada)
+C37/C39: transponer arcos, no asumir salidas recíprocas. ... ok
+test_memoria_puerta_y_reversion_sin_cache_obsoleta (tests.test_conocimiento_rutas.TestRutasConocidas.test_memoria_puerta_y_reversion_sin_cache_obsoleta)
+C23: no observada, abierta, cerrada y deshacer cierre. ... ok
+test_oraculo_exhaustivo_semilla_fija (tests.test_conocimiento_rutas.TestRutasConocidas.test_oraculo_exhaustivo_semilla_fija)
+C22–C25/C37: 60 grafos, varios orígenes y caminos simples. ... ok
+test_puertas_paralelas_y_costo_sin_tope_artificial (tests.test_conocimiento_rutas.TestRutasConocidas.test_puertas_paralelas_y_costo_sin_tope_artificial)
+C24: no confundir dos puertas entre los mismos extremos. ... ok
+test_rechazo_destinos_y_llegada_sin_paso (tests.test_conocimiento_rutas.TestRutasConocidas.test_rechazo_destinos_y_llegada_sin_paso)
+C21: avistado, desconocido e inexistente no se distinguen. ... ok
+test_reutiliza_distancias_en_pasos_sucesivos (tests.test_conocimiento_rutas.TestRutasConocidas.test_reutiliza_distancias_en_pasos_sucesivos)
+C37: una búsqueda para tres orígenes ya resueltos al mismo destino. ... ok
+test_viaje_recalcula_con_observacion_y_cancelacion_tras_reversion (tests.test_conocimiento_rutas.TestRutasConocidas.test_viaje_recalcula_con_observacion_y_cancelacion_tras_reversion)
+I5 C27/C29: control de C con buscador real; movimiento suministrado. ... ok
+test_fr008_fr020_argumentos_invalidos_antes_de_abrir_sesion (tests.test_modos_historia.ModosHistoriaTest.test_fr008_fr020_argumentos_invalidos_antes_de_abrir_sesion) ... ok
+test_fr013_ac18_ac21_no_completada_muestra_causa_y_alcance_sin_diagnostico (tests.test_modos_historia.ModosHistoriaTest.test_fr013_ac18_ac21_no_completada_muestra_causa_y_alcance_sin_diagnostico) ... ok
+test_fr013_detiene_el_replay_cuando_no_hay_revisiones_posteriores (tests.test_modos_historia.ModosHistoriaTest.test_fr013_detiene_el_replay_cuando_no_hay_revisiones_posteriores) ... ok
+test_fr013_fr014_fr017_replay_completo_y_hasta_sin_vista (tests.test_modos_historia.ModosHistoriaTest.test_fr013_fr014_fr017_replay_completo_y_hasta_sin_vista) ... ok
+test_fr013_replay_respeta_carga_y_retroceso_posteriores (tests.test_modos_historia.ModosHistoriaTest.test_fr013_replay_respeta_carga_y_retroceso_posteriores) ... ok
+test_fr015_delega_la_version_y_el_almacen_de_datos_offline (tests.test_modos_historia.ModosHistoriaTest.test_fr015_delega_la_version_y_el_almacen_de_datos_offline) ... ok
+test_fr015_descarga_rechaza_llaves_si_cambia_la_version (tests.test_modos_historia.ModosHistoriaTest.test_fr015_descarga_rechaza_llaves_si_cambia_la_version) ... ok
+test_fr015_fr016_r4_cli_offline_con_verificador_real (tests.test_modos_historia.ModosHistoriaTest.test_fr015_fr016_r4_cli_offline_con_verificador_real) ... ok
+test_fr015_no_confunde_modulo_ausente_con_no_resoluble (tests.test_modos_historia.ModosHistoriaTest.test_fr015_no_confunde_modulo_ausente_con_no_resoluble) ... ok
+test_fr015_paquete_descargado_se_verifica_offline (tests.test_modos_historia.ModosHistoriaTest.test_fr015_paquete_descargado_se_verifica_offline) ... ok
+test_fr015_reporte_negativo_expone_frontera_ubicacion_y_ciclo (tests.test_modos_historia.ModosHistoriaTest.test_fr015_reporte_negativo_expone_frontera_ubicacion_y_ciclo) ... ok
+test_fr015_verificar_no_crea_juego_ni_catalogo_ni_vista (tests.test_modos_historia.ModosHistoriaTest.test_fr015_verificar_no_crea_juego_ni_catalogo_ni_vista) ... ok
+test_fr016_forzar_no_inicia_con_paquete_sin_llaves (tests.test_modos_historia.ModosHistoriaTest.test_fr016_forzar_no_inicia_con_paquete_sin_llaves) ... ok
+test_fr016_no_resoluble_solo_inicia_con_forzar (tests.test_modos_historia.ModosHistoriaTest.test_fr016_no_resoluble_solo_inicia_con_forzar) ... ok
+test_fr017_motor_actual_reproduce_sin_vista_y_explica_si_falta_historia (tests.test_modos_historia.ModosHistoriaTest.test_fr017_motor_actual_reproduce_sin_vista_y_explica_si_falta_historia) ... ok
+test_T026_FR013_AC15_AC18_inicio_y_verificacion_exclusiva (tests.test_verificacion_entrega.TestInicioVerificado.test_T026_FR013_AC15_AC18_inicio_y_verificacion_exclusiva) ... ok
+test_137_salas_tipos_nuevos_eventos_victoria_guardado_replay (tests.test_verificacion_entrega.TestCriptaDesconocida.test_137_salas_tipos_nuevos_eventos_victoria_guardado_replay) ... ok
+test_arma_enemigos_botin_y_pocion_con_ids_nuevos (tests.test_verificacion_entrega.TestCriptaDesconocida.test_arma_enemigos_botin_y_pocion_con_ids_nuevos) ... ok
+test_archivo_guardado_y_cargado (tests.test_persistencia_historia.TestPersistenciaHistoria.test_archivo_guardado_y_cargado)
+FR-011: reemplazo íntegro y determinista. ... ok
+test_carga_inexistente_informa_error (tests.test_persistencia_historia.TestPersistenciaHistoria.test_carga_inexistente_informa_error)
+FR-020: error de archivo presentable al controlador. ... ok
+test_conserva_todos_los_tipos_sin_coercion (tests.test_persistencia_historia.TestPersistenciaHistoria.test_conserva_todos_los_tipos_sin_coercion)
+FR-011: nulo, bool, int grande, float, Unicode y tuplas. ... ok
+test_corrupcion_truncamientos_y_sobrantes (tests.test_persistencia_historia.TestPersistenciaHistoria.test_corrupcion_truncamientos_y_sobrantes)
+FR-011/020: el lector no acepta payload incompleto o alterado. ... ok
+test_dto_incoherente_es_rechazado_sin_alterar_original (tests.test_persistencia_historia.TestPersistenciaHistoria.test_dto_incoherente_es_rechazado_sin_alterar_original)
+FR-020: validar K, tiempos y valores anteriores al importar. ... ok
+test_estructura_invalida_aunque_crc_coincida (tests.test_persistencia_historia.TestPersistenciaHistoria.test_estructura_invalida_aunque_crc_coincida)
+FR-020: CRC correcto no sustituye validación semántica. ... ok
+test_etiquetas_texto_y_reales_invalidos_con_crc_valido (tests.test_persistencia_historia.TestPersistenciaHistoria.test_etiquetas_texto_y_reales_invalidos_con_crc_valido)
+FR-020: valores malformados no se admiten aunque el CRC sea válido. ... ok
+test_exportacion_tipificada_y_reconstruccion_de_controles (tests.test_persistencia_historia.TestPersistenciaHistoria.test_exportacion_tipificada_y_reconstruccion_de_controles)
+FR-009/010/011: importa una historia nueva, no estado compartido. ... ok
+test_historia_larga_persistida_conserva_fronteras_y_k (tests.test_persistencia_historia.TestPersistenciaHistoria.test_historia_larga_persistida_conserva_fronteras_y_k)
+FR-010/011: igualdad al recargar 5000 acciones; no mide rendimiento. ... ok
+test_ida_vuelta_binaria_y_continuacion (tests.test_persistencia_historia.TestPersistenciaHistoria.test_ida_vuelta_binaria_y_continuacion)
+FR-011: mismo pasado y mismo estado tras continuar. ... ok
+test_limites_de_profundidad_del_formato (tests.test_persistencia_historia.TestPersistenciaHistoria.test_limites_de_profundidad_del_formato)
+FR-020: guardar falla sin producir un archivo ilegible. ... ok
+test_no_admite_claves_repetidas_ni_conteos_imposibles (tests.test_persistencia_historia.TestPersistenciaHistoria.test_no_admite_claves_repetidas_ni_conteos_imposibles)
+FR-020: valida la estructura, no solo límites exteriores. ... ok
+test_p1_y_version_futura_rechazados_explicita (tests.test_persistencia_historia.TestPersistenciaHistoria.test_p1_y_version_futura_rechazados_explicita)
+FR-012/H6 parcial: lector del fragmento distingue CRPT. ... ok
+test_preserva_eventos_y_campos_creados_o_eliminados (tests.test_persistencia_historia.TestPersistenciaHistoria.test_preserva_eventos_y_campos_creados_o_eliminados)
+FR-002/011: reconstruir entre eventos tras cargar. ... ok
+test_preserva_solo_rama_vigente_y_correcciones (tests.test_persistencia_historia.TestPersistenciaHistoria.test_preserva_solo_rama_vigente_y_correcciones)
+FR-007/011: frontera inicial, checkpoint y bloque incompleto. ... ok
+test_reemplazo_fallido_conserva_archivo_anterior_y_limpia_temporal (tests.test_persistencia_historia.TestPersistenciaHistoria.test_reemplazo_fallido_conserva_archivo_anterior_y_limpia_temporal)
+FR-011/020: guardar no destruye el archivo anterior al fallar. ... ok
+test_rng_guardado_como_valor_puro_continua_igual (tests.test_persistencia_historia.TestPersistenciaHistoria.test_rng_guardado_como_valor_puro_continua_igual)
+NFR-004/FR-011: demuestra preservar getstate, sin capturar motor. ... ok
+
+----------------------------------------------------------------------
+Ran 66 tests in 19.041s
+
+OK

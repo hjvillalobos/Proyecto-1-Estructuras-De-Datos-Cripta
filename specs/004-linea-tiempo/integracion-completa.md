@@ -1,5 +1,7 @@
 # Integración completa — 2026-11-14
 
+Seguimiento del 2026-11-17: [revisión de los cruces, declaración del equipo y contraste Git](revision-cruces-2026-11-17.md), 66 pruebas dirigidas aprobadas. Belén confirma que todos hicieron pruebas y comprobaron el funcionamiento integrado. Se documentan contribuciones de los cuatro integrantes y commits de integración; autoría y merge no demuestran por sí solos aprobación previa de cada PR por ambos responsables. No sustituye el proceso histórico.
+
 ## Revisión técnica de interfaces — 2026-11-16
 
 Esta revisión de Codex contrasta los cruces técnicos; no es aprobación cruzada de integrantes del equipo.
