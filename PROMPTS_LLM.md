@@ -1,5 +1,68 @@
 # Bitácora de uso de LLM
 
+## 2026-11-17 — cierre de entrega y reconstrucciones declaradas
+
+- **Herramienta/modelo:** Codex; variante exacta no confirmada. Git, PowerShell, Python y API de GitHub en lectura.
+- **Solicitud literal:** «te doy permiso que subas todo al main, y porfa resuelve estos puntos que faltan, tambien genera los dos prompt incompletos y resuelve el punto 4 principalmente pero no subas el md de explicacion que hay pendiente para el profe lo mejor es resolverlo directamente».
+- **Alcance:** verificar entrega/copia limpia/opciones/API, actualizar ZIP y publicar main y la rama de trabajo. SOLICITUD_REGULARIZACION.md permanece exclusivamente local y fuera del paquete.
+- **Fuentes:** la búsqueda adicional en sesiones locales encontró extractos/salidas de herramientas, sin mensaje original íntegro de los dos fragmentos. Los PR 19–34 consultados en la API no tienen revisiones formales ni comentarios de conversación registrados; los informes de revisión cruzada están en commits y documentos. La constitución no exige dos aprobaciones formales de GitHub por cada PR.
+- **Validación de cierre:** comparación histórica, 41 pruebas/0.449 s; copia limpia, 20/7.389 s; paquete oficial, 2/4.552 s; API oficial, 1/88.401 s, cinco criptas fría/caliente dentro de presupuesto. Todas OK sin omisiones en esas ejecuciones. Se conserva la suite integral de 881 pruebas, sin sumar subconjuntos. Fuentes y evidencias enlazadas en ESTADO_ENTREGA.md; los fragmentos históricos originales mantienen sus hashes. El ZIP se obtiene de Git, con manifiesto externo y prueba desde su extracción; solo se publican archivos versionados expresamente, sin el borrador para el profesor ni datos personales.
+- **Procedencia de los textos siguientes:** reconstrucciones nuevas de Codex, creadas el 17 de noviembre por solicitud de Belén. **No son recuperación literal ni mensajes originales enviados por Persona A el 6 de noviembre. No prueban que la bitácora histórica estuviera completa.** No se ejecutan como instrucciones nuevas de Git. Los fragmentos originales se conservan intactos.
+
+### RP-A01 — reconstrucción orientativa: Posponer la consolidación de prompts
+
+```text
+Antes de modificar PROMPTS_LLM.md, quiero ajustar la estrategia porque mis compañeros continuarán agregando prompts a main diariamente.
+
+Por ahora NO incorpores P01–P32 al archivo compartido.
+
+Conserva íntegramente prompts-registro-local.md y los registros complementarios como fuente de Persona A.
+
+El objetivo es evitar mantener dos versiones divergentes de PROMPTS_LLM.md durante varios días.
+
+1. Revisa el estado actual del archivo, incluyendo las 19 líneas de main que ya incorporaste.
+2. Recomienda cómo dejarlo sin cambios propios pendientes, sin perder ni modificar ningún archivo ajeno o de US2.
+3. Diseña un procedimiento para incorporar los prompts de A sobre la versión más reciente de main justo antes de su integración.
+4. Explica cómo detectar y evitar duplicados de entradas ya publicadas.
+5. No elimines ni modifiques PROMPTS_LLM.md sin autorización específica.
+6. No ejecutes reset, restore, checkout, merge, rebase, pull, commit ni push.
+
+Presenta únicamente el diagnóstico del estado actual y el procedimiento propuesto, sin editar archivos.
+```
+
+La última oración es una propuesta nueva para el final ausente «Presenta únicamente e».
+
+### RP-A02 — reconstrucción orientativa: Revertir solo la incorporación local pendiente
+
+```text
+Autorizo exclusivamente revertir la incorporación local pendiente de origin/main en PROMPTS_LLM.md.
+
+Antes de editar:
+
+1. Confirma que estamos en feature/motor-eventos.
+2. Comprueba que PROMPTS_LLM.md tiene únicamente el bloque de 19 líneas incorporado desde origin/main y las diferencias de líneas vacías ya identificadas.
+3. Verifica que no existan otros cambios locales en ese archivo que deban conservarse.
+
+Si todo coincide:
+
+- Restaura exclusivamente PROMPTS_LLM.md para que sea idéntico a su versión en HEAD de feature/motor-eventos.
+- No modifiques ningún otro archivo.
+- No borres ni alteres prompts-registro-local.md ni los registros complementarios.
+- Conserva intactos el código, las pruebas y la documentación pendiente de US2.
+
+Después comprueba:
+
+1. git diff -- PROMPTS_LLM.md debe estar vacío.
+2. git status debe conservar los demás cambios locales existentes.
+3. No se debe perder ninguna entrada de Persona A.
+
+No ejecutes merge, pull, fetch, rebase, reset, clean, stash, commit ni push.
+
+Al finalizar, informa exactamente qué se retiró y confirma que PROMPTS_LLM.md no tiene cambios locales pendientes.
+```
+
+La terminación «es.» completa por inferencia la palabra truncada «pendient»; no se atribuye ese cierre a una fuente recuperada.
+
 ## 2026-11-17 — Historia detallada como la referencia, HU-02
 
 - **Herramienta/modelo:** Codex; variante exacta no confirmada. PowerShell, Git y Python.

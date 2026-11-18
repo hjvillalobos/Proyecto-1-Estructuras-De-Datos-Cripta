@@ -1,6 +1,6 @@
 # CRIPTA
 
-Proyecto de Estructuras de Datos II, Parte II. Python 3.11 o superior, arquitectura MVC y estructuras de datos propias. Terreno/cazadores, mapa conocido/viaje, resolubilidad e historia están integrados en `004-linea-tiempo`.
+Proyecto de Estructuras de Datos II, Parte II. Python 3.11 o superior, arquitectura MVC y estructuras de datos propias. Terreno/cazadores, mapa conocido/viaje, resolubilidad e historia están integrados en la entrega de `main`, desarrollada en `004-linea-tiempo`.
 
 [Estado vigente y trazabilidad punto por punto](ESTADO_ENTREGA.md) · [Decisiones y mediciones](DECISIONES.md) · [Bitácora LLM](PROMPTS_LLM.md)
 

@@ -1,0 +1,7 @@
+test_partidas_hasta_victoria_y_replay_en_las_cuatro_criptas (tests.test_criptas_api.TestPaqueteOficial.test_partidas_hasta_victoria_y_replay_en_las_cuatro_criptas) ... ok
+test_todas_las_salas_iconos_guardado_y_carga (tests.test_criptas_api.TestPaqueteOficial.test_todas_las_salas_iconos_guardado_y_carga) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 4.552s
+
+OK
