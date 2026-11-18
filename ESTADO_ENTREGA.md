@@ -2,7 +2,7 @@
 
 ## Estado actual — 17 de noviembre de 2026
 
-**Cierre de publicación autorizado:** Belén autoriza integrar y publicar la entrega en `main`, conservando `004-linea-tiempo` y excluyendo `SOLICITUD_REGULARIZACION.md`. Código funcional verificado: `18691b9`; los cambios de cierre posteriores son documentales. El ZIP se genera desde los archivos versionados de la revisión final; su manifiesto externo identifica revisión, SHA-256, exclusiones y resultado de las pruebas desde la extracción.
+**Cierre de publicación autorizado:** Belén autoriza integrar y publicar la entrega en `main`, conservando `004-linea-tiempo` y excluyendo `SOLICITUD_REGULARIZACION.md`. Código funcional verificado: `18691b9`; los cambios de cierre posteriores son documentales. La entrega se publica mediante Git. Belén canceló la preparación del ZIP; se retiraron el paquete nuevo y sus archivos auxiliares, sin publicar ese artefacto.
 
 Se completaron las verificaciones separadas de las opciones omitidas: [comparación histórica](specs/004-linea-tiempo/evidencia-cierre-comparacion-2026-11-17.txt), 41 pruebas/0.449 s; [copia limpia](specs/004-linea-tiempo/evidencia-cierre-copia-limpia-2026-11-17.txt), 20 pruebas/7.389 s; [paquete oficial](specs/004-linea-tiempo/evidencia-cierre-paquete-oficial-2026-11-17.txt), 2 pruebas/4.552 s; [API real](specs/004-linea-tiempo/evidencia-cierre-api-real-2026-11-17.txt), 1 prueba/88.401 s, cinco criptas en frío/caliente dentro de presupuesto. Todas terminaron en OK, sin omisiones en esas ejecuciones. Los conjuntos se solapan con la suite de 881 y no se suman para anunciar un total mayor.
 

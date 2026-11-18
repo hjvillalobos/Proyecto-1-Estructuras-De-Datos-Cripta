@@ -2,6 +2,8 @@
 
 ## 2026-11-17 — cierre de entrega y reconstrucciones declaradas
 
+- **Aclaración posterior literal:** «cual zip?» y «ay no eso no lo hagas no se ocupa». Se cancela la entrega ZIP y se retiran el paquete del 17 de noviembre, su manifiesto y su log externo recién generados; el ZIP previo del 16 de noviembre queda intacto. La publicación Git autorizada continúa, excluyendo el Markdown del profesor. Las menciones de empaquetado siguientes describen el plan y trabajo anteriores a esta cancelación, no un entregable vigente.
+
 - **Herramienta/modelo:** Codex; variante exacta no confirmada. Git, PowerShell, Python y API de GitHub en lectura.
 - **Solicitud literal:** «te doy permiso que subas todo al main, y porfa resuelve estos puntos que faltan, tambien genera los dos prompt incompletos y resuelve el punto 4 principalmente pero no subas el md de explicacion que hay pendiente para el profe lo mejor es resolverlo directamente».
 - **Alcance:** verificar entrega/copia limpia/opciones/API, actualizar ZIP y publicar main y la rama de trabajo. SOLICITUD_REGULARIZACION.md permanece exclusivamente local y fuera del paquete.
