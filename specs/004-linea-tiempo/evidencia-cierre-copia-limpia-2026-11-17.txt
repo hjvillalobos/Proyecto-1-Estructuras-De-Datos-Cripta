@@ -23,4 +23,3 @@ test_rastro_en_ids_grandes_y_empate (tests.test_almacen_salas.AlmacenSalasTest.t
 Ran 20 tests in 7.389s
 
 OK
-
