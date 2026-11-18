@@ -45,12 +45,18 @@ class MenuInicio:
         self.controles.place(relx=.63, rely=.43, anchor="n", width=280)
         for nombre, comando in acciones:
             boton = ttk.Button(self.controles, text=nombre, command=comando, takefocus=True,
-                               style="Principal.Menu.TButton" if nombre == "Jugar" else "Menu.TButton")
+                               style="Menu.TButton")
             boton.pack(fill="x", pady=5, ipady=5)
             boton.bind("<Up>", lambda e: self.mover(-1))
             boton.bind("<Down>", lambda e: self.mover(1))
+            boton.bind("<Left>", lambda e: self.mover(-1))
+            boton.bind("<Right>", lambda e: self.mover(1))
             boton.bind("<Return>", lambda e, b=boton: self.activar(b))
+            boton.bind("<Motion>", lambda e, b=boton: b.focus_set())
             self.botones.append(boton)
+        for tecla, avance in (("Up", -1), ("Down", 1), ("Left", -1), ("Right", 1)):
+            self.canvas.bind("<" + tecla + ">", lambda e, paso=avance: self.mover(paso))
+        self.canvas.bind("<Return>", lambda e: self.activar(self.botones[0]))
         self.canvas.bind("<Configure>", self.dibujar)
         sonorizar_botones(self.panel, vista.sonidos)
 
@@ -71,7 +77,7 @@ class MenuInicio:
 
     def mover(self, avance):
         foco = self.vista.root.focus_get()
-        indice = self.botones.index(foco) if foco in self.botones else 0
+        indice = self.botones.index(foco) if foco in self.botones else (-1 if avance > 0 else 0)
         self.botones[(indice + avance) % len(self.botones)].focus_set()
         return "break"
 
@@ -145,16 +151,16 @@ class MenuInicio:
         if w > 1 and h > 1:
             self.vista.recursos.imagen("jugador", int(w * .29), int(h * .68))
 
-    def mostrar(self):
+    def mostrar(self, reproducir_inicio=True):
         self.vista._en_menu = True
         self.vista.root.protocol("WM_DELETE_WINDOW", lambda: self.elegir("salir"))
         try:
             self.vista.root.update_idletasks()
             self.dibujar()
             self.vista.root.update_idletasks()
-            if getattr(self.vista, "sonidos", None) is not None:
+            if reproducir_inicio and getattr(self.vista, "sonidos", None) is not None:
                 self.vista.sonidos.reproducir("inicio")
-            self.botones[0].focus_set()
+            self.canvas.focus_set()
             self.vista.root.wait_variable(self.fin)
             return self.resultado
         finally:

@@ -16,6 +16,55 @@ from tests import test_regresiones_juego as base
 
 
 class TestMenuInicio(unittest.TestCase):
+    def test_menu_comienza_sin_resaltado_y_primera_flecha_selecciona(self):
+        from tkinter import ttk
+        from vista.tema import PIEDRA
+        vista = VistaGrafica()
+        self.addCleanup(vista.cerrar)
+        menu = MenuInicio(vista, Mock(), Mock())
+        vista.root.update()
+        menu.canvas.focus_force()
+        vista.root.update()
+        estilo = ttk.Style(vista.root)
+        for boton in menu.botones:
+            self.assertEqual(estilo.lookup(boton.cget("style"), "background", boton.state()), PIEDRA)
+        menu.canvas.event_generate("<Down>")
+        vista.root.update()
+        self.assertIs(vista.root.focus_get(), menu.botones[0])
+        menu.panel.destroy()
+
+    def test_cuatro_flechas_y_enter_activan_opcion_enfocada(self):
+        vista = VistaGrafica()
+        self.addCleanup(vista.cerrar)
+        replay = Mock()
+        menu = MenuInicio(vista, replay, Mock())
+        vista.root.update()
+        menu.botones[0].focus_force()
+        for tecla, indice in (("Down", 1), ("Right", 2), ("Up", 1),
+                              ("Left", 0), ("Left", 4), ("Right", 0),
+                              ("Down", 1), ("Down", 2)):
+            vista.root.focus_get().event_generate("<" + tecla + ">")
+            vista.root.update()
+            self.assertIs(vista.root.focus_get(), menu.botones[indice])
+        vista.root.focus_get().event_generate("<Return>")
+        replay.assert_called_once_with()
+        self.assertEqual(vista._cola, [])
+        menu.botones[3].event_generate("<Motion>", x=10, y=10)
+        vista.root.update()
+        self.assertIs(vista.root.focus_get(), menu.botones[3])
+        from tkinter import ttk
+        from vista.tema import NARANJA, PIEDRA
+        estilo = ttk.Style(vista.root)
+        self.assertEqual(estilo.lookup("Menu.TButton", "background", ("focus",)), NARANJA)
+        self.assertEqual(estilo.lookup("Menu.TButton", "background", ("active",)), PIEDRA)
+        self.assertEqual(sum(b.instate(("focus",)) for b in menu.botones), 1)
+        menu.mover(-1)
+        vista.root.update()
+        self.assertIs(vista.root.focus_get(), menu.botones[2])
+        self.assertEqual(sum(b.instate(("focus",)) for b in menu.botones), 1)
+        self.assertEqual(estilo.lookup("Principal.Menu.TButton", "background", ("focus",)), NARANJA)
+        menu.panel.destroy()
+
     def test_cerrar_principal_con_selector_abierto_no_recrea_menu(self):
         from controlador.aplicacion import ejecutar_juego
         try:

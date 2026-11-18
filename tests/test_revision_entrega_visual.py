@@ -48,7 +48,7 @@ class RevisionEntregaVisualTest(unittest.TestCase):
                 self.assertEqual(wav.getframerate(), 22050)
             reproducciones.append((Path(ruta).stem, flags))
         backend = SimpleNamespace(PlaySound=reproducir, SND_FILENAME=1,
-                                  SND_ASYNC=2, SND_NODEFAULT=4)
+                                  SND_ASYNC=2, SND_NODEFAULT=4, SND_LOOP=8)
         v.sonidos.cerrar()
         v.sonidos = Sonidos(backend)
         v.sonidos.habilitar(True)

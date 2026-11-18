@@ -13,8 +13,37 @@ from vista.sonidos import Sonidos
 
 
 class TestSonidos(unittest.TestCase):
+    def test_primera_sala_detiene_musica_del_menu(self):
+        datos = base.TestRegresionesJuego()
+        datos.setUp()
+        vista = VistaGrafica()
+        self.addCleanup(vista.cerrar)
+        vista.sonidos.cerrar()
+        vista.sonidos, reproductor = self.crear()
+        vista.sonidos.reproducir("inicio")
+        vista.mostrar_estado(datos.motor.estado_vista(), [])
+        self.assertFalse(vista.sonidos._musica_inicio)
+        reproductor.PlaySound.assert_called_with(None, 0)
+
+    def test_bucle_nativo_no_reinicia_ni_lo_interrumpen_los_botones(self):
+        sonidos, reproductor = self.crear()
+        sonidos.reproducir("inicio")
+        ruta, flags = reproductor.PlaySound.call_args.args
+        self.assertTrue(flags & reproductor.SND_LOOP)
+        self.assertTrue(flags & reproductor.SND_ASYNC)
+        for _ in range(10):
+            sonidos.reproducir("inicio")
+            sonidos.reproducir("boton")
+        reproductor.PlaySound.assert_called_once()
+        sonidos.detener_inicio()
+        reproductor.PlaySound.assert_called_with(None, 0)
+        sonidos.detener_inicio()
+        self.assertEqual(reproductor.PlaySound.call_count, 2)
+        sonidos.reproducir("boton")
+        self.assertEqual(reproductor.PlaySound.call_count, 3)
+
     def crear(self):
-        reproductor = SimpleNamespace(PlaySound=Mock(), SND_FILENAME=1, SND_ASYNC=2, SND_NODEFAULT=4)
+        reproductor = SimpleNamespace(PlaySound=Mock(), SND_FILENAME=1, SND_ASYNC=2, SND_NODEFAULT=4, SND_LOOP=8)
         sonidos = Sonidos(reproductor)
         sonidos.habilitar(True)
         self.addCleanup(sonidos.cerrar)
@@ -29,7 +58,7 @@ class TestSonidos(unittest.TestCase):
                 ruta, flags = reproductor.PlaySound.call_args.args
                 self.assertTrue(flags & reproductor.SND_ASYNC)
                 with wave.open(ruta, "rb") as archivo:
-                    self.assertEqual(archivo.getnchannels(), 1)
+                    self.assertEqual(archivo.getnchannels(), 2 if efecto == "inicio" else 1)
                     self.assertEqual(archivo.getsampwidth(), 2)
                     self.assertEqual(archivo.getframerate(), 22050)
                     self.assertGreater(archivo.getnframes(), 0)
@@ -84,6 +113,7 @@ class TestSonidos(unittest.TestCase):
         menu.vista = Mock()
         menu.animacion, menu.panel, menu.fin = Mock(), Mock(), Mock()
         menu.botones = [Mock()]
+        menu.canvas = Mock()
         menu.resultado = ("jugar", None)
         menu.dibujar = Mock()
         menu._precarga_selector = None

@@ -2,13 +2,34 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="88669b21-95b1-4620-805b-8de4401bd5bb" name="Changes" comment="fix: incluir las llaves en los paquetes de descarga offline">
+      <change afterPath="$PROJECT_DIR$/tests/test_musica_partida.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/test_portada.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vista/musica_partida.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vista/portada.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vista/recursos/portada/fondo.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vista/recursos/portada/fuego0.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vista/recursos/portada/fuego1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vista/recursos/portada/fuego2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vista/recursos/portada/fuego3.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vista/recursos/portada/fuego4.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vista/recursos/portada/fuego5.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vista/recursos/portada/fuego6.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vista/recursos/portada/fuego7.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vista/recursos/portada/texto.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vista/recursos/sonidos/bajo_la_piedra.wav" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vista/recursos/sonidos/pasillos_calma.wav" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/vista/recursos/sonidos/pasillos_tension.wav" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DECISIONES.md" beforeDir="false" afterPath="$PROJECT_DIR$/DECISIONES.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PROMPTS_LLM.md" beforeDir="false" afterPath="$PROJECT_DIR$/PROMPTS_LLM.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/specs/001-verificador-resolubilidad/quickstart.md" beforeDir="false" afterPath="$PROJECT_DIR$/specs/001-verificador-resolubilidad/quickstart.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/specs/001-verificador-resolubilidad/tasks.md" beforeDir="false" afterPath="$PROJECT_DIR$/specs/001-verificador-resolubilidad/tasks.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_verificacion_entrega.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_verificacion_entrega.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_menu_inicio.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_menu_inicio.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_rendimiento_arranque.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_rendimiento_arranque.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_revision_entrega_visual.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_revision_entrega_visual.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_sonidos.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_sonidos.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_transicion_inicio.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_transicion_inicio.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vista/grafica.py" beforeDir="false" afterPath="$PROJECT_DIR$/vista/grafica.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vista/menu_inicio.py" beforeDir="false" afterPath="$PROJECT_DIR$/vista/menu_inicio.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vista/sonidos.py" beforeDir="false" afterPath="$PROJECT_DIR$/vista/sonidos.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vista/tema.py" beforeDir="false" afterPath="$PROJECT_DIR$/vista/tema.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,19 +60,19 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;codex/verificador-resolubilidad&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "feature/pendientes-finales",
+    "ignore.virus.scanning.warn.message": "true",
+    "nodejs_package_manager_path": "npm"
   }
-}</component>
+}]]></component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>

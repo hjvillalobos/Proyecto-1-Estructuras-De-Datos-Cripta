@@ -16,8 +16,10 @@ BORDE = "#42544d"
 def configurar_botones_menu(root):
     from tkinter import ttk
     estilo = ttk.Style(root)
-    estilo.configure("Menu.TButton", font=("Segoe UI", 12), padding=(12, 9))
-    estilo.configure("Principal.Menu.TButton", background=AMARILLO, foreground=FONDO,
-                     bordercolor=AMARILLO)
-    estilo.map("Principal.Menu.TButton", background=[("active", VERDE), ("disabled", PANEL)],
-               foreground=[("disabled", TENUE)])
+    estilo.configure("Menu.TButton", font=("Segoe UI", 12), padding=(12, 9),
+                     background=PIEDRA, foreground=TEXTO, bordercolor=BORDE)
+    for nombre in ("Menu.TButton", "Principal.Menu.TButton"):
+        estilo.map(nombre,
+                   background=[("disabled", PANEL), ("focus", NARANJA), ("!focus", PIEDRA)],
+                   foreground=[("disabled", TENUE), ("focus", FONDO), ("!focus", TEXTO)],
+                   bordercolor=[("focus", NARANJA), ("!focus", BORDE)])

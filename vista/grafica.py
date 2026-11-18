@@ -64,7 +64,7 @@ class VistaGrafica:
         self._replay_detener = False
 
         self.recursos = RecursosGraficos(self.root, personaje=leer_personaje())
-        self.sonidos = Sonidos()
+        self.sonidos = Sonidos(root=self.root)
         self.escena = EscenaCripta(self)
         self.transicion_salas = TransicionSalas(self)
         self._estado = None
@@ -326,10 +326,23 @@ class VistaGrafica:
         return ejecutar_tarea(self, funcion, *args, **kwargs)
 
     def mostrar_menu(self, replay, puntajes):
+        mostrar_portada = not getattr(self, "_portada_mostrada", False)
+        if mostrar_portada:
+            from vista.portada import Portada
+            self._portada_mostrada = True
+            self._en_menu = True
+            try:
+                portada = Portada(self.root)
+                if getattr(self, "sonidos", None) is not None:
+                    self.sonidos.reproducir("inicio")
+                if not portada.mostrar():
+                    return ("salir", None)
+            finally:
+                self._en_menu = False
         from vista.menu_inicio import MenuInicio
         menu = MenuInicio(self, replay, puntajes)
         self._liberar_inicio()
-        return menu.mostrar()
+        return menu.mostrar(reproducir_inicio=not mostrar_portada)
 
     def _conservar_inicio(self, menu):
         self._liberar_inicio()
@@ -470,6 +483,8 @@ class VistaGrafica:
     def mostrar_estado(self, e, mensajes):
         if self._cerrada:
             return
+        if getattr(self, "sonidos", None) is not None:
+            self.sonidos.actualizar_partida(any(enemigo.vida > 0 for enemigo in e.enemigos))
         anterior = self._estado
         self._estado = e
         if e != anterior or getattr(self, "_accion_visual", None) in ("cargar", "retroceso"):
