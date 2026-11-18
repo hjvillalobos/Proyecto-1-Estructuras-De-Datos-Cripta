@@ -1,5 +1,9 @@
 # Plan técnico propuesto
 
+## HU-02 — informe detallado
+
+Añadir un formateador detallado separado de `resumir`, con fichas residentes y proyección del mapa reconstruida por conocimiento histórico sobre topología inmutable. Transmitir al formateador solo esas proyecciones. Añadir contador de acciones a la respuesta de consulta, calculado desde la frontera ya localizada. Registrar derrotados/resultado en un campo histórico adicional de tamaño constante, por diferencias; las historias antiguas sin ese campo conservan su esquema al cargar/continuar y se identifican como no registradas. Sin cambios del formato binario, reglas, reloj o azar. Presentación gráfica monoespaciada, secciones y desplazamiento. Validar privacidad, inventario, muerte/victoria, binario antiguo/nuevo, retroceso, pureza y regresiones; medir impacto del campo adicional con los benchmarks existentes. Análisis: MVC, estructuras propias y límites de reconstrucción conservados; no copiar mundo por acción ni consultar red.
+
 ## HU-01 — contexto de Historia (2026-11-17)
 
 El controlador transmite a la vista los dos escalares de `linea_tiempo` (reloj y cantidad de acciones) al presentar el estado, mediante un método opcional de vista. La ventana recibe esos valores, muestra rangos, preselecciona una referencia válida por modo y valida sin consultar el modelo. El título del informe identifica tiempo u ordinal solicitado; el contenido conserva `resumen_historia`. Sin búsquedas/copias históricas adicionales por turno, sin cambio del motor, persistencia o API. Pruebas Tk del diálogo y recorrido botón→cola→controlador→informe con motor offline real, incluyendo pureza y cancelación. Análisis previo: implementa FR-001/003/005/020; no altera estructuras ni complejidad de reconstrucción y conserva MVC.

@@ -1,5 +1,12 @@
 # Bitácora de uso de LLM
 
+## 2026-11-17 — Historia detallada como la referencia, HU-02
+
+- **Herramienta/modelo:** Codex; variante exacta no confirmada. PowerShell, Git y Python.
+- **Solicitudes literales:** «y no deberia verse asi de completa?», «y la mia lo muestra a ese nivel de datalle?», «modificala como la de la imagen, siento que es mas completa asi».
+- **Referencia:** captura adjunta con reloj/acciones, resultado, sala/estadísticas, enemigos derrotados, inventario en orden histórico, efectos y mapa con nombres, salidas/costos/puertas.
+- **Uso previsto:** especificar HU-02 antes del código, implementar informe detallado preservando pureza y privacidad, ampliar metadatos históricos sin inventar valores en guardados anteriores. Mantener `004-linea-tiempo`; no integrar a main. El contrato actual no registra usos por objeto; no se inventará ese dato por copiar la imagen.
+
 ## 2026-11-17 — diagnóstico del botón Historia, HU-01
 
 - **Herramienta/modelo:** Codex; variante exacta no confirmada. Git, PowerShell, Python y control visual de Windows.

@@ -1,5 +1,11 @@
 # Feature Specification: historia, persistencia y comandos de integración
 
+## Informe histórico detallado — HU-02 (2026-11-17)
+
+La consulta gráfica debe presentar un informe legible como la referencia suministrada: reloj/acciones, resultado, sala, vida/estadísticas, enemigos derrotados, inventario numerado en orden histórico con nombres/tipos/clases y equipo, efectos, enemigos vivos de la sala y mapa con totales de exploradas/avistadas, nombres y salidas/costos/puertas recordadas. No inventar usos que el contrato no registra. Usar exclusivamente estado histórico para valores variables; los nombres/clases y la topología estática pueden proceder de los datos residentes de la versión de la partida. No efectuar HTTP ni exponer nombres/salidas de salas solo avistadas o desconocidas. Mantener consultas puras y los formatos persistidos compatibles; identificar explícitamente datos no registrados en historias antiguas. Conservar el resumen existente para los consumidores de replay. (FR-001/003/005/011/020)
+
+Aceptación: consultar antes/después de recoger/equipar, matar un enemigo y cambiar conocimiento/puertas; conservar orden, valores pasados y privacidad aunque el vivo cambie. Tras guardar/cargar, el informe coincide; historias previas sin estadísticas adicionales siguen cargando y muestran «no registrado». Texto desplazable, salida visible y tipografía alineada.
+
 ## Claridad de consulta histórica — HU-01 (2026-11-17)
 
 Derivado de FR-001/003/005/020. Al abrir Historia, mostrar el tiempo actual y la cantidad de acciones de la rama vigente; distinguir tiempo del reloj y ordinal de acción. Sugerir inicialmente el tiempo actual y, al elegir acción, la última acción disponible. Explicar que instantes cercanos pueden compartir estado y que consultar una acción muestra el estado justo antes de ejecutarla. Rechazar referencias fuera del rango disponible y acción cuando aún no hay ninguna, conservando cancelación sin cambios. El resultado identifica la referencia solicitada. No cambia la reconstrucción histórica ni avanza o revierte la partida.
