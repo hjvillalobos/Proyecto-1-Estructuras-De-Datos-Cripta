@@ -1,7 +1,7 @@
 import os
 from subprocess import CalledProcessError
 
-from controlador.resumen_historia import consultar, resumir
+from controlador.resumen_historia import consultar, resumir, detallar_partida
 from controlador.presentacion_conocimiento import lineas_mapa
 from modelo.errores_historia import ErrorHistoria
 from modelo.viaje import ControlViaje, ResultadoPaso
@@ -512,7 +512,9 @@ class ControladorJuego:
         if historia is None:
             return self.vista.mostrar_error("El motor todavía no entrega cambios históricos.")
         try:
-            texto = resumir(consultar(historia, argumentos[0]))
+            consulta = consultar(historia, argumentos[0])
+            texto = (detallar_partida(consulta, self.modelo)
+                     if callable(getattr(type(self.vista), 'mostrar_informe', None)) else resumir(consulta))
         except ErrorHistoria as error:
             return self.vista.mostrar_error(str(error))
         referencia = argumentos[0]

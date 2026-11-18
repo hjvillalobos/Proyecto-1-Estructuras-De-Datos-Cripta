@@ -94,10 +94,14 @@ class MotorPartida(_MotorConHistoriaDePrueba):
         from modelo.rutas import ContextoRutasCompartidas
         self._rutas_reales = ContextoRutasCompartidas(salas_lista)
         self._deltas_conocimiento = []
+        self._resumen_historico = True
 
     def estado_historico_inicial(self):
         from modelo.linea_tiempo import EstadoHistorico
         return EstadoHistorico(self.proyeccion_completa())
+
+    def mapa_historico(self, estado):
+        return self._conocimiento.mapa_historico(estado) if self._conocimiento is not None else ()
 
     def proyeccion_completa(self):
         return tuple(self.proyeccion_h3()) + (campos_mapa(self._conocimiento) if self._conocimiento is not None else ())
@@ -121,6 +125,8 @@ class MotorPartida(_MotorConHistoriaDePrueba):
                    + tuple((f'enemigo:{e.id_instancia}',
                             (e.tipo_catalogo, e.vida, e.vida_max, e.comportamiento))
                            for e in self._enemigos_ordenados if e.vida > 0))
+        if self._resumen_historico:
+            basicos += (('estadisticas_partida', (self.enemigos_derrotados, self.resultado)),)
         inventario = campos_inventario(self.jugador.inventario)
         if inventario == getattr(self, '_inventario_proyectado', None):
             inventario = self._inventario_proyectado
@@ -200,6 +206,11 @@ class MotorPartida(_MotorConHistoriaDePrueba):
             raise CambioHistoriaIncoherente('Estado e historia tienen fronteras diferentes.')
         final = historia.consultar_final().estado
         preparado = copy(self)
+        try:
+            historia.consultar_t(0).estado.obtener('estadisticas_partida')
+            preparado._resumen_historico = True
+        except KeyError:
+            preparado._resumen_historico = False
         preparado.jugador = deepcopy(self.jugador)
         preparado.salas = deepcopy(self.salas)
         from modelo.rutas import ContextoRutasCompartidas
@@ -232,6 +243,7 @@ class MotorPartida(_MotorConHistoriaDePrueba):
         if diferencias(final.campos(), preparado.proyeccion_completa()):
             raise CambioHistoriaIncoherente('La historia no coincide con el estado o el conocimiento guardados.')
         Motor.restaurar_estado(self, estado)
+        self._resumen_historico = preparado._resumen_historico
         if cursor is not None:
             self.jugador.inventario.seleccionar(cursor)
         if self._conocimiento is not None:

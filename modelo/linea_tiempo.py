@@ -92,6 +92,7 @@ class ConsultaHistoria:
     reloj: int
     estado: EstadoHistorico
     acciones_reconstruidas: int
+    acciones: int | None = None
 
 
 class LineaTiempo:
@@ -224,18 +225,21 @@ class LineaTiempo:
                         break
                     self._aplicar(estado, evento.cambios)
                 reconstruidas += 1
-        return ConsultaHistoria(tiempo, estado, reconstruidas)
+        cantidad = bajo
+        if bajo < self._cantidad and tiempo > self._accion(bajo).inicio:
+            cantidad += 1
+        return ConsultaHistoria(tiempo, estado, reconstruidas, cantidad)
 
     def consultar_final(self):
         """Estado efectivo al terminar, incluso si la última acción fue instantánea."""
-        return ConsultaHistoria(self._reloj, self._actual.copiar(), 0)
+        return ConsultaHistoria(self._reloj, self._actual.copiar(), 0, self._cantidad)
 
     def consultar_accion(self, numero):
         _entero(numero, 1, "Acción")
         if numero > self._cantidad:
             raise ReferenciaHistoricaInvalida("Esa acción no existe en la rama vigente.")
         estado, reconstruidas = self._reconstruir_completas(numero - 1)
-        return ConsultaHistoria(self._accion(numero - 1).inicio, estado, reconstruidas)
+        return ConsultaHistoria(self._accion(numero - 1).inicio, estado, reconstruidas, numero - 1)
 
     def recortar(self, acciones_conservadas, correcciones=()):
         """Descarta solo el sufijo; las correcciones sobreviven al retroceso.

@@ -696,7 +696,7 @@ class VistaGrafica:
         ventana = tk.Toplevel(self.root)
         ventana.title(titulo)
         ventana.configure(bg=FONDO)
-        ventana.geometry('720x480')
+        ventana.geometry('900x620' if titulo.startswith('Historia') else '720x480')
         ventana.minsize(560, 380)
         ventana.transient(self.root)
         tk.Label(ventana, text=titulo, bg=FONDO, fg=AMARILLO,
@@ -704,7 +704,7 @@ class VistaGrafica:
         ttk.Button(ventana, text="Volver a la partida", command=ventana.destroy).pack(side='bottom', anchor='e', padx=24, pady=(0, 20))
         cuerpo = ScrolledText(ventana, wrap="word", width=70, height=1,
                               bg=PANEL, fg=TEXTO, relief='flat', padx=16, pady=14,
-                              font=('Segoe UI', 11), spacing3=8)
+                              font=('Consolas', 11) if titulo.startswith('Historia') else ('Segoe UI', 11), spacing3=4)
         cuerpo.pack(fill="both", expand=True, padx=24, pady=(0, 16))
         cuerpo.insert("1.0", texto)
         cuerpo.configure(state="disabled")

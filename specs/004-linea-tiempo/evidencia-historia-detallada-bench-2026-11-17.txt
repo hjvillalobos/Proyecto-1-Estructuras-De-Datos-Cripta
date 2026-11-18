@@ -1,0 +1,33 @@
+Python 3.14.6 | Windows-11-10.0.26200-SP0
+Operaciones/carga=10000, repeticiones=60, semilla=20261001
+Tiempos en us/operacion: promedio [min, max]. Sin red ni vista.
+Referencia cripta-06@f9ed9afa683d: 300 salas, 30 cazadores inyectados para carga, cero HTTP.
+Rutas V=300 H=1 rango=100 puertas=estables individual: total=1.513 ms consultas=60
+Rutas V=300 H=1 rango=100 puertas=estables reutilizacion: total=0.075 ms consultas=60
+Rutas V=300 H=1 rango=100 puertas=estables compartido: total=2.623 ms consultas=60
+Rutas V=300 H=1 rango=100 puertas=inestables individual: total=1.555 ms consultas=60
+Rutas V=300 H=1 rango=100 puertas=inestables reutilizacion: total=1.430 ms consultas=60
+Rutas V=300 H=1 rango=100 puertas=inestables compartido: total=139.440 ms consultas=60
+Rutas V=300 H=1 rango=None puertas=estables individual: total=123.623 ms consultas=60
+Rutas V=300 H=1 rango=None puertas=estables reutilizacion: total=1.980 ms consultas=60
+Rutas V=300 H=1 rango=None puertas=estables compartido: total=2.149 ms consultas=60
+Rutas V=300 H=1 rango=None puertas=inestables individual: total=137.348 ms consultas=60
+Rutas V=300 H=1 rango=None puertas=inestables reutilizacion: total=128.319 ms consultas=60
+Rutas V=300 H=1 rango=None puertas=inestables compartido: total=133.583 ms consultas=60
+Rutas V=300 H=30 rango=100 puertas=estables individual: total=21.404 ms consultas=1800
+Rutas V=300 H=30 rango=100 puertas=estables reutilizacion: total=0.940 ms consultas=1800
+Rutas V=300 H=30 rango=100 puertas=estables compartido: total=3.237 ms consultas=1800
+Rutas V=300 H=30 rango=100 puertas=inestables individual: total=25.640 ms consultas=1800
+Rutas V=300 H=30 rango=100 puertas=inestables reutilizacion: total=22.639 ms consultas=1800
+Rutas V=300 H=30 rango=100 puertas=inestables compartido: total=129.382 ms consultas=1800
+Rutas V=300 H=30 rango=None puertas=estables individual: total=3017.744 ms consultas=1800
+Rutas V=300 H=30 rango=None puertas=estables reutilizacion: total=57.147 ms consultas=1800
+Rutas V=300 H=30 rango=None puertas=estables compartido: total=8.838 ms consultas=1800
+Rutas V=300 H=30 rango=None puertas=inestables individual: total=2870.176 ms consultas=1800
+Rutas V=300 H=30 rango=None puertas=inestables reutilizacion: total=2822.469 ms consultas=1800
+Rutas V=300 H=30 rango=None puertas=inestables compartido: total=136.720 ms consultas=1800
+Heap anterior: mediana=3.3546 ms máximo=5.2324 ms muestras=60
+Heap claves retenidas: mediana=2.0800 ms máximo=3.6550 ms muestras=60
+Razón medianas anterior/nuevo=1.613; decisiones iguales.
+Ciclo integrado H=30 historia+mapa completo: máximo=10.453 ms media=3.615 ms sobre20=0/60
+Paso conocido: máximo=2.421 ms media=0.051 ms sobre5=0/60

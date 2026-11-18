@@ -187,6 +187,30 @@ class ConocimientoMapa:
             resultado.append((sala.id, estado, sala.nombre, tuple(salidas)))
         return tuple(resultado)
 
+    def mapa_historico(self, estado):
+        """Topología estática filtrada por el conocimiento de la consulta."""
+        resultado = []
+        for sala in self._salas:
+            try:
+                nivel = estado.obtener(f'conocimiento:sala:{sala.id}')
+            except KeyError:
+                continue
+            if nivel == AVISTADA:
+                resultado.append((sala.id, nivel, None, ()))
+            elif nivel == EXPLORADA:
+                salidas = []
+                for salida in sala.salidas:
+                    recuerdo = False
+                    if salida.puerta is not None:
+                        try:
+                            recuerdo = estado.obtener(f'conocimiento:puerta:{salida.puerta}')
+                        except KeyError:
+                            recuerdo = None
+                    salidas.append((salida.direccion, salida.destino, salida.costo,
+                                    salida.puerta, recuerdo))
+                resultado.append((sala.id, nivel, sala.nombre, tuple(salidas)))
+        return tuple(resultado)
+
     def aplicar(self, cambios):
         self._procesar(cambios, False)
 

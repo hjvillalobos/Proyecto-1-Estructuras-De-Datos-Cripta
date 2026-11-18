@@ -2,9 +2,9 @@
 
 ## Informe detallado — HU-02
 
-- [ ] HU-T04 Proyectar acciones y estadísticas históricas, conservando carga/continuación de historias previas. (HU-02; FR-001/011/020)
-- [ ] HU-T05 Presentar inventario ordenado, enemigos, efectos y mapa histórico detallado sin HTTP ni filtraciones. (HU-02; FR-003/005)
-- [ ] HU-T06 Validar pureza, guardado/carga/retroceso, privacidad y rendimiento; documentar resultados y límites. (HU-02; FR-005/011/020)
+- [X] HU-T04 Proyectar acciones y estadísticas históricas, conservando carga/continuación de historias previas. (HU-02; FR-001/011/020)
+- [X] HU-T05 Presentar inventario ordenado, enemigos, efectos y mapa histórico detallado sin HTTP ni filtraciones. (HU-02; FR-003/005)
+- [X] HU-T06 Validar pureza, guardado/carga/retroceso, privacidad y rendimiento; documentar resultados y límites. (HU-02; FR-005/011/020) [881 pruebas, benchmarks y revisión visual](historia-detallada-2026-11-17.md).
 
 ## Claridad de Historia — HU-01
 

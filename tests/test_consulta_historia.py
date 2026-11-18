@@ -86,7 +86,7 @@ class ConsultaHistoriaVentanaTest(unittest.TestCase):
 
     def test_hu01_boton_consulta_estados_distintos_sin_mutar_partida(self):
         from tests.test_controlador_ac_real import ControladorACRealTest
-        from controlador.resumen_historia import consultar, resumir
+        from controlador.resumen_historia import consultar, detallar_partida
         with ControladorACRealTest().partida() as (motor, juego, control, _, raiz, __):
             control.procesar_comando('mover E')
             control.procesar_comando('esperar')
@@ -120,7 +120,7 @@ class ConsultaHistoriaVentanaTest(unittest.TestCase):
                         control.procesar_comando(vista._cola.pop())
                     titulo, texto = mostrar.call_args.args
                     self.assertIn('acción ' + referencia if referencia.startswith('#') else 'tiempo ' + referencia, titulo)
-                    self.assertEqual(texto, resumir(consultar(juego.linea_tiempo, referencia)))
+                    self.assertEqual(texto, detallar_partida(consultar(juego.linea_tiempo, referencia), juego))
                     textos.append(texto)
                     self.assertEqual((juego.exportar_estado(), control.bitacora_replay.ruta.read_bytes()), antes)
             self.assertNotEqual(textos[0], textos[1])
