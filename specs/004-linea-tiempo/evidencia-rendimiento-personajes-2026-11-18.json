@@ -1,0 +1,79 @@
+{
+  "python": "3.14.6",
+  "sistema": "Windows-11-10.0.26200-SP0",
+  "alcance": "Cache visual fria; disco del SO sin vaciar; Tk oculto; sin red",
+  "personajes": {
+    "jugador": {
+      "portada_ambos_primera_carga_ms": 627.405,
+      "portada_ambos_en_memoria_ms": 0.079,
+      "alternar_personaje_con_ambos_retratos_ms": 1.322,
+      "equipo_con_ambas_orientaciones_y_bebidas_primera_carga": {
+        "mediana_ms": 787.945,
+        "p95_ms": 958.025,
+        "max_ms": 958.025,
+        "muestras": 8
+      },
+      "equipo_repetido_en_memoria": {
+        "mediana_ms": 0.05,
+        "p95_ms": 0.075,
+        "max_ms": 0.075,
+        "muestras": 8
+      },
+      "intervalo_animacion_objetivo_20ms": {
+        "mediana_ms": 15.864,
+        "p95_ms": 31.913,
+        "max_ms": 34.535,
+        "muestras": 100
+      },
+      "trabajo_por_tic": {
+        "mediana_ms": 0.293,
+        "p95_ms": 2.762,
+        "max_ms": 3.042,
+        "muestras": 100
+      },
+      "atlas_pil": 2,
+      "cache_tk": {
+        "acciones": 8,
+        "secuencias": 0,
+        "vestidos": 4,
+        "bebidas": 4
+      }
+    },
+    "tigresa": {
+      "portada_ambos_primera_carga_ms": 606.557,
+      "portada_ambos_en_memoria_ms": 0.12,
+      "alternar_personaje_con_ambos_retratos_ms": 1.518,
+      "equipo_con_ambas_orientaciones_y_bebidas_primera_carga": {
+        "mediana_ms": 573.271,
+        "p95_ms": 821.826,
+        "max_ms": 821.826,
+        "muestras": 8
+      },
+      "equipo_repetido_en_memoria": {
+        "mediana_ms": 0.036,
+        "p95_ms": 0.074,
+        "max_ms": 0.074,
+        "muestras": 8
+      },
+      "intervalo_animacion_objetivo_20ms": {
+        "mediana_ms": 15.974,
+        "p95_ms": 31.548,
+        "max_ms": 33.459,
+        "muestras": 100
+      },
+      "trabajo_por_tic": {
+        "mediana_ms": 0.257,
+        "p95_ms": 2.501,
+        "max_ms": 2.68,
+        "muestras": 100
+      },
+      "atlas_pil": 2,
+      "cache_tk": {
+        "acciones": 8,
+        "secuencias": 0,
+        "vestidos": 4,
+        "bebidas": 4
+      }
+    }
+  }
+}

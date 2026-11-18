@@ -1,5 +1,13 @@
 # Bitácora de uso de LLM
 
+## 2026-11-18 — replay con ambos personajes, offline, rendimiento y documentación
+
+- **Herramienta/modelo:** Codex; variante exacta no confirmada. Git, PowerShell, Python/unittest, Tk/Pillow y benchmarks existentes.
+- **Solicitud literal:** «pregunta, el replay funciona bien con los dos jugadores? el offline? el rendimiento? todo esta bien????? la documentacion?».
+- **Uso:** comprobar específicamente replay gráfico real con Tigre/Tigresa, estado final y conservación de archivos, modos offline y datos disponibles, límites de procesamiento y presentación de ambos personajes. Revisar documentación y aclarar apariencia del replay/condiciones de datos sin cambiar producción.
+- **Resultado:** 42 pruebas dirigidas/37.095 s, OK sin omisiones, incluyendo una nueva regresión con ambas apariencias y renderizado real. Cinco criptas verificadas sin HTTP; cuatro cargas completas y 05 bloqueada correctamente por no resoluble. Ciclo máximo 10.652 ms (0/60 sobre 20), resolubilidad 8.733 ms (0/60 sobre 200), paso 2.413 ms (0/60 sobre 5), historia K=50 2.0221 ms (0/111 sobre 50). Medición visual aislada de ambos personajes, sin atribuirle límites de motor ni garantía de fluidez. 16 documentos principales/185 enlaces locales sin roturas antes de agregar el informe; enlaces nuevos verificados al cierre. [Evidencias y límites](specs/004-linea-tiempo/replay-offline-rendimiento-2026-11-18.md).
+- **Alcance conservado:** sin repetir suite integral/API ni sumar subconjuntos a 881. Preferencias, partidas y caché fuente de la usuaria intactas; el ensayo offline trabaja sobre una copia. Solo prueba nueva y documentación. Continúan publicación main/rama, exclusión del Markdown del profesor y ausencia de ZIP de entrega conforme a las instrucciones vigentes.
+
 ## 2026-11-17 — estado documental vigente y revisión del botón Viajar
 
 - **Herramienta/modelo:** Codex; variante exacta no confirmada. Git, PowerShell, Python/unittest, Tk y control visual de Windows.

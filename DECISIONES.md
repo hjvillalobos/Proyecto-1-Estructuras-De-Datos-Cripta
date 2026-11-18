@@ -1,5 +1,11 @@
 # Decisiones de diseño
 
+## Revalidación del 18 de noviembre — replay, offline y rendimiento
+
+Sin cambios de producción. Una regresión nueva renderiza la misma grabación offline con Tigre y Tigresa, con estado final idéntico y archivos intactos; la apariencia es la preferencia local al abrir el replay, sin modificar el log. 42 pruebas dirigidas/37.095 s, OK sin omisiones. La copia de datos actual carga 20/40/50/300 salas de 02/03/04/06 sin HTTP; 05 es no resoluble y se bloquea.
+
+Misma carga declarada de 300 salas/30 cazadores: ciclo máximo 10.652 ms (0/60 sobre 20), resolubilidad incremental completa 8.733 ms (0/60 sobre 200), paso conocido 2.413 ms (0/60 sobre 5), consulta K=50/5.000 acciones 2.0221 ms (0/111 sobre 50). Sin controles: 101.9904 ms y 51/111 excesos; sigue descartada. Medición visual de ambos personajes separada: hay costo de primera carga y variación de callbacks por encima de 20 ms, sin confundir esa cadencia con el límite de procesamiento. [Comandos, resultados completos y límites](specs/004-linea-tiempo/replay-offline-rendimiento-2026-11-18.md). Los antecedentes siguientes conservan sus propias muestras.
+
 ## HU-02 — detalle histórico sin consultar el estado vivo
 
 El informe gráfico amplía la presentación según [HU-02](specs/004-linea-tiempo/spec.md), con el [plan previo](specs/004-linea-tiempo/plan.md). Se conserva el resumen de replay/consola. Se descarta completar estadísticas desde el estado actual porque falsearía el pasado; un campo opcional de tamaño constante `estadisticas_partida` conserva derrotados/resultado por diferencias. Las historias anteriores mantienen su esquema y señalan «no registrado». El contador de acciones usa la frontera ya localizada; el mapa combina topología estática y conocimiento/recuerdos históricos, con fichas residentes para nombres. No hay HTTP ni copias nuevas del mundo por acción. El costo adicional de captura es O(1); la proyección detallada del mapa se realiza solo al consultar y recorre la topología con búsquedas en el estado histórico. No se afirma O(1) para el renderizado.
