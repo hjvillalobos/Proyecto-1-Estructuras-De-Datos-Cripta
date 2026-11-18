@@ -1,5 +1,13 @@
 # Bitácora de uso de LLM
 
+## 2026-11-17 — estado documental vigente y revisión del botón Viajar
+
+- **Herramienta/modelo:** Codex; variante exacta no confirmada. Git, PowerShell, Python/unittest, Tk y control visual de Windows.
+- **Solicitud literal:** «resuelve el punto 3  e ignora el punto 1 y 2, ademas revisa si el boton de viaje sirve bien».
+- **Uso:** corregir contradicciones de publicación/API y resultados de opciones en ESTADO_ENTREGA.md; mantener los registros anteriores como antecedentes. Revisar el recorrido real de Viajar, sin modificar los puntos históricos excluidos ni el borrador del profesor.
+- **Validación:** 55 pruebas dirigidas/25.129 s, OK sin omisiones; incluye una nueva regresión del botón→diálogo→controlador/motor→dos pasos registrados. Cancelación sin mutación, destinos permitidos, daño/enemigos/puertas y llegada cubiertos. Revisión nativa: cancelar conserva sala 100/t=1025; seleccionar 102 recorre 101 y llega a t=1525 con motivo visible. No se encontró un fallo de producción. La primera aserción nueva buscaba el aviso en el log en vez de la banda visible; se corrigió el punto de lectura y se repitió la selección completa.
+- **Resultado:** [informe y evidencia](specs/004-linea-tiempo/revision-viaje-2026-11-17.md); solo documentación y prueba nueva. Sin nueva suite integral, benchmarks o API; no sumar los subconjuntos al total previo de 881. Publicación en main y sincronización de 004-linea-tiempo conforme a la autorización vigente.
+
 ## 2026-11-17 — cierre de entrega y reconstrucciones declaradas
 
 - **Aclaraciones posteriores literales:** «cual zip?», «ay no eso no lo hagas no se ocupa» y «el profe lo que pide es mandar el link del github nada mas no pide zip». Se cancela la entrega ZIP y se retiran el paquete del 17 de noviembre, su manifiesto y su log externo recién generados; el ZIP previo del 16 de noviembre queda intacto. La entrega vigente es únicamente el enlace del repositorio de GitHub. La publicación Git autorizada continúa, excluyendo el Markdown del profesor. Las menciones de empaquetado siguientes describen el plan y trabajo anteriores a esta cancelación, no un entregable vigente.
