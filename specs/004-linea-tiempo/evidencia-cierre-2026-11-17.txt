@@ -1,0 +1,37 @@
+Evidencia conservada del cierre de Tigresa — 17 de noviembre de 2026
+Código de referencia: 7d712fa; rama 004-linea-tiempo.
+Copias textuales de logs locales previos. No se volvieron a ejecutar estas pruebas durante la actualización documental.
+
+Fuente: .cache/pruebas-personajes/suite-final.log
+.....................................s........................................................................................................................................................................................................................................ss..................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................s.......................
+----------------------------------------------------------------------
+Ran 873 tests in 382.968s
+
+OK (skipped=4)
+
+Fuente: .cache/pruebas-personajes/personajes-sonidos-final.log
+test_hojas_con_alpha_y_celdas_compatibles (tests.test_personajes.TestPaqueteTigresa.test_hojas_con_alpha_y_celdas_compatibles) ... ok
+test_las_caches_no_comparten_rutas_ni_firmas (tests.test_personajes.TestPaqueteTigresa.test_las_caches_no_comparten_rutas_ni_firmas) ... ok
+test_todas_las_composiciones_coinciden_con_su_respaldo (tests.test_personajes.TestPaqueteTigresa.test_todas_las_composiciones_coinciden_con_su_respaldo) ... ok
+test_preferencia_local_validada_y_tolerante_a_archivo_ajeno (tests.test_personajes.TestPreferenciaPersonaje.test_preferencia_local_validada_y_tolerante_a_archivo_ajeno) ... ok
+test_sin_permisos_conserva_eleccion_en_memoria (tests.test_personajes.TestPreferenciaPersonaje.test_sin_permisos_conserva_eleccion_en_memoria) ... ok
+test_cambio_preserva_fondo_y_descarta_todas_las_poses_del_otro (tests.test_personajes.TestSelectorYAnimaciones.test_cambio_preserva_fondo_y_descarta_todas_las_poses_del_otro) ... ok
+test_carrera_ataque_y_caida_comparten_decodificacion (tests.test_personajes.TestSelectorYAnimaciones.test_carrera_ataque_y_caida_comparten_decodificacion) ... ok
+test_portada_muestra_ambos_sin_recargar_retratos_al_alternar (tests.test_personajes.TestSelectorYAnimaciones.test_portada_muestra_ambos_sin_recargar_retratos_al_alternar) ... ok
+test_selector_real_conserva_eleccion_al_reiniciar_y_restaura_original (tests.test_personajes.TestSelectorYAnimaciones.test_selector_real_conserva_eleccion_al_reiniciar_y_restaura_original) ... ok
+test_tamanos_equipo_y_animaciones_no_recomponen_y_cache_acotada (tests.test_personajes.TestSelectorYAnimaciones.test_tamanos_equipo_y_animaciones_no_recomponen_y_cache_acotada) ... ok
+test_accion_rechazada_no_suena_y_aceptada_no_altera_motor (tests.test_sonidos.TestSonidos.test_accion_rechazada_no_suena_y_aceptada_no_altera_motor) ... ok
+test_boton_corto_respeta_silencio (tests.test_sonidos.TestSonidos.test_boton_corto_respeta_silencio) ... ok
+test_boton_envuelve_comando_una_vez_y_respeta_deshabilitado (tests.test_sonidos.TestSonidos.test_boton_envuelve_comando_una_vez_y_respeta_deshabilitado) ... ok
+test_cerrar_limpia_archivos_y_es_idempotente (tests.test_sonidos.TestSonidos.test_cerrar_limpia_archivos_y_es_idempotente) ... ok
+test_control_silenciar_en_la_vista (tests.test_sonidos.TestSonidos.test_control_silenciar_en_la_vista) ... ok
+test_efectos_validos_asincronos_y_cacheados (tests.test_sonidos.TestSonidos.test_efectos_validos_asincronos_y_cacheados) ... ok
+test_intro_con_ambiente_y_cola_no_usa_azar_global (tests.test_sonidos.TestSonidos.test_intro_con_ambiente_y_cola_no_usa_azar_global) ... ok
+test_menu_reproduce_intro_una_vez_al_mostrarse (tests.test_sonidos.TestSonidos.test_menu_reproduce_intro_una_vez_al_mostrarse) ... ok
+test_silenciar_detiene_y_no_reproduce_nuevos_efectos (tests.test_sonidos.TestSonidos.test_silenciar_detiene_y_no_reproduce_nuevos_efectos) ... ok
+test_sin_dispositivo_o_con_error_no_interrumpe_juego (tests.test_sonidos.TestSonidos.test_sin_dispositivo_o_con_error_no_interrumpe_juego) ... ok
+
+----------------------------------------------------------------------
+Ran 20 tests in 34.540s
+
+OK

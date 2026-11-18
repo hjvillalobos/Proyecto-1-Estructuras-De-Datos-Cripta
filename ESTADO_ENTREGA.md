@@ -1,12 +1,30 @@
 # Estado vigente y trazabilidad de entrega
 
+## Estado actual — 17 de noviembre de 2026
+
+Rama de trabajo: `004-linea-tiempo`, revisión de código `7d712fa`. Última regresión integral registrada: **873 pruebas en 382.968 s, cero fallos/errores, cuatro omisiones**, durante el incremento de Tigresa. La ronda dirigida posterior de personajes y sonidos aprobó **20 pruebas en 34.540 s**. [Informe del incremento](specs/004-linea-tiempo/tigresa-2026-11-17.md) y [salidas originales conservadas](specs/004-linea-tiempo/evidencia-cierre-2026-11-17.txt). Estos resultados son ejecuciones anteriores conservadas, no pruebas repetidas por esta actualización documental.
+
+| Omisión de la última suite | Motivo y evidencia disponible |
+|---|---|
+| Clase `tests.test_bench_escenarios_rutas.TestEscenariosRutas` | La comparación requiere cargar la revisión anterior mediante `python -m utilidades.verificar_conocimiento_rutas`. La omisión de clase se registra una vez; no representa un solo método aprobado. Última ejecución separada registrada: 41 pruebas/0.384 s sobre `42ee527`, OK. No repetida tras Tigresa. |
+| Dos métodos de `tests.test_criptas_api.TestPaqueteOficial` | Requieren `CRIPTA_PAQUETE_API`. El paquete histórico se ejecutó en la regresión anterior de 863 pruebas; no se volvió a ejecutar con el incremento de Tigresa. |
+| `tests.test_verificacion_entrega.TestApiRealEntrega` | Requiere `CRIPTA_API_REAL=1`. Última comprobación registrada en la auditoría del 16 de noviembre: cinco criptas en frío/caliente, dentro del presupuesto. No se repitió con Tigresa. |
+
+Las cuatro omisiones no se presentan como aprobaciones de esta versión. Los resultados históricos y los subconjuntos dirigidos no se suman a las 873 pruebas. Esta actualización no repite API, benchmarks ni pruebas de aplicación porque solo cambia documentación.
+
+**Revisión cruzada:** hay declaración del equipo y registros históricos concretos de revisión, además de las pruebas técnicas de Codex. El [informe de cruces](specs/004-linea-tiempo/revision-cruces-2026-11-17.md#registros-históricos-de-revisión-recuperados-en-git) identifica revisiones de C sobre la integración con A y de B sobre cambios de D, junto con aceptación técnica de A y aportes de integración. Se sustituye la conclusión anterior de ausencia total de registros. Sigue sin acreditarse la aprobación previa de cada PR por ambos responsables; la evidencia disponible se describe con su alcance real.
+
+Las cuatro capacidades están integradas en la aplicación normal. Defensa excluida. La actualización de los puntos de revisión y estado se mantiene en esta rama; la integración a `main` queda pendiente de indicación de Belén. Las dos salvedades históricas de prompts y orden de commits permanecen al final.
+
+## Registros de validaciones anteriores
+
 Actualización documental del 2026-11-17: [revisión de A↔C y B↔D](specs/004-linea-tiempo/revision-cruces-2026-11-17.md), 66 pruebas dirigidas/19.041 s, sin fallos, errores ni omisiones. Belén confirma que todos los integrantes hicieron pruebas y comprobaron el funcionamiento integrado; se incorporan referencias Git de los aportes de A/B/C/D y su integración. La declaración del equipo, la autoría Git y la ejecución de Codex se identifican por separado; los commits no prueban por sí solos aprobación previa de cada PR por ambos responsables. No sustituye las salvedades históricas ni añade esas 66 pruebas al total integral.
 
 Regresión repetida el 2026-11-17 sobre `42ee527`: **863 pruebas en 213.337 s, cero fallos/errores, dos opciones omitidas**. La comparación histórica omitida se ejecutó aparte: 41 pruebas en 0.384 s, OK. Copia sin cachés ni partidas: 20 pruebas en 7.060 s, OK. La API real no se repitió en este corte. Logs locales en `.cache/revision-bugs-20261117/`; los conjuntos se solapan y no se suman. No se modificó código de producción.
 
 Cierre posterior ERR-01: **863 pruebas en 239.241 s, cero fallos/errores, dos opciones omitidas con evidencia separada previa**. El paquete histórico se ejecutó en la suite. La comprobación de copia sin cachés pasó 20 pruebas en 9.357 s. Se corrigió la conservación del error principal al fallar guardado y limpieza de datos; se agruparon 92 evidencias y auxiliares locales en .cache/revisiones/. Constitución 1.1.0 y main intactos; no cambia el estado de los faltantes históricos.
 
-Corte anterior del 2026-11-16: 858 pruebas, cero fallos/errores; las cuatro omisiones opcionales se ejecutaron por separado y aprobaron. Resultados de procesamiento en DECISIONES.md. Las anotaciones fechadas de specs/planes/checklists conservan sus cortes históricos; los encabezados de estado identifican la integración posterior. No se cambió la constitución 1.1.0. La usuaria confirmó que no dispone de revisiones cruzadas del equipo: su acreditación continúa pendiente y no se sustituye por pruebas automáticas.
+Corte anterior del 2026-11-16: 858 pruebas, cero fallos/errores; las cuatro omisiones opcionales se ejecutaron por separado y aprobaron. Resultados de procesamiento en DECISIONES.md. Las anotaciones fechadas de specs/planes/checklists conservan sus cortes históricos; los encabezados de estado identifican la integración posterior. No se cambió la constitución 1.1.0. En ese corte no se habían identificado los registros de revisión del equipo. La declaración posterior de Belén y las fuentes históricas recuperadas se recogen en el estado actual y en el informe de cruces.
 
 Rama `004-linea-tiempo`. Este documento distingue la entrega integrada de los registros fechados de desarrollo. Defensa excluida. Las cuatro capacidades funcionan desde la aplicación normal, con historia, conocimiento y persistencia conjuntos. Las anotaciones antiguas de entregas parciales no representan capacidades ausentes.
 
@@ -24,7 +42,7 @@ Actualización VI-01..05: mapa gráfico con niebla que respeta conocimiento, sel
 - Antorcha: explora vecinas y revela nombre/salidas; las puertas solo se observan desde la posición ocupada. No hay observación de puertas remotas ni activación de contenido remoto. Q1 de C deja de ser un bloqueo técnico por la autorización e interpretación documentadas en IA-05.
 - Resolubilidad: acumulación de llaves sin trayectoria única aceptada según aclaración registrada del 2026-11-02; se informa esa limitación. Normalización O(N log N), recorrido/diagnóstico lineales más reporte; evidencia empírica para el crecimiento aproximadamente lineal, sin afirmar O(N) total estricto.
 - Referencia de medición local: paquete `cripta-06@f9ed9afa683d`, 300 salas. Los resultados corresponden a esa versión; no se inventa una enmienda que cambie los límites 20/200/50/5 ms. Los cazadores inyectados y el mapa completo se identifican como preparación experimental.
-- Autorización: la usuaria permite mejorar A/B/C/D. Los límites de propiedad y permisos de las fases individuales quedaron superados para esta integración. No equivale a afirmar una revisión cruzada humana que no se realizó.
+- Autorización: la usuaria permite mejorar A/B/C/D. Los límites de propiedad y permisos de las fases individuales quedaron superados para esta integración. Las revisiones del equipo se acreditan mediante su declaración y los registros identificados en el informe de cruces, dentro del alcance de cada fuente.
 
 ## Enunciado punto por punto, sin defensa
 
@@ -79,9 +97,9 @@ Rutas de esta tabla relativas a la raíz. La prueba indicada se ejecuta con `pyt
 
 Los cuatro prefijos A/B/C/D identifican su carpeta de especificación. La cobertura de Parte I se conserva en las regresiones heredadas, incluyendo combate, inventario, efectos, cancelación, retroceso, caché, presupuesto, guardado y replay. Esta tabla no sustituye ejecutar las pruebas.
 
-## Cierre comprobado del fortalecimiento
+## Antecedente: cierre comprobado del fortalecimiento
 
-Regresión final: **818 pruebas en 181.531 s, cero fallos y cero errores**, dos omisiones opcionales con ejecución separada aprobada: comparación histórica (41 pruebas) y API oficial (cinco criptas, caché fría/caliente dentro de presupuesto). Copia limpia de fuentes sin datos locales mediante `python -m utilidades.verificar_copia_limpia`; no reinstala las dependencias.
+Regresión de ese incremento: **818 pruebas en 181.531 s, cero fallos y cero errores**, dos omisiones opcionales con ejecución separada aprobada: comparación histórica (41 pruebas) y API oficial (cinco criptas, caché fría/caliente dentro de presupuesto). Copia limpia de fuentes sin datos locales mediante `python -m utilidades.verificar_copia_limpia`; no reinstala las dependencias. El resultado más reciente figura al comienzo del documento.
 
 | Operación | Máximo final | Límite | Excesos |
 |---|---:|---:|---:|

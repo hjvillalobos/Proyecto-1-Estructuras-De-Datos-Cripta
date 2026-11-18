@@ -1,5 +1,15 @@
 # Bitácora de uso de LLM
 
+## 2026-11-17 — evidencia de revisión cruzada y estado vigente en línea de tiempo
+
+- **Herramienta/modelo:** Codex; variante exacta no confirmada. PowerShell, Git y Python para comprobaciones documentales.
+- **Solicitud de diagnóstico literal:** «que falta para ganarnos un 100 en el proyecto dejando de lado la defensa?»
+- **Solicitud de acción literal:** «haz el punto 2 y 3 en mi rama linea de tiempo y luego cuando yo te diga podemos subirlo al main».
+- **Alcance:** completar la evidencia disponible de revisión cruzada y actualizar el estado de entrega en `004-linea-tiempo`. La integración a `main` queda pendiente de indicación posterior. El borrador local de solicitud al profesor permanece fuera de estos cambios.
+- **Uso:** recuperar y leer los registros históricos `a1e0184`, `8526e3c`, `f9df7ab`, `7662353`, `4794a86` y `8b88125`; documentar dirección, fecha, referencia revisada, observaciones y límites. Corregir la afirmación de ausencia total de registros sin inventar aprobaciones previas de PR. La consulta de la API de GitHub no se completó por DNS; el contraste se apoya en Git local y archivos versionados.
+- **Estado actualizado:** último código `7d712fa`; suite conservada de Tigresa, 873 pruebas/382.968 s, cero fallos/errores y cuatro omisiones; ronda dirigida, 20 pruebas/34.540 s, OK. Copiar los logs originales a `specs/004-linea-tiempo/evidencia-cierre-2026-11-17.txt` y explicar la omisión de clase de comparación, dos métodos de paquete oficial y API real. Conservar resultados anteriores con sus revisiones y fechas, sin sumar subconjuntos ni presentar ejecuciones previas como nuevas.
+- **Validación:** contraste de las fuentes Git y salidas originales, enlaces documentales locales y `git diff --check`. Cambios exclusivamente documentales; sin repetir suite funcional, API o benchmarks, sin cambios de constitución ni reescritura histórica.
+
 ## 2026-11-17 — regresión y publicación de documentación
 
 - **Herramienta/modelo:** Codex; variante exacta no confirmada. PowerShell, Python y Git.

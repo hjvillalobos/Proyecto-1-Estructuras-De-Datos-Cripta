@@ -6,6 +6,8 @@ La integración examinada conecta los algoritmos de rutas de A con el conocimien
 
 La selección ejecutada reúne **66 pruebas en siete módulos**, con resultado **OK**, sin fallos, errores ni omisiones. Incluye casos de resultado esperado, entradas rechazadas, cambios de conocimiento, continuidad tras carga y reproducción de partidas. También se contrastaron las contribuciones e integraciones registradas en Git con la declaración de Belén sobre las pruebas realizadas por el equipo.
 
+Actualización documental de cierre sobre `7d712fa`: se recuperaron registros históricos de revisión de C sobre la integración y de B sobre un commit de D, además de la aceptación técnica documentada por A. La sección «Registros históricos de revisión recuperados en Git» identifica sus fuentes, fechas y límites. Se conserva el resultado de las 66 pruebas sobre `42ee527`; no se atribuye una ejecución nueva a esta actualización.
+
 El resultado respalda el funcionamiento de los cruces en los escenarios comprobados. La interpretación de cada evidencia, la reproducción y los límites se detallan en este informe.
 
 ## Guía de lectura
@@ -222,6 +224,36 @@ Responsables de los cruces: Sebastián y Juan (A↔C), Heifryl y Belén (B↔D).
 
 Los commits acreditan autoría registrada, contenido e integración. La participación en las pruebas se registra a partir de la declaración de Belén; Git por sí solo no identifica quién ejecutó cada prueba ni demuestra una aprobación previa de cada PR por ambos integrantes del cruce. Esta distinción delimita la evidencia respecto de la revisión cruzada exigida por la constitución 1.1.0.
 
+## Registros históricos de revisión recuperados en Git
+
+La búsqueda adicional del 17 de noviembre de 2026 examinó mensajes y cambios de commits ya presentes en la historia de `7d712fa`, junto con los informes y contratos versionados. No solo se contaron commits de implementación: se leyeron registros con referencia revisada, observaciones y resultados. Las fechas siguientes son las registradas en Git, con zona `-06:00`; los resultados son los declarados en esos registros originales, sin atribuir su ejecución a esta sesión.
+
+| Cruce y dirección | Registro original | Alcance y resultado documentado |
+|---|---|---|
+| A↔C: C revisa la integración con A/B/D | Juan, [`a1e0184`](https://github.com/hjvillalobos/Proyecto-1-Estructuras-De-Datos-Cripta/commit/a1e0184), 10 de noviembre, 12:47. [Informe de C](../002-niebla-viaje/revision-integracion.md), sección «Revisión anterior». | Copia aislada con A `9730482`, B `694dcf6`, C `3198f55` y D `02da6b6`. Identifica conflictos, seis casos con preparación incorrecta y un parche propuesto. Repetición: 672 pruebas/67.257 s, OK, cinco omisiones. También señala conexiones aún pendientes en aquella fecha; no es una aprobación de integración completa. |
+| A↔C: C revalida una integración posterior | Juan, [`8526e3c`](https://github.com/hjvillalobos/Proyecto-1-Estructuras-De-Datos-Cripta/commit/8526e3c), 12 de noviembre, 10:03. Mismo informe, «Actualización del 12 de noviembre». | Exportación limpia de `d796dae`: 753 pruebas/100.664 s, OK, seis omisiones; comparación de rutas, 41 pruebas sin omisiones; selección integrada, 90 pruebas. Registra las limitaciones pendientes de motor/viaje/historia de ese corte. Los conjuntos se solapan. |
+| A↔C: A documenta aceptación técnica del contrato integrado con C | Sebastián, [`f9df7ab`](https://github.com/hjvillalobos/Proyecto-1-Estructuras-De-Datos-Cripta/commit/f9df7ab), 14 de noviembre, 07:10. [Contrato de A](../001-terreno-cazador/contracts/integracion.md), filas E-C-RUTA, E-C-DESPACHO, E-C-OBS y E-C-UNDO. | Registra el protocolo filtrado consumido por el planificador de C, adopta el despacho del cazador y relaciona observación/reversión con pruebas integradas. Acredita aceptación técnica documentada por A; el propio contrato distingue ese alcance de declaraciones personales de otros integrantes. |
+| B↔D: B revisa inicio, datos y rendimiento integrados con D | Heifryl, [`7662353`](https://github.com/hjvillalobos/Proyecto-1-Estructuras-De-Datos-Cripta/commit/7662353), 10 de noviembre, 12:27. [Tareas de B](../001-verificador-resolubilidad/tasks.md), «Revisión de B del 2026-11-10». | T026 registra seis inicios y tres verificaciones en procesos nuevos con motor/controlador reales. T032 registra 162 pruebas: 161 aprobadas y una omitida. Señala defectos de presentación y del benchmark para D; no declara resueltos esos hallazgos en esa revisión. |
+| B↔D: B revalida un commit concreto de D | Heifryl, [`4794a86`](https://github.com/hjvillalobos/Proyecto-1-Estructuras-De-Datos-Cripta/commit/4794a86), 10 de noviembre, 22:55. Mismo archivo, «Revalidación del commit de D `6de00bf` por B». | Confirma causa y leyenda de alcanzabilidad, diez repeticiones del benchmark, máximo incremental de 4.194 ms y cero solicitudes offline. Documenta conflictos y una prueba aún pendiente por el diagnóstico de ruta: 22 de 23 tras adaptar temporalmente dos paquetes negativos. |
+| B↔D: integración posterior a la revalidación | Heifryl, [`8b88125`](https://github.com/hjvillalobos/Proyecto-1-Estructuras-De-Datos-Cripta/commit/8b88125), 10 de noviembre, 22:57. | Hito de integración del cierre de B y D posterior al registro anterior. El merge acredita incorporación de cambios; no se usa por sí solo para convertir la prueba pendiente de aquel ensayo en aprobada. Las pruebas integradas posteriores tienen sus propios resultados en este informe y en el estado de entrega. |
+
+**Balance de evidencia.** Hay registros de revisión y hallazgos del equipo para ambos cruces, además de la declaración de Belén y la comprobación posterior de Codex. Por ello se corrige la conclusión anterior de ausencia total de registros. La dirección C→integración con A y B→D tiene informes concretos; A registra aceptación técnica de contratos con C. Los aportes e integración de D están identificados en la tabla anterior, sin inferir de ellos una aprobación personal de cada PR de B.
+
+La constitución 1.1.0 exige revisión cruzada de PRs en incrementos pequeños. Estos registros permiten acreditar revisión del trabajo entre capacidades dentro de los cortes descritos; no permiten afirmar que cada PR fue aprobado antes de integrarse por ambos responsables. No se modifican casillas históricas ni se crean firmas o fechas retrospectivas. La consulta de revisiones de PR mediante la API de GitHub no pudo completarse por resolución DNS; no se afirma que falten aprobaciones en el servidor a partir de esa imposibilidad de consulta.
+
+### Cómo comprobar las fuentes
+
+Desde la raíz del proyecto, los siguientes comandos permiten contrastar autoría, fecha y contenido original, sin depender de que la API esté disponible:
+
+```text
+git show --format=fuller a1e0184 -- specs/002-niebla-viaje/revision-integracion.md
+git show --format=fuller 8526e3c -- specs/002-niebla-viaje/revision-integracion.md
+git show --format=fuller f9df7ab -- specs/001-terreno-cazador/contracts/integracion.md
+git show --format=fuller 7662353 -- specs/001-verificador-resolubilidad/tasks.md
+git show --format=fuller 4794a86 -- specs/001-verificador-resolubilidad/tasks.md
+git show --format=fuller --stat 8b88125
+```
+
 ## Conclusión
 
-La integración cuenta con contribuciones trazables de A/B/C/D, confirmación de pruebas del equipo y una comprobación técnica reproducible de los cruces: 66 pruebas aprobadas. No se encontraron fallos en esos casos. Las salvedades históricas de prompts y orden de commits se conservan en [el estado de entrega](../../ESTADO_ENTREGA.md).
+La integración cuenta con contribuciones trazables de A/B/C/D, confirmación de pruebas del equipo, registros históricos de revisión entre capacidades y una comprobación técnica reproducible de los cruces: 66 pruebas aprobadas sobre `42ee527`. La última regresión integral registrada, tras Tigresa, es de 873 pruebas con cuatro omisiones descritas en [el estado de entrega](../../ESTADO_ENTREGA.md); no se suman los conjuntos. La evidencia de revisión deja de figurar como totalmente ausente, conservando el límite sobre aprobaciones previas de cada PR y las salvedades históricas de prompts y orden de commits.
