@@ -179,6 +179,9 @@ class ControladorJuego:
 
     def _mostrar_estado(self):
         estado = self.modelo.estado_vista()
+        historia = getattr(self.modelo, 'linea_tiempo', None)
+        if historia is not None and callable(getattr(type(self.vista), 'actualizar_contexto_historia', None)):
+            self.vista.actualizar_contexto_historia(historia.reloj, historia.cantidad_acciones)
         salas = getattr(self.modelo, "salas", None)
         from modelo.almacen_salas import TablaPorId, limite_ids
         if isinstance(salas, (list, TablaPorId)) and 0 <= estado.sala_id < limite_ids(salas):
@@ -512,7 +515,10 @@ class ControladorJuego:
             texto = resumir(consultar(historia, argumentos[0]))
         except ErrorHistoria as error:
             return self.vista.mostrar_error(str(error))
-        return self._mostrar_informe("Historia", texto)
+        referencia = argumentos[0]
+        titulo = (f'Historia · antes de la acción {referencia}' if referencia.startswith('#') else
+                  f'Historia · tiempo {referencia}')
+        return self._mostrar_informe(titulo, texto)
 
     def _mapa(self, argumentos):
         if argumentos:

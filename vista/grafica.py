@@ -667,12 +667,16 @@ class VistaGrafica:
         if texto is not None and texto.strip():
             self._enviar(f"{prefijo} {texto.strip()}")
 
+    def actualizar_contexto_historia(self, reloj, acciones):
+        self._contexto_historia = (reloj, acciones)
+
     def _pedir_historia(self):
         from vista.consulta_historia import ConsultaHistoria
         anterior = getattr(self, '_en_menu', False)
         self._en_menu = True
         try:
-            dialogo = ConsultaHistoria(self.root)
+            reloj, acciones = getattr(self, '_contexto_historia', (None, None))
+            dialogo = ConsultaHistoria(self.root, reloj=reloj, acciones=acciones)
         finally:
             self._en_menu = anterior
         if dialogo.result is not None:
@@ -696,15 +700,21 @@ class VistaGrafica:
         ventana.minsize(560, 380)
         ventana.transient(self.root)
         tk.Label(ventana, text=titulo, bg=FONDO, fg=AMARILLO,
-                 font=('Georgia', 23)).pack(anchor='w', padx=24, pady=(20, 12))
-        cuerpo = ScrolledText(ventana, wrap="word", width=70, height=18,
+                 font=('Georgia', 23), wraplength=660, justify='left').pack(anchor='w', padx=24, pady=(20, 12))
+        ttk.Button(ventana, text="Volver a la partida", command=ventana.destroy).pack(side='bottom', anchor='e', padx=24, pady=(0, 20))
+        cuerpo = ScrolledText(ventana, wrap="word", width=70, height=1,
                               bg=PANEL, fg=TEXTO, relief='flat', padx=16, pady=14,
                               font=('Segoe UI', 11), spacing3=8)
         cuerpo.pack(fill="both", expand=True, padx=24, pady=(0, 16))
         cuerpo.insert("1.0", texto)
         cuerpo.configure(state="disabled")
-        ttk.Button(ventana, text="Volver a la partida", command=ventana.destroy).pack(anchor='e', padx=24, pady=(0, 20))
         ventana.bind("<Escape>", lambda _evento: ventana.destroy())
+        ventana.update_idletasks()
+        x = self.root.winfo_rootx() + (self.root.winfo_width() - ventana.winfo_width()) // 2
+        y = self.root.winfo_rooty() + (self.root.winfo_height() - ventana.winfo_height()) // 2
+        x = max(0, min(x, ventana.winfo_screenwidth() - ventana.winfo_width()))
+        y = max(0, min(y, ventana.winfo_screenheight() - ventana.winfo_height() - 50))
+        ventana.geometry(f'+{x}+{y}')
         ventana.grab_set()
         self.root.wait_window(ventana)
 

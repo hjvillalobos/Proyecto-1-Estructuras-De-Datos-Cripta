@@ -5,8 +5,10 @@
 - **Herramienta/modelo:** Codex; variante exacta no confirmada. Git, PowerShell, Python y control visual de Windows.
 - **Solicitud literal:** «puedes revisar el boton de historia? me parece que no esta funcionando correctamente».
 - **Síntoma comunicado:** «muestra lo mismo siempre la misma informacion».
+- **Aclaración literal sobre el modo:** «por lo que sea».
 - **Diagnóstico:** reconstrucción offline de la bitácora local de 61 acciones: reloj final 5355; tiempos 1/2/3 conservan sala 1 y vida 30/30, acción #10 muestra sala 3 y ataque/defensa distintos, y tiempo 5355 muestra sala 18 y vida 0/30. No se modificó la partida original. La consulta distingue referencias; el diálogo carece de límites/contexto y puede inducir a confundir unidades de tiempo con ordinales.
 - **Plan previo:** HU-01 y HU-T01..03 especifican contexto/rangos, sugerencia válida e identificación de la consulta, conservando motor y semántica. Validar después con Tk y controlador/motor reales. Mantener trabajo en `004-linea-tiempo`; no integrar a main.
+- **Resultado:** especificación previa `056535c`; contexto/rangos/sugerencias, identificación del resultado y disposición visible del informe. 100 pruebas dirigidas/20.165 s, OK sin omisiones; no sumar a las 873 anteriores. Revisión nativa con tiempo 200/vida 28 y acción #2/tiempo 100/vida 29, sin modificar la partida abierta de la usuaria. No se reprodujo una referencia ignorada; se conserva ese límite diagnóstico. [Informe y evidencia](specs/004-linea-tiempo/historia-ui-2026-11-17.md). Sin suite completa, API o benchmarks nuevos.
 
 ## 2026-11-17 — evidencia de revisión cruzada y estado vigente en línea de tiempo
 

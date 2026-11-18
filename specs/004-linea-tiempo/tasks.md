@@ -2,9 +2,9 @@
 
 ## Claridad de Historia — HU-01
 
-- [ ] HU-T01 Transmitir reloj y cantidad de acciones vigentes al diálogo, sugerir la referencia y mostrar rangos por modo. (HU-01; FR-001/003)
-- [ ] HU-T02 Validar rangos/ausencia de acciones, explicar estados iguales entre cambios e identificar la consulta en el título del resultado. (HU-01; FR-001/003/020)
-- [ ] HU-T03 Verificar diálogo y flujo completo con motor real: referencias distintas, pureza, cancelación y límites actualizados. Registrar resultados reales. (HU-01; FR-005/020)
+- [X] HU-T01 Transmitir reloj y cantidad de acciones vigentes al diálogo, sugerir la referencia y mostrar rangos por modo. (HU-01; FR-001/003)
+- [X] HU-T02 Validar rangos/ausencia de acciones, explicar estados iguales entre cambios e identificar la consulta en el título del resultado. (HU-01; FR-001/003/020)
+- [X] HU-T03 Verificar diálogo y flujo completo con motor real: referencias distintas, pureza, cancelación y límites actualizados. Registrar resultados reales. (HU-01; FR-005/020) [100 pruebas dirigidas y revisión nativa](historia-ui-2026-11-17.md).
 
 ## Recuperación de almacenamiento — ERR-01
 

@@ -2,7 +2,9 @@
 
 ## Estado actual — 17 de noviembre de 2026
 
-Rama de trabajo: `004-linea-tiempo`, revisión de código `7d712fa`. Última regresión integral registrada: **873 pruebas en 382.968 s, cero fallos/errores, cuatro omisiones**, durante el incremento de Tigresa. La ronda dirigida posterior de personajes y sonidos aprobó **20 pruebas en 34.540 s**. [Informe del incremento](specs/004-linea-tiempo/tigresa-2026-11-17.md) y [salidas originales conservadas](specs/004-linea-tiempo/evidencia-cierre-2026-11-17.txt). Estos resultados son ejecuciones anteriores conservadas, no pruebas repetidas por esta actualización documental.
+Rama de trabajo: `004-linea-tiempo`. Actualización HU-01: Historia muestra contexto/rangos y la referencia consultada; informe centrado con botón de regreso visible. **100 pruebas dirigidas en 20.165 s, OK, sin omisiones**, con diálogo y controlador/motor reales, pureza y límites tras guardar/cargar; revisión nativa adicional. [Diagnóstico, evidencia y límites](specs/004-linea-tiempo/historia-ui-2026-11-17.md). No se repitieron suite completa, API ni benchmarks tras este cambio.
+
+Última regresión integral registrada: **873 pruebas en 382.968 s, cero fallos/errores, cuatro omisiones**, durante el incremento de Tigresa, referencia `7d712fa`. La ronda dirigida posterior de personajes y sonidos aprobó **20 pruebas en 34.540 s**. [Informe del incremento](specs/004-linea-tiempo/tigresa-2026-11-17.md) y [salidas originales conservadas](specs/004-linea-tiempo/evidencia-cierre-2026-11-17.txt). Estos resultados son ejecuciones anteriores conservadas y no se suman a las pruebas de HU-01.
 
 | Omisión de la última suite | Motivo y evidencia disponible |
 |---|---|
@@ -10,7 +12,7 @@ Rama de trabajo: `004-linea-tiempo`, revisión de código `7d712fa`. Última reg
 | Dos métodos de `tests.test_criptas_api.TestPaqueteOficial` | Requieren `CRIPTA_PAQUETE_API`. El paquete histórico se ejecutó en la regresión anterior de 863 pruebas; no se volvió a ejecutar con el incremento de Tigresa. |
 | `tests.test_verificacion_entrega.TestApiRealEntrega` | Requiere `CRIPTA_API_REAL=1`. Última comprobación registrada en la auditoría del 16 de noviembre: cinco criptas en frío/caliente, dentro del presupuesto. No se repitió con Tigresa. |
 
-Las cuatro omisiones no se presentan como aprobaciones de esta versión. Los resultados históricos y los subconjuntos dirigidos no se suman a las 873 pruebas. Esta actualización no repite API, benchmarks ni pruebas de aplicación porque solo cambia documentación.
+Las cuatro omisiones no se presentan como aprobaciones de esta versión. Los resultados históricos y los subconjuntos dirigidos no se suman a las 873 pruebas. La actualización documental anterior no repitió pruebas; el incremento HU-01 posterior tiene su validación dirigida descrita al comienzo.
 
 **Revisión cruzada:** hay declaración del equipo y registros históricos concretos de revisión, además de las pruebas técnicas de Codex. El [informe de cruces](specs/004-linea-tiempo/revision-cruces-2026-11-17.md#registros-históricos-de-revisión-recuperados-en-git) identifica revisiones de C sobre la integración con A y de B sobre cambios de D, junto con aceptación técnica de A y aportes de integración. Se sustituye la conclusión anterior de ausencia total de registros. Sigue sin acreditarse la aprobación previa de cada PR por ambos responsables; la evidencia disponible se describe con su alcance real.
 
