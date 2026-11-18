@@ -9,17 +9,20 @@ import tempfile
 class CacheVisual:
     LIMITE = 128
 
-    def __init__(self, recursos, carpeta=None):
+    def __init__(self, recursos, carpeta=None, personaje="jugador"):
+        from vista.personajes import validar_personaje
+        self.personaje = validar_personaje(personaje)
         self.recursos = Path(recursos)
         self.carpeta = Path(carpeta) if carpeta else Path(tempfile.gettempdir()) / "cripta-visuales"
         self._firma = None
 
     def _firma_actual(self):
         if self._firma is None:
-            partes = [str(self.recursos.resolve())]
+            partes = [str(self.recursos.resolve()), self.personaje]
             for nombre in ("jugador", "jugador_antorcha", "jugador_acciones", "jugador_beber", "itm_coraza_cuero",
                            "objetos_ilustrados", "itm_daga_oxidada", "itm_antorcha",
                            "fondo_cripta_ilustrado", "fondo_ladrillos"):
+                nombre = nombre.replace("jugador", self.personaje, 1) if nombre.startswith("jugador") else nombre
                 ruta = self.recursos / (nombre + ".png")
                 try:
                     datos = ruta.stat()
@@ -32,7 +35,7 @@ class CacheVisual:
         return self._firma
 
     def _ruta(self, clave):
-        nombre = hashlib.sha256(repr(clave).encode("utf-8")).hexdigest()
+        nombre = hashlib.sha256(repr((self.personaje, clave)).encode("utf-8")).hexdigest()
         return self.carpeta / (nombre + ".png")
 
     def leer(self, clave):

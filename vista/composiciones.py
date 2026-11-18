@@ -4,9 +4,13 @@ from pathlib import Path
 
 
 class ComposicionesPreparadas:
-    def __init__(self, recursos):
+    def __init__(self, recursos, personaje="jugador"):
+        from vista.personajes import validar_personaje
+        self.personaje = validar_personaje(personaje)
         self.recursos = Path(recursos)
         self.carpeta = self.recursos / "composiciones"
+        if personaje != "jugador":
+            self.carpeta = self.carpeta / personaje
         self.habilitada = True
         self._firma = None
 
@@ -15,9 +19,10 @@ class ComposicionesPreparadas:
             huella = hashlib.sha256()
             for nombre in ("jugador", "jugador_acciones", "jugador_beber", "objetos_ilustrados",
                            "itm_coraza_cuero", "itm_daga_oxidada", "itm_antorcha"):
+                nombre = nombre.replace("jugador", self.personaje, 1) if nombre.startswith("jugador") else nombre
                 huella.update(nombre.encode())
                 huella.update((self.recursos / (nombre + ".png")).read_bytes())
-            pose = self.recursos / "jugador_antorcha.png"
+            pose = self.recursos / (self.personaje + "_antorcha.png")
             huella.update(pose.read_bytes() if pose.is_file() else b"sin-pose-antorcha")
             for nombre in ("equipo_visual.py", "recursos_graficos.py", "composiciones.py"):
                 huella.update((Path(__file__).parent / nombre).read_bytes().replace(b"\r\n", b"\n"))

@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
 from tkinter.scrolledtext import ScrolledText
 from vista.recursos_graficos import RecursosGraficos
+from vista.personajes import leer_personaje
 from vista.escena import EscenaCripta
 from vista.transicion_salas import TransicionSalas
 from vista.sonidos import Sonidos, sonorizar_botones
@@ -62,7 +63,7 @@ class VistaGrafica:
         self._replay_pausado = False
         self._replay_detener = False
 
-        self.recursos = RecursosGraficos(self.root)
+        self.recursos = RecursosGraficos(self.root, personaje=leer_personaje())
         self.sonidos = Sonidos()
         self.escena = EscenaCripta(self)
         self.transicion_salas = TransicionSalas(self)

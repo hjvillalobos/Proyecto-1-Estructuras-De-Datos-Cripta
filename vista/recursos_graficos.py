@@ -1,6 +1,7 @@
 from pathlib import Path
 import tkinter as tk
 from vista.cache_visual import CacheVisual
+from vista.personajes import validar_personaje
 from vista.composiciones import ComposicionesPreparadas, clave_equipo
 from vista.tema import PANEL, TEXTO, BORDE
 
@@ -25,12 +26,14 @@ _RECORTES_OBJETOS = (
 class RecursosGraficos:
     """Imagenes locales de la vista, independientes del catalogo y de la red."""
 
-    def __init__(self, root, carpeta=None):
+    def __init__(self, root, carpeta=None, personaje="jugador"):
         self.root = root
+        self.personaje = validar_personaje(personaje)
         self.carpeta = Path(carpeta) if carpeta else Path(__file__).parent / "recursos"
         self._imagenes = []
         self._secuencias = []
         self._acciones = []
+        self._hojas_accion = []
         self._fondo = None
         self._hoja_jugador = None
         self._fondo_sala = None
@@ -46,10 +49,23 @@ class RecursosGraficos:
         self._jugador_antorcha = None
         self._fondo_original = None
         self._cuadros_preparados = None
-        self._cache_visual = CacheVisual(self.carpeta)
-        self._preparadas = ComposicionesPreparadas(self.carpeta)
+        self._cache_visual = CacheVisual(self.carpeta, personaje=self.personaje)
+        self._preparadas = ComposicionesPreparadas(self.carpeta, personaje=self.personaje)
         self._neutras = []
         self._ausentes = []
+
+    def seleccionar_personaje(self, personaje):
+        """Descarta fotos/poses anteriores conservando la identidad del proveedor."""
+        validar_personaje(personaje)
+        if personaje != self.personaje:
+            compartidos = {nombre: getattr(self, nombre) for nombre in (
+                "_fondo", "_fondo_sala", "_fondo_original", "_objetos_ilustrados",
+                "_chaleco", "_daga", "_antorcha", "_neutras", "_imagenes")}
+            self.__init__(self.root, self.carpeta, personaje)
+            self.__dict__.update(compartidos)
+
+    def _ruta_personaje(self, sufijo=""):
+        return self.carpeta / (self.personaje + sufijo + ".png")
 
     def imagen_entidad(self, nombre, ancho, alto):
         imagen = self.imagen(nombre, ancho, alto)
@@ -93,14 +109,14 @@ class RecursosGraficos:
 
     def _original_jugador(self):
         if self._jugador_original is None:
-            with Image.open(self.carpeta / "jugador.png") as origen:
+            with Image.open(self._ruta_personaje()) as origen:
                 self._jugador_original = origen.convert("RGBA")
         return self._jugador_original.copy()
 
     def _original_jugador_antorcha(self):
         """Pose de reposo con brazo doblado y agarre pintado alrededor del mango."""
         if self._jugador_antorcha is None:
-            with Image.open(self.carpeta / "jugador_antorcha.png") as origen:
+            with Image.open(self._ruta_personaje("_antorcha")) as origen:
                 self._jugador_antorcha = origen.convert("RGBA")
         return self._jugador_antorcha.copy()
 
@@ -139,7 +155,7 @@ class RecursosGraficos:
         if self._puno is None:
             try:
                 if self._hoja_jugador is None:
-                    with Image.open(self.carpeta / "jugador_acciones.png") as origen:
+                    with Image.open(self._ruta_personaje("_acciones")) as origen:
                         self._hoja_jugador = origen.convert("RGBA")
                 hoja = self._hoja_jugador
                 self._puno = hoja.crop((int(hoja.width * 299 / 1536), int(hoja.height * 224 / 1024),
@@ -245,7 +261,7 @@ class RecursosGraficos:
             return preparado
         try:
             if self._pose_beber is None:
-                with Image.open(self.carpeta / "jugador_beber.png") as origen:
+                with Image.open(self._ruta_personaje("_beber")) as origen:
                     hoja = origen.convert("RGBA")
                 # Solo la celda central conserva el mismo brazo de reposo.
                 celda = hoja.width // 3
@@ -397,10 +413,7 @@ class RecursosGraficos:
         if Image is None:
             return ()
         try:
-            hoja_guardada = self._cache_visual.leer(("secuencia", *clave))
-            if hoja_guardada is None:
-                hoja_guardada = self._preparadas.leer(("secuencia", *tamano, int(bool(invertir)),
-                                                     *clave_equipo(armadura, arma, antorcha)))
+            hoja_guardada = self._hoja_secuencia(clave)
             if hoja_guardada is not None and hoja_guardada.width % 8 == 0:
                 resultado = self._fotos_desde_hoja(hoja_guardada)
                 self._secuencias.append((clave, resultado))
@@ -442,6 +455,22 @@ class RecursosGraficos:
         w, h = hoja.width // 8, hoja.height
         return tuple(ImageTk.PhotoImage(hoja.crop((i*w, 0, (i+1)*w, h)), master=self.root) for i in indices)
 
+    def _hoja_secuencia(self, clave):
+        """Carrera, ataque y caida comparten una decodificacion por orientacion."""
+        for actual, hoja in self._hojas_accion:
+            if actual == clave:
+                return hoja
+        ancho, alto, invertir, armadura, arma, antorcha = clave
+        hoja = self._cache_visual.leer(("secuencia", *clave))
+        if hoja is None:
+            hoja = self._preparadas.leer(("secuencia", ancho, alto, int(invertir),
+                                         *clave_equipo(armadura, arma, antorcha)))
+        if hoja is not None:
+            self._hojas_accion.append((clave, hoja))
+            if len(self._hojas_accion) > 2:
+                self._hojas_accion.pop(0)
+        return hoja
+
     def fotogramas_accion(self, accion, ancho, alto, invertir=False, armadura=None, arma=None, antorcha=False):
         indices = {"correr": (0, 1, 2, 3), "atacar": (4, 5), "caer": (6, 7)}[accion]
         clave = (int(ancho), int(alto), bool(invertir), armadura, arma, bool(antorcha))
@@ -458,10 +487,7 @@ class RecursosGraficos:
         if Image is None:
             return ()
         try:
-            hoja = self._cache_visual.leer(("secuencia", *clave))
-            if hoja is None:
-                hoja = self._preparadas.leer(("secuencia", int(ancho), int(alto), int(bool(invertir)),
-                                             *clave_equipo(armadura, arma, antorcha)))
+            hoja = self._hoja_secuencia(clave)
             if hoja is None:
                 todos = self.fotogramas_jugador(ancho, alto, invertir, armadura, arma, antorcha)
                 if len(todos) != 8:
@@ -482,7 +508,7 @@ class RecursosGraficos:
             w, h = preparada.width // 8, preparada.height
             return tuple(preparada.crop((i*w, 0, (i+1)*w, h)) for i in range(8))
         if self._hoja_jugador is None:
-            with Image.open(self.carpeta / "jugador_acciones.png") as origen:
+            with Image.open(self._ruta_personaje("_acciones")) as origen:
                 self._hoja_jugador = origen.convert("RGBA")
         hoja = self._hoja_jugador
         w, h = hoja.width // 4, hoja.height // 2
@@ -495,15 +521,21 @@ class RecursosGraficos:
             fila, col = divmod(indice, 4)
             cuadro = hoja.crop((col * w, fila * h + int(h * .19),
                                (col + 1) * w, fila * h + int(h * .88)))
+            # La cuarta zancada de la nueva hoja retrasa los brazos 29 px
+            # dentro de la celda de 384 px; cintura y pies conservan su anclaje.
+            ajustar_brazos = self.personaje == "tigresa" and indice == 3
             if ropa is not None:
                 from vista.equipo_visual import vestir_jugador
-                cuadro = vestir_jugador(cuadro, ropa, indice)
+                torso = ((.43, .300), (.638, .343), (.450, .504)) if ajustar_brazos else None
+                cuadro = vestir_jugador(cuadro, ropa, indice, torso=torso)
             if daga is not None and puno is not None:
                 from vista.equipo_visual import armar_jugador
-                cuadro = armar_jugador(cuadro, daga, puno, indice)
+                cuadro = armar_jugador(cuadro, daga, puno, indice,
+                                      mano=(.755, .473) if ajustar_brazos else None)
             if luz is not None and puno is not None:
                 from vista.equipo_visual import iluminar_jugador
-                cuadro = iluminar_jugador(cuadro, luz, puno, indice)
+                cuadro = iluminar_jugador(cuadro, luz, puno, indice,
+                                         mano=(.405, .55) if ajustar_brazos else None)
             cuadros.append(cuadro)
         return tuple(cuadros)
 
@@ -526,7 +558,14 @@ class RecursosGraficos:
                     imagen.put(color, (x, y))
         return imagen
 
-    def imagen(self, nombre, ancho, alto):
+    def retrato_personaje(self, personaje, ancho, alto):
+        """Retrato explicito para mostrar ambos sin cambiar el personaje activo."""
+        validar_personaje(personaje)
+        return self.imagen(personaje, ancho, alto, resolver_jugador=False)
+
+    def imagen(self, nombre, ancho, alto, *, resolver_jugador=True):
+        if resolver_jugador and nombre == "jugador":
+            nombre = self.personaje
         if Path(nombre).name != nombre:
             return None
         if nombre in self._ausentes:
@@ -555,7 +594,7 @@ class RecursosGraficos:
                 original = self._cache_visual.leer(preparada)
                 if original is None:
                     original = self._objeto_ilustrado(nombre)
-                    if original is None and nombre == "jugador":
+                    if original is None and nombre == self.personaje:
                         original = self._original_jugador()
                     if original is None:
                         with Image.open(ruta) as origen:

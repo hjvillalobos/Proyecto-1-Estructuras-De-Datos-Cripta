@@ -27,12 +27,12 @@ _MANOS_IZQUIERDAS = ((.365, .505), (.365, .53), (.30, .475), (.48, .55),
                      (.275, .405), (.693, .484), (.273, .686), (.23, .88))
 
 
-def iluminar_jugador(imagen, antorcha, puno, pose=None):
+def iluminar_jugador(imagen, antorcha, puno, pose=None, mano=None):
     """Antorcha en el puno izquierdo, independiente del arma y de sus efectos."""
     from PIL import Image, ImageDraw, ImageOps
 
-    mano = ((.36, .60) if pose == "beber" else (.38, .57) if pose is None
-            else _MANOS_IZQUIERDAS[pose])
+    mano = mano or ((.36, .60) if pose == "beber" else (.38, .57) if pose is None
+                    else _MANOS_IZQUIERDAS[pose])
     tamano = max(1, int(imagen.height * .38))
     objeto = antorcha.copy()
     objeto.thumbnail((tamano, tamano), Image.Resampling.LANCZOS)
