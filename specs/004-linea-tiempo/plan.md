@@ -1,5 +1,9 @@
 # Plan técnico propuesto
 
+## HU-01 — contexto de Historia (2026-11-17)
+
+El controlador transmite a la vista los dos escalares de `linea_tiempo` (reloj y cantidad de acciones) al presentar el estado, mediante un método opcional de vista. La ventana recibe esos valores, muestra rangos, preselecciona una referencia válida por modo y valida sin consultar el modelo. El título del informe identifica tiempo u ordinal solicitado; el contenido conserva `resumen_historia`. Sin búsquedas/copias históricas adicionales por turno, sin cambio del motor, persistencia o API. Pruebas Tk del diálogo y recorrido botón→cola→controlador→informe con motor offline real, incluyendo pureza y cancelación. Análisis previo: implementa FR-001/003/005/020; no altera estructuras ni complejidad de reconstrucción y conserva MVC.
+
 ## Estado técnico vigente — 2026-11-16
 
 ERR-01: adaptar AlmacenLocal al patrón de limpieza ya usado por la persistencia histórica. Conservar una excepción pública DatosNoDisponibles con causa original; añadir notas Python 3.11 si unlink falla durante recuperación. Tras os.replace exitoso, retirar la referencia al temporal. Probar reemplazo fallido más limpieza fallida, serialización inválida y éxito sin residuos usando archivos reales y fallos inyectados. Trabajo O(tamaño del JSON), sin nueva estructura evaluada, dependencia, vista o cambio de red.

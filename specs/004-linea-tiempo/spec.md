@@ -1,5 +1,11 @@
 # Feature Specification: historia, persistencia y comandos de integración
 
+## Claridad de consulta histórica — HU-01 (2026-11-17)
+
+Derivado de FR-001/003/005/020. Al abrir Historia, mostrar el tiempo actual y la cantidad de acciones de la rama vigente; distinguir tiempo del reloj y ordinal de acción. Sugerir inicialmente el tiempo actual y, al elegir acción, la última acción disponible. Explicar que instantes cercanos pueden compartir estado y que consultar una acción muestra el estado justo antes de ejecutarla. Rechazar referencias fuera del rango disponible y acción cuando aún no hay ninguna, conservando cancelación sin cambios. El resultado identifica la referencia solicitada. No cambia la reconstrucción histórica ni avanza o revierte la partida.
+
+Aceptación: tras moverse y esperar, el diálogo recibe los límites actuales; consultas por tiempo y por acción producen los estados de sus respectivas referencias, con diferencias verificables de sala/vida/inventario. Los tiempos 1/2/3 de un intervalo sin cambios pueden coincidir. Cancelar, rechazar futuro o cerrar el resultado no modifica estado, azar ni log. Reabrir después de actuar/cargar/retroceder utiliza los límites vigentes.
+
 > **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
 
 

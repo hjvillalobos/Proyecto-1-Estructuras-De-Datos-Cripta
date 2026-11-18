@@ -1,5 +1,13 @@
 # Bitácora de uso de LLM
 
+## 2026-11-17 — diagnóstico del botón Historia, HU-01
+
+- **Herramienta/modelo:** Codex; variante exacta no confirmada. Git, PowerShell, Python y control visual de Windows.
+- **Solicitud literal:** «puedes revisar el boton de historia? me parece que no esta funcionando correctamente».
+- **Síntoma comunicado:** «muestra lo mismo siempre la misma informacion».
+- **Diagnóstico:** reconstrucción offline de la bitácora local de 61 acciones: reloj final 5355; tiempos 1/2/3 conservan sala 1 y vida 30/30, acción #10 muestra sala 3 y ataque/defensa distintos, y tiempo 5355 muestra sala 18 y vida 0/30. No se modificó la partida original. La consulta distingue referencias; el diálogo carece de límites/contexto y puede inducir a confundir unidades de tiempo con ordinales.
+- **Plan previo:** HU-01 y HU-T01..03 especifican contexto/rangos, sugerencia válida e identificación de la consulta, conservando motor y semántica. Validar después con Tk y controlador/motor reales. Mantener trabajo en `004-linea-tiempo`; no integrar a main.
+
 ## 2026-11-17 — evidencia de revisión cruzada y estado vigente en línea de tiempo
 
 - **Herramienta/modelo:** Codex; variante exacta no confirmada. PowerShell, Git y Python para comprobaciones documentales.
