@@ -253,3 +253,9 @@ La usuaria autoriza corregir los pendientes confirmados. Esta revisión no cambi
 - CD-05: consolidar los textos completos de los prompts reconstruidos en la bitácora normal, conservando procedencia y fragmentos históricos; retirar el borrador de regularización y el archivo duplicado. No presentar reconstrucciones como originales ni modificar hechos históricos de Git.
 
 Aceptación CD-01/02: tras recibir más de 20 mensajes, ambas alternativas muestran exactamente los últimos 20 en orden; reiniciar vacía el almacenamiento; las mediciones reportan muestras positivas, misma salida y consumo acotado. El comando de medición funciona sin construir una vista. CD-03/04/05 se verifican por contraste de documentación, referencias y preservación de los fragmentos originales.
+
+## CD-06 — diagnóstico veraz cuando falla la grabación (2026-11-18)
+
+Si la bitácora no puede iniciarse antes de pedir el primer comando, informar el fallo de inicio sin afirmar que se ejecutó una acción. Si falla registrar una acción ya aceptada, informar que la acción ocurrió y que su grabación no pudo completarse. Si la carga de una partida terminó y falla registrar esa carga, indicar que la partida ya fue cargada; si falla la propia restauración inicial, no presentarla como exitosa. Si falla anotar la orden de viaje antes de su primer paso, no afirmar que se ejecutó un nuevo movimiento. En todos estos casos conservar la detención existente de la sesión y el aviso de bitácora incompleta; no agregar una reversión ni modificar el estado ya producido. (FR-011/013/019; P1 §4.11)
+
+Aceptación: fallo de creación del log sin pedir comandos ni modificar la partida; fallo de registro tras esperar conserva la acción y la describe como realizada; fallo de registro tras cargar conserva la carga y la identifica; fallo del comentario de viaje impide iniciar un paso. Comprobar el contexto también al iniciar con una partida guardada y ante un fallo de restauración, sin afirmar carga exitosa.

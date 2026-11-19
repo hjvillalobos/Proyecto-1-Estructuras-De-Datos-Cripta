@@ -313,3 +313,7 @@ RC-01 cerrado: 818 pruebas en 181.531 s, cero fallos/errores y dos opciones omit
 - [ ] CD-T04 (CD-04): publicar matriz vigente de errores y distinguir antecedentes sin prometer atomicidad universal.
 - [ ] CD-T05 (CD-05): consolidar reconstrucciones en PROMPTS_LLM, registrar solicitudes actuales, quitar duplicado y solicitud local, comprobar fragmentos intactos y enlaces.
 - [ ] CD-T06 (CD-01..05): regresión del flujo que usa el buffer y suite integral; validar documentación y estado final sin publicar.
+
+## Mensajes de grabación CD-06 — 2026-11-18
+
+- [ ] CD-T07 (CD-06; FR-011/013/019): confirmar especificación/plan/tarea antes del código; distinguir los mensajes de inicio, acción realizada, carga completada, restauración fallida y comentario de viaje sin nuevo movimiento, conservando la política de detención. Ampliar `tests/test_replay_reinicio.py` con fallos inyectados y comprobación del estado; ejecutar ese módulo y registrar el resultado al cerrar el incremento.
