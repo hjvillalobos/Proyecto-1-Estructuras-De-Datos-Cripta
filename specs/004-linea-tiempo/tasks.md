@@ -304,3 +304,12 @@ La recuperación del PDF original y de dos finales de prompts, así como las res
 Cierre RF-01..03: especificación 5bccc94; suite final 814, cero fallos/errores, dos opciones aprobadas por separado. Copia limpia final: 20 pruebas en 6.775 s, OK. Las cuatro cargas de bench finales terminan correctamente, con muestras en fortalecimiento-mediciones.json; trazabilidad vigente en ESTADO_ENTREGA.md. Se conservan los faltantes históricos y no se afirma revisión humana ni nota.
 
 RC-01 cerrado: 818 pruebas en 181.531 s, cero fallos/errores y dos opciones omitidas identificadas. Contraste exacto por evento y cinco series pareadas de 120 ciclos, estados/historia/azar iguales; máximo optimizado 11.931 ms, 0/600 sobre 20. Copia limpia 20 pruebas OK y CLI sintética ejecutada. Referencia y muestras versionadas; ver DECISIONES.md.
+
+## Cierre CD-01..05 — 2026-11-18
+
+- [ ] CD-T01 (CD-01/02): confirmar especificación/plan/tareas antes del código; conservar importación pública del buffer y añadir medición comparable sin vista/red.
+- [ ] CD-T02 (CD-01/02): verificar orden, límite, vaciado y comando del benchmark con ambas alternativas; ejecutar carga reproducible y guardar resultados reales.
+- [ ] CD-T03 (CD-03): completar decisiones de bitácora/ordenamiento y enlaces spec/plan A/B/C/D con resultados, alternativas y límites.
+- [ ] CD-T04 (CD-04): publicar matriz vigente de errores y distinguir antecedentes sin prometer atomicidad universal.
+- [ ] CD-T05 (CD-05): consolidar reconstrucciones en PROMPTS_LLM, registrar solicitudes actuales, quitar duplicado y solicitud local, comprobar fragmentos intactos y enlaces.
+- [ ] CD-T06 (CD-01..05): regresión del flujo que usa el buffer y suite integral; validar documentación y estado final sin publicar.
