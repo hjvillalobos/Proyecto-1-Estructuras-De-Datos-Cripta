@@ -321,3 +321,7 @@ RC-01 cerrado: 818 pruebas en 181.531 s, cero fallos/errores y dos opciones omit
 Cierre CD del 18 de noviembre: previos `30d89a3`/`cf85272`; benchmark de bitácora 100.000 operaciones/carga y cinco series, ordenamiento 10.000 operaciones/carga y cinco series, resultados completos en DECISIONES.md. Suite integral905/238.658 s, cero fallos/errores, cuatro omisiones opcionales; copia limpia20/6.324 s, OK. Se verifican enlaces y conservación de los fragmentos históricos; no se declara reparación retrospectiva de `33d97ac`. Sin publicación nueva.
 
 - [x] CD-T08 (RE-02/IA-01): dos regresiones adicionales para cripta y objetos inéditos: siete clases del contrato con IDs nuevos, acciones completas e iconos ? en GUI sin modificar el estado. Ejecutadas después de la suite en conjunto dirigido17/14.170 s, OK sin omisiones; no se suman los conjuntos ni se anuncia suite907. Ver `tests/test_criptas_objetos_ineditos.py` y `evidencia-objetos-ineditos-2026-11-18.txt`.
+
+## Aislamiento CD-07 — 2026-11-18
+
+- [ ] CD-T09 (CD-07/RE-04): aislar --datos-dir en pruebas CLI offline sintéticas; revisar invocaciones equivalentes, repetir módulos afectados y comprobar caché real intacta por hashes. Restaurar únicamente la selección local de catálogo compatible tras respaldar la referencia anterior y confirmar sintaxis/offline reales antes de publicar.
