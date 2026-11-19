@@ -1,5 +1,41 @@
 # Bitácora de uso de LLM
 
+<a id="indice-parte-ii"></a>
+
+## Índice de prompts — Parte II
+
+La Parte II está registrada en este mismo archivo, distribuida por fecha e integrante. Las entradas del 7 de noviembre son históricas; las solicitudes y revisiones de hoy figuran bajo el **18 de noviembre de 2026**. Se conservan los bloques anteriores y sus fechas auténticas; el archivo no tiene un único orden cronológico global. Los enlaces siguientes permiten encontrar cada capacidad sin duplicar sus prompts.
+
+| Capacidad | Inicio del registro | Fases y continuaciones |
+|---|---|---|
+| Preparación compartida | [Spec-kit y constitución](#p2-preparacion) | Herramientas, principios y documentación del equipo. |
+| A — Terreno, cazador y rutas | [P01 y siguientes](#p2-a) | [Specify](#p2-a-spec), [Plan](#p2-a-plan), [Tasks](#p2-a-tasks), [Analyze](#p2-a-analyze); implementación y seguimientos en los bloques fechados posteriores. |
+| B — Resolubilidad | [Specify del verificador](#p2-b) | [Plan](#p2-b-plan), [Tasks](#p2-b-tasks), aclaraciones, diagnóstico y validación posteriores. |
+| C — Niebla y viaje | [Especificación de C](#p2-c) | [Investigación/plan](#p2-c-plan), [viaje I5](#p2-c-viaje), historia del conocimiento e integración. |
+| D — Línea de tiempo | [Preparación de D](#p2-d) | [Núcleo](#p2-d-nucleo), [persistencia](#p2-d-persistencia), [aceptación offline](#p2-d-integracion) y seguimientos por fecha. |
+| Revisiones actuales | [18 de noviembre: publicación, offline y navegación](#p2-actual) | Cierre documental, correcciones y solicitudes de este chat. |
+| Textos completados por reconstrucción | [RP-A01](#rp-a01), [RP-A02](#rp-a02) | Procedencia declarada; los fragmentos históricos originales permanecen intactos. |
+
+<a id="p2-actual"></a>
+
+## 2026-11-18 — publicación autorizada, offline real y navegación de la bitácora
+
+- **Herramienta/modelo:** Codex; variante exacta no confirmada. Git, PowerShell, Python 3.14.6 y pruebas existentes.
+- **Solicitudes literales de este tramo:**
+  - 18:41:16: «ya puedo entregar el proyecto ?».
+  - 18:41:46: «subelo al main todo».
+  - 18:42:07: «si compila verdad y lo offline sirve? y el juego no se pega?».
+  - 18:48:06: «tambien porque los prompts quedaron en la fecha 11-07??».
+  - 18:50:17: «ya la cerre».
+  - 18:51:32: «hay muy pocos prompts de la parte 2 ».
+  - 18:51:41: «o donde estan?».
+- **Uso:** subir todos los cambios a main, confirmar sintaxis y datos offline reales, explicar las fechas y localizar los prompts de las cuatro capacidades; añadir el índice de Parte II sin inventar ni duplicar solicitudes.
+- **Corrección CD-07:** una prueba lanzaba main con un paquete offline sintético sin aislar --datos-dir, cambiando la selección de catálogo de la caché personal a cat1. Se confirmó especificación/plan/tarea en `675e9fb` antes del parche de pruebas. Se añade únicamente un destino temporal explícito, sin cambiar el comportamiento del programa. Módulo afectado: cinco pruebas/8.858 s, OK, una omisión opcional de API real; hashes de los 601 archivos y estructura de 41 directorios de la caché real idénticos antes/después.
+- **Recuperación local:** catálogo real compatible cotejado con el paquete completo (17 archivos iguales); se respaldó la referencia anterior y se cambió solamente catalogo/actual.json a la versión real. Sobre una copia se cargaron todas las salas de 02/03/04/06, con acción aceptada; 05 permanece correctamente bloqueada por no resoluble, cero HTTP.
+- **Incidencia de comprobación:** una primera verificación CLI de inicio/cierre no aisló su directorio de trabajo y pudo sobrescribir el log local mientras la usuaria jugaba. Se reconoció el error; la usuaria confirmó la partida abierta y luego su cierre. No se reemplazó su partida cerrada por copias antiguas: se respaldó íntegra localmente y se comprobó que el log actual es legible. No se afirma haber recuperado un log anterior desconocido. Las verificaciones posteriores usan cwd temporal y comprueban hashes de los datos personales antes/después; estos archivos no se publican.
+- **Validación previa a publicación:** 226 fuentes Python verificadas mediante compile; offline real con peticiones HTTP bloqueadas y operaciones normales en destinos de sesión temporales. Evidencias en ESTADO_ENTREGA.md. No se repite la suite integral por un cambio exclusivo de preparación de pruebas; no se suman subconjuntos.
+- **Git:** fetch remoto completado antes de publicar. Se usa push ordinario a main; no se fuerzan referencias, no se modifica la rama de otro integrante y no se envían cachés ni partidas. El resultado remoto se verifica después de la subida.
+
 ## 2026-11-18 — consolidación de prompts y cierre de pendientes documentales
 
 - **Herramienta/modelo:** Codex; variante exacta no confirmada. PowerShell, Git, Python/unittest y benchmarks del proyecto.
@@ -951,6 +987,8 @@ local de tres aperturas por variante, con cache de disco nueva: mediana visual
 de 210.89 ms sin preparar y 30.91 ms preparada. No incluye HTTP ni la carga del
 motor. Las 34 pruebas de menu, selector, transicion e inicio pasan.
 
+<a id="p2-preparacion"></a>
+
 ## Preparación compartida de la Parte II
 
 Las tres propuestas siguientes fueron redactadas por el agente y aprobadas por
@@ -1012,6 +1050,8 @@ modelo no se consigna porque no está confirmada para estas intervenciones.
   la selección de archivos del commit. La integración en `main` queda para el
   siguiente paso; no se registra como realizada.
 
+<a id="p2-b"></a>
+
 ### 2026-10-30 — Especificación del verificador de resolubilidad
 
 - **Herramienta/modelo:** Codex; variante del modelo no registrada.
@@ -1044,6 +1084,8 @@ modelo no se consigna porque no está confirmada para estas intervenciones.
   original. Actualizar requisitos y escenarios de aceptación, sin implementar código
   ni generar todavía el plan o las tareas. No se atribuye esta interpretación al profesor.
 
+<a id="p2-b-plan"></a>
+
 ### 2026-11-01 — Plan técnico del verificador de resolubilidad
 
 - **Herramienta/modelo:** Codex; variante del modelo no registrada.
@@ -1061,6 +1103,8 @@ modelo no se consigna porque no está confirmada para estas intervenciones.
 > Registra el supuesto y su limitación en la especificación con altas probabilidades de quedar como opción definitiva en un futuro y completa el plan con ese alcance
 
 - **Uso de la respuesta:** Registrar el modelo acumulativo como supuesto provisional autorizado y opción preferida del equipo, sin probabilidad numérica inventada ni aprobación atribuida al profesor. Incorporar AC-21 y alcance explícito del resultado. Completar plan, investigación, modelo de datos, contrato para D y guía de validación; revisar la lista documental. No generar tareas, ejecutar pruebas del verificador inexistente ni implementar o confirmar código.
+
+<a id="p2-b-tasks"></a>
 
 ### 2026-11-01 — Tareas del verificador de resolubilidad
 
@@ -1133,6 +1177,8 @@ modelo no se consigna porque no está confirmada para estas intervenciones.
 > Muy bien, cierra con el diagnostico de ciclos
 
 - **Uso de la respuesta:** Completar el diseño documental: certificado global del cierre para justificar pendientes, componentes para mostrar ciclos concretos y alternativas por referencias. Sustituir la certificación incompleta por componente; distinguir bloqueo autónomo, bloqueos externos y desconexión. Agregar AC-24/25 y actualizar tareas, modelo, contrato y guía. Sin código ni commit; no atribuir confirmación al profesor.
+
+<a id="p2-a"></a>
 
 ### 2026-11-01 — Persona A — P01 — revisión inicial
 
@@ -1264,6 +1310,8 @@ modelo no se consigna porque no está confirmada para estas intervenciones.
 
 - **Uso de la respuesta:** documentos oficiales y reparto. Fuente: registro local de Persona A.
 
+<a id="p2-a-spec"></a>
+
 ### 2026-11-01 — Persona A — P05 — Especificación de terreno y cazador
 
 - **Hora:** 17:42:35.854 (America/Costa_Rica, registro de sesión).
@@ -1357,6 +1405,8 @@ modelo no se consigna porque no está confirmada para estas intervenciones.
 - **Prompt textual:** «Continua con el speckit-implement».
 - **Uso de la respuesta:** Implementación del verificador de resolubilidad siguiendo la especificación, el plan y las tareas previamente aprobados. Las tareas completadas y las pruebas ejecutadas se registran según los resultados reales.
 
+<a id="p2-d"></a>
+
 ## 2026-11-02 — preparación de línea de tiempo
 
 
@@ -1373,6 +1423,8 @@ Prompt textual a agente de investigación requerido por speckit-plan:
 
 Uso de respuesta: capturar cambios tipados en lugar de closures, exigir cierre de lote temporal, conservar excepción persistente del pergamino y separar reconstrucción del restaurador con catálogo. Pruebas actuales y límites en baseline.md. No se atribuyen resultados de benchmarks todavía no ejecutados.
 
+<a id="p2-d-nucleo"></a>
+
 ## 2026-11-02 — núcleo de línea de tiempo
 
 Herramienta: Codex desktop; modelo concreto no expuesto. Prompt textual:
@@ -1380,6 +1432,8 @@ Herramienta: Codex desktop; modelo concreto no expuesto. Prompt textual:
 > okay empecemos con el codigo entonces la parte que me toca a mi, que se puede ir haciendo sin depender de los compañeros?
 
 Uso: aplicar speckit-implement al subconjunto independiente T002/T004–T006/T009. Checklist de requisitos: 8 satisfechos, 0 pendientes; scripts de prerrequisitos correctos; sin extensions.yml ni hooks. Se precisó el plan y el orden del núcleo sintético antes del código en commit 9ac1088. Se implementaron contratos inmutables, estado puro con búsqueda propia, deltas/checkpoints, consultas y recorte. Pruebas escritas antes del módulo; fallo inicial esperado por importación aún inexistente. Después: 14 nuevas pruebas correctas, 147 incluyendo regresión seleccionada. Demo ejecutada. No se modificaron reglas del motor, guardado binario, red ni vista. Integración pendiente.
+
+<a id="p2-d-persistencia"></a>
 
 ## 2026-11-02 — persistencia del núcleo histórico
 
@@ -1488,6 +1542,8 @@ Uso: revisar y completar las decisiones del núcleo, conservar las entradas ante
 > Presenta únicamente un diagnóstico de preparación para Plan, separando claramente lo confirmado de lo pendiente.
 
 - **Uso de la respuesta:** diagnóstico de preparación de Plan. Fuente: registro local de Persona A.
+
+<a id="p2-a-plan"></a>
 
 ### 2026-11-02 — Persona A — P13 — Plan técnico
 
@@ -1612,6 +1668,8 @@ Uso: revisar y completar las decisiones del núcleo, conservar las entradas ante
 
 - **Uso de la respuesta:** tres correcciones de Plan. Fuente: registro local de Persona A.
 
+<a id="p2-a-tasks"></a>
+
 ### 2026-11-02 — Persona A — P16 — Generación de tareas
 
 - **Hora:** 15:49:13.771 (America/Costa_Rica, registro de sesión).
@@ -1661,6 +1719,8 @@ Uso: revisar y completar las decisiones del núcleo, conservar las entradas ante
 > Al finalizar, resume la cantidad de tareas, las dependencias pendientes y los archivos modificados.
 
 - **Uso de la respuesta:** generar únicamente tasks.md provisional condicionado para Persona A, con requisitos/escenarios, dependencias externas y separación de base/experimentos. No ejecutar tareas.
+
+<a id="p2-a-analyze"></a>
 
 ### 2026-11-05 — Persona A — P17 — Analyze solicitado
 
@@ -4373,6 +4433,8 @@ No se enviaron prompts a otros agentes ni se atribuyen acuerdos a compañeros.
 
 - **Uso de la respuesta:** Registrar la solicitud original y su alcance en la sesión de trabajo de Persona A.
 
+<a id="p2-c"></a>
+
 ## Persona C — inicio de especificación — 2026-11-08
 
 Herramienta: Codex desktop; identificador exacto de modelo no registrado. Fecha de esta sesión, no atribuida retrospectivamente a mensajes anteriores.
@@ -4431,6 +4493,8 @@ Prompt textual:
 
 Uso: registrar Q1 como pendiente de aclaración oficial, sin convertir la interpretación sugerida en una regla aceptada. Delimitar el caso de puertas remotas sin observación física y distinguirlo de la puerta observable desde la sala actual. Mantener abierta la revisión de aclaraciones y señalar el trabajo documental independiente. No se modifica código ni se publica nada.
 
+<a id="p2-c-plan"></a>
+
 ### Persona C — investigación y plan provisional — 2026-11-08
 
 Herramienta: Codex desktop; identificador exacto de modelo no registrado.
@@ -4460,6 +4524,8 @@ Prompts textuales recientes:
 Uso: delimitar y aclarar I1, adaptar plan y datos, generar tareas mediante flujo speckit-tasks y revisar consistencia antes de implementar. La autorización permite continuar I1 sin resolver las casillas generales ajenas a ese alcance; no se marcaron como cumplidas. Se usó speckit-implement con pruebas previas, implementación propia, regresión y mediciones locales. No existe extensions.yml; no hubo hooks de las fases. La investigación de planificación anterior se reutilizó, sin agentes de edición adicionales.
 
 Se confirmó primero documentación en fa5418a, después se implementó conocimiento básico, observaciones y deltas en archivos nuevos. Resultado: 16 pruebas nuevas y 125 seleccionadas existentes pasan. Q1, contratos compartidos, historia/inventario, antorcha y viaje permanecen pendientes. No se publica ni se modifica main, y puntajes se excluyen de los commits.
+
+<a id="p2-d-integracion"></a>
 
 ## 2026-11-08 — aceptación offline de D
 
@@ -5527,6 +5593,8 @@ Se registraron comandos, muestras y límites sin modificar el motor.
 > Al finalizar, confirmá el hash remoto, los commits publicados, el estado del índice y del árbol de trabajo, y que `.idea/`, los respaldos y `PROMPTS_LLM.md` siguen intactos.
 
 - **Uso de la respuesta:** Registrar la solicitud original y su alcance en la sesión de trabajo de Persona A.
+
+<a id="p2-c-viaje"></a>
 
 ### Persona C — control local de viaje I5 — 2026-11-10
 

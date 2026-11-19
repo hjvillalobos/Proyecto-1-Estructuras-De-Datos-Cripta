@@ -45,7 +45,8 @@ class TestInicioVerificado(unittest.TestCase):
                             opciones.append("--forzar")
                         proceso = subprocess.run(
                             [sys.executable, "-X", "utf8", "-X", "importtime", str(programa),
-                             "--offline", str(paquete), *opciones], cwd=carpeta, input="salir\n",
+                             "--offline", str(paquete), "--datos-dir", str(carpeta / "datos"),
+                             *opciones], cwd=carpeta, input="salir\n",
                             capture_output=True, encoding="utf-8", timeout=30)
                         inicia = modo != "verificar" and (estado == "resoluble" or
                                                           (modo == "forzar" and estado == "no resoluble"))

@@ -1,5 +1,11 @@
 # Decisiones de diseño
 
+## CD-07 — aislamiento de pruebas offline y recuperación local
+
+La prueba de inicio verificado pasaba un paquete sintético con --offline y un cwd temporal, pero omitía --datos-dir. El programa ancla su destino predeterminado al proyecto; por tanto, esa prueba publicaba cat1 en la caché personal y podía impedir un inicio offline real aunque los datos compatibles estuvieran descargados. Se descarta cambiar producción o elegir versiones heurísticamente para disimular la incompatibilidad: se corrige la preparación de la prueba con un destino temporal explícito. La decisión no altera reglas, formatos ni algoritmos del juego. [Especificación CD-07](specs/004-linea-tiempo/spec.md), plan y tarea previos en `675e9fb`.
+
+Cinco pruebas/8.858 s, OK con una omisión opcional de API real; los hashes de todos los 601 archivos de la caché real y sus 41 directorios permanecieron idénticos antes/después. [Evidencia](specs/004-linea-tiempo/evidencia-aislamiento-offline-2026-11-18.txt). Se restauró solamente la referencia local de catálogo después de respaldarla y cotejar los 17 archivos compatibles; no se borró ninguna caché ni se publicaron datos personales. La validación real de las cinco criptas y la sintaxis se conservan [por separado](specs/004-linea-tiempo/evidencia-publicacion-offline-2026-11-18.txt). Offline sigue exigiendo datos completos y versiones compatibles; no se pretende jugar sin haberlos descargado.
+
 ## Cierre documental CD y aceptación de contenido inédito — 18 de noviembre
 
 Los apartados de bitácora y ordenamiento siguientes completan sus decisiones heredadas; la integración de Parte II enlaza ahora cada especificación/plan A/B/C/D. La [matriz vigente de errores](specs/004-linea-tiempo/errores.md) distingue el estado integrado de los antecedentes. Suite de producción905/238.658 s, OK con cuatro omisiones; copia sin cachés20/6.324 s, OK. Dos pruebas de contenido inédito añadidas después pasaron en conjunto dirigido17/14.170 s, sin omisiones. [Salidas y alcance](ESTADO_ENTREGA.md); los conjuntos no se suman.

@@ -1,0 +1,20 @@
+CD-07: aislamiento de pruebas offline, 18 de noviembre de 2026.
+Python: 3.14.6
+Comando: C:\Users\Belén\AppData\Local\Python\pythoncore-3.14-64\python.exe -B -X utf8 -m unittest tests.test_verificacion_entrega -v
+CRIPTA_API_REAL ausente; TEMP/TMP escribibles; audio desactivado.
+Cache real antes: 601 archivos, 41 directorios.
+Cache real después: 601 archivos, 41 directorios.
+{"archivos_agregados": [], "archivos_eliminados": [], "archivos_modificados": [], "directorios_iguales": true, "cache_completa_intacta": true}
+
+
+test_criptas_publicadas_cache_fria_y_caliente_dentro_de_presupuesto (tests.test_verificacion_entrega.TestApiRealEntrega.test_criptas_publicadas_cache_fria_y_caliente_dentro_de_presupuesto) ... skipped 'API real: habilitacion explicita requerida'
+test_cancelar_nombre_no_pierde_puntaje_ni_impide_cierre (tests.test_verificacion_entrega.TestCierrePuntajeConsola.test_cancelar_nombre_no_pierde_puntaje_ni_impide_cierre) ... ok
+test_137_salas_tipos_nuevos_eventos_victoria_guardado_replay (tests.test_verificacion_entrega.TestCriptaDesconocida.test_137_salas_tipos_nuevos_eventos_victoria_guardado_replay) ... ok
+test_arma_enemigos_botin_y_pocion_con_ids_nuevos (tests.test_verificacion_entrega.TestCriptaDesconocida.test_arma_enemigos_botin_y_pocion_con_ids_nuevos) ... ok
+test_T026_FR013_AC15_AC18_inicio_y_verificacion_exclusiva (tests.test_verificacion_entrega.TestInicioVerificado.test_T026_FR013_AC15_AC18_inicio_y_verificacion_exclusiva) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 8.858s
+
+OK (skipped=1)
+Código de salida: 0

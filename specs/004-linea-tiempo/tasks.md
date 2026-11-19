@@ -324,4 +324,6 @@ Cierre CD del 18 de noviembre: previos `30d89a3`/`cf85272`; benchmark de bitáco
 
 ## Aislamiento CD-07 — 2026-11-18
 
-- [ ] CD-T09 (CD-07/RE-04): aislar --datos-dir en pruebas CLI offline sintéticas; revisar invocaciones equivalentes, repetir módulos afectados y comprobar caché real intacta por hashes. Restaurar únicamente la selección local de catálogo compatible tras respaldar la referencia anterior y confirmar sintaxis/offline reales antes de publicar.
+- [x] CD-T09 (CD-07/RE-04): aislar --datos-dir en pruebas CLI offline sintéticas; revisar invocaciones equivalentes, repetir módulos afectados y comprobar caché real intacta por hashes. Restaurar únicamente la selección local de catálogo compatible tras respaldar la referencia anterior y confirmar sintaxis/offline reales antes de publicar.
+
+CD-07 verificado: módulo específico cinco pruebas/8.858 s, una omisión opcional API real; caché personal601archivos/41directorios intacta antes/después. Referencia real restaurada con respaldo; validación offline aislada y sintaxis en evidencia-publicacion-offline-2026-11-18.txt. No cambia producción y no se repite ni suma la suite integral.
