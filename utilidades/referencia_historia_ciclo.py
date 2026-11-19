@@ -6,6 +6,9 @@ from modelo.juego import _MotorConHistoriaDePrueba
 class MotorHistoriaAnterior(MotorPartida):
     def proyeccion_h3(self):
             basicos = _MotorConHistoriaDePrueba.proyeccion_h3(self)
+            # HU-02: comparar ambos algoritmos con los mismos campos observables.
+            if self._resumen_historico:
+                basicos += (('estadisticas_partida', (self.enemigos_derrotados, self.resultado)),)
             inventario = campos_inventario(self.jugador.inventario)
             if inventario == getattr(self, '_inventario_proyectado', None):
                 inventario = self._inventario_proyectado

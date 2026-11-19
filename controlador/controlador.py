@@ -1,7 +1,7 @@
 import os
 from subprocess import CalledProcessError
 
-from controlador.resumen_historia import consultar, resumir
+from controlador.resumen_historia import consultar, resumir, detallar_partida
 from controlador.presentacion_conocimiento import lineas_mapa
 from modelo.errores_historia import ErrorHistoria
 from modelo.viaje import ControlViaje, ResultadoPaso
@@ -86,16 +86,18 @@ class ControladorJuego:
             try:
                 self.bitacora_replay.iniciar(self.modelo.meta)
             except OSError as error:
-                self._fallo_grabacion(error)
+                self._fallo_grabacion(error, contexto="inicio")
                 return False
 
         self.notificar("Partida iniciada.")
         if estado_inicial is not None:
+            contexto_grabacion = "restauracion"
             try:
                 self.modelo.restaurar_estado(estado_inicial)
+                contexto_grabacion = "carga"
                 self.bitacora_replay.registrar_carga(estado_inicial)
             except OSError as error:
-                self._fallo_grabacion(error)
+                self._fallo_grabacion(error, contexto=contexto_grabacion)
                 return False
             except Exception as error:
                 self.ejecutando = False
@@ -179,6 +181,9 @@ class ControladorJuego:
 
     def _mostrar_estado(self):
         estado = self.modelo.estado_vista()
+        historia = getattr(self.modelo, 'linea_tiempo', None)
+        if historia is not None and callable(getattr(type(self.vista), 'actualizar_contexto_historia', None)):
+            self.vista.actualizar_contexto_historia(historia.reloj, historia.cantidad_acciones)
         salas = getattr(self.modelo, "salas", None)
         from modelo.almacen_salas import TablaPorId, limite_ids
         if isinstance(salas, (list, TablaPorId)) and 0 <= estado.sala_id < limite_ids(salas):
@@ -509,10 +514,15 @@ class ControladorJuego:
         if historia is None:
             return self.vista.mostrar_error("El motor todavía no entrega cambios históricos.")
         try:
-            texto = resumir(consultar(historia, argumentos[0]))
+            consulta = consultar(historia, argumentos[0])
+            texto = (detallar_partida(consulta, self.modelo)
+                     if callable(getattr(type(self.vista), 'mostrar_informe', None)) else resumir(consulta))
         except ErrorHistoria as error:
             return self.vista.mostrar_error(str(error))
-        return self._mostrar_informe("Historia", texto)
+        referencia = argumentos[0]
+        titulo = (f'Historia · antes de la acción {referencia}' if referencia.startswith('#') else
+                  f'Historia · tiempo {referencia}')
+        return self._mostrar_informe(titulo, texto)
 
     def _mapa(self, argumentos):
         if argumentos:
@@ -575,7 +585,7 @@ class ControladorJuego:
         try:
             self.bitacora_replay.registrar_comentario(f"ir a {destino}")
         except OSError as error:
-            self._fallo_grabacion(error)
+            self._fallo_grabacion(error, contexto="orden_viaje")
             return False
         return True
 
@@ -859,11 +869,21 @@ class ControladorJuego:
                 f"No se pudo guardar: {error}"
             )
 
-    def _fallo_grabacion(self, error):
+    def _fallo_grabacion(self, error, contexto="accion"):
         self._cancelar_viaje(mostrar=False)
         self._grabacion_valida = False
         self.ejecutando = False
-        texto = (f"La accion se realizo, pero no pudo grabarse: {error}. "
+        if contexto == "inicio":
+            detalle = "No se pudo iniciar la bitacora; no se ejecutaron acciones"
+        elif contexto == "carga":
+            detalle = "La partida se cargo, pero no pudo registrarse la carga"
+        elif contexto == "restauracion":
+            detalle = "No se pudo completar la restauracion inicial"
+        elif contexto == "orden_viaje":
+            detalle = "No se pudo registrar la orden de viaje; no se ejecuto un nuevo movimiento"
+        else:
+            detalle = "La accion se realizo, pero no pudo grabarse"
+        texto = (f"{detalle}: {error}. "
                  "La sesion se detiene para evitar un replay divergente. La bitacora esta incompleta.")
         self.notificar(texto)
         if callable(getattr(type(self.vista), "mostrar_error_replay", None)):
@@ -896,7 +916,7 @@ class ControladorJuego:
                 try:
                     self.bitacora_replay.registrar_carga(estado)
                 except OSError as error:
-                    self._fallo_grabacion(error)
+                    self._fallo_grabacion(error, contexto="carga")
                     return
             self._puntaje_registrado = False
 

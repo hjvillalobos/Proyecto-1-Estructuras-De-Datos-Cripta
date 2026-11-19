@@ -1,5 +1,17 @@
 # Tareas — línea de tiempo
 
+## Informe detallado — HU-02
+
+- [X] HU-T04 Proyectar acciones y estadísticas históricas, conservando carga/continuación de historias previas. (HU-02; FR-001/011/020)
+- [X] HU-T05 Presentar inventario ordenado, enemigos, efectos y mapa histórico detallado sin HTTP ni filtraciones. (HU-02; FR-003/005)
+- [X] HU-T06 Validar pureza, guardado/carga/retroceso, privacidad y rendimiento; documentar resultados y límites. (HU-02; FR-005/011/020) [881 pruebas, benchmarks y revisión visual](historia-detallada-2026-11-17.md).
+
+## Claridad de Historia — HU-01
+
+- [X] HU-T01 Transmitir reloj y cantidad de acciones vigentes al diálogo, sugerir la referencia y mostrar rangos por modo. (HU-01; FR-001/003)
+- [X] HU-T02 Validar rangos/ausencia de acciones, explicar estados iguales entre cambios e identificar la consulta en el título del resultado. (HU-01; FR-001/003/020)
+- [X] HU-T03 Verificar diálogo y flujo completo con motor real: referencias distintas, pureza, cancelación y límites actualizados. Registrar resultados reales. (HU-01; FR-005/020) [100 pruebas dirigidas y revisión nativa](historia-ui-2026-11-17.md).
+
 ## Recuperación de almacenamiento — ERR-01
 
 - [x] ERR-T01 Reproducir reemplazo+limpieza fallidos y verificar causa original y destino anterior; cubrir serialización inválida y escritura correcta (ERR-01; tests/test_almacen_errores.py).
@@ -292,3 +304,26 @@ La recuperación del PDF original y de dos finales de prompts, así como las res
 Cierre RF-01..03: especificación 5bccc94; suite final 814, cero fallos/errores, dos opciones aprobadas por separado. Copia limpia final: 20 pruebas en 6.775 s, OK. Las cuatro cargas de bench finales terminan correctamente, con muestras en fortalecimiento-mediciones.json; trazabilidad vigente en ESTADO_ENTREGA.md. Se conservan los faltantes históricos y no se afirma revisión humana ni nota.
 
 RC-01 cerrado: 818 pruebas en 181.531 s, cero fallos/errores y dos opciones omitidas identificadas. Contraste exacto por evento y cinco series pareadas de 120 ciclos, estados/historia/azar iguales; máximo optimizado 11.931 ms, 0/600 sobre 20. Copia limpia 20 pruebas OK y CLI sintética ejecutada. Referencia y muestras versionadas; ver DECISIONES.md.
+
+## Cierre CD-01..05 — 2026-11-18
+
+- [x] CD-T01 (CD-01/02): confirmar especificación/plan/tareas antes del código; conservar importación pública del buffer y añadir medición comparable sin vista/red.
+- [x] CD-T02 (CD-01/02): verificar orden, límite, vaciado y comando del benchmark con ambas alternativas; ejecutar carga reproducible y guardar resultados reales.
+- [x] CD-T03 (CD-03): completar decisiones de bitácora/ordenamiento y enlaces spec/plan A/B/C/D con resultados, alternativas y límites.
+- [x] CD-T04 (CD-04): publicar matriz vigente de errores y distinguir antecedentes sin prometer atomicidad universal.
+- [x] CD-T05 (CD-05): consolidar reconstrucciones en PROMPTS_LLM, registrar solicitudes actuales, quitar duplicado y solicitud local, comprobar fragmentos intactos y enlaces.
+- [x] CD-T06 (CD-01..05): regresión del flujo que usa el buffer y suite integral; validar documentación y estado final sin publicar.
+
+## Mensajes de grabación CD-06 — 2026-11-18
+
+- [x] CD-T07 (CD-06; FR-011/013/019): confirmar especificación/plan/tarea antes del código; distinguir los mensajes de inicio, acción realizada, carga completada, restauración fallida y comentario de viaje sin nuevo movimiento, conservando la política de detención. Ampliar `tests/test_replay_reinicio.py` con fallos inyectados y comprobación del estado; ejecutar ese módulo y registrar el resultado al cerrar el incremento.
+
+Cierre CD del 18 de noviembre: previos `30d89a3`/`cf85272`; benchmark de bitácora 100.000 operaciones/carga y cinco series, ordenamiento 10.000 operaciones/carga y cinco series, resultados completos en DECISIONES.md. Suite integral905/238.658 s, cero fallos/errores, cuatro omisiones opcionales; copia limpia20/6.324 s, OK. Se verifican enlaces y conservación de los fragmentos históricos; no se declara reparación retrospectiva de `33d97ac`. Sin publicación nueva.
+
+- [x] CD-T08 (RE-02/IA-01): dos regresiones adicionales para cripta y objetos inéditos: siete clases del contrato con IDs nuevos, acciones completas e iconos ? en GUI sin modificar el estado. Ejecutadas después de la suite en conjunto dirigido17/14.170 s, OK sin omisiones; no se suman los conjuntos ni se anuncia suite907. Ver `tests/test_criptas_objetos_ineditos.py` y `evidencia-objetos-ineditos-2026-11-18.txt`.
+
+## Aislamiento CD-07 — 2026-11-18
+
+- [x] CD-T09 (CD-07/RE-04): aislar --datos-dir en pruebas CLI offline sintéticas; revisar invocaciones equivalentes, repetir módulos afectados y comprobar caché real intacta por hashes. Restaurar únicamente la selección local de catálogo compatible tras respaldar la referencia anterior y confirmar sintaxis/offline reales antes de publicar.
+
+CD-07 verificado: módulo específico cinco pruebas/8.858 s, una omisión opcional API real; caché personal601archivos/41directorios intacta antes/después. Referencia real restaurada con respaldo; validación offline aislada y sintaxis en evidencia-publicacion-offline-2026-11-18.txt. No cambia producción y no se repite ni suma la suite integral.

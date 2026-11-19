@@ -1,5 +1,17 @@
 # Feature Specification: historia, persistencia y comandos de integración
 
+## Informe histórico detallado — HU-02 (2026-11-17)
+
+La consulta gráfica debe presentar un informe legible como la referencia suministrada: reloj/acciones, resultado, sala, vida/estadísticas, enemigos derrotados, inventario numerado en orden histórico con nombres/tipos/clases y equipo, efectos, enemigos vivos de la sala y mapa con totales de exploradas/avistadas, nombres y salidas/costos/puertas recordadas. No inventar usos que el contrato no registra. Usar exclusivamente estado histórico para valores variables; los nombres/clases y la topología estática pueden proceder de los datos residentes de la versión de la partida. No efectuar HTTP ni exponer nombres/salidas de salas solo avistadas o desconocidas. Mantener consultas puras y los formatos persistidos compatibles; identificar explícitamente datos no registrados en historias antiguas. Conservar el resumen existente para los consumidores de replay. (FR-001/003/005/011/020)
+
+Aceptación: consultar antes/después de recoger/equipar, matar un enemigo y cambiar conocimiento/puertas; conservar orden, valores pasados y privacidad aunque el vivo cambie. Tras guardar/cargar, el informe coincide; historias previas sin estadísticas adicionales siguen cargando y muestran «no registrado». Texto desplazable, salida visible y tipografía alineada.
+
+## Claridad de consulta histórica — HU-01 (2026-11-17)
+
+Derivado de FR-001/003/005/020. Al abrir Historia, mostrar el tiempo actual y la cantidad de acciones de la rama vigente; distinguir tiempo del reloj y ordinal de acción. Sugerir inicialmente el tiempo actual y, al elegir acción, la última acción disponible. Explicar que instantes cercanos pueden compartir estado y que consultar una acción muestra el estado justo antes de ejecutarla. Rechazar referencias fuera del rango disponible y acción cuando aún no hay ninguna, conservando cancelación sin cambios. El resultado identifica la referencia solicitada. No cambia la reconstrucción histórica ni avanza o revierte la partida.
+
+Aceptación: tras moverse y esperar, el diálogo recibe los límites actuales; consultas por tiempo y por acción producen los estados de sus respectivas referencias, con diferencias verificables de sala/vida/inventario. Los tiempos 1/2/3 de un intervalo sin cambios pueden coincidir. Cancelar, rechazar futuro o cerrar el resultado no modifica estado, azar ni log. Reabrir después de actuar/cargar/retroceder utiliza los límites vigentes.
+
 > **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
 
 
@@ -229,3 +241,25 @@ Optimizar el registro de cambios históricos sin cambiar las proyecciones, valor
 - RF-03: la documentación vigente identifica cada caso obligatorio de Parte II, su requisito, tarea, implementación y prueba; separa evidencia actual de registros históricos y mantiene explícitos los faltantes auténticos. No se certifica ausencia absoluta de errores ni calificación.
 
 La usuaria autoriza completar todas las partes y publicar en su rama. IA-01: mapa, viaje, historia y guardado disponibles desde consola/GUI y replay normales. IA-02: toda acción aceptada y sus eventos producen cambios históricos, incluyendo inventario, efectos y conocimiento; retroceso recorta y conserva la excepción de pergaminos. IA-03: cargar valida y recupera conjuntamente físico, historia, conocimiento y cursor, sin publicar parcialmente. IA-04: una puerta física recíproca abre/cierra ambos extremos con un cierre pendiente; exportar conserva extremos modificados sin explorar su contenido. IA-05: antorcha revela vecinas y sus salidas sin activar contenido; observación de puertas solo desde la posición ocupada. Esta última elección sobre puertas remotas es decisión conservadora del equipo, no aclaración atribuida al profesor. IA-06: cada movimiento entrega hechos reales de daño y enemigos presentes al entrar para detener viaje. IA-07: benchmarks reproducibles comparan rutas individuales/compartidas, reutilización/recálculo y mapa/viaje, además de la carga integrada; publican máximos e incumplimientos. IA-08: pruebas antiguas de ausencia de capacidades se sustituyen por aceptación positiva, conservando corrupción/atomicidad. IA-09: documentación, tareas y prompts reflejan resultados reales y pendientes externos, sin garantía de nota.
+
+## CD-01..05 — cierre documental y medición de bitácora, 2026-11-18
+
+La usuaria autoriza corregir los pendientes confirmados. Esta revisión no cambia reglas de partida.
+
+- CD-01: el modo de medición debe comparar la bitácora de pantalla real con conservar los últimos 20 mensajes desplazando los anteriores. Ambas alternativas deben recibir los mismos mensajes y producir el mismo orden visible, incluidos vacío, primer llenado y desbordamiento.
+- CD-02: medir por separado agregar y agregar seguido de consultar los últimos mensajes; informar tiempos por operación y memoria del almacenamiento, distinguiendo las cadenas compartidas. La preparación y comprobación de resultados quedan fuera del intervalo medido. No requiere red, ventanas ni renderizado. Las cargas se reproducen con la misma semilla.
+- CD-03: Decisiones debe reunir problema, alternativas, elección, complejidad, evidencia y límites de bitácora y ordenamiento heredados; enlazar especificación y plan de las cuatro capacidades de Parte II. No presentar pruebas funcionales como mediciones.
+- CD-04: la documentación de errores debe distinguir el comportamiento integrado vigente de los antecedentes; cubrir red, versiones, datos locales, consultas, acciones, persistencia y reproducción con evidencia concreta. No prometer reversión universal ni ocultar errores inesperados.
+- CD-05: consolidar los textos completos de los prompts reconstruidos en la bitácora normal, conservando procedencia y fragmentos históricos; retirar el borrador de regularización y el archivo duplicado. No presentar reconstrucciones como originales ni modificar hechos históricos de Git.
+
+Aceptación CD-01/02: tras recibir más de 20 mensajes, ambas alternativas muestran exactamente los últimos 20 en orden; reiniciar vacía el almacenamiento; las mediciones reportan muestras positivas, misma salida y consumo acotado. El comando de medición funciona sin construir una vista. CD-03/04/05 se verifican por contraste de documentación, referencias y preservación de los fragmentos originales.
+
+## CD-06 — diagnóstico veraz cuando falla la grabación (2026-11-18)
+
+Si la bitácora no puede iniciarse antes de pedir el primer comando, informar el fallo de inicio sin afirmar que se ejecutó una acción. Si falla registrar una acción ya aceptada, informar que la acción ocurrió y que su grabación no pudo completarse. Si la carga de una partida terminó y falla registrar esa carga, indicar que la partida ya fue cargada; si falla la propia restauración inicial, no presentarla como exitosa. Si falla anotar la orden de viaje antes de su primer paso, no afirmar que se ejecutó un nuevo movimiento. En todos estos casos conservar la detención existente de la sesión y el aviso de bitácora incompleta; no agregar una reversión ni modificar el estado ya producido. (FR-011/013/019; P1 §4.11)
+
+Aceptación: fallo de creación del log sin pedir comandos ni modificar la partida; fallo de registro tras esperar conserva la acción y la describe como realizada; fallo de registro tras cargar conserva la carga y la identifica; fallo del comentario de viaje impide iniciar un paso. Comprobar el contexto también al iniciar con una partida guardada y ante un fallo de restauración, sin afirmar carga exitosa.
+
+## CD-07 — aislamiento de datos sintéticos de aceptación (2026-11-18)
+
+Las pruebas que inician el programa con paquetes offline sintéticos deben aislar tanto el paquete de entrada como el almacenamiento de destino. Ejecutarlas desde una carpeta temporal no debe bastar como supuesto de aislamiento: la ruta predeterminada del programa puede estar anclada al proyecto. La verificación no debe modificar ni el catálogo seleccionado ni otros archivos de la caché personal existente. No cambiar la política del programa normal ni escoger versiones automáticamente para ocultar datos incompatibles. Aceptación: ejecutar los casos de inicio normal/forzado/verificación y los otros comandos sintéticos sobre destinos temporales explícitos; conservar exactamente la caché real y comprobar offline sobre una copia del paquete compatible, sin HTTP.

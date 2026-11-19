@@ -1,5 +1,70 @@
 # Decisiones de diseño
 
+## CD-07 — aislamiento de pruebas offline y recuperación local
+
+La prueba de inicio verificado pasaba un paquete sintético con --offline y un cwd temporal, pero omitía --datos-dir. El programa ancla su destino predeterminado al proyecto; por tanto, esa prueba publicaba cat1 en la caché personal y podía impedir un inicio offline real aunque los datos compatibles estuvieran descargados. Se descarta cambiar producción o elegir versiones heurísticamente para disimular la incompatibilidad: se corrige la preparación de la prueba con un destino temporal explícito. La decisión no altera reglas, formatos ni algoritmos del juego. [Especificación CD-07](specs/004-linea-tiempo/spec.md), plan y tarea previos en `675e9fb`.
+
+Cinco pruebas/8.858 s, OK con una omisión opcional de API real; los hashes de todos los 601 archivos de la caché real y sus 41 directorios permanecieron idénticos antes/después. [Evidencia](specs/004-linea-tiempo/evidencia-aislamiento-offline-2026-11-18.txt). Se restauró solamente la referencia local de catálogo después de respaldarla y cotejar los 17 archivos compatibles; no se borró ninguna caché ni se publicaron datos personales. La validación real de las cinco criptas y la sintaxis se conservan [por separado](specs/004-linea-tiempo/evidencia-publicacion-offline-2026-11-18.txt). Offline sigue exigiendo datos completos y versiones compatibles; no se pretende jugar sin haberlos descargado.
+
+## Cierre documental CD y aceptación de contenido inédito — 18 de noviembre
+
+Los apartados de bitácora y ordenamiento siguientes completan sus decisiones heredadas; la integración de Parte II enlaza ahora cada especificación/plan A/B/C/D. La [matriz vigente de errores](specs/004-linea-tiempo/errores.md) distingue el estado integrado de los antecedentes. Suite de producción905/238.658 s, OK con cuatro omisiones; copia sin cachés20/6.324 s, OK. Dos pruebas de contenido inédito añadidas después pasaron en conjunto dirigido17/14.170 s, sin omisiones. [Salidas y alcance](ESTADO_ENTREGA.md); los conjuntos no se suman.
+
+No se encontró un defecto adicional de producción para IDs de cripta/catálogo nuevos: se añadieron pruebas que recorren las siete clases de objetos del contrato, sus acciones, verificación, IDs de salas dispersos, victoria y representación `?` en suelo/inventario/equipo. Un ID nuevo obtiene datos del catálogo y usa la imagen neutra cuando no hay arte; no requiere una constante de cripta ni un recurso local específico. Esto conserva RE-02; clases o reglas futuras ajenas al contrato no se simulan por conjetura. Las reconstrucciones completas de prompts quedan en la bitácora normal y el borrador local se retira por instrucción de la usuaria, conservando procedencia y hechos históricos.
+
+## Bitácora de pantalla — Parte I §4.8
+
+Problema: conservar y mostrar únicamente los últimos 20 mensajes sin desplazar físicamente los 19 anteriores al agregar uno nuevo. Alternativas: lista que elimina el primer elemento, lista enlazada y arreglo circular de capacidad fija. Se conserva el circular propio: escribe en la próxima posición, avanza su índice y sobrescribe el mensaje más antiguo. Una lista enlazada añade nodos y enlaces innecesarios a una capacidad fija; la lista con eliminación inicial desplaza referencias y contradice el requisito aunque pueda ser rápida en Python.
+
+Agregar cuesta O(1); consultar los últimos C mensajes cuesta O(C), con C=20 en el juego. El almacenamiento mantiene C posiciones y no crece con la duración de la partida; los bytes de los textos dependen de sus longitudes. El vaciado cuesta O(C). Se mide el mismo buffer usado por controlador/replay, sin instanciar vista. La reexportación desde su ubicación anterior conserva las importaciones existentes y la decisión original. Referencias del cierre: [CD-01/02](specs/004-linea-tiempo/spec.md), [plan](specs/004-linea-tiempo/plan.md) y [tareas](specs/004-linea-tiempo/tasks.md).
+
+Evidencia empírica del 18 de noviembre, Python 3.14.6/Windows, semilla 20261001: `python main.py --bench --subsistemas bitacora --operaciones 100000 --repeticiones 5 --semilla 20261001`. Cinco series de 100.000 operaciones por carga, más calentamiento excluido; [salida completa](specs/004-linea-tiempo/evidencia-bitacora-2026-11-18.txt). Preparación y validación de cada sufijo se ejecutan fuera del cronómetro, con los mismos mensajes para ambas alternativas.
+
+| Estrategia | Agregar, media µs/op | Agregar y consultar, media µs/op | Almacenamiento superficial máximo |
+|---|---:|---:|---:|
+| Circular propio | 0,287139 | 2,960212 | 280 B |
+| Lista con desplazamiento, solo benchmark | 0,278576 | 0,493977 | 296 B |
+
+La alternativa de lista resulta más rápida en estas muestras, especialmente al copiar sus 20 referencias mediante una primitiva nativa. No se declara que el circular sea más veloz: se conserva porque el enunciado prohíbe desplazar los mensajes previos al insertar. Los bytes son instancia más arreglo, sin textos compartidos, entrada, generador o temporales de consulta; no equivalen a memoria total del proceso. La pasada de memoria/validación es independiente del cronometraje. No hay red, ventanas ni renderizado; ninguna prueba funcional se presenta como medición.
+
+Límites: C se mantiene en 20 por el enunciado. Aumentar C vuelve lineal la consulta y exige volver a medir; textos de longitud arbitraria impiden prometer un número fijo de bytes. El requisito de evitar desplazamientos determina la elección incluso si una primitiva de lista implementada en C gana en alguna muestra.
+
+## Ordenamiento y selección automática — Parte I §4.9
+
+Problema: ordenar vistas de inventario sin alterar el orden real, puntajes, índices y listas auxiliares con tamaños y costos de comparación distintos. Alternativas medidas: inserción, fusión y elección automática sobre los mismos datos. Se mantienen dos algoritmos propios y estables: inserción para listas pequeñas o casi ordenadas y fusión iterativa para el caso general. No se usan `sorted()` ni `list.sort()` en los ordenamientos evaluados.
+
+La decisión usa propiedades medibles: tamaño, costo de comparación declarado y proporción de descensos de una muestra determinista de vecinos. Los umbrales implementados son 16 elementos, u 8 con comparación costosa, y 0,15 de desorden. Una inserción de datos mayores tiene presupuesto de desplazamientos proporcional a 8N; si lo supera, termina mediante fusión. Las claves se calculan una sola vez y se ordena una copia de pares, conservando la entrada. Son umbrales heurísticos contrastables, no óptimos universales.
+
+Complejidad: inserción O(N) con orden favorable y O(N²) sin protección; fusión O(N log N) y memoria O(N). El camino automático acota los desplazamientos de la inserción antes de pasar a fusión, con costo general O(N log N). La comparación de claves de texto añade su propio costo.
+
+Evidencia registrada en «Evidencia local reproducible», abajo: con 256 elementos, inserción/fusión obtuvieron 5980,211/970,211 µs por lista aleatoria, 119,989/671,378 µs casi ordenada y 39594,267/4858,033 µs con comparación costosa. Esa ejecución tuvo otra suite concurrente y se conserva como antecedente orientativo, no como latencia garantizada. El comando específico reproducible es `python main.py --bench --subsistemas ordenamiento --operaciones 1000 --repeticiones 3 --tamanos 8 16 32 256`. La elección coincide con la implementación original; se conserva la alternativa descartada y se reconoce que ninguna gana con todos los tamaños. [Plan de medición y cierre CD-03](specs/004-linea-tiempo/plan.md).
+
+Repetición del 18 de noviembre sin red/renderizado ni suite integral simultánea: `python main.py --bench --subsistemas ordenamiento --operaciones 10000 --repeticiones 5 --tamanos 8 16 32 256 --semilla 20261001`. [Salida completa para los cuatro tamaños](specs/004-linea-tiempo/evidencia-ordenamiento-2026-11-18.txt). Para tamaño 256 cada serie mide 39 listas, cinco repeticiones registradas después del calentamiento. La unidad es µs por lista, promediada por serie; los máximos de salida son máximos de esos promedios, no latencia máxima de una llamada individual.
+
+| Datos, 256 elementos | Inserción, media µs/lista | Fusión, media µs/lista | Automático, media µs/lista |
+|---|---:|---:|---:|
+| Aleatorios | 4062,792 | 764,225 | 795,367 |
+| Casi ordenados | 119,824 | 558,462 | 179,235 |
+| Comparación costosa | 28104,537 | 3376,432 | 3731,852 |
+
+Se ratifica combinar algoritmos en vez de usar siempre uno. La selección automática tiene sobrecarga de muestreo y protección: no se afirma que iguale siempre al mejor algoritmo forzado. Estas cargas no convierten los umbrales en valores óptimos universales.
+
+## Revalidación del 18 de noviembre — replay, offline y rendimiento
+
+Sin cambios de producción. Una regresión nueva renderiza la misma grabación offline con Tigre y Tigresa, con estado final idéntico y archivos intactos; la apariencia es la preferencia local al abrir el replay, sin modificar el log. 42 pruebas dirigidas/37.095 s, OK sin omisiones. La copia de datos actual carga 20/40/50/300 salas de 02/03/04/06 sin HTTP; 05 es no resoluble y se bloquea.
+
+Misma carga declarada de 300 salas/30 cazadores: ciclo máximo 10.652 ms (0/60 sobre 20), resolubilidad incremental completa 8.733 ms (0/60 sobre 200), paso conocido 2.413 ms (0/60 sobre 5), consulta K=50/5.000 acciones 2.0221 ms (0/111 sobre 50). Sin controles: 101.9904 ms y 51/111 excesos; sigue descartada. Medición visual de ambos personajes separada: hay costo de primera carga y variación de callbacks por encima de 20 ms, sin confundir esa cadencia con el límite de procesamiento. [Comandos, resultados completos y límites](specs/004-linea-tiempo/replay-offline-rendimiento-2026-11-18.md). Los antecedentes siguientes conservan sus propias muestras.
+
+## HU-02 — detalle histórico sin consultar el estado vivo
+
+El informe gráfico amplía la presentación según [HU-02](specs/004-linea-tiempo/spec.md), con el [plan previo](specs/004-linea-tiempo/plan.md). Se conserva el resumen de replay/consola. Se descarta completar estadísticas desde el estado actual porque falsearía el pasado; un campo opcional de tamaño constante `estadisticas_partida` conserva derrotados/resultado por diferencias. Las historias anteriores mantienen su esquema y señalan «no registrado». El contador de acciones usa la frontera ya localizada; el mapa combina topología estática y conocimiento/recuerdos históricos, con fichas residentes para nombres. No hay HTTP ni copias nuevas del mundo por acción. El costo adicional de captura es O(1); la proyección detallada del mapa se realiza solo al consultar y recorre la topología con búsquedas en el estado histórico. No se afirma O(1) para el renderizado.
+
+Coincide con el plan; la clave se sitúa en el orden léxico de la cola histórica para conservar el contraste de algoritmos. La referencia anterior incorpora el mismo campo observable y conserva su algoritmo de diferencias. Suite: 881 pruebas/280.978 s, OK, cuatro omisiones opcionales. Ciclo de 300 salas/30 cazadores: máximo 10.453 ms (0/60 sobre 20); paso conocido 2.421 ms (0/60 sobre 5); historia K=50, 5.000 acciones, máximo 1.0886 ms (0/111 sobre 50). Sin controles: 101.4697 ms y 36/111 excesos; no se oculta la alternativa descartada. [Carga, comandos, evidencia y límites](specs/004-linea-tiempo/historia-detallada-2026-11-17.md). Los tiempos excluyen renderizado/red y no garantizan latencias en otros equipos.
+
+## CD-06 — mensajes precisos ante fallos de grabación
+
+Problema: un único aviso decía «La acción se realizó» incluso al fallar la creación inicial de la bitácora o el comentario previo a un viaje. Se conserva la detención de sesión y el diagnóstico de grabación incompleta, diferenciando inicio, acción aceptada, carga ya completada, restauración inicial fallida y orden anterior al movimiento. Se descarta cambiar el estado o prometer rollback para corregir únicamente el texto. El contexto cuesta O(1), no añade estructuras ni modifica tiempo/log/reglas. [Especificación CD-06](specs/004-linea-tiempo/spec.md), [plan](specs/004-linea-tiempo/plan.md) y tarea previos en `cf85272`. Las comprobaciones nuevas reprodujeron cinco fallos de mensaje; el módulo completo de reinicio/replay pasó después 10 pruebas/0,867 s. La regresión integral del cierre se registra en ESTADO_ENTREGA.md; esta prueba dirigida no se suma a su total. Los errores de escritura posteriores a una acción siguen indicando que ya ocurrió, sin simular que fue anulada.
+
 ## ERR-01 — recuperación de datos locales
 
 El guardado de JSON podía fallar al reemplazar y después al eliminar su temporal: el segundo error ocultaba el primero. Se adopta el patrón ya usado por la persistencia histórica: excepción pública DatosNoDisponibles con causa original y nota adicional de limpieza. Tras reemplazo exitoso se libera la referencia al temporal. No cambia formato, red, reglas ni estructuras evaluadas; costo O(tamaño del JSON). Alternativa descartada: propagar solamente el fallo de unlink, porque pierde la causa de la operación. Tres pruebas nuevas cubren doble fallo con destino intacto, JSON inválido con limpieza y escritura correcta sin residuos. Regresión dirigida 59 pruebas/8.457 s, suite 863/239.241 s, cero fallos/errores. La limpieza fallida puede dejar el temporal propio, que se identifica en la nota; no se afirma poder eliminar un archivo al que el sistema niega acceso.
@@ -693,6 +758,8 @@ los recorridos posteriores esta en `.cache/revisiones/puertas.json`.
 
 ## Decisión de diseño: verificador de resolubilidad
 
+Trazabilidad: [especificación de B](specs/001-verificador-resolubilidad/spec.md) y [plan original de B](specs/001-verificador-resolubilidad/plan.md). Se conserva su decisión incremental; las mediciones y límites siguientes corresponden al corte fechado.
+
 Fecha: 2026-11-02. Usamos arreglos ordenados con búsqueda binaria propia para
 convertir IDs a posiciones compactas. El recorrido usa una cola con lista e índice,
 marcas de salas alcanzadas y puertas pendientes agrupadas por llave. Cada sala se
@@ -1005,27 +1072,39 @@ Los estados «pendiente» anteriores son históricos. Fuentes: [especificación 
 
 ### Ruta del cazador
 
+Referencias: [especificación de A](specs/001-terreno-cazador/spec.md) y [plan de A](specs/001-terreno-cazador/plan.md). El cambio frente al plan y su motivación medida se detallan a continuación.
+
 Problema: muchos actores persiguen el mismo objetivo. Alternativas: búsqueda individual, entradas obsoletas, selección lineal, caché de consultas y campo inverso compartido. Decisión: conservar la búsqueda individual acotada para rangos finitos; para rango ilimitado, compartir distancias desde el objetivo, manteniendo el desempate de menor ID del primer paso. Esto cambia la base individual del plan de A, motivado por la comparación medida. La construcción del campo cuesta O((V+E) log V), memoria O(V+E); una decisión compartida examina las salidas del origen. La consulta acotada conserva trabajo según la región alcanzada, sin recorrer el mapa para cada rango pequeño.
 
 ### Invalidación
+
+Referencias: [especificación de A](specs/001-terreno-cazador/spec.md) y [plan de A](specs/001-terreno-cazador/plan.md). Se conserva la equivalencia con cálculo fresco; el campo compartido modifica la información reutilizada de acuerdo con la medición integrada.
 
 Alternativas: recalcular siempre; reutilizar por objetivo/estado de puertas; dependencias detalladas por ruta. Se elige clave de objetivo y estados de puertas para el campo ilimitado, comprobada una vez por frontera del motor; abrir/cerrar invalida y el retroceso/carga descarta derivados. Fuera de una acción del motor se comprueba la firma real para admitir cambios externos. El movimiento de otro actor no invalida distancias: los actores no bloquean salidas. Las pruebas comparan contra consultas frescas tras cambios. El costo de reconstruir y mantener el campo está incluido en el benchmark, no se presenta solo el acierto barato.
 
 ### Conocimiento y viaje
 
+Referencias: [especificación de C](specs/002-niebla-viaje/spec.md) y [plan de C](specs/002-niebla-viaje/plan.md). Se mantienen índices compactos, cambios locales y coordinación de pasos del plan; las mediciones integradas incluyen consultas y el cálculo de viaje, sin sustituirlas por las mediciones independientes iniciales.
+
 Problema: ocultar información precargada y evitar copiar el mapa al registrar cada evento. Alternativas: derivar del mapa real, copiar la proyección completa o transmitir cambios locales. Se descartan las primeras dos por filtración/costo; se conservan los índices compactos/búsquedas propias de C y se transmiten sus deltas. Una entrada actualiza sala, vecinas pertinentes y observaciones de puertas desde la sala ocupada; la antorcha no activa contenido remoto. Consultas de ruta usan el subgrafo recordado y el control por pasos de C; el motor entrega daño/entrada/enemigos reales mediante A. La búsqueda comparte implementación propia con el cazador, pero no su conocimiento. El caso de puertas remotas es interpretación conservadora del equipo, no respuesta oficial.
 
 ### Resolubilidad
 
+Referencias: [especificación de B](specs/001-verificador-resolubilidad/spec.md) y [plan de B](specs/001-verificador-resolubilidad/plan.md). La decisión final coincide con ese plan; la alternativa repetitiva y las mediciones se documentan también en la sección específica del verificador.
+
 Se conserva el análisis incremental y certificado de B frente a repetir un recorrido por cada llave. La normalización es O(N log N), el recorrido es aproximadamente lineal y el reporte depende de su salida; no se borra esta distinción para afirmar linealidad estricta. El modelo acumula alcanzabilidad/llaves; no garantiza un único itinerario si hay salidas sin regreso. Las mediciones de referencia y esa limitación se mantienen explícitas.
 
 ### Historia, retroceso y persistencia
+
+Referencias: [especificación de D](specs/004-linea-tiempo/spec.md) y [plan de D](specs/004-linea-tiempo/plan.md). Se conservan diferencias y reconstrucción; K=50 queda ratificado por mediciones, no solo por el valor provisional inicial.
 
 Alternativas: copiar la partida por acción, re-simular desde controles o conservar cambios puros. Se mantiene la tercera: diferencias de estadísticas/enemigos/efectos, nodos de inventario y deltas locales de conocimiento, con controles cada K=50. Solo quedan cambios en las acciones, no las proyecciones temporales completas. Se mantiene la elección K=50 respaldada por las series K=10/50/100/sin controles documentadas arriba. Consultar reconstruye como máximo K acciones. El retroceso recorta la rama y registra la corrección irreversible del pergamino consumido.
 
 El binario v4 transporta el físico y la historia; la carga prepara conocimiento y físico independientes, valida frontera/proyección y luego publica. Las copias de preparación existen solo durante carga, no en el historial reversible. Se rechazan guardados P1 y las historias parciales incompatibles, sin migración silenciosa. La puerta modificada se exporta aunque no se haya visitado su otro extremo. Los inversos preservan también la ausencia original del campo `cerrada`.
 
 ### Revisión de estructuras de Parte I
+
+Referencias: [especificación de A](specs/001-terreno-cazador/spec.md), [plan de A](specs/001-terreno-cazador/plan.md), [especificación de D](specs/004-linea-tiempo/spec.md) y [plan de D](specs/004-linea-tiempo/plan.md). Las revisiones posteriores del heap y del productor de historia, con comparación antes/después, se conservan en RF-01 y RC-01.
 
 Se conserva la agenda propia con cancelación perezosa y el historial por inversos. La entrega de A incorpora comparaciones de heap indexado/obsoletos/lineal, caché acotada y agenda con limpieza/heap indexado frente a la original; se conecta en `--bench --subsistemas terreno-cazador`. El ciclo integrado añade historia/mapa y 30 cazadores. Las alternativas no ganadoras siguen como medición, no como dependencias de producción. Los tiempos y máximos del cierre se registran en la evidencia anexa; no se generalizan a cualquier hardware, cripta o número de actores.
 

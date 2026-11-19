@@ -1,0 +1,9 @@
+SINTAXIS OK: 226 archivos Python versionados.
+{"cripta": "cripta-02", "codigo_salida": 0, "estado": "inicio, espera y cierre controlados", "HTTP": 0}
+{"cripta": "cripta-03", "codigo_salida": 0, "estado": "inicio, espera y cierre controlados", "HTTP": 0}
+{"cripta": "cripta-04", "codigo_salida": 0, "estado": "inicio, espera y cierre controlados", "HTTP": 0}
+{"cripta": "cripta-05", "codigo_salida": 1, "estado": "no resoluble bloqueada", "HTTP": 0}
+{"cripta": "cripta-06", "codigo_salida": 0, "estado": "inicio, espera y cierre controlados", "HTTP": 0}
+DATOS PERSONALES: hashes idénticos antes/después de la comprobación aislada.
+CATALOGO LOCAL: referencia recuperada 4b9e75a42be5; 17 archivos cotejados con el paquete completo; solo cambio de catalogo/actual.json, con respaldo local de la referencia anterior.
+No se repitió la suite integral: el cambio CD-07 solo aísla la carpeta de datos de una prueba; evidencia específica separada.

@@ -11,7 +11,7 @@ from utilidades.bench_juego import (
 
 SUBSISTEMAS_BASE = ("cache", "agenda", "inventario", "historial", "ordenamiento",
                    "guardado", "ciclo", "historia")
-SUBSISTEMAS = SUBSISTEMAS_BASE + ("guardado-historia", "resolubilidad", "parte-dos", "terreno-cazador", "ciclo-historia")
+SUBSISTEMAS = SUBSISTEMAS_BASE + ("guardado-historia", "resolubilidad", "parte-dos", "terreno-cazador", "ciclo-historia", "bitacora")
 
 
 def entero_positivo(texto: str) -> int:
@@ -111,6 +111,12 @@ def main(argv=None):
             medir_inventario(args.operaciones, args.repeticiones, tamano).imprimir()
     if "historial" in args.subsistemas:
         medir_historial(args.operaciones, args.repeticiones).imprimir()
+    if "bitacora" in args.subsistemas:
+        from utilidades.bench_bitacora import medir_bitacora
+        print("Bitacora: capacidad=20; memoria superficial de instancia y arreglo, "
+              "sin cadenas compartidas ni resultados temporales.")
+        for fila in medir_bitacora(args.operaciones, args.repeticiones, args.semilla):
+            fila.imprimir()
     if "ordenamiento" in args.subsistemas:
         for resultado in medir_ordenamientos(args.operaciones, args.repeticiones, args.tamanos, args.semilla):
             resultado.imprimir()

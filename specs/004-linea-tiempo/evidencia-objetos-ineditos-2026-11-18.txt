@@ -1,0 +1,22 @@
+test_re02_siete_clases_por_precarga_acciones_y_salida_en_ids_dispersos (tests.test_criptas_objetos_ineditos.TestCriptaYObjetosIneditos.test_re02_siete_clases_por_precarga_acciones_y_salida_en_ids_dispersos) ... ok
+test_re02_siete_tipos_sin_png_muestran_pregunta_en_suelo_inventario_y_equipo (tests.test_criptas_objetos_ineditos.TestCriptaYObjetosIneditos.test_re02_siete_tipos_sin_png_muestran_pregunta_en_suelo_inventario_y_equipo) ... ok
+test_catalogo_nuevo_en_escena_inventario_equipo_y_trampas (tests.test_contenido_desconocido_gui.TestContenidoDesconocidoGUI.test_catalogo_nuevo_en_escena_inventario_equipo_y_trampas) ... ok
+test_equipo_nuevo_con_antorcha_poses_y_movimiento_desactivado (tests.test_contenido_desconocido_gui.TestContenidoDesconocidoGUI.test_equipo_nuevo_con_antorcha_poses_y_movimiento_desactivado) ... ok
+test_imagenes_conocidas_se_conservan_y_png_danado_tiene_respaldo (tests.test_contenido_desconocido_gui.TestContenidoDesconocidoGUI.test_imagenes_conocidas_se_conservan_y_png_danado_tiene_respaldo) ... ok
+test_muchos_ids_no_crean_un_icono_por_tipo (tests.test_contenido_desconocido_gui.TestContenidoDesconocidoGUI.test_muchos_ids_no_crean_un_icono_por_tipo) ... ok
+test_neutro_compartido_y_sin_pillow (tests.test_contenido_desconocido_gui.TestContenidoDesconocidoGUI.test_neutro_compartido_y_sin_pillow) ... ok
+test_selector_acepta_mas_de_cuatro_criptas_e_ids_no_previstos (tests.test_contenido_desconocido_gui.TestContenidoDesconocidoGUI.test_selector_acepta_mas_de_cuatro_criptas_e_ids_no_previstos) ... ok
+test_137_salas_tipos_nuevos_eventos_victoria_guardado_replay (tests.test_verificacion_entrega.TestCriptaDesconocida.test_137_salas_tipos_nuevos_eventos_victoria_guardado_replay) ... ok
+test_arma_enemigos_botin_y_pocion_con_ids_nuevos (tests.test_verificacion_entrega.TestCriptaDesconocida.test_arma_enemigos_botin_y_pocion_con_ids_nuevos) ... ok
+test_denso_conserva_acceso_directo (tests.test_almacen_salas.AlmacenSalasTest.test_denso_conserva_acceso_directo) ... ok
+test_ids_grandes_no_reservan_huecos (tests.test_almacen_salas.AlmacenSalasTest.test_ids_grandes_no_reservan_huecos) ... ok
+test_radix_limites_de_digitos_y_huecos (tests.test_almacen_salas.AlmacenSalasTest.test_radix_limites_de_digitos_y_huecos) ... ok
+test_rastro_en_ids_grandes_y_empate (tests.test_almacen_salas.AlmacenSalasTest.test_rastro_en_ids_grandes_y_empate) ... ok
+test_ganar_guardar_retroceder_cargar_y_replay_en_criptas_nuevas (tests.test_partida_generada.PartidaGeneradaTest.test_ganar_guardar_retroceder_cargar_y_replay_en_criptas_nuevas) ... ok
+test_re02_objeto_nuevo_conserva_interrogacion_y_sonido_desde_otro_cwd (tests.test_revision_entrega_visual.RevisionEntregaVisualTest.test_re02_objeto_nuevo_conserva_interrogacion_y_sonido_desde_otro_cwd) ... ok
+test_re03_cazadores_animan_reposo_y_dano_sin_cambiar_modelo (tests.test_revision_entrega_visual.RevisionEntregaVisualTest.test_re03_cazadores_animan_reposo_y_dano_sin_cambiar_modelo) ... ok
+
+----------------------------------------------------------------------
+Ran 17 tests in 14.170s
+
+OK

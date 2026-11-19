@@ -56,3 +56,9 @@ Unión de C b7cfc33 con D eb8546b, que contiene main 049a990 y las ramas actuale
 En copia aislada: 866 pruebas en 258.781 s, cero fallos/errores y cuatro omisiones (comparación histórica, dos del paquete oficial ausente y API real deshabilitada). Comparación histórica ejecutada aparte: 41 pruebas, OK. Copia limpia: 20 pruebas, OK. I11: tres pruebas, OK. Los conjuntos se solapan. Logs locales bajo .cache/union-*-20261117.log. No se repitieron API real ni benchmarks; los resultados publicados por D se distinguen de esta comprobación.
 
 La aplicación normal ya conecta las cuatro capacidades. Las limitaciones y salvedades documentales vigentes se conservan en ESTADO_ENTREGA.md. Los archivos personales de datos_generados se respaldan y conservan localmente, aunque la integración los excluya de Git. Main y ramas ajenas no se modifican.
+
+## Actualización de entrega del 18 de noviembre de 2026
+
+Se integra main 4d1ef49 en C, conservando I11. Main contiene las ramas actuales de D d39eda3 y pendientes-finales 8eb9d57; no fue necesario fusionarlas aparte. Unión automática sin conflictos. Partida, log y puntajes personales coinciden con su respaldo y siguen fuera de Git.
+
+Pruebas seleccionadas en copia aislada: 43 casos; 41 aprobaron y dos de objetos inéditos fallaron por WinError 206 (ruta temporal demasiado larga del sandbox). Repetidos esos dos con TEMP/TMP normales de Windows: ambos aprobaron en 2.598 s, sin cambiar código ni aserciones. Copia limpia: 20 pruebas en 7.346 s, OK. Cobertura dirigida de portada, música, personajes/replay, Historia, destino de viaje, objetos nuevos e I11. No se repitieron suite integral, API ni benchmarks. Evidencia local: .cache/actualizacion-*-20261118.log.

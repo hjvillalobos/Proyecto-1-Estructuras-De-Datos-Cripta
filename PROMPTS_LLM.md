@@ -1,5 +1,199 @@
 # Bitácora de uso de LLM
 
+<a id="indice-parte-ii"></a>
+
+## Índice de prompts — Parte II
+
+La Parte II está registrada en este mismo archivo, distribuida por fecha e integrante. Las entradas del 7 de noviembre son históricas; las solicitudes y revisiones de hoy figuran bajo el **18 de noviembre de 2026**. Se conservan los bloques anteriores y sus fechas auténticas; el archivo no tiene un único orden cronológico global. Los enlaces siguientes permiten encontrar cada capacidad sin duplicar sus prompts.
+
+| Capacidad | Inicio del registro | Fases y continuaciones |
+|---|---|---|
+| Preparación compartida | [Spec-kit y constitución](#p2-preparacion) | Herramientas, principios y documentación del equipo. |
+| A — Terreno, cazador y rutas | [P01 y siguientes](#p2-a) | [Specify](#p2-a-spec), [Plan](#p2-a-plan), [Tasks](#p2-a-tasks), [Analyze](#p2-a-analyze); implementación y seguimientos en los bloques fechados posteriores. |
+| B — Resolubilidad | [Specify del verificador](#p2-b) | [Plan](#p2-b-plan), [Tasks](#p2-b-tasks), aclaraciones, diagnóstico y validación posteriores. |
+| C — Niebla y viaje | [Especificación de C](#p2-c) | [Investigación/plan](#p2-c-plan), [viaje I5](#p2-c-viaje), historia del conocimiento e integración. |
+| D — Línea de tiempo | [Preparación de D](#p2-d) | [Núcleo](#p2-d-nucleo), [persistencia](#p2-d-persistencia), [aceptación offline](#p2-d-integracion) y seguimientos por fecha. |
+| Revisiones actuales | [18 de noviembre: publicación, offline y navegación](#p2-actual) | Cierre documental, correcciones y solicitudes de este chat. |
+| Textos completados por reconstrucción | [RP-A01](#rp-a01), [RP-A02](#rp-a02) | Procedencia declarada; los fragmentos históricos originales permanecen intactos. |
+
+<a id="p2-actual"></a>
+
+## 2026-11-18 — publicación autorizada, offline real y navegación de la bitácora
+
+- **Herramienta/modelo:** Codex; variante exacta no confirmada. Git, PowerShell, Python 3.14.6 y pruebas existentes.
+- **Solicitudes literales de este tramo:**
+  - 18:41:16: «ya puedo entregar el proyecto ?».
+  - 18:41:46: «subelo al main todo».
+  - 18:42:07: «si compila verdad y lo offline sirve? y el juego no se pega?».
+  - 18:48:06: «tambien porque los prompts quedaron en la fecha 11-07??».
+  - 18:50:17: «ya la cerre».
+  - 18:51:32: «hay muy pocos prompts de la parte 2 ».
+  - 18:51:41: «o donde estan?».
+- **Uso:** subir todos los cambios a main, confirmar sintaxis y datos offline reales, explicar las fechas y localizar los prompts de las cuatro capacidades; añadir el índice de Parte II sin inventar ni duplicar solicitudes.
+- **Corrección CD-07:** una prueba lanzaba main con un paquete offline sintético sin aislar --datos-dir, cambiando la selección de catálogo de la caché personal a cat1. Se confirmó especificación/plan/tarea en `675e9fb` antes del parche de pruebas. Se añade únicamente un destino temporal explícito, sin cambiar el comportamiento del programa. Módulo afectado: cinco pruebas/8.858 s, OK, una omisión opcional de API real; hashes de los 601 archivos y estructura de 41 directorios de la caché real idénticos antes/después.
+- **Recuperación local:** catálogo real compatible cotejado con el paquete completo (17 archivos iguales); se respaldó la referencia anterior y se cambió solamente catalogo/actual.json a la versión real. Sobre una copia se cargaron todas las salas de 02/03/04/06, con acción aceptada; 05 permanece correctamente bloqueada por no resoluble, cero HTTP.
+- **Incidencia de comprobación:** una primera verificación CLI de inicio/cierre no aisló su directorio de trabajo y pudo sobrescribir el log local mientras la usuaria jugaba. Se reconoció el error; la usuaria confirmó la partida abierta y luego su cierre. No se reemplazó su partida cerrada por copias antiguas: se respaldó íntegra localmente y se comprobó que el log actual es legible. No se afirma haber recuperado un log anterior desconocido. Las verificaciones posteriores usan cwd temporal y comprueban hashes de los datos personales antes/después; estos archivos no se publican.
+- **Validación previa a publicación:** 226 fuentes Python verificadas mediante compile; offline real con peticiones HTTP bloqueadas y operaciones normales en destinos de sesión temporales. Evidencias en ESTADO_ENTREGA.md. No se repite la suite integral por un cambio exclusivo de preparación de pruebas; no se suman subconjuntos.
+- **Git:** fetch remoto completado antes de publicar. Se usa push ordinario a main; no se fuerzan referencias, no se modifica la rama de otro integrante y no se envían cachés ni partidas. El resultado remoto se verifica después de la subida.
+- **Resultado Git:** `1401a58` enviado con push ordinario a origin/main (avance desde `8eb9d57`). El índice de Parte II y las nuevas entradas del 18 ya forman parte de esa publicación. Este registro de confirmación es una actualización documental posterior; no cambia producción ni exige repetir pruebas. La comprobación final coteja HEAD con la referencia remota.
+
+## 2026-11-18 — consolidación de prompts y cierre de pendientes documentales
+
+- **Herramienta/modelo:** Codex; variante exacta no confirmada. PowerShell, Git, Python/unittest y benchmarks del proyecto.
+- **Solicitudes literales:** «la solicitud de regulacion no es necesaria y pon todo en los prompts normales. las decisiones, manejo de errores, prompy y eso esta completo?» y «todo lo que este pendiente arreglalo o lo que este mal».
+- **Uso:** conservar los dos textos completos RP-A01/RP-A02 dentro de PROMPTS_LLM.md, retirar el duplicado y el borrador local, completar trazabilidad y decisiones heredadas, actualizar el manejo de errores integrado y medir la bitácora de pantalla mediante --bench.
+- **Especificación previa:** CD-01..05, plan, análisis y tareas confirmados en `30d89a3` antes de modificar producción; CD-06 y su plan/tarea se confirmaron en `cf85272` antes de corregir mensajes. No se invoca un comando de spec-kit ni se alteran reglas de partida o el historial anterior.
+- **Solicitud posterior literal:** «tambien revisa que si mi profe mete nuevas criptas o objetos no se caiga y salgan con el signo de pregunta». Uso: comprobar IDs inéditos, clases de catálogo del contrato, recursos ausentes y acciones/renderizado reales; añadir dos regresiones de siete clases sin alterar producción.
+- **Procedencia:** las reconstrucciones siguen identificadas como textos nuevos; los dos fragmentos originales no se sustituyen. Las menciones anteriores al borrador describen su preparación histórica; no indican que el archivo siga disponible ni que deba enviarse.
+- **Medición nueva:** cinco series de 100.000 operaciones por carga de bitácora: circular 0,287139 µs/agregado y 2,960212 µs/agregado-consulta; 280 B superficiales. La lista desplazada gana en tiempo en las muestras, pero incumple la restricción de no desplazar mensajes y permanece solo como alternativa de benchmark. Ordenamiento repetido con 10.000 operaciones, tamaños 8/16/32/256 y cinco series; resultados completos y límites en DECISIONES.md. Sin repetir otros benchmarks ni API real.
+- **Validación final:** 905 pruebas/238.658 s, cero fallos/errores y cuatro omisiones opcionales; copia sin cachés/partidas, 20/6.324 s, OK. Tras la suite se añadieron dos pruebas nuevas RE-02, ejecutadas en conjunto dirigido de 17/14.170 s, OK sin omisiones: cripta/IDs inéditos, siete clases con acciones reales, signo ? en suelo/inventario/equipo, respaldo visual, selector y partidas inéditas. Los conjuntos se solapan y no se suman; no se atribuye a la suite de 905 la ejecución de esas dos pruebas posteriores. Resultados en ESTADO_ENTREGA.md. No se repitieron API real ni los cuatro benchmarks de procesamiento del motor, cuyos algoritmos y reglas se conservan.
+- **Cierre:** decisiones, matriz de errores y README actualizados; enlaces locales comprobados y fragmentos originales conservados. Borrador y duplicado retirados por instrucción de Belén. Cambios guardados localmente, sin envío al profesor ni nueva publicación en GitHub.
+
+## 2026-11-18 — auditoría integral y reconstrucción autorizada de dos prompts
+
+- **Herramienta/modelo:** Codex; variante exacta no confirmada. PowerShell, Git, Python 3.14/unittest e inspección de registros locales.
+- **Fuente de las solicitudes:** mensajes del usuario de este chat, sesión `01a1f109-cc07-7553-a9a6-006b886063f6`; horas en America/Costa_Rica.
+
+### Solicitud literal, 17:41:57
+
+```text
+1\. Terreno y cazadores. Las salidas tienen costo de tránsito y aparece un enemigo que calcula la ruta más corta \
+hacia el jugador. \
+2\. Niebla de guerra. El jugador solo conoce la parte del mapa que ha explorado, y puede viajar \
+automáticamente dentro de ella. \
+3\. Verificación de resolubilidad. Antes de jugar, el programa determina si la cripta puede ganarse y, si no, \
+explica por qué. \
+4\. Línea de tiempo. Se puede consultar el estado de la partida en cualquier instante pasado, sin copiar el \
+estado completo en cada acción.  eso lo hace ?
+```
+
+- **Solicitud literal, 17:43:40:** «haz un analisis de todo el enunciado y dime si cumple, te puse en ultra solo dime si cumple por aca».
+
+- **Solicitud literal, 17:51:38:** «y no puedes arreglar esos puntos faltantes tu???».
+
+- **Solicitud literal, 17:51:50:** «si revisaste el enunciado verdad».
+
+- **Solicitud literal, 17:53:31:** «si no hay originales hazlos tu ».
+
+- **Uso:** contrastar el enunciado completo de Parte II y la extracción conservada de Parte I con código, pruebas, documentación y Git; buscar originales de dos fragmentos y, al no encontrarlos, preparar versiones completas por reconstrucción según la última instrucción.
+- **Validación técnica:** suite integral nueva, 897 pruebas/281.220 s, cero fallos y errores, cuatro omisiones opcionales. Paquete oficial ejecutado aparte: 2 pruebas/4.504 s, OK; comparación de rutas: 41 pruebas/0.408 s, OK. Los subconjuntos se solapan y no se suman a la suite. No se repitieron API real ni benchmarks; se contrastaron sus evidencias existentes.
+- **Búsqueda de originales:** las coincidencias en registros recientes reproducen documentos o salidas de herramientas. Las sesiones comprimidas locales, incluidas las del 6 de noviembre, no aportan los mensajes originales. No se afirma que el texto enviado originalmente estuviera completo ni que fuera inconcluso.
+- **Resultado documental vigente:** los dos prompts completos se conservan directamente en esta bitácora como [RP-A01](#rp-a01) y [RP-A02](#rp-a02), con su procedencia declarada y los fragmentos históricos intactos. Por instrucción posterior de Belén se retiran el duplicado separado y la solicitud de regularización; no se requiere ese borrador para ejecutar ni entregar el proyecto.
+- **Límite:** reconstruir textos no recupera evidencia histórica. `33d97ac` continúa reuniendo especificación y código; no se revierte ni reescribe el historial para atribuirle otro orden. Sin cambios de producción ni nuevas operaciones de publicación.
+
+## 2026-11-18 — replay con ambos personajes, offline, rendimiento y documentación
+
+- **Herramienta/modelo:** Codex; variante exacta no confirmada. Git, PowerShell, Python/unittest, Tk/Pillow y benchmarks existentes.
+- **Solicitud literal:** «pregunta, el replay funciona bien con los dos jugadores? el offline? el rendimiento? todo esta bien????? la documentacion?».
+- **Uso:** comprobar específicamente replay gráfico real con Tigre/Tigresa, estado final y conservación de archivos, modos offline y datos disponibles, límites de procesamiento y presentación de ambos personajes. Revisar documentación y aclarar apariencia del replay/condiciones de datos sin cambiar producción.
+- **Resultado:** 42 pruebas dirigidas/37.095 s, OK sin omisiones, incluyendo una nueva regresión con ambas apariencias y renderizado real. Cinco criptas verificadas sin HTTP; cuatro cargas completas y 05 bloqueada correctamente por no resoluble. Ciclo máximo 10.652 ms (0/60 sobre 20), resolubilidad 8.733 ms (0/60 sobre 200), paso 2.413 ms (0/60 sobre 5), historia K=50 2.0221 ms (0/111 sobre 50). Medición visual aislada de ambos personajes, sin atribuirle límites de motor ni garantía de fluidez. 16 documentos principales/185 enlaces locales sin roturas antes de agregar el informe; enlaces nuevos verificados al cierre. [Evidencias y límites](specs/004-linea-tiempo/replay-offline-rendimiento-2026-11-18.md).
+- **Alcance conservado:** sin repetir suite integral/API ni sumar subconjuntos a 881. Preferencias, partidas y caché fuente de la usuaria intactas; el ensayo offline trabaja sobre una copia. Solo prueba nueva y documentación. Continúan publicación main/rama, exclusión del Markdown del profesor y ausencia de ZIP de entrega conforme a las instrucciones vigentes.
+
+## 2026-11-17 — estado documental vigente y revisión del botón Viajar
+
+- **Herramienta/modelo:** Codex; variante exacta no confirmada. Git, PowerShell, Python/unittest, Tk y control visual de Windows.
+- **Solicitud literal:** «resuelve el punto 3  e ignora el punto 1 y 2, ademas revisa si el boton de viaje sirve bien».
+- **Uso:** corregir contradicciones de publicación/API y resultados de opciones en ESTADO_ENTREGA.md; mantener los registros anteriores como antecedentes. Revisar el recorrido real de Viajar, sin modificar los puntos históricos excluidos ni el borrador del profesor.
+- **Validación:** 55 pruebas dirigidas/25.129 s, OK sin omisiones; incluye una nueva regresión del botón→diálogo→controlador/motor→dos pasos registrados. Cancelación sin mutación, destinos permitidos, daño/enemigos/puertas y llegada cubiertos. Revisión nativa: cancelar conserva sala 100/t=1025; seleccionar 102 recorre 101 y llega a t=1525 con motivo visible. No se encontró un fallo de producción. La primera aserción nueva buscaba el aviso en el log en vez de la banda visible; se corrigió el punto de lectura y se repitió la selección completa.
+- **Resultado:** [informe y evidencia](specs/004-linea-tiempo/revision-viaje-2026-11-17.md); solo documentación y prueba nueva. Sin nueva suite integral, benchmarks o API; no sumar los subconjuntos al total previo de 881. Publicación en main y sincronización de 004-linea-tiempo conforme a la autorización vigente.
+
+## 2026-11-17 — cierre de entrega y reconstrucciones declaradas
+
+- **Aclaraciones posteriores literales:** «cual zip?», «ay no eso no lo hagas no se ocupa» y «el profe lo que pide es mandar el link del github nada mas no pide zip». Se cancela la entrega ZIP y se retiran el paquete del 17 de noviembre, su manifiesto y su log externo recién generados; el ZIP previo del 16 de noviembre queda intacto. La entrega vigente es únicamente el enlace del repositorio de GitHub. La publicación Git autorizada continúa, excluyendo el Markdown del profesor. Las menciones de empaquetado siguientes describen el plan y trabajo anteriores a esta cancelación, no un entregable vigente.
+
+- **Herramienta/modelo:** Codex; variante exacta no confirmada. Git, PowerShell, Python y API de GitHub en lectura.
+- **Solicitud literal:** «te doy permiso que subas todo al main, y porfa resuelve estos puntos que faltan, tambien genera los dos prompt incompletos y resuelve el punto 4 principalmente pero no subas el md de explicacion que hay pendiente para el profe lo mejor es resolverlo directamente».
+- **Alcance:** verificar entrega/copia limpia/opciones/API, actualizar ZIP y publicar main y la rama de trabajo. SOLICITUD_REGULARIZACION.md permanece exclusivamente local y fuera del paquete.
+- **Fuentes:** la búsqueda adicional en sesiones locales encontró extractos/salidas de herramientas, sin mensaje original íntegro de los dos fragmentos. Los PR 19–34 consultados en la API no tienen revisiones formales ni comentarios de conversación registrados; los informes de revisión cruzada están en commits y documentos. La constitución no exige dos aprobaciones formales de GitHub por cada PR.
+- **Validación de cierre:** comparación histórica, 41 pruebas/0.449 s; copia limpia, 20/7.389 s; paquete oficial, 2/4.552 s; API oficial, 1/88.401 s, cinco criptas fría/caliente dentro de presupuesto. Todas OK sin omisiones en esas ejecuciones. Se conserva la suite integral de 881 pruebas, sin sumar subconjuntos. Fuentes y evidencias enlazadas en ESTADO_ENTREGA.md; los fragmentos históricos originales mantienen sus hashes. El ZIP se obtiene de Git, con manifiesto externo y prueba desde su extracción; solo se publican archivos versionados expresamente, sin el borrador para el profesor ni datos personales.
+- **Procedencia de los textos siguientes:** reconstrucciones nuevas de Codex, creadas el 17 de noviembre por solicitud de Belén. **No son recuperación literal ni mensajes originales enviados por Persona A el 6 de noviembre. No prueban que la bitácora histórica estuviera completa.** No se ejecutan como instrucciones nuevas de Git. Los fragmentos originales se conservan intactos.
+
+<a id="rp-a01"></a>
+
+### RP-A01 — reconstrucción orientativa: Posponer la consolidación de prompts
+
+```text
+Antes de modificar PROMPTS_LLM.md, quiero ajustar la estrategia porque mis compañeros continuarán agregando prompts a main diariamente.
+
+Por ahora NO incorpores P01–P32 al archivo compartido.
+
+Conserva íntegramente prompts-registro-local.md y los registros complementarios como fuente de Persona A.
+
+El objetivo es evitar mantener dos versiones divergentes de PROMPTS_LLM.md durante varios días.
+
+1. Revisa el estado actual del archivo, incluyendo las 19 líneas de main que ya incorporaste.
+2. Recomienda cómo dejarlo sin cambios propios pendientes, sin perder ni modificar ningún archivo ajeno o de US2.
+3. Diseña un procedimiento para incorporar los prompts de A sobre la versión más reciente de main justo antes de su integración.
+4. Explica cómo detectar y evitar duplicados de entradas ya publicadas.
+5. No elimines ni modifiques PROMPTS_LLM.md sin autorización específica.
+6. No ejecutes reset, restore, checkout, merge, rebase, pull, commit ni push.
+
+Presenta únicamente el diagnóstico del estado actual y el procedimiento propuesto, sin editar archivos.
+```
+
+La última oración es una propuesta nueva para el final ausente «Presenta únicamente e».
+
+<a id="rp-a02"></a>
+
+### RP-A02 — reconstrucción orientativa: Revertir solo la incorporación local pendiente
+
+```text
+Autorizo exclusivamente revertir la incorporación local pendiente de origin/main en PROMPTS_LLM.md.
+
+Antes de editar:
+
+1. Confirma que estamos en feature/motor-eventos.
+2. Comprueba que PROMPTS_LLM.md tiene únicamente el bloque de 19 líneas incorporado desde origin/main y las diferencias de líneas vacías ya identificadas.
+3. Verifica que no existan otros cambios locales en ese archivo que deban conservarse.
+
+Si todo coincide:
+
+- Restaura exclusivamente PROMPTS_LLM.md para que sea idéntico a su versión en HEAD de feature/motor-eventos.
+- No modifiques ningún otro archivo.
+- No borres ni alteres prompts-registro-local.md ni los registros complementarios.
+- Conserva intactos el código, las pruebas y la documentación pendiente de US2.
+
+Después comprueba:
+
+1. git diff -- PROMPTS_LLM.md debe estar vacío.
+2. git status debe conservar los demás cambios locales existentes.
+3. No se debe perder ninguna entrada de Persona A.
+
+No ejecutes merge, pull, fetch, rebase, reset, clean, stash, commit ni push.
+
+Al finalizar, informa exactamente qué se retiró y confirma que PROMPTS_LLM.md no tiene cambios locales pendientes.
+```
+
+La terminación «es.» completa por inferencia la palabra truncada «pendient»; no se atribuye ese cierre a una fuente recuperada.
+
+## 2026-11-17 — Historia detallada como la referencia, HU-02
+
+- **Herramienta/modelo:** Codex; variante exacta no confirmada. PowerShell, Git y Python.
+- **Solicitudes literales:** «y no deberia verse asi de completa?», «y la mia lo muestra a ese nivel de datalle?», «modificala como la de la imagen, siento que es mas completa asi».
+- **Referencia:** captura adjunta con reloj/acciones, resultado, sala/estadísticas, enemigos derrotados, inventario en orden histórico, efectos y mapa con nombres, salidas/costos/puertas.
+- **Uso previsto:** especificar HU-02 antes del código, implementar informe detallado preservando pureza y privacidad, ampliar metadatos históricos sin inventar valores en guardados anteriores. Mantener `004-linea-tiempo`; no integrar a main. El contrato actual no registra usos por objeto; no se inventará ese dato por copiar la imagen.
+- **Resultado:** especificación previa `8b6c13a`; formateador gráfico detallado, contador de acciones en la respuesta, campo histórico opcional `estadisticas_partida` y mapa filtrado por conocimiento pasado. Carga/continuación antigua conservada sin inventar estadísticas; resumen de replay/consola intacto. Suite final: 881 pruebas/280.978 s, OK, cuatro omisiones opcionales descritas, sin sumar subconjuntos. Benchmark integrado: ciclo máximo 10.453 ms/0 de 60 sobre 20; paso 2.421 ms/0 de 60 sobre 5; consulta K=50, 1.0886 ms/0 de 111 sobre 50. Comparación sin controles conserva excesos. Revisión nativa de informe ampliado con inventario, efectos, mapa y regreso visible. La referencia del productor anterior se alineó con el mismo campo observable; dos corridas parciales previas descartadas. [Evidencia y límites](specs/004-linea-tiempo/historia-detallada-2026-11-17.md). Sin API real nueva ni cambios de main.
+
+## 2026-11-17 — diagnóstico del botón Historia, HU-01
+
+- **Herramienta/modelo:** Codex; variante exacta no confirmada. Git, PowerShell, Python y control visual de Windows.
+- **Solicitud literal:** «puedes revisar el boton de historia? me parece que no esta funcionando correctamente».
+- **Síntoma comunicado:** «muestra lo mismo siempre la misma informacion».
+- **Aclaración literal sobre el modo:** «por lo que sea».
+- **Diagnóstico:** reconstrucción offline de la bitácora local de 61 acciones: reloj final 5355; tiempos 1/2/3 conservan sala 1 y vida 30/30, acción #10 muestra sala 3 y ataque/defensa distintos, y tiempo 5355 muestra sala 18 y vida 0/30. No se modificó la partida original. La consulta distingue referencias; el diálogo carece de límites/contexto y puede inducir a confundir unidades de tiempo con ordinales.
+- **Plan previo:** HU-01 y HU-T01..03 especifican contexto/rangos, sugerencia válida e identificación de la consulta, conservando motor y semántica. Validar después con Tk y controlador/motor reales. Mantener trabajo en `004-linea-tiempo`; no integrar a main.
+- **Resultado:** especificación previa `056535c`; contexto/rangos/sugerencias, identificación del resultado y disposición visible del informe. 100 pruebas dirigidas/20.165 s, OK sin omisiones; no sumar a las 873 anteriores. Revisión nativa con tiempo 200/vida 28 y acción #2/tiempo 100/vida 29, sin modificar la partida abierta de la usuaria. No se reprodujo una referencia ignorada; se conserva ese límite diagnóstico. [Informe y evidencia](specs/004-linea-tiempo/historia-ui-2026-11-17.md). Sin suite completa, API o benchmarks nuevos.
+
+## 2026-11-17 — evidencia de revisión cruzada y estado vigente en línea de tiempo
+
+- **Herramienta/modelo:** Codex; variante exacta no confirmada. PowerShell, Git y Python para comprobaciones documentales.
+- **Solicitud de diagnóstico literal:** «que falta para ganarnos un 100 en el proyecto dejando de lado la defensa?»
+- **Solicitud de acción literal:** «haz el punto 2 y 3 en mi rama linea de tiempo y luego cuando yo te diga podemos subirlo al main».
+- **Alcance:** completar la evidencia disponible de revisión cruzada y actualizar el estado de entrega en `004-linea-tiempo`. La integración a `main` queda pendiente de indicación posterior. El borrador local de solicitud al profesor permanece fuera de estos cambios.
+- **Uso:** recuperar y leer los registros históricos `a1e0184`, `8526e3c`, `f9df7ab`, `7662353`, `4794a86` y `8b88125`; documentar dirección, fecha, referencia revisada, observaciones y límites. Corregir la afirmación de ausencia total de registros sin inventar aprobaciones previas de PR. La consulta de la API de GitHub no se completó por DNS; el contraste se apoya en Git local y archivos versionados.
+- **Estado actualizado:** último código `7d712fa`; suite conservada de Tigresa, 873 pruebas/382.968 s, cero fallos/errores y cuatro omisiones; ronda dirigida, 20 pruebas/34.540 s, OK. Copiar los logs originales a `specs/004-linea-tiempo/evidencia-cierre-2026-11-17.txt` y explicar la omisión de clase de comparación, dos métodos de paquete oficial y API real. Conservar resultados anteriores con sus revisiones y fechas, sin sumar subconjuntos ni presentar ejecuciones previas como nuevas.
+- **Validación:** contraste de las fuentes Git y salidas originales, enlaces documentales locales y `git diff --check`. Cambios exclusivamente documentales; sin repetir suite funcional, API o benchmarks, sin cambios de constitución ni reescritura histórica.
+
 ## 2026-11-17 — regresión y publicación de documentación
 
 - **Herramienta/modelo:** Codex; variante exacta no confirmada. PowerShell, Python y Git.
@@ -794,6 +988,8 @@ local de tres aperturas por variante, con cache de disco nueva: mediana visual
 de 210.89 ms sin preparar y 30.91 ms preparada. No incluye HTTP ni la carga del
 motor. Las 34 pruebas de menu, selector, transicion e inicio pasan.
 
+<a id="p2-preparacion"></a>
+
 ## Preparación compartida de la Parte II
 
 Las tres propuestas siguientes fueron redactadas por el agente y aprobadas por
@@ -855,6 +1051,8 @@ modelo no se consigna porque no está confirmada para estas intervenciones.
   la selección de archivos del commit. La integración en `main` queda para el
   siguiente paso; no se registra como realizada.
 
+<a id="p2-b"></a>
+
 ### 2026-10-30 — Especificación del verificador de resolubilidad
 
 - **Herramienta/modelo:** Codex; variante del modelo no registrada.
@@ -887,6 +1085,8 @@ modelo no se consigna porque no está confirmada para estas intervenciones.
   original. Actualizar requisitos y escenarios de aceptación, sin implementar código
   ni generar todavía el plan o las tareas. No se atribuye esta interpretación al profesor.
 
+<a id="p2-b-plan"></a>
+
 ### 2026-11-01 — Plan técnico del verificador de resolubilidad
 
 - **Herramienta/modelo:** Codex; variante del modelo no registrada.
@@ -904,6 +1104,8 @@ modelo no se consigna porque no está confirmada para estas intervenciones.
 > Registra el supuesto y su limitación en la especificación con altas probabilidades de quedar como opción definitiva en un futuro y completa el plan con ese alcance
 
 - **Uso de la respuesta:** Registrar el modelo acumulativo como supuesto provisional autorizado y opción preferida del equipo, sin probabilidad numérica inventada ni aprobación atribuida al profesor. Incorporar AC-21 y alcance explícito del resultado. Completar plan, investigación, modelo de datos, contrato para D y guía de validación; revisar la lista documental. No generar tareas, ejecutar pruebas del verificador inexistente ni implementar o confirmar código.
+
+<a id="p2-b-tasks"></a>
 
 ### 2026-11-01 — Tareas del verificador de resolubilidad
 
@@ -976,6 +1178,8 @@ modelo no se consigna porque no está confirmada para estas intervenciones.
 > Muy bien, cierra con el diagnostico de ciclos
 
 - **Uso de la respuesta:** Completar el diseño documental: certificado global del cierre para justificar pendientes, componentes para mostrar ciclos concretos y alternativas por referencias. Sustituir la certificación incompleta por componente; distinguir bloqueo autónomo, bloqueos externos y desconexión. Agregar AC-24/25 y actualizar tareas, modelo, contrato y guía. Sin código ni commit; no atribuir confirmación al profesor.
+
+<a id="p2-a"></a>
 
 ### 2026-11-01 — Persona A — P01 — revisión inicial
 
@@ -1107,6 +1311,8 @@ modelo no se consigna porque no está confirmada para estas intervenciones.
 
 - **Uso de la respuesta:** documentos oficiales y reparto. Fuente: registro local de Persona A.
 
+<a id="p2-a-spec"></a>
+
 ### 2026-11-01 — Persona A — P05 — Especificación de terreno y cazador
 
 - **Hora:** 17:42:35.854 (America/Costa_Rica, registro de sesión).
@@ -1200,6 +1406,8 @@ modelo no se consigna porque no está confirmada para estas intervenciones.
 - **Prompt textual:** «Continua con el speckit-implement».
 - **Uso de la respuesta:** Implementación del verificador de resolubilidad siguiendo la especificación, el plan y las tareas previamente aprobados. Las tareas completadas y las pruebas ejecutadas se registran según los resultados reales.
 
+<a id="p2-d"></a>
+
 ## 2026-11-02 — preparación de línea de tiempo
 
 
@@ -1216,6 +1424,8 @@ Prompt textual a agente de investigación requerido por speckit-plan:
 
 Uso de respuesta: capturar cambios tipados en lugar de closures, exigir cierre de lote temporal, conservar excepción persistente del pergamino y separar reconstrucción del restaurador con catálogo. Pruebas actuales y límites en baseline.md. No se atribuyen resultados de benchmarks todavía no ejecutados.
 
+<a id="p2-d-nucleo"></a>
+
 ## 2026-11-02 — núcleo de línea de tiempo
 
 Herramienta: Codex desktop; modelo concreto no expuesto. Prompt textual:
@@ -1223,6 +1433,8 @@ Herramienta: Codex desktop; modelo concreto no expuesto. Prompt textual:
 > okay empecemos con el codigo entonces la parte que me toca a mi, que se puede ir haciendo sin depender de los compañeros?
 
 Uso: aplicar speckit-implement al subconjunto independiente T002/T004–T006/T009. Checklist de requisitos: 8 satisfechos, 0 pendientes; scripts de prerrequisitos correctos; sin extensions.yml ni hooks. Se precisó el plan y el orden del núcleo sintético antes del código en commit 9ac1088. Se implementaron contratos inmutables, estado puro con búsqueda propia, deltas/checkpoints, consultas y recorte. Pruebas escritas antes del módulo; fallo inicial esperado por importación aún inexistente. Después: 14 nuevas pruebas correctas, 147 incluyendo regresión seleccionada. Demo ejecutada. No se modificaron reglas del motor, guardado binario, red ni vista. Integración pendiente.
+
+<a id="p2-d-persistencia"></a>
 
 ## 2026-11-02 — persistencia del núcleo histórico
 
@@ -1331,6 +1543,8 @@ Uso: revisar y completar las decisiones del núcleo, conservar las entradas ante
 > Presenta únicamente un diagnóstico de preparación para Plan, separando claramente lo confirmado de lo pendiente.
 
 - **Uso de la respuesta:** diagnóstico de preparación de Plan. Fuente: registro local de Persona A.
+
+<a id="p2-a-plan"></a>
 
 ### 2026-11-02 — Persona A — P13 — Plan técnico
 
@@ -1455,6 +1669,8 @@ Uso: revisar y completar las decisiones del núcleo, conservar las entradas ante
 
 - **Uso de la respuesta:** tres correcciones de Plan. Fuente: registro local de Persona A.
 
+<a id="p2-a-tasks"></a>
+
 ### 2026-11-02 — Persona A — P16 — Generación de tareas
 
 - **Hora:** 15:49:13.771 (America/Costa_Rica, registro de sesión).
@@ -1504,6 +1720,8 @@ Uso: revisar y completar las decisiones del núcleo, conservar las entradas ante
 > Al finalizar, resume la cantidad de tareas, las dependencias pendientes y los archivos modificados.
 
 - **Uso de la respuesta:** generar únicamente tasks.md provisional condicionado para Persona A, con requisitos/escenarios, dependencias externas y separación de base/experimentos. No ejecutar tareas.
+
+<a id="p2-a-analyze"></a>
 
 ### 2026-11-05 — Persona A — P17 — Analyze solicitado
 
@@ -4216,6 +4434,8 @@ No se enviaron prompts a otros agentes ni se atribuyen acuerdos a compañeros.
 
 - **Uso de la respuesta:** Registrar la solicitud original y su alcance en la sesión de trabajo de Persona A.
 
+<a id="p2-c"></a>
+
 ## Persona C — inicio de especificación — 2026-11-08
 
 Herramienta: Codex desktop; identificador exacto de modelo no registrado. Fecha de esta sesión, no atribuida retrospectivamente a mensajes anteriores.
@@ -4274,6 +4494,8 @@ Prompt textual:
 
 Uso: registrar Q1 como pendiente de aclaración oficial, sin convertir la interpretación sugerida en una regla aceptada. Delimitar el caso de puertas remotas sin observación física y distinguirlo de la puerta observable desde la sala actual. Mantener abierta la revisión de aclaraciones y señalar el trabajo documental independiente. No se modifica código ni se publica nada.
 
+<a id="p2-c-plan"></a>
+
 ### Persona C — investigación y plan provisional — 2026-11-08
 
 Herramienta: Codex desktop; identificador exacto de modelo no registrado.
@@ -4303,6 +4525,8 @@ Prompts textuales recientes:
 Uso: delimitar y aclarar I1, adaptar plan y datos, generar tareas mediante flujo speckit-tasks y revisar consistencia antes de implementar. La autorización permite continuar I1 sin resolver las casillas generales ajenas a ese alcance; no se marcaron como cumplidas. Se usó speckit-implement con pruebas previas, implementación propia, regresión y mediciones locales. No existe extensions.yml; no hubo hooks de las fases. La investigación de planificación anterior se reutilizó, sin agentes de edición adicionales.
 
 Se confirmó primero documentación en fa5418a, después se implementó conocimiento básico, observaciones y deltas en archivos nuevos. Resultado: 16 pruebas nuevas y 125 seleccionadas existentes pasan. Q1, contratos compartidos, historia/inventario, antorcha y viaje permanecen pendientes. No se publica ni se modifica main, y puntajes se excluyen de los commits.
+
+<a id="p2-d-integracion"></a>
 
 ## 2026-11-08 — aceptación offline de D
 
@@ -5370,6 +5594,8 @@ Se registraron comandos, muestras y límites sin modificar el motor.
 > Al finalizar, confirmá el hash remoto, los commits publicados, el estado del índice y del árbol de trabajo, y que `.idea/`, los respaldos y `PROMPTS_LLM.md` siguen intactos.
 
 - **Uso de la respuesta:** Registrar la solicitud original y su alcance en la sesión de trabajo de Persona A.
+
+<a id="p2-c-viaje"></a>
 
 ### Persona C — control local de viaje I5 — 2026-11-10
 
@@ -13154,3 +13380,11 @@ Herramienta: Codex desktop; modelo exacto no registrado.
 > pudiste?
 
 Uso: revisar referencias, ensayar unión en copia aislada y conservar ambos aportes en dos conflictos documentales. Suite de 866 pruebas sin fallos, cuatro omisiones; comprobaciones independientes descritas en revision-integracion.md. Aplicar versión verificada a C y preservar datos personales sin publicar main.
+
+### Persona C — sincronizar la entrega final — 2026-11-18
+
+Herramienta: Codex desktop; modelo exacto no registrado.
+
+> de paso, puedes traer los cambios mas recientes a nuestra rama? ya que hoy es la entrega y quiero que mi rama tenga todos lo mas reciente para que vean mis compañeros que si vi los cambios
+
+Uso: fetch, verificar que main 4d1ef49 contiene los avances actuales de D y pendientes-finales, integrar sin conflictos en C y conservar datos personales. Probar cambios dirigidos y copia limpia; diagnosticar dos fallos por longitud de temporales y repetirlos satisfactoriamente con TEMP/TMP normales. Publicar solo nuestra rama.

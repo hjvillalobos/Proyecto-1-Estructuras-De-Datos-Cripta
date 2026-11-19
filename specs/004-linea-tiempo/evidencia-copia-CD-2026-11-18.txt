@@ -1,0 +1,25 @@
+test_ganar_guardar_retroceder_cargar_y_replay_en_criptas_nuevas (tests.test_partida_generada.PartidaGeneradaTest.test_ganar_guardar_retroceder_cargar_y_replay_en_criptas_nuevas) ... ok
+test_fr008_fr020_argumentos_invalidos_antes_de_abrir_sesion (tests.test_modos_historia.ModosHistoriaTest.test_fr008_fr020_argumentos_invalidos_antes_de_abrir_sesion) ... ok
+test_fr013_ac18_ac21_no_completada_muestra_causa_y_alcance_sin_diagnostico (tests.test_modos_historia.ModosHistoriaTest.test_fr013_ac18_ac21_no_completada_muestra_causa_y_alcance_sin_diagnostico) ... ok
+test_fr013_detiene_el_replay_cuando_no_hay_revisiones_posteriores (tests.test_modos_historia.ModosHistoriaTest.test_fr013_detiene_el_replay_cuando_no_hay_revisiones_posteriores) ... ok
+test_fr013_fr014_fr017_replay_completo_y_hasta_sin_vista (tests.test_modos_historia.ModosHistoriaTest.test_fr013_fr014_fr017_replay_completo_y_hasta_sin_vista) ... ok
+test_fr013_replay_respeta_carga_y_retroceso_posteriores (tests.test_modos_historia.ModosHistoriaTest.test_fr013_replay_respeta_carga_y_retroceso_posteriores) ... ok
+test_fr015_delega_la_version_y_el_almacen_de_datos_offline (tests.test_modos_historia.ModosHistoriaTest.test_fr015_delega_la_version_y_el_almacen_de_datos_offline) ... ok
+test_fr015_descarga_rechaza_llaves_si_cambia_la_version (tests.test_modos_historia.ModosHistoriaTest.test_fr015_descarga_rechaza_llaves_si_cambia_la_version) ... ok
+test_fr015_fr016_r4_cli_offline_con_verificador_real (tests.test_modos_historia.ModosHistoriaTest.test_fr015_fr016_r4_cli_offline_con_verificador_real) ... ok
+test_fr015_no_confunde_modulo_ausente_con_no_resoluble (tests.test_modos_historia.ModosHistoriaTest.test_fr015_no_confunde_modulo_ausente_con_no_resoluble) ... ok
+test_fr015_paquete_descargado_se_verifica_offline (tests.test_modos_historia.ModosHistoriaTest.test_fr015_paquete_descargado_se_verifica_offline) ... ok
+test_fr015_reporte_negativo_expone_frontera_ubicacion_y_ciclo (tests.test_modos_historia.ModosHistoriaTest.test_fr015_reporte_negativo_expone_frontera_ubicacion_y_ciclo) ... ok
+test_fr015_verificar_no_crea_juego_ni_catalogo_ni_vista (tests.test_modos_historia.ModosHistoriaTest.test_fr015_verificar_no_crea_juego_ni_catalogo_ni_vista) ... ok
+test_fr016_forzar_no_inicia_con_paquete_sin_llaves (tests.test_modos_historia.ModosHistoriaTest.test_fr016_forzar_no_inicia_con_paquete_sin_llaves) ... ok
+test_fr016_no_resoluble_solo_inicia_con_forzar (tests.test_modos_historia.ModosHistoriaTest.test_fr016_no_resoluble_solo_inicia_con_forzar) ... ok
+test_fr017_motor_actual_reproduce_sin_vista_y_explica_si_falta_historia (tests.test_modos_historia.ModosHistoriaTest.test_fr017_motor_actual_reproduce_sin_vista_y_explica_si_falta_historia) ... ok
+test_denso_conserva_acceso_directo (tests.test_almacen_salas.AlmacenSalasTest.test_denso_conserva_acceso_directo) ... ok
+test_ids_grandes_no_reservan_huecos (tests.test_almacen_salas.AlmacenSalasTest.test_ids_grandes_no_reservan_huecos) ... ok
+test_radix_limites_de_digitos_y_huecos (tests.test_almacen_salas.AlmacenSalasTest.test_radix_limites_de_digitos_y_huecos) ... ok
+test_rastro_en_ids_grandes_y_empate (tests.test_almacen_salas.AlmacenSalasTest.test_rastro_en_ids_grandes_y_empate) ... ok
+
+----------------------------------------------------------------------
+Ran 20 tests in 6.324s
+
+OK

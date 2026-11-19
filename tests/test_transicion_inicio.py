@@ -53,6 +53,7 @@ class TestTransicionInicio(unittest.TestCase):
         self.assertTrue(self.v.canvas.find_withtag("jugador"))
 
     def test_cargar_y_reintentar_reemplaza_la_capa_sin_acumularla(self):
+        self.v._portada_mostrada = True
         anterior = self.iniciar("cargar")
         nuevo = MenuInicio(self.v, Mock(), Mock())
         self.v.root.after(20, lambda: nuevo.elegir("salir"))

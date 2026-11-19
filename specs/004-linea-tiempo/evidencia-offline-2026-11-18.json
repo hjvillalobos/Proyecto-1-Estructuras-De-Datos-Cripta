@@ -1,0 +1,49 @@
+[
+  {
+    "id": "cripta-02",
+    "dictamen": "resoluble",
+    "version": "52532a77ee04",
+    "salas_cargadas": 20,
+    "posicion": 1,
+    "reloj": 0,
+    "accion_ordinaria": "esperar aceptado",
+    "solicitudes_red": 0
+  },
+  {
+    "id": "cripta-03",
+    "dictamen": "resoluble",
+    "version": "f9186ac25124",
+    "salas_cargadas": 40,
+    "posicion": 1,
+    "reloj": 0,
+    "accion_ordinaria": "esperar aceptado",
+    "solicitudes_red": 0
+  },
+  {
+    "id": "cripta-04",
+    "dictamen": "resoluble",
+    "version": "7074a17814ad",
+    "salas_cargadas": 50,
+    "posicion": 1,
+    "reloj": 0,
+    "accion_ordinaria": "esperar aceptado",
+    "solicitudes_red": 0
+  },
+  {
+    "id": "cripta-05",
+    "dictamen": "no_resoluble",
+    "version": "48bfa3b75055",
+    "inicio_normal": "bloqueado correctamente por dictamen no resoluble",
+    "solicitudes_red": 0
+  },
+  {
+    "id": "cripta-06",
+    "dictamen": "resoluble",
+    "version": "f9ed9afa683d",
+    "salas_cargadas": 300,
+    "posicion": 141,
+    "reloj": 0,
+    "accion_ordinaria": "esperar aceptado",
+    "solicitudes_red": 0
+  }
+]

@@ -1,5 +1,24 @@
 # Recursos visuales
 
+## Tigresa seleccionable — 2026-11-17
+
+`tigresa.png`, `tigresa_acciones.png`, `tigresa_beber.png` y
+`tigresa_antorcha.png` se crearon con ImageGen integrado tomando como referencia
+las cuatro hojas del jugador original. Son PNG RGBA locales: aventurera adulta,
+cabello cobrizo, ojos verdes y el mismo traje de tigre ilustrado. El arte original
+se conserva. La seleccion solo afecta a la vista y se recuerda como preferencia
+local en `datos_generados/personaje_visual.json`; cargar una partida o reproducir
+un replay utiliza la apariencia elegida actualmente, sin cambiar sus reglas.
+
+Hay 152 composiciones de cada personaje (304 en total). Las de la tigresa estan
+en `composiciones/tigresa/`; `python -m utilidades.preparar_visuales` regenera ambos
+paquetes. Se mantienen los anclajes y las ocho combinaciones de coraza, daga y
+antorcha, ambas orientaciones y bebida/antidoto. Carrera, ataque y caida comparten
+atlas decodificados con un limite de dos, ademas de las caches Tk acotadas.
+
+Prompts, alcance y verificaciones en
+[tigresa-2026-11-17.md](../../specs/004-linea-tiempo/tigresa-2026-11-17.md).
+
 ## Enemigos VI-01 — 2026-11-14
 
 Generados con ImageGen integrado, con fondo transparente real, sin sobrescribir recursos anteriores:

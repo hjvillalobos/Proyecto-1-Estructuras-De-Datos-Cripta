@@ -48,38 +48,58 @@ def sonorizar_botones(contenedor, sonidos):
 
 
 class Sonidos:
-    def __init__(self, reproductor=winsound):
+    def __init__(self, reproductor=winsound, root=None):
         self.reproductor = reproductor
         self.disponible = reproductor is not None
         self.activo = self.disponible and os.environ.get("CRIPTA_SIN_AUDIO") != "1"
         self._carpeta = None
         self._reprodujo = False
         self._cerrado = False
+        self._musica_inicio = False
+        self.root = root
+        self._musica_partida = None
+        self._musica_no_disponible = False
+        self._en_partida = False
+        self._peligro = False
 
     def habilitar(self, activo):
         self.activo = bool(activo) and self.disponible and not self._cerrado
         if not self.activo:
             self._detener()
+            self.detener_partida()
+        elif self._en_partida:
+            self.actualizar_partida(self._peligro)
 
     def reproducir(self, efecto):
+        if efecto in ("inicio", "victoria", "derrota"):
+            self._en_partida = False
+            self.detener_partida()
         if not self.activo or self._cerrado or efecto not in _NOTAS:
             return
+        if self._musica_inicio and efecto in ("inicio", "boton"):
+            return
+        if efecto == "inicio":
+            self._preparar_partida()
         try:
             if self._carpeta is None:
                 self._carpeta = TemporaryDirectory(prefix="cripta-audio-")
             ruta = Path(self._carpeta.name) / (efecto + ".wav")
             if not ruta.exists():
                 self._crear_efecto(ruta, _NOTAS[efecto], efecto)
-            self.reproductor.PlaySound(str(ruta), self.reproductor.SND_FILENAME
-                                       | self.reproductor.SND_ASYNC | self.reproductor.SND_NODEFAULT)
+            flags = self.reproductor.SND_FILENAME | self.reproductor.SND_ASYNC | self.reproductor.SND_NODEFAULT
+            if efecto == "inicio":
+                flags |= self.reproductor.SND_LOOP
+            self.reproductor.PlaySound(str(ruta), flags)
             self._reprodujo = True
+            self._musica_inicio = efecto == "inicio"
         except (OSError, RuntimeError, ValueError):
             self.activo = False
             self._detener()
 
     @staticmethod
     def _crear_efecto(ruta, notas, efecto=""):
-        preparado = Path(__file__).parent / "recursos" / "sonidos" / (efecto + ".wav")
+        nombre = "bajo_la_piedra" if efecto == "inicio" else efecto
+        preparado = Path(__file__).parent / "recursos" / "sonidos" / (nombre + ".wav")
         if notas == _NOTAS.get(efecto) and preparado.is_file():
             shutil.copyfile(preparado, ruta)
             return
@@ -131,6 +151,7 @@ class Sonidos:
             archivo.writeframes(muestras.tobytes())
 
     def _detener(self):
+        self._musica_inicio = False
         if self._reprodujo:
             try:
                 self.reproductor.PlaySound(None, 0)
@@ -138,9 +159,38 @@ class Sonidos:
                 pass
             self._reprodujo = False
 
+    def detener_inicio(self):
+        if self._musica_inicio:
+            self._detener()
+
+    def _preparar_partida(self):
+        if self.root is None or self._musica_partida is not None or self._musica_no_disponible:
+            return
+        try:
+            from vista.musica_partida import MusicaPartida
+            self._musica_partida = MusicaPartida(self.root)
+        except (ImportError, OSError, RuntimeError):
+            self._musica_no_disponible = True
+
+    def actualizar_partida(self, peligro):
+        self.detener_inicio()
+        self._en_partida = True
+        self._peligro = bool(peligro)
+        if self.activo and not self._cerrado:
+            self._preparar_partida()
+            if self._musica_partida is not None:
+                self._musica_partida.actualizar(self._peligro)
+
+    def detener_partida(self):
+        if self._musica_partida is not None:
+            self._musica_partida.detener()
+
     def cerrar(self):
         self.habilitar(False)
         self._cerrado = True
+        if self._musica_partida is not None:
+            self._musica_partida.cerrar()
+            self._musica_partida = None
         if self._carpeta is not None:
             try:
                 self._carpeta.cleanup()

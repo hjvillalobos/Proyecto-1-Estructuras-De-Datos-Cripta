@@ -1,0 +1,68 @@
+[
+  {
+    "orden": 1,
+    "id": "cripta-02",
+    "nombre": "Catacumbas menores",
+    "resolubilidad": "resoluble",
+    "inicio_normal": true,
+    "detalle": "Verificación de cripta-02: resoluble\nVerificación por alcanzabilidad acumulada; no garantiza una trayectoria única si hay salidas sin regreso.\nOrden de llaves: itm_llave_bronce → itm_llave_negra",
+    "catalogo": "4b9e75a42be5",
+    "carga_motor": "correcta",
+    "version": "52532a77ee04",
+    "sala_inicial": 1,
+    "salas_con_contenido_offline": 20,
+    "solicitudes_red": 0
+  },
+  {
+    "orden": 2,
+    "id": "cripta-03",
+    "nombre": "Catacumbas medias",
+    "resolubilidad": "resoluble",
+    "inicio_normal": true,
+    "detalle": "Verificación de cripta-03: resoluble\nVerificación por alcanzabilidad acumulada; no garantiza una trayectoria única si hay salidas sin regreso.\nOrden de llaves: itm_llave_bronce → itm_llave_negra → itm_llave_hierro",
+    "catalogo": "4b9e75a42be5",
+    "carga_motor": "correcta",
+    "version": "f9186ac25124",
+    "sala_inicial": 1,
+    "salas_con_contenido_offline": 40,
+    "solicitudes_red": 0
+  },
+  {
+    "orden": 3,
+    "id": "cripta-04",
+    "nombre": "Catacumbas profundas",
+    "resolubilidad": "resoluble",
+    "inicio_normal": true,
+    "detalle": "Verificación de cripta-04: resoluble\nVerificación por alcanzabilidad acumulada; no garantiza una trayectoria única si hay salidas sin regreso.\nOrden de llaves: itm_llave_bronce → itm_llave_negra → itm_llave_hierro",
+    "catalogo": "4b9e75a42be5",
+    "carga_motor": "correcta",
+    "version": "7074a17814ad",
+    "sala_inicial": 1,
+    "salas_con_contenido_offline": 50,
+    "solicitudes_red": 0
+  },
+  {
+    "orden": 4,
+    "id": "cripta-05",
+    "nombre": "Cripta sellada",
+    "resolubilidad": "no_resoluble",
+    "inicio_normal": false,
+    "detalle": "Verificación de cripta-05: no resoluble\nVerificación por alcanzabilidad acumulada; no garantiza una trayectoria única si hay salidas sin regreso.\nLlave inaccesible itm_llave_hierro: sala 24\nLlave inaccesible itm_llave_negra: sala 23\nPuerta 7 E → 22: itm_llave_hierro\nPuerta 12 E → 24: itm_llave_negra\nPuerta 19 N → 20: itm_llave_negra\nCiclo (bloqueo circular autonomo): llave itm_llave_hierro → sala 24 → paso 26 → llave itm_llave_negra → sala 23 → paso 44 → sala 22 → paso 14 → llave itm_llave_hierro\n  Integrantes: llave itm_llave_negra, paso 26, sala 24, llave itm_llave_hierro, paso 14, sala 22, paso 44, sala 23, paso 46",
+    "catalogo": "4b9e75a42be5",
+    "error_carga": "DatosNoDisponibles: Offline: faltan datos para sala 1 de cripta-05. Carpeta consultada: C:\\Users\\Belén\\Documents\\2026\\Datos\\Proyecto\\Proyecto-1-Estructuras-De-Datos-Cripta\\.cache\\pruebas-personajes\\offline-verificado"
+  },
+  {
+    "orden": 5,
+    "id": "cripta-06",
+    "nombre": "Cripta de referencia",
+    "resolubilidad": "resoluble",
+    "inicio_normal": true,
+    "detalle": "Verificación de cripta-06: resoluble\nVerificación por alcanzabilidad acumulada; no garantiza una trayectoria única si hay salidas sin regreso.\nOrden de llaves: itm_llave_bronce → itm_llave_hierro → itm_llave_plata → itm_llave_negra",
+    "catalogo": "4b9e75a42be5",
+    "carga_motor": "correcta",
+    "version": "f9ed9afa683d",
+    "sala_inicial": 141,
+    "salas_con_contenido_offline": 300,
+    "solicitudes_red": 0
+  }
+]

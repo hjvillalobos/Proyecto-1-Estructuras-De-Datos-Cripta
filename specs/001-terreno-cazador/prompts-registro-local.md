@@ -1,5 +1,7 @@
 # Registro local verificable de prompts — Persona A
 
+**Actualización del 17 de noviembre de 2026:** las dos reconstrucciones orientativas solicitadas por Belén están en `PROMPTS_LLM.md`, entrada de cierre, identificadas como RP-A01/RP-A02. Son redacciones nuevas; los fragmentos originales de este registro permanecen intactos y no se presentan como recuperados.
+
 **Consolidado:** 2026-11-05, America/Costa_Rica. **Herramienta:** aplicación Codex en todas las entradas; modelo exacto no confirmado. **Destino posterior:** PROMPTS_LLM.md, únicamente con autorización y preservando entradas ajenas. No se ha realizado ese traslado.
 
 ## Procedencia, fechas y completitud

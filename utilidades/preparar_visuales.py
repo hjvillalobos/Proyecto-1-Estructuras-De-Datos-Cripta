@@ -32,10 +32,10 @@ def reducir_cuadros(cuadros, tamano, invertir=False):
     return resultado
 
 
-def main():
+def preparar_personaje(personaje="jugador"):
     if Image is None:
         raise SystemExit("Se necesita Pillow para generar las composiciones.")
-    recursos = RecursosGraficos(None)
+    recursos = RecursosGraficos(None, personaje=personaje)
     preparadas = recursos._preparadas
     preparadas.habilitada = False
     for coraza, daga, antorcha in product((0, 1), repeat=3):
@@ -63,7 +63,13 @@ def main():
             reducido.thumbnail((290, alto), Image.Resampling.LANCZOS)
             preparadas.guardar(("bebida", alto, *opciones), reducido)
     archivos = list(preparadas.carpeta.glob("*.png"))
-    print(f"{len(archivos)} composiciones; {sum(p.stat().st_size for p in archivos)/1e6:.2f} MB")
+    print(f"{personaje}: {len(archivos)} composiciones; {sum(p.stat().st_size for p in archivos)/1e6:.2f} MB")
+
+
+def main():
+    from vista.personajes import PERSONAJES
+    for personaje, _ in PERSONAJES:
+        preparar_personaje(personaje)
 
 
 if __name__ == "__main__":

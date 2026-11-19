@@ -1,8 +1,10 @@
 # CRIPTA
 
-Proyecto de Estructuras de Datos II, Parte II. Python 3.11 o superior, arquitectura MVC y estructuras de datos propias. Terreno/cazadores, mapa conocido/viaje, resolubilidad e historia están integrados en `004-linea-tiempo`.
+Proyecto de Estructuras de Datos II, Parte II. Python 3.11 o superior, arquitectura MVC y estructuras de datos propias. Terreno/cazadores, mapa conocido/viaje, resolubilidad e historia están integrados en la entrega de `main`, desarrollada en `004-linea-tiempo`.
 
 [Estado vigente y trazabilidad punto por punto](ESTADO_ENTREGA.md) · [Decisiones y mediciones](DECISIONES.md) · [Bitácora LLM](PROMPTS_LLM.md)
+
+Revisión del 18 de noviembre: replay con Tigre/Tigresa renderizados, datos offline de las cinco criptas disponibles y cuatro límites de procesamiento comprobados. [Resultados, mediciones y condiciones](specs/004-linea-tiempo/replay-offline-rendimiento-2026-11-18.md).
 
 ## Instalación desde una copia limpia
 
@@ -52,6 +54,8 @@ Al consultar el servicio el 15 de noviembre se publicaban cripta-02–06. Las do
 
 ## Acciones y archivos
 
+En la portada puedes elegir **Tigre** o **Tigresa**. La elección es visual y se recuerda localmente; ambos usan las mismas reglas y estadísticas. El replay usa la apariencia seleccionada al abrir su ventana: la apariencia no está guardada en el log de acciones. Se comprobó la misma grabación con ambos personajes, incluyendo retroceso y carga, con estado final idéntico y archivos originales intactos.
+
 En la GUI, **Replay** abre una ventana independiente con reproducción gráfica, pausa/continuar, velocidad y detener. Alternativa: `python main.py --offline .cache/entrega --replay-grafico datos_generados/partida.log` con datos compatibles. Lee el log al abrirlo; para incluir acciones posteriores hay que abrirlo de nuevo. `--replay` y `--hasta` conservan su modo sin vista. **Viajar** permite seleccionar una sala explorada o escribir su número en un diálogo temático; Cancelar, Escape o X conservan la partida. [Validación y límites](specs/004-linea-tiempo/replay-viaje-2026-11-15.md).
 
 Durante una partida gráfica, **Salir** permite continuar, reiniciar esa cripta, volver al menú o cerrar el juego. Escape o cerrar el diálogo conserva la partida; reiniciar requiere elección explícita y no sobrescribe guardados. El encabezado muestra el ID de cripta y una orientación del objetivo respetando el mapa conocido. La salida no tiene por qué ser la sala con mayor número: debes abrir su acceso con la llave correspondiente y atravesarlo. [Diagnóstico del recorrido por sala20, enemigos/daño y validación](specs/004-linea-tiempo/seguimiento-ux-2026-11-15.md).
@@ -59,6 +63,10 @@ Durante una partida gráfica, **Salir** permite continuar, reiniciar esa cripta,
 En consola: `mover N` (también S/E/O), `abrir E`, `atacar INSTANCIA`, `esperar`, `recoger INSTANCIA`, `usar INSTANCIA`, `equipar INSTANCIA`, `soltar INSTANCIA`, `inventario`, `mapa`, `ir a SALA`, `cancelar`, `retroceso`, `historia T`, `historia #K`, `guardar "archivo.bin"`, `cargar "archivo.bin"` y `salir`. La GUI ofrece los controles correspondientes y navegación del inventario. Cada enemigo/objeto se identifica por instancia.
 
 El viaje usa solo conocimiento del jugador y se detiene por llegada, enemigos, daño o falta de ruta. Cada paso es un movimiento ordinario. Historia consulta sin alterar la partida. Guardado binario v4 conserva estado, azar, historia y conocimiento; versiones antiguas incompatibles se rechazan explícitamente.
+
+Historia muestra reloj/acciones, resultado, estadísticas, inventario en orden histórico, efectos, enemigos y mapa con nombres/salidas/costos/puertas recordadas. Los guardados anteriores que no registraban derrotados/resultado histórico muestran «no registrado» para esos datos, sin sustituirlos por valores actuales.
+
+Para jugar o reproducir **offline**, descarga primero los datos completos y conserva las versiones de cripta y catálogo indicadas por el log o guardado. El modo offline no hace HTTP; informa los datos ausentes o incompatibles. Con los datos publicados comprobados, 02/03/04/06 cargan y 05 se bloquea correctamente por ser no resoluble. La existencia de 05 en el listado no significa que sea ganable.
 
 Los datos descargados están en `--datos-dir` (por defecto `.cache/cripta`, excluida de Git). Partidas, log de reproducción y puntajes normales están bajo `datos_generados/`; los nombres de guardado explícitos respetan la ruta indicada. `datos_generados/` se excluye de nuevas entregas Git: los guardados y puntajes son archivos personales creados al jugar. Conserva tus archivos antes de reemplazarlos. No borrar la copia de datos compatible necesaria para reproducir una partida.
 
@@ -83,8 +91,11 @@ python main.py --bench --subsistemas ciclo-historia --paquete .cache/entrega --c
 python main.py --bench --subsistemas terreno-cazador --salas 40 --repeticiones 3
 python main.py --bench --subsistemas resolubilidad --paquete .cache/entrega --cripta cripta-06 --repeticiones 10
 python main.py --bench --subsistemas historia --operaciones 5000 --salas 100 --repeticiones 5
+python main.py --bench --subsistemas bitacora --operaciones 100000 --repeticiones 5 --semilla 20261001
 Remove-Item Env:CRIPTA_SIN_AUDIO -ErrorAction SilentlyContinue
 ```
+
+`bitacora` compara el buffer circular real con una lista que desplaza los mensajes anteriores; valida el mismo sufijo de 20 y mide agregar y agregar/consultar, sin red ni vista. Informa memoria superficial de estructura/arreglo, excluyendo textos compartidos. La lista es una alternativa de medición, no el almacenamiento del juego. [Decisión, resultados y límites](DECISIONES.md).
 
 `parte-dos` incluye comparación pareada del heap anterior/optimizado con decisiones iguales, estrategias de rutas, puertas estables/cambiantes, ciclo con 30 cazadores y pasos sobre mapa conocido completo. La preparación queda fuera del intervalo medido. Las inyecciones sintéticas se identifican; no se presentan como población natural de la cripta. Los benchmarks no usan HTTP ni renderizado.
 
@@ -102,7 +113,7 @@ python -B -X utf8 -m unittest tests.test_criptas_api.TestPaqueteOficial -v
 
 El segundo comando requiere el paquete histórico completo de cuatro criptas; la API actual no garantiza conservar esos mapas. La suite ordinaria declara las omisiones cuando falta preparación. TEMP/TMP deben apuntar a una carpeta escribible. Las pruebas gráficas necesitan una sesión con Tk disponible.
 
-Resultado de presentación VI-01..05: **828 pruebas en 214.910 s, cero fallos/errores**, dos opciones omitidas (comparación histórica, aprobada previamente, y API real, repetida aparte: cinco criptas fría/caliente, 87.563 s, OK). Las 152 composiciones regeneradas conservan exactamente los píxeles anteriores y su carga preparada. [Auditoría y evidencia vigente](specs/004-linea-tiempo/visual-api-2026-11-14.md). Los resultados del fortalecimiento anterior se conservan en [sus muestras completas](specs/004-linea-tiempo/fortalecimiento-mediciones.json).
+Antecedente de presentación VI-01..05, 14 de noviembre: **828 pruebas en 214.910 s, cero fallos/errores**, dos opciones omitidas (comparación histórica, aprobada previamente, y API real, repetida aparte: cinco criptas fría/caliente, 87.563 s, OK). Las 152 composiciones regeneradas conservan exactamente los píxeles anteriores y su carga preparada. [Informe de ese corte](specs/004-linea-tiempo/visual-api-2026-11-14.md). La última suite integral y verificaciones posteriores están en ESTADO_ENTREGA.md; los conteos de subconjuntos no se suman. Los resultados del fortalecimiento anterior se conservan en [sus muestras completas](specs/004-linea-tiempo/fortalecimiento-mediciones.json).
 
 ## Proceso y documentación
 

@@ -1,0 +1,81 @@
+A: 9730482d4c6e33e5ba39e6eeb6f76d1f19b4220c; C: archivos de trabajo. Copia: C:\Users\Belén\Documents\2026\Datos\Proyecto\Proyecto-1-Estructuras-De-Datos-Cripta\.cache\integracion-rutas-ai7uib4u
+test_cambios_consecutivos_mismo_campo (tests.test_conocimiento.TestConocimiento.test_cambios_consecutivos_mismo_campo)
+FR-014: inversión exacta, sin deduplicación que pierda estados. ... ok
+test_direcciones_y_puertas_invalidas (tests.test_conocimiento.TestConocimiento.test_direcciones_y_puertas_invalidas)
+C14: validación sin atribuir políticas a los adaptadores de B. ... ok
+test_entrada_inexistente_no_muta (tests.test_conocimiento.TestConocimiento.test_entrada_inexistente_no_muta) ... ok
+test_entrada_no_recorre_mapa_completo (tests.test_conocimiento.TestConocimiento.test_entrada_no_recorre_mapa_completo)
+PR-002: C13 verifica localidad, no solo un tiempo favorable. ... ok
+test_entrada_sin_recursion_y_repeticion (tests.test_conocimiento.TestConocimiento.test_entrada_sin_recursion_y_repeticion)
+FR-001/003/014: solo las vecinas pasan a avistadas. ... ok
+test_ids_dispersos_no_reservan_hasta_id_maximo (tests.test_conocimiento.TestConocimiento.test_ids_dispersos_no_reservan_hasta_id_maximo)
+PR-002: C13; memoria por entidad, no por ID. ... ok
+test_inicial_y_proyeccion_sin_filtraciones (tests.test_conocimiento.TestConocimiento.test_inicial_y_proyeccion_sin_filtraciones)
+FR-001–003/005: C01, C02, C04. ... ok
+test_lote_incompatible_no_deja_prefijo_aplicado (tests.test_conocimiento.TestConocimiento.test_lote_incompatible_no_deja_prefijo_aplicado)
+FR-014/017: rechazo atómico C12. ... ok
+test_lotes_mal_tipados_no_mutan (tests.test_conocimiento.TestConocimiento.test_lotes_mal_tipados_no_mutan) ... ok
+test_memoria_desde_ambos_extremos (tests.test_conocimiento.TestConocimiento.test_memoria_desde_ambos_extremos)
+FR-004: C03; solo la observación explícita actualiza. ... ok
+test_observacion_repetida_no_produce_cambios (tests.test_conocimiento.TestConocimiento.test_observacion_repetida_no_produce_cambios) ... ok
+test_observaciones_invalidas_no_mutan (tests.test_conocimiento.TestConocimiento.test_observaciones_invalidas_no_mutan)
+FR-004: no observar desde sala ajena o no explorada. ... ok
+test_rechaza_esqueleto_incoherente (tests.test_conocimiento.TestConocimiento.test_rechaza_esqueleto_incoherente)
+C14: precondición interna, no política de corrección de API. ... ok
+test_reconstruccion_y_reversion_varios_lotes (tests.test_conocimiento.TestConocimiento.test_reconstruccion_y_reversion_varios_lotes)
+FR-014/017: C12, datos de cambios transportables. ... ok
+test_reversion_incompatible_es_atomica (tests.test_conocimiento.TestConocimiento.test_reversion_incompatible_es_atomica)
+FR-014: también el rollback de una reversión parcial es exacto. ... ok
+test_sin_puerta_y_costo_se_conservan (tests.test_conocimiento.TestConocimiento.test_sin_puerta_y_costo_se_conservan) ... ok
+test_aplicar_revertir_y_lote_fallido_invalidan_cache (tests.test_conocimiento_rutas.TestRutasConocidas.test_aplicar_revertir_y_lote_fallido_invalidan_cache)
+C38: no volver a una revisión que permita usar etiquetas viejas. ... ok
+test_atajo_desconocido_y_reversion_de_exploracion (tests.test_conocimiento_rutas.TestRutasConocidas.test_atajo_desconocido_y_reversion_de_exploracion)
+C22/C25: no filtrar después de buscar en mapa real. ... ok
+test_c42_explorar_habilita_salida_y_no_descarta_alternativa (tests.test_conocimiento_rutas.TestRutasConocidas.test_c42_explorar_habilita_salida_y_no_descarta_alternativa)
+FR-008/017: usar conocimiento, sin confundir falta de ruta con cierre. ... ok
+test_c42_origen_bloqueado_no_busca_y_reversion_lo_recupera (tests.test_conocimiento_rutas.TestRutasConocidas.test_c42_origen_bloqueado_no_busca_y_reversion_lo_recupera)
+FR-010/012/014: no recorrer el mapa para un origen sin salida. ... ok
+test_consultas_alternadas_no_mutan_ni_proyectan_todo_el_mapa (tests.test_conocimiento_rutas.TestRutasConocidas.test_consultas_alternadas_no_mutan_ni_proyectan_todo_el_mapa)
+C24/C25: ciclos, desconexión y reutilización de auxiliares. ... ok
+test_empate_menor_vecina_no_orden_de_entrada (tests.test_conocimiento_rutas.TestRutasConocidas.test_empate_menor_vecina_no_orden_de_entrada)
+C22: ambas rutas cuestan 4; gana primera vecina 20. ... ok
+test_fallo_de_busqueda_no_publica_cache_parcial (tests.test_conocimiento_rutas.TestRutasConocidas.test_fallo_de_busqueda_no_publica_cache_parcial)
+C39: el destino anterior tampoco reutiliza una generación dañada. ... ok
+test_grafo_dirigido_y_origen_fuera_de_region_cerrada (tests.test_conocimiento_rutas.TestRutasConocidas.test_grafo_dirigido_y_origen_fuera_de_region_cerrada)
+C37/C39: transponer arcos, no asumir salidas recíprocas. ... ok
+test_memoria_puerta_y_reversion_sin_cache_obsoleta (tests.test_conocimiento_rutas.TestRutasConocidas.test_memoria_puerta_y_reversion_sin_cache_obsoleta)
+C23: no observada, abierta, cerrada y deshacer cierre. ... ok
+test_oraculo_exhaustivo_semilla_fija (tests.test_conocimiento_rutas.TestRutasConocidas.test_oraculo_exhaustivo_semilla_fija)
+C22–C25/C37: 60 grafos, varios orígenes y caminos simples. ... ok
+test_puertas_paralelas_y_costo_sin_tope_artificial (tests.test_conocimiento_rutas.TestRutasConocidas.test_puertas_paralelas_y_costo_sin_tope_artificial)
+C24: no confundir dos puertas entre los mismos extremos. ... ok
+test_rechazo_destinos_y_llegada_sin_paso (tests.test_conocimiento_rutas.TestRutasConocidas.test_rechazo_destinos_y_llegada_sin_paso)
+C21: avistado, desconocido e inexistente no se distinguen. ... ok
+test_reutiliza_distancias_en_pasos_sucesivos (tests.test_conocimiento_rutas.TestRutasConocidas.test_reutiliza_distancias_en_pasos_sucesivos)
+C37: una búsqueda para tres orígenes ya resueltos al mismo destino. ... ok
+test_viaje_recalcula_con_observacion_y_cancelacion_tras_reversion (tests.test_conocimiento_rutas.TestRutasConocidas.test_viaje_recalcula_con_observacion_y_cancelacion_tras_reversion)
+I5 C27/C29: control de C con buscador real; movimiento suministrado. ... ok
+test_cancelacion_antes_y_despues_de_paso_no_reanuda (tests.test_viaje.TestViaje.test_cancelacion_antes_y_despues_de_paso_no_reanuda)
+C29 / FR-015 local: la reversión externa no activa viaje. ... ok
+test_dano_enemigos_fin_y_causas_coincidentes (tests.test_viaje.TestViaje.test_dano_enemigos_fin_y_causas_coincidentes)
+C28 / FR-011/018: daño es hecho, no diferencia de vida. ... ok
+test_datos_mal_tipados_y_fallo_busqueda_conservan_estado (tests.test_viaje.TestViaje.test_datos_mal_tipados_y_fallo_busqueda_conservan_estado)
+C30: no aceptar enteros como señales booleanas. ... ok
+test_rechazo_de_movimiento_permite_recalcular_sin_reintentar (tests.test_viaje.TestViaje.test_rechazo_de_movimiento_permite_recalcular_sin_reintentar)
+C27 / FR-010/012: observaciones se actualizan fuera de C. ... ok
+test_rechazo_llegada_y_sin_ruta_no_proponen_movimiento (tests.test_viaje.TestViaje.test_rechazo_llegada_y_sin_ruta_no_proponen_movimiento)
+C26 / FR-007/012. ... ok
+test_resultado_tardio_no_afecta_viaje_nuevo (tests.test_viaje.TestViaje.test_resultado_tardio_no_afecta_viaje_nuevo)
+C29/C30 / FR-017: los números no se reciclan. ... ok
+test_resultados_incoherentes_y_duplicados_no_mutan (tests.test_viaje.TestViaje.test_resultados_incoherentes_y_duplicados_no_mutan)
+C30 / FR-009/017: validación antes de cambiar posición/estado. ... ok
+test_un_paso_pendiente_y_consulta_nueva_al_proponer (tests.test_viaje.TestViaje.test_un_paso_pendiente_y_consulta_nueva_al_proponer)
+C26/C27 / FR-009/010. ... ok
+test_c40_c41_todos_los_escenarios_conservan_resultados (tests.test_bench_escenarios_rutas.TestEscenariosRutas.test_c40_c41_todos_los_escenarios_conservan_resultados) ... ok
+test_c40_generacion_reproducible (tests.test_bench_escenarios_rutas.TestEscenariosRutas.test_c40_generacion_reproducible) ... ok
+test_c41_discrepancia_no_se_publica_como_medicion_valida (tests.test_bench_escenarios_rutas.TestEscenariosRutas.test_c41_discrepancia_no_se_publica_como_medicion_valida) ... ok
+
+----------------------------------------------------------------------
+Ran 41 tests in 0.449s
+
+OK

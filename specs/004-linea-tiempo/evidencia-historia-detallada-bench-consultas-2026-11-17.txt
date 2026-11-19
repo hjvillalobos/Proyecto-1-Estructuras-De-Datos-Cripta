@@ -1,0 +1,27 @@
+Python 3.14.6 | Windows-11-10.0.26200-SP0
+Operaciones/carga=5000, repeticiones=3, semilla=20261001
+Tiempos en us/operacion: promedio [min, max]. Sin red ni vista.
+Historia K=10 | controles=501 memoria=6991764 B pico=7228132 B CRLH=587534 B máx. acciones=10
+  búsqueda        ms media=0.0151 mediana=0.0143 p95=0.0207 máx=0.0895 >50 ms=0/111
+  reconstrucción  ms media=0.1078 mediana=0.1095 p95=0.1772 máx=0.5400 >50 ms=0/111
+  total           ms media=0.0883 mediana=0.0932 p95=0.1487 máx=0.1838 >50 ms=0/111
+  inversa         ms media=36.2991 mediana=36.5165 p95=78.2539 máx=90.5427 >50 ms=32/111
+  recorte         ms media=0.0525 mediana=0.0332 p95=0.1106 máx=0.1106 >50 ms=0/9
+Historia K=50 | controles=101 memoria=5673260 B pico=5983228 B CRLH=587534 B máx. acciones=50
+  búsqueda        ms media=0.0132 mediana=0.0130 p95=0.0187 máx=0.0315 >50 ms=0/111
+  reconstrucción  ms media=0.3548 mediana=0.3279 p95=0.7676 máx=1.3356 >50 ms=0/111
+  total           ms media=0.3246 mediana=0.2928 p95=0.7287 máx=1.0886 >50 ms=0/111
+  inversa         ms media=35.5942 mediana=33.8058 p95=75.5055 máx=93.7306 >50 ms=33/111
+  recorte         ms media=0.2309 mediana=0.0295 p95=0.7533 máx=0.7533 >50 ms=0/9
+Historia K=100 | controles=51 memoria=5349420 B pico=5659388 B CRLH=587534 B máx. acciones=100
+  búsqueda        ms media=0.0132 mediana=0.0130 p95=0.0184 máx=0.0227 >50 ms=0/111
+  reconstrucción  ms media=0.6875 mediana=0.7123 p95=1.4624 máx=2.0336 >50 ms=0/111
+  total           ms media=0.6412 mediana=0.6510 p95=1.3810 máx=1.8031 >50 ms=0/111
+  inversa         ms media=37.5441 mediana=36.0390 p95=82.0435 máx=95.8546 >50 ms=36/111
+  recorte         ms media=0.7179 mediana=0.6492 p95=2.1778 máx=2.1778 >50 ms=0/9
+Historia K=sin controles | controles=1 memoria=4773004 B pico=5083300 B CRLH=587534 B máx. acciones=5000
+  búsqueda        ms media=0.0139 mediana=0.0130 p95=0.0219 máx=0.0245 >50 ms=0/111
+  reconstrucción  ms media=36.3362 mediana=36.0035 p95=67.5423 máx=86.3849 >50 ms=39/111
+  total           ms media=36.3734 mediana=38.1584 p95=66.4698 máx=101.4697 >50 ms=36/111
+  inversa         ms media=38.5295 mediana=36.5943 p95=89.5951 máx=111.5003 >50 ms=35/111
+  recorte         ms media=41.7744 mediana=31.9110 p95=84.5744 máx=84.5744 >50 ms=3/9

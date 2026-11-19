@@ -1,0 +1,12 @@
+Python 3.14.6 | Windows-11-10.0.26200-SP0
+Operaciones/carga=100000, repeticiones=5, semilla=20261001
+Tiempos en us/operacion: promedio [min, max]. Sin red ni vista.
+Bitacora: capacidad=20; memoria superficial de instancia y arreglo, sin cadenas compartidas ni resultados temporales.
+bitacora/circular/agregar: n=100000 capacidad=20 promedio=0.287139 min=0.269380 max=0.297573 us/op almacenamiento_max=280 B
+  Muestras (us/op): 0.269380, 0.297573, 0.295617, 0.295978, 0.277145
+bitacora/circular/agregar_y_consultar: n=100000 capacidad=20 promedio=2.960212 min=2.852571 max=3.106439 us/op almacenamiento_max=280 B
+  Muestras (us/op): 2.955350, 3.106439, 2.902225, 2.984473, 2.852571
+bitacora/desplazada/agregar: n=100000 capacidad=20 promedio=0.278576 min=0.260497 max=0.305466 us/op almacenamiento_max=296 B
+  Muestras (us/op): 0.276515, 0.276157, 0.260497, 0.274244, 0.305466
+bitacora/desplazada/agregar_y_consultar: n=100000 capacidad=20 promedio=0.493977 min=0.481116 max=0.504502 us/op almacenamiento_max=296 B
+  Muestras (us/op): 0.490591, 0.501492, 0.481116, 0.504502, 0.492183

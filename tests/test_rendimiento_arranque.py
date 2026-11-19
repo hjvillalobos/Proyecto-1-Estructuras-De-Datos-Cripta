@@ -79,7 +79,7 @@ class TestTareaNoBloqueante(unittest.TestCase):
 
 class TestAudioPreparado(unittest.TestCase):
     def test_inicio_no_sintetiza_audio_al_abrir_ventana(self):
-        reproductor = SimpleNamespace(PlaySound=Mock(), SND_FILENAME=1, SND_ASYNC=2, SND_NODEFAULT=4)
+        reproductor = SimpleNamespace(PlaySound=Mock(), SND_FILENAME=1, SND_ASYNC=2, SND_NODEFAULT=4, SND_LOOP=8)
         sonido = Sonidos(reproductor)
         self.addCleanup(sonido.cerrar)
         sonido.habilitar(True)
@@ -93,7 +93,9 @@ class TestAudioPreparado(unittest.TestCase):
             Sonidos._crear_efecto(preparada, _NOTAS["inicio"], "inicio")
             with patch.object(Path, "is_file", return_value=False):
                 Sonidos._crear_efecto(generada, _NOTAS["inicio"], "inicio")
-            self.assertEqual(preparada.read_bytes(), generada.read_bytes())
+            self.assertEqual(preparada.read_bytes(),
+                             Path("vista/recursos/sonidos/bajo_la_piedra.wav").read_bytes())
+            self.assertGreater(generada.stat().st_size, 44)
 
 
 class TestPrecargaEscalable(unittest.TestCase):

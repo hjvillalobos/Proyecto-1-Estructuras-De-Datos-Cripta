@@ -39,7 +39,9 @@ class TestReplayReinicio(unittest.TestCase):
         self.assertEqual(datos.motor.reloj, 100)
         self.assertFalse(c.ejecutando)
         self.assertFalse(c._grabacion_valida)
-        self.assertIn("incompleta", vista.mostrar_error.call_args.args[0])
+        mensaje = vista.mostrar_error.call_args.args[0]
+        self.assertIn("incompleta", mensaje)
+        self.assertIn("La accion se realizo", mensaje)
 
     def test_fallo_al_iniciar_no_ejecuta_acciones(self):
         datos = base.TestRegresionesJuego()
@@ -48,9 +50,77 @@ class TestReplayReinicio(unittest.TestCase):
         c = ControladorJuego(datos.motor, vista)
         c.bitacora_replay = Mock()
         c.bitacora_replay.iniciar.side_effect = OSError("sin permisos")
+        antes = datos.motor.exportar_estado()
         c.iniciar()
         vista.pedir_comando.assert_not_called()
         self.assertFalse(c._grabacion_valida)
+        self.assertFalse(c.ejecutando)
+        self.assertEqual(datos.motor.exportar_estado(), antes)
+        mensaje = vista.mostrar_error.call_args.args[0]
+        self.assertIn("No se pudo iniciar la bitacora", mensaje)
+        self.assertIn("no se ejecutaron acciones", mensaje)
+        self.assertNotIn("La accion se realizo", mensaje)
+
+    def test_cd06_fallo_al_grabar_carga_describe_el_estado_ya_cargado(self):
+        for durante_inicio in (True, False):
+            with self.subTest(durante_inicio=durante_inicio):
+                datos = base.TestRegresionesJuego()
+                datos.setUp()
+                self.assertTrue(datos.motor.ejecutar("esperar").ok)
+                cargado = datos.motor.exportar_estado()
+                self.assertTrue(datos.motor.ejecutar("esperar").ok)
+                self.assertEqual(datos.motor.reloj, 200)
+                vista = Mock()
+                c = ControladorJuego(datos.motor, vista)
+                c.bitacora_replay = Mock()
+                c.bitacora_replay.registrar_carga.side_effect = OSError("disco lleno")
+                if durante_inicio:
+                    self.assertFalse(c.iniciar(cargado))
+                else:
+                    with patch("controlador.controlador.cargar_estado", return_value=cargado):
+                        c._cargar("partida.bin")
+                self.assertEqual(datos.motor.exportar_estado(), cargado)
+                self.assertFalse(c.ejecutando)
+                self.assertFalse(c._grabacion_valida)
+                vista.pedir_comando.assert_not_called()
+                mensaje = vista.mostrar_error.call_args.args[0]
+                self.assertIn("La partida se cargo", mensaje)
+                self.assertIn("no pudo registrarse la carga", mensaje)
+                self.assertNotIn("La accion se realizo", mensaje)
+
+    def test_cd06_fallo_de_restauracion_inicial_no_afirma_carga_exitosa(self):
+        datos = base.TestRegresionesJuego()
+        datos.setUp()
+        vista = Mock()
+        c = ControladorJuego(datos.motor, vista)
+        c.bitacora_replay = Mock()
+        antes = datos.motor.exportar_estado()
+        with patch.object(datos.motor, "restaurar_estado", side_effect=OSError("lectura fallida")):
+            self.assertFalse(c.iniciar(antes))
+        self.assertEqual(datos.motor.exportar_estado(), antes)
+        c.bitacora_replay.registrar_carga.assert_not_called()
+        vista.pedir_comando.assert_not_called()
+        mensaje = vista.mostrar_error.call_args.args[0]
+        self.assertIn("No se pudo completar la restauracion inicial", mensaje)
+        self.assertNotIn("La partida se cargo", mensaje)
+        self.assertNotIn("La accion se realizo", mensaje)
+
+    def test_cd06_fallo_de_comentario_de_viaje_no_afirma_movimiento(self):
+        datos = base.TestRegresionesJuego()
+        datos.setUp()
+        vista = Mock()
+        c = ControladorJuego(datos.motor, vista)
+        c.bitacora_replay = Mock()
+        c.bitacora_replay.registrar_comentario.side_effect = OSError("sin permisos")
+        antes = datos.motor.exportar_estado()
+        self.assertFalse(c._registrar_orden_viaje(2))
+        self.assertEqual(datos.motor.exportar_estado(), antes)
+        self.assertFalse(c.ejecutando)
+        self.assertFalse(c._grabacion_valida)
+        mensaje = vista.mostrar_error.call_args.args[0]
+        self.assertIn("No se pudo registrar la orden de viaje", mensaje)
+        self.assertIn("no se ejecuto un nuevo movimiento", mensaje)
+        self.assertNotIn("La accion se realizo", mensaje)
 
     def test_error_de_replay_espera_confirmacion(self):
         vista = VistaGrafica.__new__(VistaGrafica)

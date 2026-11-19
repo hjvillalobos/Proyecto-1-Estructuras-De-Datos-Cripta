@@ -85,6 +85,58 @@ class DestinoViajeTest(unittest.TestCase):
         self.assertFalse(self.v._cerrada)
         self.assertEqual(self.v._cola,['inv'])
 
+    def test_vd01_boton_dialogo_y_dos_pasos_reales_sin_teletransporte(self):
+        with grabacion() as (_, juego, ruta, __, ___):
+            control=ControladorJuego(juego,self.v,ruta_replay=str(ruta))
+            # Explorar y volver con acciones ordinarias en el paquete de ensayo.
+            for direccion in ('E','O','O'):
+                control.procesar_comando('mover '+direccion)
+            control._mostrar_estado()
+            self.assertEqual(juego.jugador.posicion_actual,100)
+            boton=next(w for marco in self.v.root.winfo_children()
+                       for w in marco.winfo_children()
+                       if isinstance(w,tk.ttk.Button) and w.cget('text')=='Viajar')
+            antes=juego.exportar_estado(),ruta.read_bytes()
+            errores=[]
+            def completar(cancelar=False):
+                try:
+                    dialogo=self.v._dialogo_destino
+                    if cancelar:
+                        dialogo.boton_cancelar.invoke()
+                    else:
+                        indice=next(i for i,(identidad,_) in enumerate(dialogo.salas) if identidad==102)
+                        dialogo.lista.selection_set(indice)
+                        dialogo.seleccionar()
+                        dialogo.boton_viajar.invoke()
+                except Exception as error:
+                    errores.append(error)
+                    self.v._dialogo_destino.cancelar()
+            boton.invoke()
+            self.assertEqual(self.v._cola,['viajar'])
+            self.v.root.after(60,lambda:completar(cancelar=True))
+            control.procesar_comando(self.v._cola.pop(0))
+            self.assertEqual(errores,[])
+            self.assertEqual((juego.exportar_estado(),ruta.read_bytes()),antes)
+            self.assertFalse(control._viaje_activo)
+            boton.invoke()
+            self.v.root.after(60,completar)
+            control.procesar_comando(self.v._cola.pop(0))
+            self.assertEqual(errores,[])
+            self.assertTrue(control._viaje_activo)
+            self.assertEqual(juego.jugador.posicion_actual,100)
+            control._avanzar_viaje()
+            self.assertEqual(juego.jugador.posicion_actual,101)
+            self.assertEqual(juego.reloj,antes[0].reloj+250)
+            self.assertTrue(control._viaje_activo)
+            control._avanzar_viaje()
+            self.assertEqual(juego.jugador.posicion_actual,102)
+            self.assertEqual(juego.reloj,antes[0].reloj+500)
+            self.assertFalse(control._viaje_activo)
+            self.assertIn('destino alcanzado',self.v.var_aviso.get())
+            from datos.bitacora_replay import BitacoraReplay
+            movimientos=BitacoraReplay(ruta).leer()[1][-2:]
+            self.assertEqual([(a.accion,a.argumento) for a in movimientos],[('mover','E'),('mover','E')])
+
 
 class DestinoControlTest(unittest.TestCase):
     def test_cancelar_conserva_viaje_estado_archivos_y_aceptar_usa_flujo_normal(self):
