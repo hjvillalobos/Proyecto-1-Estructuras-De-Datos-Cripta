@@ -55,6 +55,12 @@ class RecursosGraficos:
         imagen = self.imagen(nombre, ancho, alto)
         return imagen if imagen is not None else self.imagen_neutra(ancho, alto)
 
+    def imagen_enemigo(self, tipo, comportamiento, ancho, alto):
+        imagen = self.imagen(tipo, ancho, alto)
+        if imagen is None and comportamiento == 'cazador':
+            imagen = self.imagen('cazador_ilustrado', ancho, alto)
+        return imagen if imagen is not None else self.imagen_neutra(ancho, alto)
+
     def imagen_neutra(self, ancho, alto):
         """Signo neutro nativo, compartido por tamano; no necesita PNG ni Pillow."""
         tamano = max(8, min(96, int(ancho), int(alto)))
@@ -439,12 +445,16 @@ class RecursosGraficos:
     def fotogramas_accion(self, accion, ancho, alto, invertir=False, armadura=None, arma=None, antorcha=False):
         indices = {"correr": (0, 1, 2, 3), "atacar": (4, 5), "caer": (6, 7)}[accion]
         clave = (int(ancho), int(alto), bool(invertir), armadura, arma, bool(antorcha))
-        for actual, cuadros in self._secuencias:
-            if actual == clave:
-                return tuple(cuadros[i] for i in indices)
         for actual, cuadros in self._acciones:
             if actual == (accion, *clave):
                 return cuadros
+        for actual, cuadros in self._secuencias:
+            if actual == clave:
+                resultado = tuple(cuadros[i] for i in indices)
+                self._acciones.append(((accion, *clave), resultado))
+                if len(self._acciones) > 8:
+                    self._acciones.pop(0)
+                return resultado
         if Image is None:
             return ()
         try:
@@ -454,8 +464,11 @@ class RecursosGraficos:
                                              *clave_equipo(armadura, arma, antorcha)))
             if hoja is None:
                 todos = self.fotogramas_jugador(ancho, alto, invertir, armadura, arma, antorcha)
-                return tuple(todos[i] for i in indices) if len(todos) == 8 else ()
-            cuadros = self._fotos_desde_hoja(hoja, indices)
+                if len(todos) != 8:
+                    return ()
+                cuadros = tuple(todos[i] for i in indices)
+            else:
+                cuadros = self._fotos_desde_hoja(hoja, indices)
         except (OSError, ValueError, tk.TclError):
             return ()
         self._acciones.append(((accion, *clave), cuadros))
@@ -494,6 +507,25 @@ class RecursosGraficos:
             cuadros.append(cuadro)
         return tuple(cuadros)
 
+    def _llave_hierro(self, ancho, alto):
+        """Silueta metálica nativa; también funciona sin Pillow ni archivos externos."""
+        tamano = max(1, min(ancho, alto))
+        imagen = tk.PhotoImage(master=self.root, width=tamano, height=tamano)
+        for y in range(tamano):
+            for x in range(tamano):
+                # Coordenadas de una llave girada en diagonal.
+                px, py = (x + .5) * 64 / tamano, (y + .5) * 64 / tamano
+                u, v = (px + py) / 1.4142 - 4, (py - px) / 1.4142 + 16
+                radio = ((u - 16)**2 + (v - 16)**2)**.5
+                aro = 6 <= radio <= 11
+                mango = 24 <= u <= 53 and 12 <= v <= 19
+                dientes = ((40 <= u <= 45 or 48 <= u <= 53) and 17 <= v <= 27)
+                if aro or mango or dientes:
+                    borde = (aro and (radio < 7 or radio > 10)) or v > 25 or u > 51
+                    color = '#52616b' if borde else ('#e0edf2' if v < 15 else '#9aaebc')
+                    imagen.put(color, (x, y))
+        return imagen
+
     def imagen(self, nombre, ancho, alto):
         if Path(nombre).name != nombre:
             return None
@@ -504,6 +536,12 @@ class RecursosGraficos:
         for actual, imagen in self._imagenes:
             if actual == clave:
                 return imagen
+        if nombre == 'itm_llave_hierro':
+            imagen = self._llave_hierro(ancho, alto)
+            self._imagenes.append((clave, imagen))
+            if len(self._imagenes) > 24:
+                self._imagenes.pop(0)
+            return imagen
         ruta = self.carpeta / (nombre + ".png")
         if nombre == "ent_guardian_oseo" and (self.carpeta / "guardian_ilustrado.png").is_file():
             ruta = self.carpeta / "guardian_ilustrado.png"

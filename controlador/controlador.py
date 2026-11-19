@@ -58,6 +58,7 @@ class ControladorJuego:
         self.lanzador_replay = lanzador_replay
 
         self.ejecutando = True
+        self.reiniciar_solicitado = False
         self._puntaje_registrado = False
         self._grabacion_valida = True
         self.ultimo_resultado_accion = None
@@ -179,7 +180,8 @@ class ControladorJuego:
     def _mostrar_estado(self):
         estado = self.modelo.estado_vista()
         salas = getattr(self.modelo, "salas", None)
-        if isinstance(salas, list) and 0 <= estado.sala_id < len(salas):
+        from modelo.almacen_salas import TablaPorId, limite_ids
+        if isinstance(salas, (list, TablaPorId)) and 0 <= estado.sala_id < limite_ids(salas):
             sala = salas[estado.sala_id]
             if sala is not None:
                 for salida in estado.salidas:
@@ -229,6 +231,21 @@ class ControladorJuego:
         else:
             argumentos = partes[1].split() if len(partes) > 1 else []
 
+        if comando == 'viajar':
+            if argumentos:
+                return self.vista.mostrar_error('Uso: viajar')
+            elegir = getattr(type(self.vista), 'pedir_destino', None)
+            mapa = getattr(self.modelo, 'mapa_conocido', None)
+            if not callable(elegir) or not callable(mapa):
+                return self.vista.mostrar_error('Usa ir a <sala> para viajar.')
+            destino = self.vista.pedir_destino(tuple(mapa()), self.modelo.jugador.posicion_actual)
+            if destino is not None:
+                return self._viaje(['a', str(destino)])
+            return
+        if comando == "salir":
+            if argumentos:
+                return self.vista.mostrar_error('Uso: salir')
+            return self._salir()
         if comando == "cancelar":
             if argumentos:
                 return self.vista.mostrar_error("Uso: cancelar")
@@ -459,12 +476,6 @@ class ControladorJuego:
         # SALIR
         # ---------------------------------------------
 
-        if comando == "salir":
-            self.ejecutando = False
-            if callable(getattr(type(self.vista), "marcar_volver_menu", None)):
-                self.vista.marcar_volver_menu()
-            return
-
         self.vista.mostrar_error(
             f"Comando desconocido: {comando}"
         )
@@ -472,6 +483,19 @@ class ControladorJuego:
     # ---------------------------------------------------------
     # EJECUTAR ACCIÓN DEL MODELO
     # ---------------------------------------------------------
+
+    def _salir(self):
+        accion = (self.vista.preguntar_salida()
+                  if callable(getattr(type(self.vista), 'preguntar_salida', None)) else 'terminar')
+        if accion not in ('menu', 'reiniciar', 'terminar'):
+            return  # Cancelar conserva también el viaje y el log.
+        self._cancelar_viaje(mostrar=False)
+        self.reiniciar_solicitado = accion == 'reiniciar'
+        if accion == 'menu':
+            self.vista.marcar_volver_menu()
+        elif accion == 'reiniciar':
+            self.vista.marcar_reinicio()
+        self.ejecutando = False
 
     def _mostrar_informe(self, titulo, texto):
         if callable(getattr(type(self.vista), "mostrar_informe", None)):
@@ -496,7 +520,14 @@ class ControladorJuego:
         mapa = getattr(self.modelo, "mapa_conocido", None)
         if not callable(mapa):
             return self.vista.mostrar_error("El mapa conocido todavía no está disponible.")
-        return self._mostrar_informe("Mapa conocido", "\n".join(lineas_mapa(mapa())) or "El mapa está vacío.")
+        proyeccion = tuple(mapa())
+        mostrar = getattr(type(self.vista), 'mostrar_mapa', None)
+        if callable(mostrar) and all(not isinstance(r, str) for r in proyeccion):
+            jugador = getattr(self.modelo, 'jugador', None)
+            actual = getattr(jugador, 'posicion_actual', None)
+            destino = self.control_viaje.destino if self._viaje_activo and self.control_viaje is not None else None
+            return self.vista.mostrar_mapa(proyeccion, actual, destino)
+        return self._mostrar_informe("Mapa conocido", "\n".join(lineas_mapa(proyeccion)) or "El mapa está vacío.")
 
     def _viaje(self, argumentos):
         if len(argumentos) != 2 or argumentos[0].lower() != "a":

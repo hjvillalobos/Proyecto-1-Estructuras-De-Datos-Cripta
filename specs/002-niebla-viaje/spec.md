@@ -1,8 +1,11 @@
 # Feature Specification: Niebla de guerra y viaje automático
 
+> **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
+
+
 **Feature Branch**: `codex/002-niebla-viaje`
 **Created**: 2026-11-08
-**Status**: I1 e I2 implementados y probados; I3 comprobado contra historia real de D e I4/I5 (rutas y control local de viaje) contra rutas reales de A en copias aisladas. Capacidad completa pendiente de Q1, ejecución del viaje en el juego, conexión al motor y revisión cruzada.
+**Status**: Implementado e integrado; aceptación y límites vigentes en ESTADO_ENTREGA.md.
 
 **Actualización de alcance I1:** el usuario autorizó implementar lo independiente de sus compañeros. Se cierra la aclaración del incremento de conocimiento básico descrito abajo; la capacidad completa continúa pendiente. La autorización posterior de I2 amplía ese alcance únicamente con las operaciones independientes indicadas en su apartado.
 **Input**: Persona C según asignación confirmada por el usuario. Preparar su capacidad conforme a Parte II §§3.3–3.4, 5.3, 5.6, 6.1 y Apéndice B.
@@ -139,7 +142,7 @@ Los identificadores FR son locales a esta capacidad y se citarán con el prefijo
 - Se depende de A para movimiento, eventos y observaciones; de B para datos válidos; de D para interfaz, persistencia y reconstrucción histórica. Los contratos todavía no están aceptados por todas las partes.
 - I1 e I2 cuentan con alcance aclarado, plan, tareas, revisión de consistencia e implementación local. Eso no cierra las fases ni la aceptación de la capacidad completa; Q1 y acuerdos de integración siguen abiertos.
 
-## Clarifications pendientes
+## Registro histórico de aclaraciones
 
 ### I8: reutilización segura de rutas
 
@@ -232,7 +235,7 @@ I2 aclara solamente estas operaciones independientes. Q1 y los contratos de moto
 - C13: dados IDs dispersos y mapas de tamaños crecientes, el almacenamiento depende de la cantidad de entidades; una entrada procesa solo su sala y salidas, además de búsquedas de identificadores. PR-002.
 - C14: datos internos incompletos o contradictorios se rechazan antes de construir el componente; esta precondición local no define cómo B debe tratar null, asimetría u otros problemas de la API.
 
-**Q1 — puertas de salas reveladas con antorcha.** [NEEDS CLARIFICATION: ¿qué información recibe el jugador sobre una puerta que pertenece a una vecina revelada por antorcha, pero cuyos extremos nunca ha ocupado? §3.3 exige exploración de la vecina y memoria de la última observación, pero define observación estando en un extremo. Confirmar si queda sin observación utilizable para viaje o si la antorcha también permite observar esa puerta; no asumir el estado real como recuerdo.]
+**Q1 — puertas de salas reveladas con antorcha.** Decisión/alcance vigente documentado en ESTADO_ENTREGA.md; el texto fechado de esta sección conserva el contexto histórico.
 
 Esta pregunta requiere aclaración del enunciado o referencia oficial; una preferencia técnica no la resuelve. La revisión obligatoria de clarify podrá identificar otros casos antes de cerrar el diseño.
 
@@ -243,3 +246,8 @@ El usuario indicó: «okay, entonces dejalo como pendiente». Q1 permanece abier
 El caso pendiente se limita a una puerta entre una vecina revelada y otra sala, sin observación física previa. La puerta que conecta la sala ocupada con esa vecina sí se observa desde la posición actual conforme a FR-004.
 
 Se puede continuar revisando y preparando el conocimiento por entrada física, avistamiento, memoria de puertas observadas y cambios reversibles. Las decisiones y pruebas sobre información de puertas remotas reveladas por antorcha quedan pendientes de respuesta oficial. Esto no declara completa la fase de aclaración ni autoriza omitir plan, tareas y análisis antes de implementar.
+
+
+## Consolidación compartida — 2026-11-14
+
+La autorización de la usuaria amplió el alcance a todas las partes. La integración de producción, las decisiones conservadoras de antorcha/puertas, los benchmarks de A conectados a la CLI y la aceptación del conjunto se documentan en [integracion-completa.md](../004-linea-tiempo/integracion-completa.md). Los balances, gates de autorización y pendientes de entregas anteriores son históricos; no se inventa una respuesta oficial para preguntas del profesor ni se cambian marcadores de checklists de revisión.

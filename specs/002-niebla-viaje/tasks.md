@@ -7,6 +7,8 @@
 - [x] T042 Registrar pruebas y límites, publicar en C y conservar pendientes de puertas/producción.
 
 Análisis: spec, plan y tareas cubren el mismo ensayo; no hay reglas nuevas ni dependencias de Q1. Documentación antes del código. Los pendientes generales de aclaración/revisión cruzada no se dan por resueltos.
+> **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
+
 
 ## I10: rechazo local de origen sin salida
 

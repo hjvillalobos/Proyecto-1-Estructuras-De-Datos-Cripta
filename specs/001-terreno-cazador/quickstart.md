@@ -1,5 +1,8 @@
 # Guía de validación prevista — provisional
 
+> **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
+
+
 **Comandos portables:** ejecutar desde la raíz del proyecto con el entorno y dependencias preparados. Las ejecuciones originales registradas utilizaron Python 3.12.14 del runtime auxiliar de Codex; los comandos se muestran como `python -B -m unittest ...` para no depender de una ruta personal. Esta corrección editorial conserva todos los resultados históricos.
 
 **Fecha:** 2026-11-02. No se ejecutó ningún test ni benchmark durante Plan. No hay implementación nueva ni suites T1–T7 creadas. Esta guía separa comandos existentes de escenarios futuros para no afirmar ejecutabilidad inexistente.
@@ -24,7 +27,7 @@ Python ≥3.11, entorno reproducible según README y dependencias del proyecto; 
 
 La documentación puede actualizarse con autorización G-DOC, sin necesitar Implement. Código y ejecución de pruebas/benchmarks requieren permisos posteriores G0/GA, spec confirmada antes del código y revisión vigente de las correcciones; una edición documental no libera Q1/Q2 ni entregables E-*. Q3 pendiente no se convierte en referencia sintética oficial. Los borradores de cierre se permiten, pero T047–T050 solo se completan con sus prerrequisitos y evidencia final; el paquete local no significa actualización de DECISIONES.md/README.md.
 
-Para integración, T013/T014 esperan E-B-COSTOS sin esperar E-B-RANGO; T025 requiere ambos y E-C-DESPACHO. Tras autorización futura, una ejecución parcial de las pruebas del núcleo puede registrarse con suites omitidas/motivo, sin completar T027. Su cierre total exige T024/T025/T026, contratos/permisos aplicables y las tres suites incluidas en T027. La [comunicación de B](research.md#comunicación-reportada-de-b-sobre-openapi-110) es evidencia indirecta, sin copia primaria: no habilita pruebas que prescriban políticas de rango ausente/null, costo null o inconsistencias. El profesor sigue sin responder Q1/Q2; esto no impide registrar o corregir documentación autorizada.
+Para integración, T013/T014 esperan E-B-COSTOS sin esperar E-B-RANGO; T025 requiere ambos y E-C-DESPACHO. Tras autorización futura, una ejecución parcial de las pruebas del núcleo puede registrarse con suites omitidas/motivo, sin completar T027. Su cierre total exige T024/T025/T026, contratos/permisos aplicables y las tres suites incluidas en T027. La [comunicación de B](research.md#comunicación-reportada-de-b-sobre-openapi-110) es evidencia indirecta, sin copia primaria: no habilita pruebas que prescriban políticas de rango ausente/null, costo null o inconsistencias. Ese era el estado de la evidencia en este corte histórico. Las aclaraciones posteriores están en el [registro de investigación](research.md#incógnitas).
 
 ## Comandos existentes para ejecución posterior autorizada
 
@@ -646,3 +649,131 @@ La reejecución de `tests.test_localidad_rutas`, rutas, decisión, FR-020 y las 
 El [registro local](prompts-registro-local.md#corte-documental-en-p77) consolida 77 solicitudes íntegras hasta P77, con una fila por ID en orden de envío. Se verificaron 73 cuerpos en el registro y cuatro en los tres anexos. Se conservaron P01–P75 y los anexos, y se cotejaron P76 y P77 con el registro original de la sesión de Codex.
 
 Los dos mensajes incompletos entre P48 y P33 conservan sus fragmentos literales y sus finales siguen pendientes de recuperación. La autorización de este cierre es posterior al corte y queda para el mantenimiento incremental. El traslado a `PROMPTS_LLM.md` sigue pendiente de autorización.
+
+## Revalidación parcial de T027 y estado de integración
+
+En `53c9453`, con Python 3.14.5, el núcleo de rutas y decisión, el turno real del cazador y la prueba de localidad pasaron **30/30**, sin omisiones:
+
+```powershell
+python -B -m unittest tests.test_rutas_cazador tests.test_decision_cazador tests.test_turno_cazador tests.test_localidad_rutas
+```
+
+El turno ordinario verifica el rango inclusivo, `null` explícito sin tope, costos 250 y 100, la puerta cerrada antes de la decisión, agenda y retroceso, y el acceso a la ficha residente sin HTTP ni lectura de disco durante la decisión. El conteo de localidad T039 sigue siendo evidencia de trabajo por consulta sobre el fixture, sin certificar el objetivo temporal de T046. T027 conserva pendiente `tests.test_contrato_rutas_c` por E-C-RUTA y depende del cierre de T024 y T025. T025 sigue pendiente de E-C-DESPACHO.
+
+La entrada al mapa conocido y el productor H3 de A siguen sujetos a opciones explícitas de prueba. Las verificaciones de guardado, carga y replay de ese productor usan la variante histórica offline. Las pruebas de D que exigen un productor en `Motor` base quedan separadas de esa evidencia. La validación de enemigos de `53c9453` compara identidad, tipo y vida en la frontera final de la carga v4; una frontera válida sin enemigos no identifica la generación del productor.
+
+Para T030, las pruebas de frontera temporal ya ejercitan la repetición con la misma agenda y RNG, ambos órdenes de secuencia y la reprogramación por un efecto empatado. Las pruebas de costos verifican la primera activación a costo 100, y las de combate y retroceso cubren muerte, veneno y trampas. Esta evidencia se puede reutilizar al preparar A7–A11. Queda por demostrar el caso conjunto de A8 con puerta, efecto y actor en el mismo instante; la prueba de cierre previa al turno del cazador cubre puerta y actor, y la de velocidad cubre efecto y actor. T030 conserva su dependencia de T025.
+
+La corrida `python -B -m unittest discover -v` en el entorno local sin Pillow reportó 749 pruebas ejecutadas, dos fallos, un error y 46 registros de omisión. Los tres casos que fallaron pasaron al repetirlos con Pillow 12.3.0 desde un directorio temporal. En esa segunda corrida completa, `tests.test_replay_reinicio.TestReplayReinicio.test_main_reinicia_con_motor_y_precarga_nuevos` quedó en reintentos al faltar la ficha `itm_antorcha` en el paquete local `.cache/cripta`. El diagnóstico se realizó sin modificar la prueba ni completar ese paquete.
+
+Al repetir el descubrimiento con Pillow y seleccionar todos los casos salvo esa prueba de reinicio, `unittest` reportó 748 pruebas ejecutadas, 743 aprobadas, cero fallos, cero errores y seis registros de omisión (cinco métodos y un `setUpClass`). Las omisiones fueron dos casos de historia con `Motor` base, dos del paquete oficial opcional, uno de API real y la clase de comparación de revisiones de rutas de C. El caso de reinicio excluido de esta corrida sigue sin verificarse con el paquete local disponible.
+
+### Evidencia posterior de T030
+
+Sobre `53c9453`, con la prueba nueva en el árbol de trabajo, pasaron **172 pruebas seleccionadas**, sin fallos, errores ni omisiones. Los cinco casos de `tests/test_eventos_terreno.py` usan el motor ordinario con datos offline. A8 cubre el empate entre cierre, efecto y turno del cazador en ambos órdenes relativos de cierre y turno. A9 verifica la activación ordenada de enemigos dormidos y la conservación del turno del enemigo que ya llegó activo. A10 verifica el cierre tras cruzar, la conservación de la llave y el rechazo al volver a intentar el mismo arco. A11 verifica la curación y los pulsos reales de regeneración en `t=200` y `t=400`, con el siguiente pulso pendiente en `t=600`. T030 sigue abierta por su dependencia de T025.
+
+## Evidencia de A13 para T037
+
+Sobre `b1e78c8`, con las pruebas de A13 en el árbol de trabajo, pasaron 57 pruebas sin fallos, errores ni omisiones.
+
+```powershell
+.\.venv\Scripts\python.exe -B -m unittest tests.test_costos_terreno tests.test_eventos_terreno tests.test_validez_rutas tests.test_frontera_temporal tests.test_restauracion_rutas tests.test_rastro
+```
+
+Con el motor ordinario y un paquete sintético offline se verificaron el rastro inicial, su refresco al esperar, las marcas de origen y destino al moverse y la espera del guardián en su turno fuera de la sala del jugador. Para el rastreador, la prueba prepara las marcas de rastro y el estado de una salida, activa al enemigo y procesa su turno real en t=400 mediante `ejecutar_ciclo()` con el callback de producción. Comprueba que se desplaza hacia el menor ID con rastros empatados de 399 unidades, espera con rastros de 400 y elige la otra salida cuando la de menor ID está cerrada. En los tres casos se comprueba el siguiente turno en t=800. T037 sigue pendiente de T036. Esta ejecución no mide rendimiento.
+
+## Entradas verificadas de terreno y rango
+
+Para datos válidos, A consume costos enteros positivos y simétricos, con 100 si el campo está ausente. Un rango entero válido es inclusivo y un `null` explícito deja la búsqueda sin tope. Para reproducir ambos comportamientos con el motor real, ejecutar desde la raíz `python -B -m unittest tests.test_turno_cazador tests.test_costos_terreno` con el entorno del proyecto activo. El primer módulo incluye una ruta de costo 400 con rango ilimitado. El segundo verifica el costo 250 en ambos sentidos de una conexión. Véanse las [aclaraciones de Q2](research.md#aclaración-del-profesor-sobre-q2) y [Q1](research.md#aclaración-del-profesor-sobre-q1). Las pruebas de validación de datos corresponden a B. El motor de A consume entradas conformes. Para los casos fuera de ese dominio, la guía no establece una política de rechazo o normalización. Véase el [alcance de cierre de T001, T002 y T018](research.md#alcance-oficial-de-q1-y-q2).
+
+## Evaluación sintética de rutas y agendas
+
+En `0396f60` quedó publicada la utilidad aislada. La matriz reproducible usa 40 salas, 78 arcos, 1 o 24 cazadores, rango 100 o ilimitado, puertas estables o cambiantes y semilla 20261113. La salida JSON informa equipo, Python, repeticiones y resultados por estrategia.
+
+```powershell
+.\.venv\Scripts\python.exe -B -m utilidades.bench_terreno_cazador --vertices 40 --semilla 20261113 --repeticiones 3
+```
+
+Leer por separado la preparación del grafo y de la estrategia, el tiempo de lote y la liberación final. El lote incluye las invalidaciones que ocurren durante sus consultas. El campo inverso informa preparación de arcos entrantes, reconstrucción y reutilización. Los costos de mantenimiento de caché se instrumentan en otra pasada. La extracción aislada de agenda se mide después de las reprogramaciones. El ciclo del motor ordinario usa una carga sintética en memoria con 24 cazadores y cambios de velocidad. Sus cifras son de evaluación local, sin referencia oficial Q3 ni certificación de T046.
+
+### Regresión de publicación
+
+Antes de crear `0396f60`, sobre `53d7367` con el contenido publicado de la utilidad y las pruebas, y con los tres casos de T029/T033, pasaron **90 pruebas**, sin fallos, errores ni omisiones. Para reproducir ese total se requieren los tres casos de [validez de rutas](../../tests/test_validez_rutas.py) incluidos en este mismo incremento documental.
+
+```powershell
+.\.venv\Scripts\python.exe -B -m unittest tests.test_bench_terreno_cazador tests.test_rutas_cazador tests.test_localidad_rutas tests.test_validez_rutas tests.test_eventos_terreno tests.test_frontera_temporal tests.test_restauracion_rutas tests.test_turno_cazador tests.test_velocidad_terreno tests.test_costos_terreno
+```
+
+Las rutas filtradas y la conexión de medición forman parte de la entrega integrada. La [regresión conjunta](#reproducción-de-la-entrega-integrada-de-a) aporta evidencia para T037 y T048. T048 queda cerrado para el seguimiento interno con la medición reproducible de T046. T027, T037 y T045 ya constan en el cierre integrado de A.
+
+## Reproducción de la entrega integrada de A
+
+Sobre `980168a`, ejecutar desde la raíz del worktree integrado. La corrida registrada usó el intérprete del entorno virtual del proyecto. El ejemplo lo busca en el directorio hermano y, si no está allí, usa el entorno virtual activo.
+
+```powershell
+$interprete = if (Test-Path '..\.venv\Scripts\python.exe') { '..\.venv\Scripts\python.exe' } else { 'python' }
+& $interprete -B -m unittest tests.test_contrato_rutas_c tests.test_rutas_cazador tests.test_decision_cazador tests.test_conocimiento_rutas tests.test_turno_cazador tests.test_eventos_terreno tests.test_validez_rutas tests.test_restauracion_rutas tests.test_puertas_reciprocas_d tests.test_bench_terreno_cazador tests.test_controlador_ac_real tests.test_partida_completa tests.test_receptor_h3_d
+& $interprete -B main.py --bench --subsistemas terreno-cazador --salas 40 --semilla 20261113 --repeticiones 3
+```
+
+La primera corrida registró **99 pruebas aprobadas** y cubre aceptación funcional sobre paquetes temporales y la búsqueda sin red. La segunda ejecuta la carga sintética de evaluación vía la CLI conectada por D. Usar [la constancia de interfaces](research.md#interfaces-de-la-entrega-integrada) para trazar el alcance de cada entrega. La [medición separada de cripta-06](research.md#ciclo-integrado-en-cripta-06-evidencia-para-t046) conserva sus valores y condiciones. El alcance de la referencia consta en la [decisión de cierre interno](tasks.md#decisión-de-cierre-interno).
+
+## Medición candidata y referencia Q3
+
+La referencia interna adoptada para la entrega es `cripta-06@f9ed9afa683d`. El [resultado de d43ded2](research.md#medición-interna-de-la-última-integración) satisface el umbral de 20 ms en los 30 ciclos de la carga interna. Véase la [nota de alcance](tasks.md#decisión-de-cierre-interno).
+
+Usar un paquete offline archivado con `cripta-06@f9ed9afa683d` y 300 salas. Una descarga actual puede corresponder a otra versión. Para reproducir la corrida interna más reciente, usar el worktree aislado en `d43ded2`. Para repetir la corrida candidata anterior, usar una copia de `af979bb`. El paquete puede prepararse con `python -B main.py --cripta cripta-06 --descargar-todo --datos-dir RUTA_AL_PAQUETE_OFFLINE`. La descarga se hace antes del benchmark y el script comprueba la versión. Con el entorno del proyecto activo, ejecutar desde la raíz:
+
+```powershell
+$env:CRIPTA_BENCH_PAQUETE = 'RUTA_AL_PAQUETE_OFFLINE'
+@"
+import os
+from statistics import median
+from time import perf_counter_ns
+from unittest.mock import patch
+
+from datos.offline import ClienteOffline
+from red.precarga import validar_pagina_esqueleto
+from utilidades import bench_parte_dos
+
+cripta, version = "cripta-06", "f9ed9afa683d"
+cliente = ClienteOffline(os.environ["CRIPTA_BENCH_PAQUETE"], version)
+datos = cliente.obtener_datos_generales(cripta)
+assert datos["version"] == version, datos["version"]
+paginas = datos["paginas"]
+salas = [
+    sala
+    for pagina in range(1, paginas + 1)
+    for sala in validar_pagina_esqueleto(cliente.obtener_esqueleto(cripta, pagina), pagina, paginas)
+]
+assert len(salas) == 300, len(salas)
+
+instantes = []
+def registrar_reloj():
+    instante = perf_counter_ns()
+    instantes.append(instante)
+    return instante
+
+with patch.object(bench_parte_dos, "perf_counter_ns", registrar_reloj):
+    bench_parte_dos.medir_integracion(salas, 20261001, 30)
+
+assert len(instantes) == 120, len(instantes)
+ciclos = [(fin - inicio) / 1e6 for inicio, fin in zip(instantes[:60:2], instantes[1:60:2])]
+print(f"Ciclo (ms), min/mediana/max: {min(ciclos):.4f} / {median(ciclos):.4f} / {max(ciclos):.4f}")
+print(f"Ciclos por debajo de 20 ms: {sum(t < 20 for t in ciclos)}/{len(ciclos)}")
+"@ | python -B -
+```
+
+El script mide 30 ciclos con historia, mapa y 30 cazadores. Como comprobación de la entrada, exige 300 salas y la versión exacta. Los primeros 30 pares corresponden a esos ciclos. Los 30 pares siguientes corresponden a consultas de viaje. La [corrida candidata registrada](research.md#ciclo-integrado-en-cripta-06-evidencia-para-t046) conserva el resultado histórico y el equipo. La [corrida sobre la integración actualizada](research.md#medición-interna-de-la-última-integración) conserva el resultado más reciente. Los tiempos pueden variar al reproducirla.
+
+Para Q3, registrar fuente de designación, ID y versión, equipo, carga y enmiendas aplicables. Ajustar la preparación solo según esa fuente. Medir el ciclo completo sin red ni renderizado y registrar mínimo, mediana, máximo, cantidad de ciclos bajo el umbral y cumplimiento o incumplimiento. T004 acredita la referencia. T046 acredita el resultado.
+
+## Verificación de la integración actualizada
+
+Desde la raíz de una copia de `d43ded2`, con el entorno del proyecto activo:
+
+```powershell
+python -B -m unittest tests.test_almacen_salas tests.test_heap_rutas tests.test_turno_cazador tests.test_controlador_ac_real
+```
+
+Resultado registrado el 2026-11-14: 30 aprobadas, cero fallos, errores u omisiones. El paquete offline de rendimiento es independiente de esta regresión.

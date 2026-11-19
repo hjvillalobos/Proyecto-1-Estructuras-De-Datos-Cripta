@@ -1,5 +1,33 @@
 # Decisiones de diseño
 
+## ERR-01 — recuperación de datos locales
+
+El guardado de JSON podía fallar al reemplazar y después al eliminar su temporal: el segundo error ocultaba el primero. Se adopta el patrón ya usado por la persistencia histórica: excepción pública DatosNoDisponibles con causa original y nota adicional de limpieza. Tras reemplazo exitoso se libera la referencia al temporal. No cambia formato, red, reglas ni estructuras evaluadas; costo O(tamaño del JSON). Alternativa descartada: propagar solamente el fallo de unlink, porque pierde la causa de la operación. Tres pruebas nuevas cubren doble fallo con destino intacto, JSON inválido con limpieza y escritura correcta sin residuos. Regresión dirigida 59 pruebas/8.457 s, suite 863/239.241 s, cero fallos/errores. La limpieza fallida puede dejar el temporal propio, que se identifica en la nota; no se afirma poder eliminar un archivo al que el sistema niega acceso.
+
+## Auditoría integral — 2026-11-16
+
+Se conservan las estructuras y reglas existentes. Se corrige la reutilización de tuplas de animación en el respaldo sin atlas, manteniendo la caché de acciones acotada a ocho entradas; no se introduce índice hash en algoritmos evaluados. Se regeneran las 152 composiciones por invalidación de firmas tras cambios locales anteriores: sus píxeles son idénticos a HEAD. Historia aclara el estado anterior a la acción y rechaza #0 desde el diálogo, conforme a FR-003/020.
+
+Medición `--bench` aislada, semilla 20261001, referencia 06 de 300 salas, 30 cazadores inyectados y mapa completo: ciclo máximo 10.074 ms (0/60 >20), paso 2.767 ms (0/60 >5), verificación incremental completa 9.261 ms (0/60 >200), historia 5.000 acciones/K50 máximo total 1.0017 ms (0/111 >50). K50 retiene 5.673.220 B y reconstruye como máximo 50 acciones; sin controles alcanza 80.3071 ms (39/111 >50). Heap anterior/vigente: medianas 3.1867/1.9895 ms con decisiones iguales. No se atribuye la variación del motor a cambios de presentación ni se garantiza latencia absoluta. Estos resultados son locales, sin nueva publicación Git.
+
+## RP / VD — replay independiente y destino conocido
+
+Se conserva `--replay` sin vista y se añade `--replay-grafico` para la GUI en proceso separado. La fábrica completa con historia permite cargas/retrocesos sin tocar la partida original. El log se lee al abrirse. El diálogo de Viajar recibe únicamente proyección conocida y delega al viaje ordinario; cancelar vuelve antes de cancelar un viaje activo. No se cambian estructuras del motor ni formatos. 112 pruebas dirigidas en 41.511 s, OK, e inspección nativa aislada; sin nuevas afirmaciones de rendimiento. [Informe](specs/004-linea-tiempo/replay-viaje-2026-11-15.md).
+
+## UX-01..03 — salida cancelable y puerta física
+
+Problema: salir abandonaba inmediatamente y la aplicación solo admitía reiniciar tras derrota; el objetivo de salida no estaba explicado. Se descarta confirmar después de cancelar viaje o modificar estado porque cancelar ya no podría conservarlos. Se consulta primero en un diálogo local que bloquea entradas nuevas sin borrar cola, y el controlador comunica una elección explícita a la aplicación. Esta reutiliza la renovación de sesión y semilla, con motor nuevo para la misma cripta; guardados intactos. ID/objetivo son campos opcionales de vista, ajenos al binario/historia, derivados de salidas observadas y conocimiento (consulta O(log V), grado≤4).
+
+La victoria requería una marca orientada aun cuando la misma puerta física se hubiera abierto con llave por el otro extremo. Se acreditan los extremos recíprocos compatibles, registrando sus inversos; no se vuelve ganable una puerta sin llave ni se extiende a arcos ambiguos. Referencia: [spec](specs/004-linea-tiempo/spec.md), [plan](specs/004-linea-tiempo/plan.md),0a98158/d95a58a previos al código. La consulta de llave/apertura sigue local al grado, sin nuevos índices o estructuras prohibidas. No se modificaron búsquedas, agenda, combate ni frecuencia de actores.188 pruebas pertinentes OK y cinco recorridos offline hasta victoria, con daño real comprobado; no se extrapolan nuevos tiempos ni se repiten benchmarks sin señal de regresión. [Evidencia y limitaciones](specs/004-linea-tiempo/seguimiento-ux-2026-11-15.md).
+
+## RE-01..04 — revisión de entrega y metadatos de puerta (2026-11-15)
+
+Problema: una puerta recíproca podía declarar llave/cierre solo en un lado, como ocurre en mapas publicados. El cierre existente afectaba ambos extremos, pero reabrir desde el descriptor sin esos campos omitía la llave y no programaba otro cierre. Alternativas: conservar la lectura unilateral (rechazada por dos pruebas que reproducen el fallo), copiar/normalizar los descriptores al cargar (descartada porque modifica los estados iniciales del servicio) o resolver los atributos faltantes con el emparejamiento propio de extremos inequívocos ya existente. Se elige la tercera; un campo explícito del lado usado tiene prioridad, y sin retorno único no se hereda nada. No se agregan índices hash, dependencia ni formato nuevo. Trabajo O(grado) al abrir o presentar una salida, sin barrer la cripta ni añadirlo a todos los eventos. Carga y acreditación de llave usan la misma consulta. Coincide con [plan RE](specs/004-linea-tiempo/plan.md) y [especificación RE](specs/004-linea-tiempo/spec.md), confirmados en 6309e20 antes del código.
+
+Evidencia: nuevas pruebas negativas sin llave/sin mutación, apertura/cierre desde el lado sin campos, carga/retroceso y una partida con historia/binario reales; conexiones sin retorno o ambiguas conservan independencia. Revisión final: 834 pruebas en 244.140 s, cero fallos/errores, dos opciones con aprobación separada; comparación histórica 41 y API real de cinco criptas fría/caliente, OK. El ajuste de los fixtures de transición reconstruye el grafo tras cambiar sus direcciones; no se silencian excepciones ni se eliminan aserciones.
+
+Medición posterior aislada con --bench, referencia 06 de 300 salas y 30 cazadores inyectados/mapa completo, semilla20261001: ciclo máximo 9.275 ms,0/120 sobre 20; paso máximo 2.342 ms,0/120 sobre 5; verificador completo máximo 12.586 ms,120 muestras, bajo 200; historia 5000 acciones/K50 máximo 0.5745 ms,0/111 sobre 50 y 5.673.260 B. Los valores anteriores a la corrección fueron14.595/2.558/12.602 ms; la variación no se atribuye a una optimización de algoritmos. El [informe completo](specs/004-linea-tiempo/revision-entrega-2026-11-15.md) contiene matriz de Parte I/II, mapas, fuentes, animación y audio. Se conservan los picos históricos de viaje, PDF de P1 vacío, prompts históricos incompletos y limitaciones de audición/evaluación humana; no se certifican latencias absolutas ni cero bugs.
+
 ## Actualizacion tecnica: 2026-10-16
 
 Esta seccion sustituye el pendiente de implementar --bench indicado en las
@@ -189,6 +217,8 @@ Las copias temporales corresponden a cargar, no al historial, que usa solo delta
 
 ## Parte B: red, catálogo, precarga y caché
 
+**Alcance temporal de esta sección:** los apartados originales siguientes conservan las mediciones y pendientes del corte de B anterior a la integración. Los acuerdos A/C/D, pruebas integradas y mediciones de ciclo ya se completaron y están registrados en las actualizaciones de integración y en ESTADO_ENTREGA.md. Los datos de la API y paquetes descargados no equivalen a certificar un paquete externo del curso que no se haya recibido. Las frecuencias de los escenarios medidos no se extrapolan a todas las partidas posibles.
+
 Actualización: 2026-10-03.
 
 Se utiliza la restricción adicional de no usar tablas hash en la lógica estructural. Los diccionarios se conservan únicamente como representación de respuestas JSON, atributos y reportes; no se usan como índices. La deduplicación y los registros de trabajo usan listas.
@@ -332,7 +362,7 @@ El contenido descargado describe el estado inicial de una sala. Al revisitarla, 
 
 Queda por acordar con las partes A, C y D cuándo anticipar salas, confirmar entradas y actualizar referencias. Los componentes deben soltar las referencias a fichas que ya no utilizan para permitir liberar memoria.
 
-### Pendiente de agregar
+### Pendientes del corte histórico de B
 
 - Frecuencias de consulta, inserción y desalojo observadas en partidas reales.
 - Medición del ciclo completo del juego y verificación del límite de 20 ms.
@@ -561,8 +591,8 @@ python -m unittest discover -v
 python -m tests.medir_rendimiento --paquete .cache/cripta
 ```
 
-Los datos completos estan en `.cache/rendimiento.json` y la salida de la suite
-en `.cache/pruebas-rendimiento.txt` (archivos locales ignorados por Git).
+Los datos completos estan en `.cache/revisiones/rendimiento.json` y la salida de la suite
+en `.cache/revisiones/pruebas-rendimiento.txt` (archivos locales ignorados por Git).
 El benchmark excluye Tk y audio. Un perfil previo con cache visual vacia
 dedico aproximadamente 0.82 s al primer dibujo, incluyendo la preparacion de
 ambas orientaciones del personaje; ese costo grafico inicial sigue existiendo.
@@ -623,8 +653,8 @@ limite estricto de 20 ms para la presentacion.
 Son mediciones de snapshots sinteticos con Python 3.14.6, no una medicion de HTTP
 ni del motor. No incluyen la pausa intencional de las animaciones; en movimiento
 se dibujan salida y llegada sin esa pausa. La cache del sistema operativo puede
-estar caliente. El detalle esta en `.cache/presentacion.json` y la suite en
-`.cache/pruebas-objetos.txt`. El script no genera partidas ni consume solicitudes.
+estar caliente. El detalle esta en `.cache/revisiones/presentacion.json` y la suite en
+`.cache/revisiones/pruebas-objetos.txt`. El script no genera partidas ni consume solicitudes.
 
 ## Medicion especifica de puerta a puerta
 
@@ -658,7 +688,7 @@ del sistema operativo. Los maximos de distintas columnas pueden ser casos distin
 
 Validacion de este ajuste: 31 pruebas aprobadas de animacion, cadencia, puertas,
 trampas y transicion de inicio; auditoria estatica sin hallazgos. El detalle de
-los recorridos posteriores esta en `.cache/puertas.json`.
+los recorridos posteriores esta en `.cache/revisiones/puertas.json`.
 
 
 ## Decisión de diseño: verificador de resolubilidad
@@ -943,3 +973,162 @@ en la versión y el equipo medidos. Incluye normalización, recorrido,
 diagnóstico cuando corresponde y construcción del reporte. La
 preparación se muestra aparte. Queda pendiente la revisión cruzada
 con B y la medición del ciclo integrado con cazadores.
+
+## D: aceptación del controlador con A/C reales — 2026-11-12
+
+Problema: las pruebas anteriores de D usaban un productor de contrato mientras
+A ya había entregado captura/restauración H3 offline y conexión del mapa de C.
+Se añadió `tests/test_controlador_ac_real.py` sobre motor, datos offline,
+conocimiento, planificador, control de viaje, binario y replay reales. La vista
+es receptora de prueba. Se verifica la frontera de eventos por los comandos del
+controlador y no escribiendo a mano su bitácora.
+
+Se conserva la activación explícita de prueba de A. Activarla globalmente en
+la CLI sería prematuro: el productor solo admite mover/esperar/atacar, la
+restauración rechaza conocimiento activo y el movimiento no entrega hechos de
+viaje. D no infiere daño desde la vida final ni reconstruye el mapa a partir de
+datos precargados. La alternativa elegida es aceptar lo entregado y verificar
+también los límites con pruebas negativas, sin ampliar reglas de A/C.
+
+Las nueve pruebas nuevas pasaron en 2.376 s con Python 3.14.6. Esto acredita
+funcionamiento en los escenarios documentados, no un límite de rendimiento.
+La consulta no altera estado/azar/log; cargas inválidas no publican cambios;
+el replay conserva la carga embebida aunque se elimine su archivo original.
+El viaje cancelado no mueve; ante hechos ausentes se registra el primer paso
+real y se impide continuar. Con mapa activo, carga rechazada conserva partida,
+mapa, rama histórica y log. Aceptación conjunta completa sigue pendiente.
+
+
+## Integración final de Parte II — 2026-11-14
+
+Los estados «pendiente» anteriores son históricos. Fuentes: [especificación IA-01..09](specs/004-linea-tiempo/spec.md), [plan](specs/004-linea-tiempo/plan.md) y [trazabilidad/evidencia](specs/004-linea-tiempo/integracion-completa.md). Se incorporó la entrega remota de A f8e10ef antes de cerrar; se conservaron su captura de pasos, resolución topológica, exportación y pruebas/benchmarks.
+
+### Ruta del cazador
+
+Problema: muchos actores persiguen el mismo objetivo. Alternativas: búsqueda individual, entradas obsoletas, selección lineal, caché de consultas y campo inverso compartido. Decisión: conservar la búsqueda individual acotada para rangos finitos; para rango ilimitado, compartir distancias desde el objetivo, manteniendo el desempate de menor ID del primer paso. Esto cambia la base individual del plan de A, motivado por la comparación medida. La construcción del campo cuesta O((V+E) log V), memoria O(V+E); una decisión compartida examina las salidas del origen. La consulta acotada conserva trabajo según la región alcanzada, sin recorrer el mapa para cada rango pequeño.
+
+### Invalidación
+
+Alternativas: recalcular siempre; reutilizar por objetivo/estado de puertas; dependencias detalladas por ruta. Se elige clave de objetivo y estados de puertas para el campo ilimitado, comprobada una vez por frontera del motor; abrir/cerrar invalida y el retroceso/carga descarta derivados. Fuera de una acción del motor se comprueba la firma real para admitir cambios externos. El movimiento de otro actor no invalida distancias: los actores no bloquean salidas. Las pruebas comparan contra consultas frescas tras cambios. El costo de reconstruir y mantener el campo está incluido en el benchmark, no se presenta solo el acierto barato.
+
+### Conocimiento y viaje
+
+Problema: ocultar información precargada y evitar copiar el mapa al registrar cada evento. Alternativas: derivar del mapa real, copiar la proyección completa o transmitir cambios locales. Se descartan las primeras dos por filtración/costo; se conservan los índices compactos/búsquedas propias de C y se transmiten sus deltas. Una entrada actualiza sala, vecinas pertinentes y observaciones de puertas desde la sala ocupada; la antorcha no activa contenido remoto. Consultas de ruta usan el subgrafo recordado y el control por pasos de C; el motor entrega daño/entrada/enemigos reales mediante A. La búsqueda comparte implementación propia con el cazador, pero no su conocimiento. El caso de puertas remotas es interpretación conservadora del equipo, no respuesta oficial.
+
+### Resolubilidad
+
+Se conserva el análisis incremental y certificado de B frente a repetir un recorrido por cada llave. La normalización es O(N log N), el recorrido es aproximadamente lineal y el reporte depende de su salida; no se borra esta distinción para afirmar linealidad estricta. El modelo acumula alcanzabilidad/llaves; no garantiza un único itinerario si hay salidas sin regreso. Las mediciones de referencia y esa limitación se mantienen explícitas.
+
+### Historia, retroceso y persistencia
+
+Alternativas: copiar la partida por acción, re-simular desde controles o conservar cambios puros. Se mantiene la tercera: diferencias de estadísticas/enemigos/efectos, nodos de inventario y deltas locales de conocimiento, con controles cada K=50. Solo quedan cambios en las acciones, no las proyecciones temporales completas. Se mantiene la elección K=50 respaldada por las series K=10/50/100/sin controles documentadas arriba. Consultar reconstruye como máximo K acciones. El retroceso recorta la rama y registra la corrección irreversible del pergamino consumido.
+
+El binario v4 transporta el físico y la historia; la carga prepara conocimiento y físico independientes, valida frontera/proyección y luego publica. Las copias de preparación existen solo durante carga, no en el historial reversible. Se rechazan guardados P1 y las historias parciales incompatibles, sin migración silenciosa. La puerta modificada se exporta aunque no se haya visitado su otro extremo. Los inversos preservan también la ausencia original del campo `cerrada`.
+
+### Revisión de estructuras de Parte I
+
+Se conserva la agenda propia con cancelación perezosa y el historial por inversos. La entrega de A incorpora comparaciones de heap indexado/obsoletos/lineal, caché acotada y agenda con limpieza/heap indexado frente a la original; se conecta en `--bench --subsistemas terreno-cazador`. El ciclo integrado añade historia/mapa y 30 cazadores. Las alternativas no ganadoras siguen como medición, no como dependencias de producción. Los tiempos y máximos del cierre se registran en la evidencia anexa; no se generalizan a cualquier hardware, cripta o número de actores.
+
+
+### Evidencia final de la integración
+
+Referencia cripta-06@f9ed9afa683d (300 salas), descargada con 46/63 solicitudes. Medición offline con 30 cazadores inyectados y mapa completo: ciclo máximo 10.789 ms (media 3.639 ms), 0/30 sobre 20 ms. Paso conocido con recuerdos de todas las puertas y primera búsqueda incluida: máximo 4.323 ms, 0/30 sobre 5 ms. Verificador incremental: máximo 11.777 ms en diez muestras. Las estrategias compartida, cacheada e individual se comparan sobre idénticas consultas y puertas, comprobando decisiones antes de reportar tiempos. Los rangos pequeños favorecen evitar el campo global; las puertas cambiantes reducen las ventajas de caché, como muestra la salida completa. [Resultados conservados](specs/004-linea-tiempo/integracion-mediciones.json) y [aceptación](specs/004-linea-tiempo/integracion-completa.md).
+
+Suite integrada con la entrega remota de A: 809 pruebas, cero fallos/errores y cuatro omisiones opcionales explícitas. Se conserva el límite del mapa por mayor ID en los arreglos heredados del motor; no se afirma memoria proporcional solo a V para IDs arbitrariamente dispersos. La API permite preparar datos compatibles; el paquete antiguo incompleto no se presenta como validación exitosa.
+
+## Validación adicional sin preparación de defensa — 2026-11-14
+
+Se completó una copia del paquete histórico con fichas reales del catálogo publicado compatible, conservando el paquete original y las versiones de mapas. Se corrigió la estrategia del bot ante inventario lleno mediante acciones reales de soltar y un límite de recolección de pociones; no se aumentó la capacidad del juego. Las dos pruebas opcionales de las cuatro criptas aprueban.
+
+La API ya no publica los cuatro IDs fijos de la prueba antigua. Se consulta el listado vigente y se verifican todas sus entradas con procesos separados por fase fría/caliente, para respetar UUID, contador y presupuesto por ejecución. Se incluye el verificador y el motor completo; esta prueba de datos no reemplaza el bloqueo de arranque de criptas no resolubles.
+
+Se añade aceptación completa con IDs/costos nuevos para tres semillas: comandos del controlador, historia, equipo, luz, llave, puerta, victoria y replay sin archivo de guardado original. Se complementa con inspección manual de guardar/cargar, mapa e historia en la GUI real. La comparación histórica de rutas vuelve a ejecutarse aislada. Las opciones omitidas de una ejecución estándar tienen evidencia separada, sin transformarlas en aprobaciones ficticias.
+
+Se registran las fuentes faltantes y tres preguntas de interpretación en [QA adicional](specs/004-linea-tiempo/qa-adicional-2026-11-14.md). No se inventan finales de prompts ni respuestas del profesor; no se envían mensajes ni se preparan materiales de defensa.
+
+La ejecución conjunta detectó una espera intermitente en la prueba de teclado del nombre de puntaje. Se diagnosticó con pila y se sincronizó la transferencia de foco antes de inyectar teclas, conservando los bindings y las aserciones. Las ejecuciones detenidas se declaran separadamente de la regresión final; no se modifica el diálogo de producción sin evidencia de un fallo en su uso real.
+
+Resultado posterior: 810 pruebas en 217.145 s, OK (skipped=2), cero fallos/errores. Las dos omisiones opcionales tienen ejecución separada aprobada: comparación de revisiones (41) y API publicada (una prueba con cinco criptas/fría/caliente). La regresión aislada de foco pasó 15 pruebas en tres repeticiones. Los conjuntos se solapan y no se suman.
+
+### Revisión posterior de decisiones y rama — 2026-11-14
+
+La revisión del PDF íntegro de Parte II respalda resolver las interpretaciones con criterios documentados. La acumulación de llaves ya tenía aceptación registrada del profesor, comunicada por la usuaria el 2026-11-02; no corresponde volver a pedirla. La antorcha revela vecinas y la observación de puertas se mantiene desde la sala ocupada. El verificador conserva la cota total O(N log N + salida), la comparación incremental/repetitiva y las series de escalamiento como evidencia para el crecimiento aproximadamente lineal solicitado; no se afirma O(N) estricto ni se exige una consulta externa para continuar.
+
+Se verificó la ascendencia de `f8e10ef` en la rama y se repitieron 810 pruebas en 198.006 s: cero fallos/errores, dos omisiones opcionales explícitas. La medición aislada dio máximos de 16.664 ms por ciclo con 30 cazadores, 4.381 ms por paso conocido y 9.369 ms en verificación completa. Historia K=50 con 5.000 acciones: máximo total 1.0117 ms, 0/111 excesos; se repitió la comparación con K=10/100 y sin controles. La [revisión de rama](specs/004-linea-tiempo/revision-rama-2026-11-14.md) conserva también el exceso observado bajo concurrencia, los límites de memoria por IDs y los defectos históricos de fuentes/proceso. No se modificaron reglas ni código de producción.
+
+## Fortalecimiento RF-01..03 — 2026-11-14
+
+Fuentes: [especificación RF](specs/004-linea-tiempo/spec.md), [plan y decisión final](specs/004-linea-tiempo/plan.md), [tareas RF](specs/004-linea-tiempo/tasks.md). Especificación confirmada en `5bccc94` antes del código. La autorización abarca A/B/C/D, con defensa excluida.
+
+### Comparaciones del heap
+
+Problema: cada ascenso/descenso reconstruía repetidamente etiquetas y tuplas para nodos cuyas prioridades no habían cambiado. Alternativas: conservar el heap sin cambios, almacenar claves al mejorar una etiqueta, o sustituir la búsqueda. Se elige retener claves totales en el heap propio para conservar algoritmo y desempate; se descarta sustituir la búsqueda porque no hace falta cambiar sus reglas ni la estructura para eliminar ese trabajo. Insertar/disminuir/extraer sigue siendo O(log F), con espacio O(V) preparado una sola vez. No hay índices de biblioteca ni reinicialización O(V) por consulta. Las pruebas de generaciones, disminuciones y oráculos verifican que las prioridades de una consulta no se reutilicen en otra.
+
+Evidencia pareada: `--bench --subsistemas parte-dos --paquete .cache/entrega-completa --cripta cripta-06 --repeticiones 60`. Preparación excluida, mismo grafo y parejas, orden de ejecución alternado, igualdad de decisiones comprobada. Mediana anterior 4.1880 ms, nueva 2.1898 ms (razón 1.912; reducción aproximada del 47.7%); máximos 6.9196 y 3.0624 ms. La alternativa anterior permanece en `utilidades/bench_heap_claves.py`, solo para medición.
+
+En la misma ejecución: paso conocido máximo 2.567 ms, 0/60 sobre 5 ms; ciclo integrado con 30 cazadores máximo 14.264 ms, 0/60 sobre 20 ms. Medias 0.054 y 7.589 ms. La primera búsqueda está incluida. No se atribuye una mejora porcentual de ciclo frente a las antiguas 30 repeticiones: aquí son 60 y la población alcanza al jugador en momentos distintos. Log local `.cache/revisiones/fortalecimiento-bench.log`. Los resultados corresponden a esa referencia/equipo y no garantizan tiempos bajo cualquier carga del sistema.
+
+### IDs dispersos, rastro y persistencia
+
+Problema: el motor y su rastro reservaban posiciones hasta maxID, aunque hubiera pocas salas. Alternativas: arrays directos, traducción mediante búsqueda binaria, o un índice radix propio con valores compactos. Se conserva acceso directo cuando maxID+1 <= 4V; para IDs dispersos se elige radix sobre dígitos de cuatro bits. La búsqueda binaria fue el diseño inicial y se descartó para que consultar rastro no introduzca un factor log V por vecina. Hay hasta ocho niveles para IDs uint32, independientemente de V; el trabajo del rastreador sigue limitado a sus salidas. Espacio O(V) para el dominio uint32 del binario, con mayor constante que un índice binario. IDs de tamaño arbitrario pueden necesitar más niveles y el formato persistible mantiene sus límites existentes.
+
+`modelo/almacen_salas.py` suministra la colección, sin dict/set. Longitud/iteración abarcan valores existentes y el límite lógico de IDs se consulta separadamente. Se recorren IDs reales en exportación/restauración; mapa y rastro también usan almacenamiento acotado. El formato v4 y los IDs observables no cambian. Se conserva el constructor histórico independiente de RegistroRastro para sus consumidores antiguos.
+
+Una prueba inicial detectó que exponer maxID como `len()` hacía que `list()` intentara reservar millones de posiciones: se corrigió, se conservó el caso y se añadieron límites de dígitos, huecos, copias independientes y empate de rastros. Una partida generada completa usa IDs entre 1.000.000.000 y 4.000.000.000 con victoria, guardado/carga, retroceso y replay. La memoria de una preparación experimental de seis salas y maxID 2.500.000.001 fue 79.800 bytes retenidos y 80.040 de pico en tracemalloc; no es memoria total del proceso ni una comparación equivalente con arranque frío. El riesgo previo de reserva proporcional a maxID queda resuelto en el motor.
+
+### Documentación y validación
+
+README reescrito para instalación, modos, comandos, datos generados, pruebas y herramientas vigentes; notas antiguas conservadas en README_HISTORICO. ESTADO_ENTREGA contiene el contraste por sección y los 23 casos del Apéndice B, con requisito/escenario/tarea/código/prueba. Specs/planes/contratos identifican su estado actual y separan los antecedentes. No se convierten revisiones humanas ni prompts incompletos en aprobaciones ficticias.
+
+La primera regresión de fortalecimiento aprobó 813 pruebas en 191.984 s, cero fallos/errores y dos omisiones opcionales. Las opciones se ejecutaron aparte: comparación histórica 41 pruebas, OK; API oficial cinco criptas en fases fría/caliente, una prueba en 88.736 s, OK, todos los presupuestos respetados (fría 13/23, 16/42, 17/52, 14/25 y 46/63; caliente tres solicitudes por cripta). La ejecución restringida inicial falló por DNS; el reintento autorizado con acceso de red aprobó, sin modificar el programa ni ocultar la ejecución fallida. Copia limpia de fuentes sin cachés/partidas: 19 pruebas de modos, IDs e integración, OK, 6.691 s, usando el intérprete/dependencias instalados; no se afirma haber reinstalado dependencias desde Internet. Después del índice radix final aprobaron 24 pruebas de almacenamiento, partidas, rastro y restauración; la regresión final se registra a continuación.
+
+Regresión final del índice definitivo: **814 pruebas en 183.269 s, OK (skipped=2), cero fallos/errores**. Log `.cache/revisiones/fortalecimiento-suite-final.log`. Las dos opciones tienen las ejecuciones separadas aprobadas indicadas antes. Se ejecutaron además diez pruebas del benchmark/estrategias tras conectar la comparación de claves; cero fallos.
+
+Repetición final offline sin la suite concurrente, mismo equipo/versión/semilla: mediana heap anterior/nuevo 4.3523/2.2538 ms, razón 1.931 (48.2% menos tiempo mediano), decisiones iguales. Viaje máximo 2.501 ms (0/60 sobre 5); ciclo 14.017 ms (0/60 sobre 20); verificador completo 7.855 ms (0/10 sobre 200). Historia, cinco repeticiones y 185 consultas por variante: máximos K=10/50/100/sin controles 0.2208/0.9363/1.8317/123.0777 ms; memorias retenidas 6.212.156/5.305.932/5.126.876/4.808.436 bytes. K=50 mantiene un máximo de 50 acciones reconstruidas y 0/185 excesos; sin controles hubo 72/185 excesos. Se conserva K=50.
+
+Los cuatro benchmarks terminaron correctamente y sus salidas completas están en [fortalecimiento-mediciones.json](specs/004-linea-tiempo/fortalecimiento-mediciones.json), junto con entorno, semilla y resumen de suite. La preparación/disco/red no se incluyó en las consultas; el verificador sí incluye normalización/diagnóstico/reporte. No se promete una calificación, aceptación humana ni ausencia absoluta de bugs.
+
+La aceptación final de copia limpia con el índice definitivo se repitió mediante `python -m utilidades.verificar_copia_limpia`: **20 pruebas en 6.775 s, OK**, sin reutilizar cachés ni partidas. El intérprete y las dependencias son los instalados; no se simula una instalación nueva de paquetes.
+
+
+### Publicación con novedades remotas de A
+
+
+
+Se integró dff5882 (a2a72fc y ec77cc9): conservar claves retenidas, ascenso/descenso con menos comparaciones de A y marcador (?) para salas avistadas. Pruebas específicas 44, OK; suite conjunta **815 en 220.346 s, cero fallos/errores, dos omisiones opcionales**. El push inicial rechazó el avance remoto y se resolvió mediante fusión normal, sin sobrescribirlo.
+
+Benchmark posterior: mediana sin/con claves retenidas 3.8838/2.3941 ms; decisiones iguales. Ciclo máximo 20.282 ms, 1/60 sobre 20; paso 4.208 ms, 0/60 sobre 5. Repetición aislada del ciclo: máximo 19.783 ms, media 7.614 ms, 0/60 sobre 20; paso 2.341 ms, 0/60 sobre 5. Se conserva el exceso inicial: el margen de ciclo fluctúa con la carga del equipo y no se declara cumplimiento absoluto en todas las muestras. Los resultados anteriores de otras operaciones siguen correspondiendo a sus cargas documentadas.
+
+## RC-01 — eliminar ordenamientos redundantes de historia
+
+La especificación/plan/tareas RC-01 se confirmaron en `5972e3d` antes del código. El perfil de 120 acciones encontró que proyecciones y diferencias ordenaban repetidamente enemigos y campos por evento: `diferencias` y `proyeccion_h3` acumularon 1.046 y 1.211 s instrumentados; 16.385 llamadas al ordenamiento acumularon 1.628 s (los tiempos anidados se solapan). cProfile solo identifica el cuello; sus máximos no son mediciones de cumplimiento.
+
+Alternativas: conservar el registro general con ordenamiento, almacenar deltas especializados para todas las reglas, o reutilizar únicamente el orden de referencias y fusionar campos ya ordenados. Se elige la tercera: reduce trabajo sin ampliar la superficie de instrumentación de reglas, manteniendo el comparador general para inventario/mapa y restauración. No se almacenan vidas ni valores mutables en el derivado. La cache retiene solo una colección de sala y orden de referencias, O(H); compara sala, secuencia, identidad de objetos e IDs. Los valores se proyectan nuevos y los muertos se filtran al emitir. Cambiar colección, reemplazar actores, cambiar IDs, revertir o cargar obliga a recalcular cuando corresponde.
+
+La proyección conserva el esquema y orden previos. Los tres campos fijos se comparan por posición y los enemigos por fusión O(H), sin volver a ordenar ambos lados ni crear cambios tipados que el receptor volvía a construir. Emitir los deltas conserva el orden exacto previo, no solo su efecto. Primera preparación de orden O(H log H); consulta/validación de orden estable O(H), incluyendo lectura de valores. No hay dict/set ni ordenamientos de biblioteca. El costo de inventario y checkpoints mantiene sus límites anteriores.
+
+Validación: `tests.test_ciclo_historia_rapida` contrasta proyecciones y deltas por evento con el productor anterior d43ded2 conservado en `utilidades/referencia_historia_ciclo.py`. Incluye tres partidas completas con guardar/cargar, equipo, luz, combate, retroceso y replay; pruebas de fallos, reemplazos de igual tamaño, identidad, muerte/reaparición y cambio de sala. Un fallo inicial de fixture intentaba inspeccionar una sala sin cargar; se corrigió entrando mediante un movimiento real. No se cambió producción para hacer pasar esa preparación incorrecta.
+
+Benchmark pareado sin profiler ni suite concurrente: referencia cripta-06@f9ed9afa683d, 300 salas, mapa completo, 30 cazadores inyectados, semilla 20261001, cinco series independientes de 120 acciones por productor y orden alternado. Incluye llegada de enemigos, combate y checkpoints. Estado final, historia serializada y azar iguales en cada pareja. Anterior: mediana 11.436 ms, máximo 76.432 ms, 2/600 sobre 20. Optimizado: mediana 4.435 ms, máximo 11.931 ms, 0/600 sobre 20; reducción aproximada del 61.2% en mediana. No se desactiva GC ni se omiten las primeras consultas/checkpoints.
+
+La medición auxiliar de viaje de la quinta serie optimizada registró 5.168 ms (una de 600 sobre 5 ms); se conserva en las muestras, sin atribuirle una regresión demostrada a este cambio que no modifica el planificador. No se extrapola el resultado de ciclos a todos los subsistemas ni se garantiza ausencia de picos externos. [Muestras completas y comando reproducible](specs/004-linea-tiempo/ciclo-historia-mediciones.json). CLI: `python main.py --bench --subsistemas ciclo-historia --paquete .cache/entrega-completa --cripta cripta-06 --repeticiones 5`.
+
+Regresión RC-01 final: **818 pruebas en 181.531 s, OK (skipped=2), cero fallos y errores**. Las opciones son comparación histórica y API real, con sus ejecuciones previas separadas; no se volvieron a ejecutar contra la red porque este cambio no afecta su contrato. Copia sin cachés/partidas: 20 pruebas en 5.765 s, OK. CLI nueva validada además con carga sintética de seis salas y 120 ciclos por productor, estados iguales y máximo nuevo 6.688 ms; no sustituye el paquete de referencia. Los conjuntos se solapan y no se suman.
+
+## VI-01..05 — arte, mapa conocido y auditoría de API
+
+Problema: cazadores y tipos del catálogo aparecían con recurso neutro, y el mapa de GUI era solo texto. La usuaria autorizó mejorar presentación y publicar en su rama manteniendo lo que funciona. Especificación confirmada antes del código en defa0c4, después de incorporar main y los cambios de A por avance rápido.
+
+Alternativas de mapa: usar una imagen del terreno real, una biblioteca de grafos o Canvas sobre la proyección conocida. Se elige Canvas: no revela salas ocultas, respeta estructuras propias y admite dirigidas/IDs dispersos sin inventar coordenadas. Orden propio y búsquedas binarias, O((V+E) log V) de preparación y O(V+E) auxiliar; recorrido de disposición lineal tras resolver IDs. Los vecinos bidireccionales internos sirven solo para distribuir tarjetas; no crean salidas jugables. Niebla estática decorativa independiente del mundo. Se descarta animarla para no añadir trabajo periódico. Dibujar solo al abrir/seleccionar/ampliar; los datos cambian al volver a abrir. Puertas son recuerdos, sin consulta remota al seleccionarlas.
+
+La vista no calcula rutas ni mueve al jugador: devuelve ir a ID tras cerrar el modal y la GUI lo encola por el controlador normal. Se conserva el informe textual de consola y un listado dentro del mapa. Selección/consulta no cambian estado, reloj, azar, log ni conocimiento. Módulos modelo/red/datos intactos. La interfaz usa los colores y tipografías existentes, barras/zoom, detalle completo y centrado; el esquema es de conexiones y no pretende posiciones geográficas.
+
+Tres recursos ImageGen locales con alpha, estilo tinta/gouache y paleta sepia/burdeos/ámbar: sabueso óseo, espectro acechador y carcelero errante. No reemplazan originales; tipo específico primero, respaldo cazador por comportamiento después, signo neutro para otros tipos sin arte. Nombre/instancia/vida permanecen del catálogo. Se reutiliza la cache visual por tamaño. Prompts literales y procedencia en PROMPTS_LLM y recursos/README.
+
+Al agregar el selector de imagen se invalidó la firma que incorpora el código de recursos a las composiciones preparadas. La primera suite detectó dos fallos/nueve errores, todos de composiciones; log local conservado. Se regeneraron las 152 con utilidades.preparar_visuales. Tamaño, modo y bytes de píxeles idénticos contra Git en las 152, sin tocar las animaciones; firmas actualizadas para seguir cargando preparado en vez de recomponer al jugar. Los 14 casos de composiciones/mapa pasaron después; suite final 828 pruebas en 214.910 s, cero fallos/errores, dos opciones omitidas identificadas. La comparación histórica ya tenía 41 pruebas aprobadas aparte; API real repetida ahora.
+
+Auditoría directa OpenAPI 1.1.0: nueve GET publicados, ocho integrados y la alternativa de ficha individual cubierta por catálogo por lote. No hay endpoint de imágenes ni faltante necesario en los datos publicados examinados. Fases fría/caliente de las cinco criptas con UUID y presupuesto normal: una prueba en 87.563 s, OK; cripta-06 46/63 solicitudes en frío y tres en caliente. Auditoría offline de sus 300 salas: 75 enemigos/36 cazadores, cinco tipos con imagen; estadísticas y costos integrados. Se conservan interpretaciones de A para entradas conformes, sin inventar normalización de opcionales/nulos malformados que OpenAPI admite más ampliamente.
+
+Repetición de ciclo-historia aislada, cinco series alternadas de 120 ciclos por productor, 300 salas, 30 cazadores inyectados, historia/mapa completos, semilla 20261001. Estado/historia/azar iguales. Productor anterior mediana 11.7441 ms, máximo 94.1802 ms, 5/600 sobre 20; optimizado vigente mediana 4.1807 ms, máximo 9.1013 ms, 0/600. El arte no modifica ese motor y no se le atribuye la diferencia de tiempos frente a ejecuciones anteriores. Viaje auxiliar registra 5.5273 ms, 1/600 sobre 5; el anterior en esta ejecución 3.3851 ms, 0/600. Se conserva el exceso y el antecedente previo de 5.168 ms; no se promete la cota de viaje en todas las muestras ni se modifica el planificador fuera de alcance. Disposición pura de 1.000 nodos/arcos: 30 repeticiones, mediana 9.6051 ms, máximo 13.7702 ms, sin render Tk; no es costo de evento.
+
+GUI inspeccionada en arranque normal offline y mapa sin avance de tiempo/log. Para comparar arte y controles se usó además una proyección preparada en ventana titulada revisión de arte, sin partida, explícitamente distinta de una ejecución natural. Evidencia, rutas API, versiones, conteos y límites en specs/004-linea-tiempo/visual-api-2026-11-14.md; muestras crudas/entorno en visual-mediciones.json. No se garantiza una nota ni ausencia absoluta de errores.

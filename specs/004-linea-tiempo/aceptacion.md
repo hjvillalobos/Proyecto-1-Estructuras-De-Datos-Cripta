@@ -1,5 +1,8 @@
 # Plan de aceptación y mediciones
 
+> **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
+
+
 La tabla vincula los escenarios de aceptación con sus requisitos y tareas.
 Los resultados ejecutados y las dependencias pendientes se registran abajo.
 
@@ -232,7 +235,7 @@ Corrida final con Python 3.14.6, Windows y `CRIPTA_SIN_AUDIO=1`: **701 pruebas,
 695 aprobadas, 6 omisiones y cero fallos/errores**, en 147.274 s. Se usó un runner
 local de `unittest` con descubrimiento de `tests/`, salida por caso y un límite
 de diagnóstico de 45 s por caso. Registro local:
-`.cache/revision-d-viaje-suite-final.log`. Reproducción ordinaria:
+`.cache/revisiones/revision-d-viaje-suite-final.log`. Reproducción ordinaria:
 
 ```powershell
 $env:CRIPTA_SIN_AUDIO='1'
@@ -276,7 +279,7 @@ independientes. La regresión seleccionada posterior aprobó 28 pruebas.
 
 Corrida final con Python 3.14.6 y `CRIPTA_SIN_AUDIO=1`: **709 pruebas, 703
 aprobadas, seis omisiones y cero fallos/errores**, en 128.960 s. Registro local:
-`.cache/revision-d-main-h3.log`. Se usó el mismo runner de descubrimiento con
+`.cache/revisiones/revision-d-main-h3.log`. Se usó el mismo runner de descubrimiento con
 límite de diagnóstico por caso descrito en la sección anterior. Reproducción:
 
 ```powershell
@@ -291,3 +294,180 @@ y restauración de A; el receptor optativo de sala/jugador no las reemplaza ni
 habilita automáticamente `integrar_historia`. T003/T010 y la aceptación integral
 de T021 permanecen abiertas. Todos los cambios de este incremento son de D y
 se publican únicamente en `004-linea-tiempo`.
+
+## Preparación de puertas recíprocas A–D, 2026-11-12
+
+Se preparó `tests/test_puertas_reciprocas_d.py` para PD-01..04 de la
+especificación, confirmados primero en `32b97f6`. No se cambió producción,
+el formato binario ni los contratos de historia completa. La propuesta de A
+todavía no está implementada en el motor de este árbol.
+
+Python 3.14.6, temporales en una carpeta escribible y sin HTTP:
+
+```powershell
+python -B -X utf8 -m unittest tests.test_puertas_reciprocas_d -v
+python -B -X utf8 -m unittest tests.test_regresiones_juego tests.test_receptor_h3_d tests.test_historia_motor
+```
+
+Suite nueva: **7 pruebas, 1 aprobada y 6 fallos de aserción; cero errores y
+cero omisiones**. Es una entrega TDD deliberadamente pendiente; el descubrimiento
+global también incluirá estos fallos hasta integrar la implementación de A.
+
+| Caso | Resultado en la base actual |
+| --- | --- |
+| PD-01 apertura/carga con extremo no visitado | Falla antes de guardar: apertura unilateral. |
+| PD-01 binario de estado bilateral preparado | Falla al cargar: extremo no visitado vuelve a cerrado. |
+| PD-02 preservación de evento y estado | Pasa: tiempo, secuencia, contador y estado completo iguales. |
+| PD-02 ejecución de cierre cargado | Falla: cierra solo un extremo. |
+| PD-03 retroceso de apertura | Falla en la precondición bilateral; las aserciones de retroceso aún no se alcanzan. |
+| PD-03 retroceso de cierre cargado | Falla en la precondición bilateral; las aserciones de retroceso aún no se alcanzan. |
+| PD-04 continuación determinista | La igualdad de estados pasa, pero falla el cierre bilateral exigido. |
+
+Los fixtures abiertos aíslan persistencia/cierre de la apertura pendiente; no
+reemplazan métodos del motor. El caso de exportación prepara expresamente un
+estado bilateral cambiado para reproducir la pérdida de una sala sin contenido
+cargado ni rastro. No acredita que el productor actual abra ambos extremos.
+La agenda contiene un único cierre; todavía no se comprueba la política de
+guardados antiguos contradictorios o con dos cierres de la misma puerta física.
+
+Regresión seleccionada: **50 pruebas, 48 aprobadas, dos omitidas y cero
+fallos/errores** en 2.162 s. Las omisiones siguen siendo la captura y restauración
+de historia completa del motor real. La suite nueva tardó 0.206 s; esas
+duraciones de unittest no son mediciones de rendimiento del juego.
+
+Pendiente de A: sincronizar apertura/cierre y conservar el extremo modificado
+sin cargar ni explorar su sala; registrar ambos deltas y conservar la identidad
+del cierre al retroceder. Pendiente de D: repetir esta aceptación al recibirlo.
+No se cierran T003/T010/T021 por preparar estas pruebas.
+
+Antes de publicar se consultó la rama remota y se incorporó `8bfe11a` mediante
+el merge `1850722`, conservando los avances nuevos de A/C. El conflicto del
+registro de prompts se resolvió conservando ambas entradas. Se repitieron las
+siete pruebas nuevas: mismo resultado (1 aprobada y 6 fallos), en 0.087 s.
+La regresión ampliada de la base integrada pasó **100 pruebas contabilizadas:
+98 aprobadas, dos omitidas, cero fallos/errores**, en 13.331 s:
+
+```powershell
+python -B -X utf8 -m unittest tests.test_regresiones_juego tests.test_receptor_h3_d tests.test_historia_motor tests.test_eventos_terreno tests.test_restauracion_rutas tests.test_turno_cazador tests.test_cambios_historicos_motor
+```
+
+La entrega nueva de A incorpora captura/restauración históricas bajo activación
+offline; las dos omisiones del flujo general siguen presentes. Estos resultados
+no sustituyen la aceptación integral de producción ni la propuesta de puertas.
+
+## Controlador de D con entregas reales de A/C — 2026-11-12
+
+Especificación DX-01..06 confirmada en `43c0d2e`. Nueva suite:
+`tests/test_controlador_ac_real.py`. Usa un paquete sintético construido por B,
+cliente/precarga offline, motor histórico o mapa de A bajo sus opciones
+explícitas de prueba, mapa/planificador/control de viaje de C y controlador,
+binario e historial de D. Solo la vista se simula y se prohíbe HTTP.
+No se parchean acciones, reglas, resultado de movimiento ni restauración.
+
+```powershell
+python -B -X utf8 -m unittest tests.test_controlador_ac_real -v
+```
+
+**9/9 pruebas aprobadas**, cero fallos, errores u omisiones, en 2.376 s con
+Python 3.14.6. Duración de unittest, sin afirmación de rendimiento.
+
+| Requisito | Evidencia desde el consumidor de D |
+| --- | --- |
+| DX-01 | `mover E`, `esperar`, `historia 99/100/#2`; vida antes/después del ataque empatado. Consulta conserva estado, RNG y bytes del log. |
+| DX-02 | Comandos con ruta con espacios escriben v4 y recuperan estado/historia. Continuación coincide con la ejecución previa a cargar. |
+| DX-02 | P1 y archivo truncado producen error de usuario, sin cambio de partida ni nueva carga en el log. |
+| DX-02 | Pergamino recorta historia, se consume y permite nueva rama; replay conserva las órdenes. No acredita inventario histórico completo. |
+| DX-03 | Replay del log escrito por el controlador, con carga embebida, coincide para 99/100/200 y avisa para 201; funciona sin archivo guardado original ni construir vistas. |
+| DX-04 | Comando mapa presenta conocimiento actualizado por entrada física y oculta la sala desconocida. Consulta conserva partida y log. |
+| DX-05 | Control de viaje real de C sobre mapa conocido del motor; cancelar antes del paso conserva estado/acciones y elimina propuesta. |
+| DX-05, límite | Un paso aceptado se graba; ante `hechos_paso` ausente se cancela y no se repite. El error se verifica, no se inventan daño o enemigos. |
+| DX-06, límite | Carga con mapa activo informa el rechazo explícito de A y conserva partida, conocimiento, historia y bytes del log. |
+
+Pendientes de productores y coordinación: ampliar acciones históricas más allá
+de mover/esperar/atacar; entregar hechos de paso; persistir/restaurar
+conocimiento e inventario históricos y conectar el flujo de producción. La
+conexión de prueba no se activa en la aplicación normal. T003/T010/T021
+permanecen abiertas. Las pruebas PD de puertas conservan su estado de entrega
+TDD pendiente; no se han ocultado para presentar una suite global aprobada.
+
+Regresión completa del mismo árbol con Python 3.14.6, `CRIPTA_SIN_AUDIO=1`
+y temporales escribibles:
+
+```powershell
+python -B -X utf8 -m unittest discover -s tests -v
+```
+
+**776 pruebas: 764 aprobadas, seis fallos, seis omitidas, cero errores**, en
+178.575 s. Salida 1 por los seis casos PD de puertas ya documentados; no se
+atribuyen a la integración DX ni se presentan como aprobados. Las omisiones
+son: comparación opcional por revisiones de rutas (setUpClass), dos casos de
+paquete oficial no indicado, dos casos de historia del motor normal aún sin
+activación de producción y API real deshabilitada. Registro local reproducible:
+`.cache/revisiones/aceptacion-d-ac-real-2026-11-12.log` (salida generada no versionada).
+No aparecieron fallos adicionales. Esta corrida no renueva mediciones de
+rendimiento ni cierra los contratos pendientes.
+
+## Carga conjunta del mapa conocido MC-01 — 2026-11-13
+
+Precisión de FR-011 / SC-004 confirmada antes del código en `49db7f5`.
+Se añadió a `tests/test_controlador_ac_real.py` el caso
+`test_mc01_cargar_descarta_descubrimientos_posteriores_y_permite_continuar`.
+Reutiliza la preparación offline DX con A/B/C/D reales y vista simulada.
+No cambia motor, conocimiento, formato ni activación de producción.
+
+| Etapa del caso sintético | Resultado actual |
+| --- | --- |
+| Entrar en 101; 102 avistada y 103 desconocida | Pasa por movimiento real. |
+| Guardar en ruta con espacios y leer v4 | El DTO completo leído coincide con el exportado; esto no demuestra que la historia incluya el mapa. |
+| Entrar en 102, atravesando K=2 | Pasa: 102 explorada y 103 avistada; mapa y estado distintos del guardado. |
+| Cargar por el controlador | Falla: `No se pudo cargar: La restauracion H3 no admite el mapa conocido activo.` |
+| Recuperar estado, historia/K, mapa y presentación guardados | Aserciones preparadas, aún no alcanzadas por el rechazo. |
+| Registrar una carga y repetir movimiento sin conservar el futuro | Aserciones de continuación preparadas, aún no alcanzadas. |
+
+Reproducción de la aceptación pendiente:
+
+```powershell
+python -B -X utf8 -m unittest tests.test_controlador_ac_real.ControladorACRealTest.test_mc01_cargar_descarta_descubrimientos_posteriores_y_permite_continuar -v
+```
+
+Una prueba, un fallo de aserción esperado por la integración pendiente, cero
+errores u omisiones, en 0.732 s. No usa skip ni expectedFailure: el fallo queda
+visible también en el descubrimiento general, además de los PD ya documentados.
+
+Regresión seleccionada con Python 3.14.6, Windows, `CRIPTA_SIN_AUDIO=1` y
+temporales en una carpeta escribible:
+
+```powershell
+python -B -X utf8 -m unittest tests.test_controlador_ac_real tests.test_persistencia_historia tests.test_presentacion_conocimiento tests.test_receptor_h3_d tests.test_fallos_transaccionales tests.test_restauracion_rutas tests.test_controlador_viaje tests.test_cambios_historicos_motor
+```
+
+**97 pruebas: 96 aprobadas y un fallo (MC-01); cero errores u omisiones**, en
+16.771 s. La selección incluye los nueve casos DX anteriores y las regresiones
+de binario, presentación, receptor H3, fallos transaccionales, restauración,
+viaje y cambios históricos. Registro local no versionado:
+`.cache/revisiones/aceptacion-d-mc01-2026-11-13.log`. No se repitió la suite completa ni se
+renuevan mediciones de rendimiento por este incremento de pruebas.
+
+### Coordinación pendiente A/C/D
+
+- A: conectar la restauración del conocimiento con el estado físico y la nueva
+  historia, validando antes de modificar la partida viva. Levantar la
+  restricción solo al completar esa conexión; quitarla sola no satisface MC-01.
+- C: confirmar con A los datos reconstruibles del conocimiento y su aplicación.
+  Ya existen `campos_iniciales` y `convertir_cambios` en
+  `modelo/conocimiento_historia.py`, con claves propuestas de C; su existencia
+  no implica un contrato aceptado ni que el motor los esté registrando.
+- D: aportar esta prueba y repetirla cuando llegue esa conexión. El formato v4
+  ya transporta historia, pero no se presume que cualquier guardado incluya el
+  conocimiento. Revisar persistencia si el contrato acordado lo exige.
+
+DX-06 conserva mientras tanto la evidencia negativa del rechazo sin publicación
+parcial. Al implementar A/C la carga válida, sustituir ese caso negativo por
+MC-01 y mantener las comprobaciones de cargas inválidas sin mutación. La
+preparación de D está hecha; T003/T010/T021 y la restauración conjunta siguen
+pendientes. No se afirma que el juego ya pueda cargar el mapa.
+
+
+## Cierre conjunto 2026-11-14
+
+Los límites negativos de MC-01/DX-06/PD descritos arriba son históricos y fueron superados por la integración completa autorizada. MC-01 pasa; DX-06 comprueba ahora rechazo de estado/historia incoherentes, conservando atomicidad; PD-01..04 pasan. El motor y el arranque normal conectan mapa, antorcha, inventario, historia, carga y viaje. [Trazabilidad, comandos, resultados y límites actuales](integracion-completa.md). Suite conjunta: 809 pruebas, OK, cuatro omisiones opcionales, sin fallos ni errores.

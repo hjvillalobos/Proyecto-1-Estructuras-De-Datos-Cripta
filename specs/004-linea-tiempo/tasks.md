@@ -1,12 +1,68 @@
 # Tareas — línea de tiempo
 
+## Recuperación de almacenamiento — ERR-01
+
+- [x] ERR-T01 Reproducir reemplazo+limpieza fallidos y verificar causa original y destino anterior; cubrir serialización inválida y escritura correcta (ERR-01; tests/test_almacen_errores.py).
+- [x] ERR-T02 Corregir limpieza del temporal propio sin ocultar excepción principal; ejecutar regresiones de datos, persistencia e integración y registrar resultados (ERR-01).
+
+ERR-01: la prueba de doble fallo reprodujo PermissionError ocultando DatosNoDisponibles antes de la corrección. Tras corregir: 59 pruebas dirigidas en 8.457 s y suite de 863 en 239.241 s, cero fallos/errores. Dos opciones omitidas (API y comparación histórica) cuentan con evidencia separada previa; el paquete histórico sí se ejecutó en esta suite. No se suman los conteos solapados.
+
+## Consolidación de presentación — 2026-11-16
+
+- [x] UI-T01 Alinear diálogo, texto y validación de historia por tiempo/acción; probar rechazo y cancelación sin encolar (UI-01, FR-003/005/020; tests/test_consulta_historia.py).
+- [x] UI-T02 Integrar niebla decorativa opcional con proyección conocida y ciclo de vida acotado a la ventana (UI-02, VI-02/04; tests/test_mapa_visual.py).
+- [x] UI-T03 Conservar caché acotada de acciones con respaldo sin atlas y regenerar recursos con píxeles iguales (UI-03, VI-01/04; tests/test_composiciones.py).
+- [x] UI-T04 Actualizar pruebas de puntos de entrada actuales de Historia/Ayuda y contrastar regresión completa (UI-01, FR-003/005/020; tests/test_comandos_integracion.py y tests/test_menu_inicio.py).
+
+Las cuatro tareas reflejan trabajo ya presente y comprobado; esta consolidación documental no altera sus fechas reales de implementación.
+
+- [x] VD-T01 Diálogo temático, selección explorada/validación, Enter/Escape/X y controlador sin mutación al cancelar; pruebas y evidencia (VD-01).
+
+## Replay gráfico RP
+
+- [x] RP-T01 Reconectar lanzador GUI y modo independiente, conservando CLI/hasta sin vista (RP-01/03/04).
+- [x] RP-T02 Fábrica completa/historia, cargas/retroceso, costos/animaciones y errores/cierre (RP-01/02/03).
+- [x] RP-T03 Probar menú/controlador, aislamiento de archivos/estado/sesión, controles y modos CLI; registrar evidencia/límites (RP-01..04).
+- [x] RP-T04 Publicar cambios validados en 004-linea-tiempo y verificar remoto (RP-01..04).
+
+RP/VD publicados: push ordinario de 442d2b1; `ls-remote` confirmó 442d2b165068b94373c459ee51208dbae52c28ed en origin/004-linea-tiempo. 112 pruebas dirigidas, OK, e inspección nativa aislada; ver replay-viaje-2026-11-15.md. Puntajes locales excluidos.
+
+## Seguimiento UX
+
+- [x] UX-T01 Reproducir replay local, población/daño y victoria de mapas resolubles (UX-03).
+- [x] UX-T02 Restaurar elección cancelable y reinicio de partida activa con pruebas de vista/controlador/aplicación (UX-01).
+- [x] UX-T03 Mostrar ID y objetivo sin filtrar conocimiento; comprobar salida y regreso desde cámara secundaria (UX-02).
+- [x] UX-T04 Ejecutar regresiones pertinentes, documentar evidencia/limitaciones y publicar en 004-linea-tiempo (UX-01..03).
+
+Publicación UX comprobada: `d88c85656610dfffc4b98431fdbfba93e1d870ec` coincide con `refs/heads/004-linea-tiempo` en `git ls-remote`; avance ordinario, sin cambios en main ni ramas ajenas. Este registro documental se confirma después.
+
+## Revisión de entrega RE (2026-11-15)
+
+- [x] RE-T01 Reproducir apertura inversa sin metadatos, respetar llave/cierre y validar binario/retroceso y ausencia/ambigüedad de retorno (RE-01, IA-04).
+- [x] RE-T02 Comprobar marcadores de objetos nuevos, sonidos con WAV reales y animación común de cazadores sin mutar el motor (RE-02/03, VI-01).
+- [x] RE-T03 Auditar datos publicados/mapas y cubrir Parte I/II en matriz de evidencia, faltantes y severidad; conservar fuentes y prompts (RE-04, RF-03).
+- [x] RE-T04 Ejecutar regresión y mediciones aisladas, publicar resultados y enviar cambios validados a 004-linea-tiempo (RE-01..04).
+
+Publicación RE verificada: `10f5f78ebfeaab7fd65f1c0ae1f81fb097652b56` coincide con `refs/heads/004-linea-tiempo` mediante `git ls-remote`; push ordinario, sin modificar main ni ramas ajenas. El commit documental posterior registra ese resultado.
+
+> **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
+
+
 Las marcas completadas incluyen el núcleo y los consumidores de D. La aceptación con productores reales de A, B y C se registra por separado.
+
+## Incremento de aceptación MC-01 — 2026-11-13
+
+- [x] Preparar el caso MC-01 en `tests/test_controlador_ac_real.py`: guardar,
+  descubrir y explorar después, cargar recuperando motor/historia/mapa y
+  continuar de forma determinista (FR-011, SC-004). Registrar el fallo actual
+  sin skip ni expectedFailure y ejecutar la regresión seleccionada de D.
+- [x] Repetir MC-01 con la conexión completa y sustituir DX-06 por carga incoherente sin publicación parcial. Cierre de T003/T010/T021 documentado en integracion-completa.md; los pendientes anteriores se conservan como historial.
 
 ## Preparación y fundamento
 
 - [x] T001 Registrar y clasificar la base de pruebas en specs/004-linea-tiempo/baseline.md, sin confundir fallos heredados con cambios nuevos (FR-011, FR-017).
 - [x] T002 Implementar contratos tipados serializables en modelo/snapshots.py: tiempo entero >=0, secuencia estable, acción desde 1, K >=1, registros independientes del estado vivo (FR-002, FR-003, FR-008, FR-010).
-- [ ] T003 Incorporar captura por evento y frontera de acción en modelo/juego.py y modelo/historial.py; conservar retroceso de cinco acciones y cerrar lote temporal antes de publicar decisión (FR-002, FR-006, FR-010).
+- [x] T003 Incorporar captura por evento y frontera de acción en modelo/juego.py y modelo/historial.py; conservar retroceso de cinco acciones y cerrar lote temporal antes de publicar decisión (FR-002, FR-006, FR-010).
 
 ## US1 — consultar el pasado (P1)
 
@@ -19,7 +75,7 @@ Las marcas completadas incluyen el núcleo y los consumidores de D. La aceptaci�
 
 - [x] T008 [US2] Crear pruebas H2,H6,EX04,EX07 en tests/test_persistencia_historia.py; verificar inventario de pergaminos, recorte, nueva rama y corrupción (FR-007, FR-011, FR-012).
 - [x] T009 [US2] Recortar sufijo y registrar corrección persistente de pergaminos en modelo/linea_tiempo.py; liberar bloques descartados sin recorrer prefijo (FR-006, FR-007, FR-009).
-- [ ] T010 [US2] Conectar cambios de conocimiento e inventario mediante modelo/snapshots.py y productores del motor; incluir mapa recordado (FR-004, FR-007, FR-011).
+- [x] T010 [US2] Conectar cambios de conocimiento e inventario mediante modelo/snapshots.py y productores del motor; incluir mapa recordado (FR-004, FR-007, FR-011).
 
 Avance parcial de T010/T017/T018 (2026-11-10): el consumidor de D presenta la
 proyección estructurada y los campos históricos reales de C. El inventario
@@ -86,7 +142,7 @@ conserva los límites de integración y rendimiento; no completa T003/T010/T021.
 
 - [x] T019 Comparar K=10,50,100 y sin checkpoints; dirección, búsqueda, reconstrucción, memoria y recorte con >=5000 acciones en bench.py (FR-009, FR-010, NFR-001, NFR-002, NFR-003, SC-003).
 - [x] T020 Añadir pruebas de igualdad del estado tras consulta, carga y continuación en tests/test_persistencia_historia.py (NFR-004, SC-004).
-- [ ] T021 Actualizar README.md, PROMPTS_LLM.md y DECISIONES.md con comandos, trazabilidad, mediciones reales y elección final de K; ejecutar regresiones y aceptación (FR-001–FR-020, NFR-001–NFR-004, SC-001, SC-002).
+- [x] T021 Actualizar README.md, PROMPTS_LLM.md y DECISIONES.md con comandos, trazabilidad, mediciones reales y elección final de K; ejecutar regresiones y aceptación (FR-001–FR-020, NFR-001–NFR-004, SC-001, SC-002).
 
 ## Dependencias y estrategia
 
@@ -153,3 +209,86 @@ Aceptación posterior al merge de main y al receptor de D: 709 pruebas,
 703 aprobadas, seis omitidas y ningún fallo/error. Se hizo independiente de la
 caché de trabajo la prueba de reinicio de D; conserva sus comprobaciones.
 [Evidencia y límites](aceptacion.md#main-integrado-y-receptor-h3-de-d-2026-11-10).
+
+Preparación A–D del 2026-11-12: siete pruebas de aceptación PD-01..04 para
+puertas recíprocas, guardado/carga, cierre único, retroceso y continuación.
+Una pasa y seis fallan por entrega bilateral/exportación todavía pendientes
+del motor; no se omiten ni se marcan como fallos esperados. Las comprobaciones
+de retroceso posteriores a la precondición bilateral aún no se alcanzan.
+La regresión seleccionada conserva 48 aprobaciones y dos omisiones conocidas.
+[Resultados y pendientes](aceptacion.md#preparación-de-puertas-recíprocas-ad-2026-11-12).
+T003/T010/T021 permanecen abiertas; no hay modificación de producción ni formato.
+
+Incremento DX-01..06 del 2026-11-12: nueve pruebas de D con controlador,
+productor histórico real de A activado offline, datos B y mapa/control de viaje
+reales de C. Pasan consultas puras, guardar/cargar/continuar v4, rechazo de
+archivos inválidos, pergamino, replay sin vistas y sin archivo de carga original,
+mapa tras entradas físicas y cancelación. También se verifican los límites
+del productor: ausencia de hechos de viaje y rechazo de carga con mapa activo.
+No se activan opciones de prueba en producción. Se actualizan README, plan y
+DECISIONES con comandos/alcance reales. T003/T010/T021 siguen abiertas por
+captura completa, inventario/mapa histórico, persistencia conjunta y aceptación
+de producción/mediciones; este incremento sustituye parte de la evidencia con
+dobles por evidencia de integración real, sin declarar cierre global.
+
+
+## Integración completa — 2026-11-14
+
+## Fortalecimiento RF-01..03 — trabajo vigente
+
+## RC-01 — margen del ciclo integrado
+
+## VI-01..05 — presentación autorizada
+
+- [x] VI-T01 Crear sprite de cazador y mapa nativo con privacidad, disposición determinista y controles accesibles (VI-01/02/04).
+- [x] VI-T02 Conectar la proyección filtrada a GUI y viaje ordinario, manteniendo consola y reglas (VI-02/03/04).
+- [x] VI-T03 Auditar contrato y datos API, casos desconocidos/futuros, presupuesto y versiones (VI-05).
+- [x] VI-T04 Probar privacidad/inmutabilidad, GUI real, regresiones y medir motor sin render; documentar prompts/evidencia (VI-01..05).
+- [x] VI-T05 Confirmar cambios y publicar exclusivamente en 004-linea-tiempo (VI-01..05).
+
+Análisis previo: incremento de presentación sobre FR-018/019. No cambia reglas ni formato binario, no introduce rutas de búsqueda de biblioteca, ni activa contenido para dibujar. La usuaria autoriza diseño visual a criterio del agente y publicación en su rama.
+
+VI-T01..04 comprobadas: siete pruebas nuevas, suite 828 en 214.910 s sin fallos/errores (dos opciones identificadas), API real cinco criptas fría/caliente OK, copia limpia de fuentes 20 pruebas en 6.476 s OK. Tres ilustraciones nuevas y 152 composiciones con píxeles idénticos. Benchmark aislado con estado/historia/azar iguales: motor máximo 9.1013 ms y 0/600 sobre 20; conservar pico auxiliar de viaje 5.5273 ms, 1/600 sobre 5. Evidencia y límites en visual-api-2026-11-14.md y visual-mediciones.json.
+
+VI-T05 comprobada: push ordinario de 51bf7fa a origin/004-linea-tiempo; ls-remote confirma 51bf7fafc55913191630e235495202774d0a301a. Main permanece en 049a990413ab536ba98acf948903cb57b30d17fc. Los cambios previos de A están incluidos, sin sobrescritura ni force-push.
+
+- [x] RC-T01 Conservar referencia anterior y comprobar igualdad de proyecciones/deltas en movimiento, llegada, daño, muerte, inventario, efectos, reversión y carga (RC-01).
+- [x] RC-T02 Reutilizar solo orden de referencias vigente; comparar campos fijos y enemigos sin reordenar por evento (RC-01).
+- [x] RC-T03 Benchmark pareado de ciclos completos antes/después con estados finales iguales, repeticiones independientes y checkpoints. Regresión completa, documentación y prompts (RC-01).
+
+- [x] RF-T01 Comparar heap/rutas antes y después sobre las mismas entradas, comprobar orden total y generaciones (RF-01).
+- [x] RF-T02 Implementar almacenamiento compacto propio para IDs dispersos, conectar motor/mapa/rastro, probar persistencia, historia y replay sin renumeración (RF-02).
+- [x] RF-T03 Consolidar estado actual y matriz de trazabilidad de los 23 casos obligatorios; preservar antecedentes y faltantes reales (RF-03).
+- [x] RF-T04 Ejecutar regresión completa, comparaciones, benchmarks offline y arranque desde copia limpia; registrar muestras y límites en DECISIONES y prompts (RF-01..03).
+
+Orden: especificación confirmada antes de código; RF-T01/RF-T02 antes de regresión final; RF-T03 antes de cierre RF-T04. La autorización actual permite cambios en A/B/C/D; no requiere consultas adicionales sobre decisiones técnicas deducibles.
+
+- [x] IC-01 Puertas recíprocas y exportación de extremos no visitados (IA-04, PD-01..04).
+- [x] IC-02 Mapa de producción, observaciones, antorcha e inversos (IA-01/05).
+- [x] IC-03 Productor completo y carga conjunta validada (IA-02/03, FR-011, MC-01).
+- [x] IC-04 Hechos reales y conexión de viaje/replay/CLI (IA-01/06).
+- [x] IC-05 Regresiones, benchmarks comparativos, documentación y publicación (IA-07..09).
+
+
+Cierre técnico 2026-11-14: IC-01..04 y T003/T010/T021 implementados y validados. La documentación histórica no constituye el estado actual; ver integracion-completa.md. IC-05 conserva el paso de publicación hasta verificar el remoto.
+
+Publicación verificada 2026-11-14: integración y documentación 1c35819 enviadas mediante push ordinario a origin/004-linea-tiempo, incorporando f8e10ef de A. IC-05 completada.
+
+## Aceptación adicional sin defensa — 2026-11-14
+
+- [x] QA-01 Repetir comparación aislada de rutas con revisiones reales (41 pruebas).
+- [x] QA-02 Completar copia compatible de datos históricos y verificar cuatro victorias/replays, salas y persistencia (dos pruebas).
+- [x] QA-03 Verificar todas las criptas publicadas con caché fría/caliente, presupuesto y procesos independientes.
+- [x] QA-04 Añadir partidas inéditas completas con tres semillas y replay sin archivo de guardado.
+- [x] QA-05 Inspeccionar guardar/cargar, mapa, equipo e historia en GUI nativa.
+- [x] QA-06 Documentar fuentes externas faltantes, consultas de interpretación, decisiones y prompts; excluir defensa y envío de mensajes.
+- [x] QA-07 Cerrar regresión conjunta y verificar publicación ordinaria en 004-linea-tiempo.
+
+Publicación comprobada: acd84db enviado mediante push ordinario a origin/004-linea-tiempo; suite 810, OK (skipped=2), opciones omitidas aprobadas por separado. Sin cambios en main ni ramas ajenas. La defensa queda excluida.
+
+La recuperación del PDF original y de dos finales de prompts, así como las respuestas del profesor, requieren fuentes externas; no se marcan como resueltas por documentación. Ver qa-adicional-2026-11-14.md.
+
+
+Cierre RF-01..03: especificación 5bccc94; suite final 814, cero fallos/errores, dos opciones aprobadas por separado. Copia limpia final: 20 pruebas en 6.775 s, OK. Las cuatro cargas de bench finales terminan correctamente, con muestras en fortalecimiento-mediciones.json; trazabilidad vigente en ESTADO_ENTREGA.md. Se conservan los faltantes históricos y no se afirma revisión humana ni nota.
+
+RC-01 cerrado: 818 pruebas en 181.531 s, cero fallos/errores y dos opciones omitidas identificadas. Contraste exacto por evento y cinco series pareadas de 120 ciclos, estados/historia/azar iguales; máximo optimizado 11.931 ms, 0/600 sobre 20. Copia limpia 20 pruebas OK y CLI sintética ejecutada. Referencia y muestras versionadas; ver DECISIONES.md.

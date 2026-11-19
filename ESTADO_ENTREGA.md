@@ -1,0 +1,102 @@
+# Estado vigente y trazabilidad de entrega
+
+Actualización documental del 2026-11-17: [revisión de A↔C y B↔D](specs/004-linea-tiempo/revision-cruces-2026-11-17.md), 66 pruebas dirigidas/19.041 s, sin fallos, errores ni omisiones. Belén confirma que todos los integrantes hicieron pruebas y comprobaron el funcionamiento integrado; se incorporan referencias Git de los aportes de A/B/C/D y su integración. La declaración del equipo, la autoría Git y la ejecución de Codex se identifican por separado; los commits no prueban por sí solos aprobación previa de cada PR por ambos responsables. No sustituye las salvedades históricas ni añade esas 66 pruebas al total integral.
+
+Regresión repetida el 2026-11-17 sobre `42ee527`: **863 pruebas en 213.337 s, cero fallos/errores, dos opciones omitidas**. La comparación histórica omitida se ejecutó aparte: 41 pruebas en 0.384 s, OK. Copia sin cachés ni partidas: 20 pruebas en 7.060 s, OK. La API real no se repitió en este corte. Logs locales en `.cache/revision-bugs-20261117/`; los conjuntos se solapan y no se suman. No se modificó código de producción.
+
+Cierre posterior ERR-01: **863 pruebas en 239.241 s, cero fallos/errores, dos opciones omitidas con evidencia separada previa**. El paquete histórico se ejecutó en la suite. La comprobación de copia sin cachés pasó 20 pruebas en 9.357 s. Se corrigió la conservación del error principal al fallar guardado y limpieza de datos; se agruparon 92 evidencias y auxiliares locales en .cache/revisiones/. Constitución 1.1.0 y main intactos; no cambia el estado de los faltantes históricos.
+
+Corte anterior del 2026-11-16: 858 pruebas, cero fallos/errores; las cuatro omisiones opcionales se ejecutaron por separado y aprobaron. Resultados de procesamiento en DECISIONES.md. Las anotaciones fechadas de specs/planes/checklists conservan sus cortes históricos; los encabezados de estado identifican la integración posterior. No se cambió la constitución 1.1.0. La usuaria confirmó que no dispone de revisiones cruzadas del equipo: su acreditación continúa pendiente y no se sustituye por pruebas automáticas.
+
+Rama `004-linea-tiempo`. Este documento distingue la entrega integrada de los registros fechados de desarrollo. Defensa excluida. Las cuatro capacidades funcionan desde la aplicación normal, con historia, conocimiento y persistencia conjuntos. Las anotaciones antiguas de entregas parciales no representan capacidades ausentes.
+
+## Reglas e interpretaciones vigentes
+
+RP-01..04 / VD-01: replay gráfico independiente desde menú y partida, controles visibles y fábrica con historia/cargas/retroceso; CLI conservada. Viajar usa diálogo temático con salas exploradas y cancelación sin mutación. **112 pruebas dirigidas en 41.511 s, OK**, más inspección nativa con datos temporales aislados. No se repitieron suite completa ni benchmarks. [Evidencia y límites](specs/004-linea-tiempo/replay-viaje-2026-11-15.md).
+
+Seguimiento UX-01..03: elección cancelable de Salir/reinicio activo, ID/objetivo visible sin revelar salas desconocidas y acreditación de la puerta de salida desde sus extremos recíprocos compatibles. **188 pruebas dirigidas, OK**, más repetición de 8 casos UX tras ajuste de cierre durante carga. Victorias offline ordinarias en 02/03/04/06 y continuación del recorrido local de sala 20 a salida 18; daño observado descontado correctamente, sin modificar dificultad/API. No es una repetición de la suite completa ni de benchmarks. [Causas, evidencia y límites](specs/004-linea-tiempo/seguimiento-ux-2026-11-15.md).
+
+Revisión RE-01..04 (15 de noviembre): corregida la apertura inversa de puertas recíprocas con metadatos de llave/cierre en un solo extremo; presentación/carga/historia coherentes. **834 pruebas en 244.140 s, OK (skipped=2)**; opciones aprobadas por separado: 41 pruebas de comparación histórica y API real de cinco criptas fría/caliente. Mapas publicados auditados: conexiones/costos válidos, 02/03/04/06 resolubles y 05 deliberadamente bloqueada. Objetos nuevos conservan ?, cazadores tienen animación común de reposo/daño, audio despacha WAV válidos desde otro CWD; audición física no verificada. [Matriz completa, corrección, evidencia y pendientes](specs/004-linea-tiempo/revision-entrega-2026-11-15.md). Las cifras siguientes pertenecen a incrementos anteriores.
+
+Actualización VI-01..05: mapa gráfico con niebla que respeta conocimiento, selección/zoom/listado/viaje ordinario, y dibujos nuevos de sabueso, espectro y carcelero. **828 pruebas en 214.910 s, cero fallos/errores**, dos opciones separadas; API real repetida en cinco criptas, fría/caliente y dentro del presupuesto, OK en 87.563 s. Sin cambios en motor, red o datos; 152 composiciones con píxeles idénticos y firmas actualizadas. [Auditoría, trazabilidad y límites](specs/004-linea-tiempo/visual-api-2026-11-14.md). Las cifras RC-01/RF posteriores son antecedentes de sus respectivos incrementos.
+
+- Terreno: costo ausente 100; datos declarados válidos positivos. El motor consume el contrato de datos; no inventa normalizaciones de valores malformados ni salidas inversas. Un `rango=null` explícito es ilimitado según la aclaración comunicada por el usuario; no se inventa un rango por defecto para un cazador sin ese campo.
+- Antorcha: explora vecinas y revela nombre/salidas; las puertas solo se observan desde la posición ocupada. No hay observación de puertas remotas ni activación de contenido remoto. Q1 de C deja de ser un bloqueo técnico por la autorización e interpretación documentadas en IA-05.
+- Resolubilidad: acumulación de llaves sin trayectoria única aceptada según aclaración registrada del 2026-11-02; se informa esa limitación. Normalización O(N log N), recorrido/diagnóstico lineales más reporte; evidencia empírica para el crecimiento aproximadamente lineal, sin afirmar O(N) total estricto.
+- Referencia de medición local: paquete `cripta-06@f9ed9afa683d`, 300 salas. Los resultados corresponden a esa versión; no se inventa una enmienda que cambie los límites 20/200/50/5 ms. Los cazadores inyectados y el mapa completo se identifican como preparación experimental.
+- Autorización: la usuaria permite mejorar A/B/C/D. Los límites de propiedad y permisos de las fases individuales quedaron superados para esta integración. No equivale a afirmar una revisión cruzada humana que no se realizó.
+
+## Enunciado punto por punto, sin defensa
+
+| Sección Parte II | Implementación / evidencia |
+|---|---|
+| 2.1–2.3, herramientas y constitución | README fija spec-kit v1.2.3/Codex; `.specify/`, `.agents/skills/` y constitución versionados. |
+| 2.4–2.6, especificación, tareas y proceso | Cuatro carpetas de capacidades con spec/plan/tasks; matriz del Apéndice B abajo; PROMPTS_LLM y antecedentes Git. Salvedades históricas al final. |
+| 3.1, terreno | `modelo/juego.py`, `modelo/rutas.py`; tests de costos y velocidad de terreno. |
+| 3.2, cazador | `modelo/cazador.py`, rutas propias; pruebas de decisión, turnos, localidad y rutas. |
+| 3.3, conocimiento | `modelo/conocimiento.py`, `modelo/partida.py`; pruebas de entrada, antorcha e historia. |
+| 3.4, viaje | `modelo/viaje.py`, controlador; pruebas de detención y hechos reales de movimiento. |
+| 3.5, verificación | `modelo/resolubilidad.py`, `red/verificacion.py`; pruebas sintéticas, offline e inicio bloqueado/forzado. |
+| 3.6, historia | `modelo/linea_tiempo.py`, `modelo/partida.py`, persistencia y replay; pruebas por tiempo, ordinal, K, recorte, empates y carga. |
+| 4.1–4.3, servicio | Cliente/precarga/catálogo, versiones, ubicaciones de llaves y presupuesto; pruebas de API y modo offline. |
+| 5.1–5.2, rutas e invalidación | Dijkstra propio limitado, campo compartido ilimitado y descarte de derivados; bench terreno-cazador y parte-dos comparan alternativas/puertas cambiantes. |
+| 5.3, mapa | Índices propios, actualizaciones locales y deltas reversibles; tests de secuencias y ausencia de copia completa al registrar eventos. |
+| 5.4, resolubilidad | Incremental frente a recorrido repetido por llave; diagnóstico global y ciclos deterministas; bench incluye normalización/reporte. |
+| 5.5, puntos de control | K=50; comparar 10/50/100/sin controles, consultas <=K acciones y recorte de sufijo; evidencia en DECISIONES. |
+| 5.6, estructuras de Parte I | Bench terreno-cazador compara agendas e historiales con la carga nueva; parte-dos mide el ciclo integrado. |
+| 6.1–6.3, límites/restricciones | Bench sin vistas/red; estructuras y ordenamientos propios. Fortalecimiento mide el heap anterior y optimizado con decisiones iguales. |
+| 7.1–7.3, documentos y comandos | DECISIONES, PROMPTS, README, specs, mapa, viaje, historia y reporte inicial disponibles; consola y GUI probadas. |
+
+## Los 23 casos obligatorios del Apéndice B
+
+Rutas de esta tabla relativas a la raíz. La prueba indicada se ejecuta con `python -m unittest tests.NOMBRE_SIN_EXTENSION`. Las especificaciones conservan los escenarios y las tareas originales; IC y RF documentan su integración y fortalecimiento.
+
+| Caso | Requisito / escenario / tarea | Código | Prueba |
+|---|---|---|---|
+| T1 sin ruta: espera 100 | A FR-008/009, T1, T020–022 | cazador/rutas | tests/test_decision_cazador.py |
+| T2 fuera de rango: espera | A FR-009, T2, T020–022 | cazador/rutas | tests/test_turno_cazador.py |
+| T3 menor costo, más salas | A FR-008, T3, T019–021 | rutas | tests/test_rutas_cazador.py |
+| T4 empate por menor vecino | A FR-010, T4, T026 | rutas | tests/test_rutas_cazador.py |
+| T5 cierre entre turnos | A FR-013, T5, T029/033 | rutas/juego/efectos | tests/test_validez_rutas.py, test_rutas_compartidas.py |
+| T6 intervalo mínimo 1 | A FR-002/003, T6, T011/015 | juego | tests/test_costos_terreno.py |
+| T7 velocidad durante tránsito | A FR-005/006, T7, T012 | juego/efectos | tests/test_velocidad_terreno.py |
+| N1 destino sin explorar | C FR-007, C21, T018–019 | conocimiento_rutas | tests/test_conocimiento_rutas.py |
+| N2 puerta recordada abierta | C FR-004/008/010, C23/C27, T018/022–024 | conocimiento/viaje | tests/test_conocimiento_rutas.py, test_controlador_viaje.py |
+| N3 enemigos dormidos detienen | C FR-009/011, C28, IC-04 | juego/viaje/controlador | tests/test_controlador_ac_real.py, test_hechos_paso_motor.py |
+| N4 antorcha sin activar vecinos | C FR-006, N4, IC-02 | partida/juego | tests/test_partida_completa.py, test_entrada_conocimiento_motor.py |
+| N5 retroceso de exploración | C FR-014, C12/N5, IC-02 | conocimiento/historial | tests/test_partida_completa.py, test_conocimiento_historia.py |
+| N6 retroceso último paso y parada | C FR-015, C29/N6, IC-04 | viaje/partida | tests/test_controlador_viaje.py, test_viaje.py |
+| R1 llave autoencerrada y ciclo | B FR-005, AC-06, T015–016 | resolubilidad | tests/test_resolubilidad.py |
+| R2 llave soltada por errante | B FR-003/010, AC-03, T005/010 | verificación/resolubilidad | tests/test_resolubilidad.py, test_verificacion_datos.py |
+| R3 orden determinista | B FR-004/007, AC-04, T005/012 | resolubilidad | tests/test_resolubilidad.py |
+| R4 bloqueo sin forzar | B FR-013 y D FR-016, AC-15, T025–026/IC-01 | aplicación/verificación | tests/test_modos_historia.py, test_verificacion_entrega.py |
+| H1 rechazar futuro | D FR-001/020, H1, T004/006 | linea_tiempo | tests/test_linea_tiempo.py |
+| H2 recorte tras pergamino | D FR-007, H2, T008/009/IC-03 | partida/linea_tiempo | tests/test_controlador_ac_real.py, test_historia_motor.py |
+| H3 todos los eventos empatados | D FR-002, H3, T003/004/006 | juego/linea_tiempo | tests/test_frontera_temporal.py, test_historia_motor.py |
+| H4 consulta sin efectos ni log | D FR-005, H4, T004/006 | controlador/linea_tiempo | tests/test_controlador_ac_real.py |
+| H5 replay hasta después del fin | D FR-014, H5, T012/014 | replay_sin_vista | tests/test_modos_historia.py |
+| H6 archivo P1 incompatible | D FR-012, H6, T008/011 | guardado_binario | tests/test_controlador_ac_real.py, test_persistencia_historia.py |
+
+Los cuatro prefijos A/B/C/D identifican su carpeta de especificación. La cobertura de Parte I se conserva en las regresiones heredadas, incluyendo combate, inventario, efectos, cancelación, retroceso, caché, presupuesto, guardado y replay. Esta tabla no sustituye ejecutar las pruebas.
+
+## Cierre comprobado del fortalecimiento
+
+Regresión final: **818 pruebas en 181.531 s, cero fallos y cero errores**, dos omisiones opcionales con ejecución separada aprobada: comparación histórica (41 pruebas) y API oficial (cinco criptas, caché fría/caliente dentro de presupuesto). Copia limpia de fuentes sin datos locales mediante `python -m utilidades.verificar_copia_limpia`; no reinstala las dependencias.
+
+| Operación | Máximo final | Límite | Excesos |
+|---|---:|---:|---:|
+| Ciclo con 30 cazadores e historia/mapa, RC-01 | 11.931 ms | 20 ms | 0/600 |
+| Paso de viaje conocido | 2.501 ms | 5 ms | 0/60 |
+| Verificador completo | 7.855 ms | 200 ms | 0/10 |
+| Historia K=50, 5.000 acciones | 0.9363 ms | 50 ms | 0/185 |
+
+El heap redujo su mediana pareada de 4.3523 a 2.2538 ms, con decisiones iguales. El motor ahora permite IDs uint32 muy dispersos sin reserva proporcional al mayor ID; hay una partida completa automatizada con esos IDs. [Salidas completas, semilla y entorno](specs/004-linea-tiempo/fortalecimiento-mediciones.json), análisis y alternativas en DECISIONES.md. Las tablas de pruebas se solapan y no se suman.
+
+## Salvedades históricas conservadas
+
+Dos finales de prompts de A no se conservan íntegros y el commit histórico `33d97ac` reunió aclaración y código. No se inventan textos ni se reescribe ese hecho. El PDF original local de Parte I está vacío; se conserva la extracción previa. Las mediciones no garantizan una calificación o cero bugs futuros. Resultados de fortalecimiento y reproducción en DECISIONES.md y README.md.
+
+Actualización de publicación con A dff5882: suite 815, OK; integración específica 44, OK. El benchmark posterior registró un ciclo de 20.282 ms (1/60 sobre 20); repetido aisladamente dio 19.783 ms (0/60). Paso conocido 4.208 ms y repetición 2.341 ms, ambos bajo 5. Se conserva la variación como límite de rendimiento, sin ocultar la muestra excedida.
+
+
+Estado posterior RC-01: eliminados los ordenamientos redundantes de historia. Cinco series pareadas de 120 ciclos por productor, historia/estado/azar iguales: mediana 11.436 → 4.435 ms; máximo optimizado 11.931 ms y 0/600 sobre 20 ms. Suite 818, cero fallos/errores, dos opciones con evidencia separada previa. Copia limpia 20 pruebas, OK. La advertencia de ciclo de la publicación anterior queda como antecedente medido; la optimización aporta margen en estas nuevas muestras, sin garantía absoluta de latencia bajo cualquier carga. El viaje no fue modificado y sus muestras auxiliares, incluida una de 5.168 ms, permanecen en [el registro completo](specs/004-linea-tiempo/ciclo-historia-mediciones.json).

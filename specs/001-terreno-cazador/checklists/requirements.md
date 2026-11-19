@@ -1,5 +1,11 @@
 # Specification Quality Checklist: Terreno, cazador y validez de rutas
 
+## Estado vigente — 2026-11-16
+
+Las listas siguientes conservan el corte de Specify/Analyze de noviembre 1–5. La implementación y los contratos ya están integrados y probados; consultar tasks.md, ESTADO_ENTREGA.md y DECISIONES.md. Q1/Q2 delimitan entradas conformes: rango explícito null ilimitado, costo ausente 100; no se inventa tratamiento de datos fuera de contrato. Q3 conserva la falta de confirmación oficial; la referencia interna versionada y las mediciones no son aprobación del profesor. La revisión técnica automatizada no acredita revisión cruzada humana, que sigue pendiente.
+
+## Lista histórica de calidad inicial
+
 **Purpose**: Revisar calidad de requisitos de Specify; no certifica código ni pruebas.
 **Created**: 2026-11-01
 **Feature**: [spec.md](../spec.md)

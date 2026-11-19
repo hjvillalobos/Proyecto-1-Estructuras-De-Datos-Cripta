@@ -3,7 +3,7 @@
 import random
 from copy import copy, deepcopy
 from contextlib import nullcontext
-from functools import partial
+from dataclasses import dataclass
 from red.errores import ErrorCripta
 from modelo.cazador import decidir_cazador
 from modelo.eventos import ColaEventos
@@ -12,7 +12,8 @@ from modelo.tipos import Jugador, InstanciaEnemigo, ObjetoInstancia
 from modelo.rastro import RegistroRastro
 from modelo.historial import HistorialRetroceso
 from modelo.coleccion_enemigos import EnemigosSala
-from modelo.rutas import EspacioBusqueda, GrafoTerreno, HeapRutas, buscar_ruta
+from modelo.rutas import ContextoRutasReales
+from modelo.almacen_salas import crear_almacen, limite_ids
 
 
 _COSTO_MOVER = 100
@@ -33,39 +34,40 @@ def calcular_dano(atacante, defensor, azar):
     return max(1, atacante.ataque + azar.randint(0, 4) - defensor.defensa)
 
 
+@dataclass
+class _CapturaPaso:
+    hubo_entrada: bool = False
+    enemigos_al_entrar: bool = False
+    recibio_dano: bool = False
+
+
 class Motor:
     _acciones_h3 = ("mover", "esperar")
 
     def __init__(self, jugador, salas_lista, semilla):
         self.jugador = jugador
         self._conocimiento = None
+        self._captura_paso = None
 
-        salas_total = 0
-        for sala in salas_lista:
-            if sala.id > salas_total:
-                salas_total = sala.id
-
-        self.salas = [None] * (salas_total + 1)
+        self._rutas_reales = ContextoRutasReales(salas_lista)
+        self._ids_salas = tuple(self._rutas_reales.grafo.ids)
+        self.salas = crear_almacen(self._ids_salas, lambda: None)
         for sala in salas_lista:
             self.salas[sala.id] = sala
         self._puertas_iniciales = [
             (sala.id, direccion, "cerrada" in salida, salida.get("cerrada", False))
             for sala in salas_lista for direccion, salida in sala.salidas.items()
         ]
-        self._grafo_cazador = GrafoTerreno(salas_lista)
-        espacio = EspacioBusqueda(self._grafo_cazador.ids)
-        self._consultar_ruta_cazador = partial(buscar_ruta, self._grafo_cazador, espacio, HeapRutas(espacio))
-
         self.cola = ColaEventos()
         self.azar = random.Random(semilla)
         self.reloj = 0
 
-        self.enemigos_por_sala = [EnemigosSala() for _ in range(salas_total + 1)]
-        self.objetos_en_suelo = [[] for _ in range(salas_total + 1)]
-        self.contenido_cargado = [False] * (salas_total + 1)
+        self.enemigos_por_sala = crear_almacen(self._ids_salas, EnemigosSala)
+        self.objetos_en_suelo = crear_almacen(self._ids_salas, list)
+        self.contenido_cargado = crear_almacen(self._ids_salas, lambda: False)
 
         self.efectos = GestorEfectos(self)
-        self.registro_rastro = RegistroRastro()
+        self.registro_rastro = RegistroRastro(ids=self._ids_salas)
         self.registro_rastro.marcar_visita(self.jugador.posicion_actual, 0)
         self.historial = HistorialRetroceso(self.registro_rastro, self.cola)
 
@@ -183,28 +185,82 @@ class Motor:
         salida = sala_actual.salidas.get(direccion)
         if salida is None:
             return False, "No hay puerta en esa dirección"
-        apertura = (sala_actual.id, direccion)
-        acreditar_salida = (salida["sala"] == self.sala_salida
-                            and salida.get("llave") == self.llave_salida
-                            and apertura not in self.puertas_abiertas_con_llave)
+        # Una puerta física puede declarar sus atributos en un solo extremo.
+        # El descriptor usado tiene prioridad; no se alteran los datos iniciales
+        # ni se heredan atributos si el retorno no es inequívoco.
+        extremos = self.extremos_puerta(sala_actual, direccion)
+        llave_necesaria = next((extremo['llave'] for _, _, extremo in extremos
+                                if 'llave' in extremo), None)
+        aperturas = [(sala.id, d) for sala, d, _ in extremos
+                     if llave_necesaria and self.llave_puerta(sala, d) == llave_necesaria]
+        acreditar_salida = (llave_necesaria == self.llave_salida
+                            and any(extremo['sala'] == self.sala_salida
+                                    and (sala.id, d) in aperturas
+                                    and (sala.id, d) not in self.puertas_abiertas_con_llave
+                                    for sala, d, extremo in extremos))
         if not salida.get("cerrada", False) and not acreditar_salida:
             return False, "La puerta ya esta abierta"
-        llave_necesaria = salida.get("llave")
         if llave_necesaria and not self._tiene_llave(llave_necesaria):
             return False, "No tenés la llave correcta"
 
-        self.historial.registrar_puerta(salida, "cerrada", salida.get("cerrada", False))
-        salida["cerrada"] = False
-        if llave_necesaria and apertura not in self.puertas_abiertas_con_llave:
-            self.puertas_abiertas_con_llave.append(apertura)
-            self.historial.registrar_cambio(lambda: self.puertas_abiertas_con_llave.remove(apertura))
+        for _, _, extremo in extremos:
+            if 'cerrada' in extremo:
+                self.historial.registrar_puerta(extremo, "cerrada", extremo['cerrada'])
+            else:
+                self.historial.registrar_cambio(lambda e=extremo: e.pop('cerrada', None))
+            extremo["cerrada"] = False
+        invalidar = getattr(self._rutas_reales, 'invalidar_puertas', None)
+        if invalidar is not None:
+            invalidar()
+        for apertura in aperturas:
+            if apertura not in self.puertas_abiertas_con_llave:
+                self.puertas_abiertas_con_llave.append(apertura)
+                self.historial.registrar_cambio(lambda a=apertura: self.puertas_abiertas_con_llave.remove(a))
         self._avanzar_actor(self.jugador, _COSTO_ABRIR_PUERTA)
 
-        if "cierre_automatico" in salida:
-            tiempo_cierre = self.reloj + salida["cierre_automatico"]
+        cierre = next((extremo for _, _, extremo in extremos
+                       if 'cierre_automatico' in extremo), None)
+        if cierre is not None:
+            tiempo_cierre = self.reloj + cierre["cierre_automatico"]
             self.programar_evento(tiempo_cierre, "cierre_puerta", (sala_actual, direccion))
 
         return True, None
+
+    def extremos_puerta(self, sala, direccion):
+        salida = sala.salidas[direccion]
+        extremos = [(sala, direccion, salida)]
+        from modelo.rutas import EstadoEmparejamiento
+        retorno = self._rutas_reales.grafo.resolver_retorno(sala.id, direccion)
+        if retorno.estado is EstadoEmparejamiento.EMPAREJADA:
+            identificador, inversa = retorno.retorno
+            destino = self.salas[identificador]
+            extremos.append((destino, inversa, destino.salidas[inversa]))
+        return extremos
+
+    def llave_puerta(self, sala, direccion):
+        """RE-01: la misma llave para abrir, presentar, acreditar y cargar."""
+        return next((extremo['llave'] for _, _, extremo in self.extremos_puerta(sala, direccion)
+                     if 'llave' in extremo), None)
+
+    def _actualizar_conocimiento(self, revelar=False):
+        conocimiento = self._conocimiento
+        if conocimiento is None:
+            return
+        sala = self.salas[self.jugador.posicion_actual]
+        cambios = list(conocimiento.entrar(sala.id)) if revelar else []
+        if revelar and self.efectos.antorchas_encendidas:
+            for salida in sala.salidas.values():
+                cambios.extend(conocimiento.entrar(salida["sala"]))
+        referencias = self._puertas_conocibles[sala.id] if hasattr(self, "_puertas_conocibles") else ()
+        for direccion, identificador in referencias:
+            cambios.extend(conocimiento.observar_puerta(sala.id, identificador,
+                                                       sala.salidas[direccion].get("cerrada", False)))
+        if cambios:
+            lote = tuple(cambios)
+            self.historial.registrar_cambio(lambda: conocimiento.revertir(lote))
+            pendientes = getattr(self, '_deltas_conocimiento', None)
+            if pendientes is not None:
+                pendientes.extend(lote)
 
     def mover(self, direccion, trampas_activadas=None):
         puede, error = self.puede_moverse(direccion)
@@ -235,11 +291,11 @@ class Motor:
         pos_anterior = self.jugador.posicion_actual
         self.historial.registrar_inventario(lambda p=pos_anterior: setattr(self.jugador, "posicion_actual", p))
         self.jugador.posicion_actual = id_destino
-        conocimiento = self._conocimiento
-        if conocimiento is not None and id_destino != pos_anterior:
-            cambios = conocimiento.entrar(id_destino)
-            if cambios:
-                self.historial.registrar_cambio(lambda: conocimiento.revertir(cambios))
+        if self._captura_paso is not None and id_destino != pos_anterior:
+            self._captura_paso.hubo_entrada = True
+            self._captura_paso.enemigos_al_entrar = any(
+                enemigo.vida > 0 for enemigo in self.enemigos_por_sala[id_destino])
+        self._actualizar_conocimiento(revelar=True)
         self._sincronizar_referencias()
         self._avanzar_actor(self.jugador, costo_salida)
         self.historial.registrar_rastro(id_destino, self.registro_rastro.tiempo_de(id_destino))
@@ -259,7 +315,7 @@ class Motor:
             self.efectos.activar_trampa(trampa)
 
         if (not self.terminado and id_destino == self.sala_salida
-                and salida.get("llave") == self.llave_salida
+                and self.llave_puerta(self.salas[pos_anterior], direccion) == self.llave_salida
                 and (pos_anterior, direccion) in self.puertas_abiertas_con_llave):
             self.historial.registrar_atributo(self, "terminado")
             self.historial.registrar_atributo(self, "resultado")
@@ -270,10 +326,16 @@ class Motor:
 
     # ---------- combate ----------
 
+    def _aplicar_dano(self, actor, dano):
+        anterior = actor.vida
+        self.historial.registrar_vida(actor, anterior)
+        actor.vida = max(0, anterior - dano)
+        if actor is self.jugador and self._captura_paso is not None and actor.vida < anterior:
+            self._captura_paso.recibio_dano = True
+
     def atacar(self, atacante, defensor):
         dano = calcular_dano(atacante, defensor, self.azar)
-        self.historial.registrar_vida(defensor, defensor.vida)
-        defensor.vida = max(0, defensor.vida - dano)
+        self._aplicar_dano(defensor, dano)
         if self._notificador is not None:
             self.informar(f"{self.nombre_actor(atacante)} ataca a {self.nombre_actor(defensor)}: {dano} de dano.")
         if defensor.vida == 0:
@@ -378,10 +440,10 @@ class Motor:
             rango = ficha.atributos["rango"]
             if rango is not None and type(rango) is not int:
                 raise TypeError("El rango suministrado al cazador debe ser un entero o null.")
-            grafo = self._grafo_cazador
+            grafo = self._rutas_reales.grafo
             accion, dato, _ = decidir_cazador(
                 grafo.indice(id_sala), grafo.indice(self.jugador.posicion_actual),
-                rango, self._consultar_ruta_cazador
+                rango, self._rutas_reales.buscar
             )
 
         if accion == "atacar":
@@ -473,9 +535,10 @@ class Motor:
 
         salidas = [
             SalidaVista(direccion=d, destino=info["sala"],
-                        cerrada=info.get("cerrada", False), llave=info.get("llave"),
+                        cerrada=info.get("cerrada", False), llave=self.llave_puerta(sala, d),
+                        costo=info.get('costo', 100),
                         apertura_pendiente=info["sala"] == self.sala_salida
-                        and info.get("llave") == self.llave_salida
+                        and self.llave_puerta(sala, d) == self.llave_salida
                         and (sala.id, d) not in self.puertas_abiertas_con_llave)
             for d, info in sala.salidas.items()
         ]
@@ -570,7 +633,25 @@ class Motor:
                        if jug.inventario.arma_equipada_objeto is not None else None),
             armadura_tipo=(jug.inventario.armadura_equipada_objeto.tipo_catalogo
                            if jug.inventario.armadura_equipada_objeto is not None else None),
+            cripta_id=getattr(self.meta, 'cripta_id', '') if hasattr(self, 'meta') else '',
+            objetivo=self.objetivo_vista(salidas),
         )
+
+    def objetivo_vista(self, salidas):
+        if self.sala_salida is None:
+            return ''
+        if self.jugador.posicion_actual == self.sala_salida and not self.terminado:
+            return ('Estás en la sala de salida. Para escapar, vuelve a su acceso, '
+                    'ábrelo con la llave requerida y crúzalo.')
+        puerta = next((s for s in salidas if s.destino == self.sala_salida
+                       and s.llave == self.llave_salida), None)
+        if puerta is not None:
+            if puerta.cerrada or puerta.apertura_pendiente:
+                return f'Salida: abre {puerta.direccion} con {puerta.llave} y después cruza esa puerta.'
+            return f'Salida: cruza {puerta.direccion} para escapar de la cripta.'
+        if self._conocimiento is not None and self._conocimiento.estado_sala(self.sala_salida) != 0:
+            return f'Salida conocida: sala {self.sala_salida}. Abre su acceso con la llave requerida y crúzalo.'
+        return 'Explora para encontrar la puerta de salida y su llave. Las cámaras secundarias no son la salida.'
 
     def resumen(self):
         from modelo.snapshots import ResumenPartida
@@ -619,7 +700,7 @@ class Motor:
         j = self.jugador
         codigo = 1 if self.resultado == "victoria" else (2 if self.resultado == "derrota" else 0)
         extras = [1 if self.terminado else 0, codigo]
-        for id_sala in range(len(self.salas)):
+        for id_sala in self._ids_salas:
             if self.contenido_cargado[id_sala]:
                 extras.append(id_sala)
 
@@ -635,14 +716,28 @@ class Motor:
             if guardado is not None:
                 eventos.append(guardado)
 
+        puertas_modificadas = crear_almacen(self._ids_salas, lambda: None)
+        for id_sala, direccion, tenia_campo, cerrada in self._puertas_iniciales:
+            salida = self.salas[id_sala].salidas.get(direccion)
+            if salida is None or "cerrada" not in salida:
+                continue
+            acreditada = (id_sala, direccion) in self.puertas_abiertas_con_llave
+            if not tenia_campo or salida["cerrada"] != cerrada or acreditada:
+                if puertas_modificadas[id_sala] is None:
+                    puertas_modificadas[id_sala] = []
+                puertas_modificadas[id_sala].append(
+                    PuertaGuardada(direccion, bool(salida["cerrada"]), acreditada))
+
         salas = []
-        for id_sala in range(len(self.salas)):
+        for id_sala in self._ids_salas:
             sala = self.salas[id_sala]
             if sala is None:
                 continue
             rastro = self.registro_rastro.exportar(id_sala)
             if not (self.contenido_cargado[id_sala] or self.enemigos_por_sala[id_sala]
                     or self.objetos_en_suelo[id_sala] or rastro != -1):
+                if puertas_modificadas[id_sala]:
+                    salas.append(SalaGuardada(sala_id=id_sala, puertas=puertas_modificadas[id_sala]))
                 continue
             salas.append(SalaGuardada(
                 sala_id=id_sala, rastro=rastro,
@@ -729,7 +824,7 @@ class Motor:
                     raise ValueError(f"Guardado incompatible: {campo} no coincide con la partida.")
         ids = [estado.jugador.sala_id] + estado.jugador.extras[2:] + [s.sala_id for s in estado.salas]
         if len(estado.jugador.extras) < 2 or any(
-                type(i) is not int or not 0 <= i < len(self.salas) or self.salas[i] is None
+                type(i) is not int or not 0 <= i < limite_ids(self.salas) or self.salas[i] is None
                 for i in ids):
             raise ValueError("Guardado incompatible: salas o indicadores invalidos.")
 
@@ -775,7 +870,7 @@ class Motor:
                 try:
                     sala, direccion = evento.objetivo.split(":")
                     sala = int(sala)
-                    valido = 0 <= sala < len(self.salas) and self.salas[sala] is not None and direccion in self.salas[sala].salidas
+                    valido = 0 <= sala < limite_ids(self.salas) and self.salas[sala] is not None and direccion in self.salas[sala].salidas
                 except (ValueError, AttributeError):
                     valido = False
             elif evento.tipo == "rearmar_trampa":
@@ -802,7 +897,8 @@ class Motor:
             preparado._restaurar_estado_validado(estado)
         preparado.gestor_precarga = self.gestor_precarga
         # Conservar las referencias publicas del jugador, salas y puertas.
-        for i, sala in enumerate(self.salas):
+        for i in self._ids_salas:
+            sala = self.salas[i]
             if sala is None:
                 continue
             nueva = preparado.salas[i]
@@ -824,6 +920,7 @@ class Motor:
         preparado.jugador = jugador
         self.__dict__.update(preparado.__dict__)
         self.efectos.motor = self
+        self._rutas_reales.descartar_derivados()
 
     def _restaurar_estado_validado(self, estado):
         from modelo.tipos import InstanciaEnemigo, ObjetoInstancia, Trampa
@@ -833,7 +930,6 @@ class Motor:
             fijar = getattr(self.gestor_precarga.catalogo, "fijar_referencias", None)
             if fijar is not None:
                 fijar([])
-        n = len(self.salas)
         self.cola = ColaEventos()
         self.efectos = GestorEfectos(self)
         self.reloj = estado.reloj
@@ -841,9 +937,9 @@ class Motor:
         self.azar.setstate(estado.rng_estado)
         self.acciones_jugador = estado.acciones_jugador
         self.enemigos_derrotados = estado.enemigos_derrotados
-        self.enemigos_por_sala = [EnemigosSala() for _ in range(n)]
-        self.objetos_en_suelo = [[] for _ in range(n)]
-        self.contenido_cargado = [False] * n
+        self.enemigos_por_sala = crear_almacen(self._ids_salas, EnemigosSala)
+        self.objetos_en_suelo = crear_almacen(self._ids_salas, list)
+        self.contenido_cargado = crear_almacen(self._ids_salas, lambda: False)
         self.puertas_abiertas_con_llave = []
         for id_sala, direccion, tenia_campo, cerrada in self._puertas_iniciales:
             salida = self.salas[id_sala].salidas[direccion]
@@ -854,7 +950,7 @@ class Motor:
         for sala in self.salas:
             if sala is not None:
                 sala.trampa = None
-        for id_sala in range(n):
+        for id_sala in self._ids_salas:
             self.registro_rastro.importar(id_sala, -1)
 
         # jugador (se modifica el mismo objeto, otros módulos pueden tener referencia)
@@ -886,7 +982,7 @@ class Motor:
                 if p.direccion in sala.salidas:
                     sala.salidas[p.direccion]["cerrada"] = p.cerrada
                     if p.abierta_con_llave:
-                        if not sala.salidas[p.direccion].get("llave"):
+                        if not self.llave_puerta(sala, p.direccion):
                             raise ValueError("Guardado invalido: apertura sin llave declarada.")
                         self.puertas_abiertas_con_llave.append((sg.sala_id, p.direccion))
             for eg in sg.enemigos:
@@ -950,12 +1046,17 @@ class Motor:
         reloj = self.reloj
         notificador = self._notificador
         mensajes = []
+        captura_anterior = self._captura_paso
+        self._captura_paso = _CapturaPaso() if accion == "mover" else None
         self._notificador = mensajes.append if notificador is not None else None
         try:
             resultado = self._ejecutar_accion(accion, argumento, registrar_h3)
+            if accion == "mover" and not resultado.ok:
+                resultado.hechos_paso = self._resultado_paso(False)
         except Exception:
             self.historial.descartar_turno()
             self.reloj = reloj
+            self._rutas_reales.descartar_derivados()
             try:
                 self._sincronizar_referencias()
             except (ErrorCripta, OSError):
@@ -963,10 +1064,18 @@ class Motor:
             raise
         finally:
             self._notificador = notificador
+            self._captura_paso = captura_anterior
         if resultado.ok and notificador is not None:
             for mensaje in mensajes:
                 notificador(mensaje)
         return resultado
+
+    def _resultado_paso(self, aceptado):
+        from modelo.viaje import ResultadoPaso
+
+        captura = self._captura_paso if aceptado else _CapturaPaso()
+        return ResultadoPaso(self.jugador.posicion_actual, aceptado, captura.recibio_dano,
+                             captura.hubo_entrada, captura.enemigos_al_entrar, self.terminado)
 
     def _antes_de_retroceder(self):
         """Punto de extensión previo a aplicar los inversos del turno."""
@@ -990,6 +1099,7 @@ class Motor:
             if reloj_anterior is None:
                 return ResultadoAccion(ok=False, mensaje="No hay nada que deshacer")
             self.reloj = reloj_anterior
+            self._rutas_reales.descartar_derivados()
             self.informar("Retroceso: se restaura la accion anterior.")
             return ResultadoAccion(ok=True)
 
@@ -1158,6 +1268,7 @@ class Motor:
 
         if not ok:
             return self._rechazar_accion(error)
+        self._actualizar_conocimiento()
 
         if self._notificador is not None:
             if accion in ("recoger", "soltar", "equipar", "usar"):
@@ -1188,6 +1299,7 @@ class Motor:
             evento = self.ejecutar_ciclo(decidir_accion, hasta=frontera)
             if evento is None:
                 break
+            self._actualizar_conocimiento()
             if registrar_h3 is not None:
                 eventos_h3.append((evento.tiempo, evento.secuencia, self._cambios_h3(estado_h3)))
             if evento.tipo == "turno_jugador":
@@ -1198,6 +1310,8 @@ class Motor:
         self.historial.registrar_atributo(self, "acciones_jugador")
         self.acciones_jugador += 1
         resultado = ResultadoAccion(ok=True, trampas_activadas=trampas_activadas)
+        if self._captura_paso is not None:
+            resultado.hechos_paso = self._resultado_paso(True)
         if registrar_h3 is not None:
             registrar_h3(inicio_h3, self.reloj, self.acciones_jugador, cambios_h3, tuple(eventos_h3))
         self.historial.cerrar_turno()
@@ -1355,7 +1469,7 @@ class _MotorConHistoriaDePrueba(Motor):
 
         # La restauracion base valida la existencia de la sala y el resto del estado.
         sala_id = jugador.sala_id
-        sala = self.salas[sala_id] if type(sala_id) is int and 0 <= sala_id < len(self.salas) else None
+        sala = self.salas[sala_id] if type(sala_id) is int and 0 <= sala_id < limite_ids(self.salas) else None
         if sala is None or sala_historica != (sala_id, sala.nombre) or jugador_historico != estadisticas:
             raise CambioHistoriaIncoherente("La sala o las estadisticas no coinciden con la historia.")
 
@@ -1399,7 +1513,7 @@ class _MotorConHistoriaDePrueba(Motor):
 
 def crear_juego(gestor_precarga, cripta_id, semilla, notificar=None,
                 version_cripta=None, version_catalogo=None, *,
-                conocimiento_para_pruebas=False, historia_para_pruebas=False):
+                conocimiento_para_pruebas=False, historia_para_pruebas=False, partida_completa=False):
     from modelo.snapshots import MetaPartida
     from modelo.inventario import Inventario
 
@@ -1421,7 +1535,9 @@ def crear_juego(gestor_precarga, cripta_id, semilla, notificar=None,
         llaves_obtenidas=[],
     )
 
-    tipo_motor = _MotorConHistoriaDePrueba if historia_para_pruebas else Motor
+    from modelo.partida import MotorPartida, conectar_mapa
+    tipo_motor = (MotorPartida if partida_completa else
+                  (_MotorConHistoriaDePrueba if historia_para_pruebas else Motor))
     motor = tipo_motor(jugador=jugador, salas_lista=preparada.salas, semilla=semilla)
     if conocimiento_para_pruebas:
         from modelo.conocimiento import ConocimientoMapa, SalaConocible, SalidaConocible
@@ -1448,6 +1564,8 @@ def crear_juego(gestor_precarga, cripta_id, semilla, notificar=None,
     _incorporar_sala_preparada(motor, preparada.inicial)
     id_inicial = preparada.inicial.sala.id
     motor.activar_enemigos_de_sala(id_inicial, motor.enemigos_por_sala[id_inicial])
+    if partida_completa:
+        conectar_mapa(motor)
 
     if notificar:
         notificar(f"Cripta '{cripta_id}' cargada: {len(preparada.salas)} salas.")

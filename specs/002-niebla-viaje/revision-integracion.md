@@ -47,3 +47,12 @@ Repetición completa: **672 pruebas en 67.257 s, OK, con 5 omisiones**; 667 apro
 | A/C y B | Conectar el despacho del cazador con sus datos y acordar identidad compartida de puertas. El motor sigue llamando al despacho previo. |
 
 Los módulos de C existen y sus pruebas se ejecutan en la copia, pero el motor no los instancia. Tampoco expone todavía `conectar_historia` y la restauración completa que espera D. Por eso una fusión sin conflictos no habilita mapa, viaje e historia completos. La aclaración de antorcha y la medición integrada siguen pendientes.
+
+
+## Integración revisada el 18 de noviembre de 2026
+
+Unión de C b7cfc33 con D eb8546b, que contiene main 049a990 y las ramas actuales de A/B revisadas el 17 de noviembre. Solo hubo conflictos en PROMPTS_LLM.md y tasks.md; se conservaron ambos aportes. El código de producción coincide con D, preservando las pruebas adicionales I11 de C.
+
+En copia aislada: 866 pruebas en 258.781 s, cero fallos/errores y cuatro omisiones (comparación histórica, dos del paquete oficial ausente y API real deshabilitada). Comparación histórica ejecutada aparte: 41 pruebas, OK. Copia limpia: 20 pruebas, OK. I11: tres pruebas, OK. Los conjuntos se solapan. Logs locales bajo .cache/union-*-20261117.log. No se repitieron API real ni benchmarks; los resultados publicados por D se distinguen de esta comprobación.
+
+La aplicación normal ya conecta las cuatro capacidades. Las limitaciones y salvedades documentales vigentes se conservan en ESTADO_ENTREGA.md. Los archivos personales de datos_generados se respaldan y conservan localmente, aunque la integración los excluya de Git. Main y ramas ajenas no se modifican.

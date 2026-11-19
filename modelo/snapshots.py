@@ -220,6 +220,8 @@ class EstadoVista:
     costos: list[tuple[str, int]] = field(default_factory=list)
     arma_tipo: str | None = None
     armadura_tipo: str | None = None
+    cripta_id: str = ''
+    objetivo: str = ''
 
 
 @dataclass

@@ -44,7 +44,7 @@ class TestMenuInicio(unittest.TestCase):
             self.skipTest(str(error))
         self.addCleanup(vista.cerrar)
         vista.root.withdraw()
-        with patch("vista.grafica.messagebox.showinfo") as dialogo:
+        with patch.object(vista, "mostrar_informe") as dialogo:
             vista.mostrar_ayuda()
             dialogo.assert_not_called()
             for _ in range(2):
@@ -82,7 +82,7 @@ class TestMenuInicio(unittest.TestCase):
                 patch("controlador.controlador.ControladorJuego", return_value=controlador):
             self.assertEqual(main.main(["--gui", "--offline", ".cache/cripta", "--datos-dir", carpeta]), 0)
         self.assertEqual(crear.call_args.args[1:], ("prueba", 42))
-        self.assertEqual(crear.call_args.kwargs, dict(version_cripta="v1", version_catalogo="cat1"))
+        self.assertEqual(crear.call_args.kwargs, dict(partida_completa=True, version_cripta="v1", version_catalogo="cat1"))
         controlador.iniciar.assert_called_once_with(estado_inicial=estado)
         vista.elegir_cripta.assert_not_called()
 

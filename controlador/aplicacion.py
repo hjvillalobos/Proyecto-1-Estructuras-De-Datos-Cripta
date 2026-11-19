@@ -118,12 +118,13 @@ def ejecutar_juego(args, sesion, lanzador_replay):
                         if not elegir_inicio():
                             return 0
                         continue
-                    vista.mostrar_informe("Verificación de resolubilidad", texto)
+                    if not args.gui:
+                        vista.mostrar_informe("Verificación de resolubilidad", texto)
                     if args.gui and getattr(vista, "_cerrada", False) is True:
                         return 0
                     if reporte.version is not None:
                         versiones["version_cripta"] = reporte.version
-                juego = cargar_datos(crear_juego, sesion.precarga, args.cripta, semilla, **versiones)
+                juego = cargar_datos(crear_juego, sesion.precarga, args.cripta, semilla, partida_completa=True, **versiones)
                 if checkpoint is not None:
                     juego = integrar_historia(juego, checkpoint)
                     if estado_inicial is not None and getattr(juego, "linea_tiempo", None) is None:
@@ -163,7 +164,9 @@ def ejecutar_juego(args, sesion, lanzador_replay):
                     return 0
                 sesion.renovar(tolerar_error=True)
                 continue
-            if not (args.gui and juego.resultado == "derrota" and vista.preguntar_reinicio()):
+            if not (args.gui and (juego.resultado == "derrota"
+                    or getattr(controlador, 'reiniciar_solicitado', False) is True)
+                    and vista.preguntar_reinicio()):
                 break
             while True:
                 try:

@@ -1,5 +1,10 @@
 # Implementation Plan: Verificador de resolubilidad
 
+**Estado vigente al 2026-11-16:** normalización e índices propios, recorrido incremental, certificado global y ciclos deterministas implementados e integrados. Datos/API, modo offline, inicio y CLI están probados; resultados finales en DECISIONES.md. Los planes y restricciones fechadas siguientes documentan etapas anteriores; no implican que el código siga pendiente. La revisión humana continúa pendiente.
+
+> **Estado vigente de entrega:** las cuatro capacidades están integradas en `004-linea-tiempo`. Consultar [estado, trazabilidad y límites actuales](../../ESTADO_ENTREGA.md). Los balances y restricciones de autorización fechados anteriores son registros históricos, no bloqueos de la implementación actual. La revisión humana y los faltantes auténticos no se dan por resueltos mediante este aviso.
+
+
 **Branch**: `codex/verificador-resolubilidad` | **Date**: 2026-11-01 | **Spec**: [spec.md](spec.md)
 
 **Estado**: Plan y tareas revisados documentalmente. C1 aprobado por aclaración del profesor comunicada por el usuario el 2026-11-02; pendiente commit de especificación antes de implementar.

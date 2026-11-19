@@ -75,9 +75,10 @@ class ModosHistoriaTest(unittest.TestCase):
                     patch("vista.grafica.VistaGrafica", side_effect=AssertionError("vista")):
                 sesion.return_value.precarga = motor.gestor_precarga
                 self.assertEqual(main.main(["--replay", ruta]), 0)
-                self.assertEqual(main.main(["--replay", ruta, "--hasta", "100"]), 1)
-            self.assertIn("Replay t=250", salida.getvalue())
-            self.assertIn("todavía no entrega cambios", error.getvalue())
+                self.assertEqual(main.main(["--replay", ruta, "--hasta", "100"]), 0)
+            self.assertIn("Historia t=250", salida.getvalue())
+            self.assertIn("Historia t=100", salida.getvalue())
+            self.assertEqual(error.getvalue(), "")
 
     def test_fr013_replay_respeta_carga_y_retroceso_posteriores(self):
         from controlador.partida_historica import integrar_historia

@@ -1,0 +1,262 @@
+{
+  "fecha": "2026-11-15",
+  "base": "7686b64",
+  "especificacion_previa": "6309e20",
+  "suite": {
+    "pruebas": 834,
+    "segundos": 244.14,
+    "fallos": 0,
+    "errores": 0,
+    "omitidas": 2
+  },
+  "opciones_separadas": {
+    "comparacion": {
+      "pruebas": 41,
+      "segundos": 0.435
+    },
+    "api": {
+      "pruebas": 1,
+      "segundos": 88.555,
+      "criptas": 5,
+      "fases_por_cripta": 2
+    }
+  },
+  "copia_limpia": {
+    "pruebas": 20,
+    "segundos": 7.987,
+    "dependencias_reutilizadas": true
+  },
+  "maximos_ms": {
+    "ciclo": 9.275,
+    "paso": 2.342,
+    "verificador": 12.586,
+    "historia_K50": 0.5745
+  },
+  "muestras": {
+    "ciclo": 120,
+    "paso": 120,
+    "verificador": 120,
+    "historia_K50": 111
+  },
+  "excesos": {
+    "ciclo": 0,
+    "paso": 0,
+    "verificador": 0,
+    "historia_K50": 0
+  },
+  "historia_acciones": 5000,
+  "historia_campos": 300,
+  "historia_memoria_B_K50": 5673260,
+  "mapas": [
+    {
+      "id": "cripta-06",
+      "version": "f9ed9afa683d",
+      "salas": 300,
+      "salidas": 760,
+      "errores": [],
+      "sin_retorno": [],
+      "costos_distintos": [],
+      "puertas_distintas": [],
+      "alcanzables_ignorando_puertas": 300,
+      "alcanzables_con_llaves": 300,
+      "salida_alcanzable": true,
+      "llave_salida_obtenible": true,
+      "llaves_obtenibles": [
+        "itm_llave_bronce",
+        "itm_llave_hierro",
+        "itm_llave_negra",
+        "itm_llave_plata"
+      ],
+      "llaves_ubicacion_erronea": [],
+      "contenidos_disponibles": 300
+    },
+    {
+      "id": "cripta-02",
+      "version": "52532a77ee04",
+      "salas": 20,
+      "salidas": 40,
+      "errores": [],
+      "sin_retorno": [],
+      "costos_distintos": [],
+      "puertas_distintas": [
+        [
+          5,
+          19
+        ],
+        [
+          17,
+          18
+        ],
+        [
+          18,
+          17
+        ],
+        [
+          19,
+          5
+        ]
+      ],
+      "alcanzables_ignorando_puertas": 20,
+      "alcanzables_con_llaves": 20,
+      "salida_alcanzable": true,
+      "llave_salida_obtenible": true,
+      "llaves_obtenibles": [
+        "itm_llave_bronce",
+        "itm_llave_negra"
+      ],
+      "llaves_ubicacion_erronea": [],
+      "contenidos_disponibles": 20
+    },
+    {
+      "id": "cripta-03",
+      "version": "f9186ac25124",
+      "salas": 40,
+      "salidas": 80,
+      "errores": [],
+      "sin_retorno": [],
+      "costos_distintos": [],
+      "puertas_distintas": [
+        [
+          5,
+          35
+        ],
+        [
+          20,
+          38
+        ],
+        [
+          33,
+          34
+        ],
+        [
+          34,
+          33
+        ],
+        [
+          35,
+          5
+        ],
+        [
+          38,
+          20
+        ]
+      ],
+      "alcanzables_ignorando_puertas": 40,
+      "alcanzables_con_llaves": 40,
+      "salida_alcanzable": true,
+      "llave_salida_obtenible": true,
+      "llaves_obtenibles": [
+        "itm_llave_bronce",
+        "itm_llave_hierro",
+        "itm_llave_negra"
+      ],
+      "llaves_ubicacion_erronea": [],
+      "contenidos_disponibles": 40
+    },
+    {
+      "id": "cripta-04",
+      "version": "7074a17814ad",
+      "salas": 50,
+      "salidas": 100,
+      "errores": [],
+      "sin_retorno": [],
+      "costos_distintos": [],
+      "puertas_distintas": [
+        [
+          5,
+          43
+        ],
+        [
+          20,
+          47
+        ],
+        [
+          41,
+          42
+        ],
+        [
+          42,
+          41
+        ],
+        [
+          43,
+          5
+        ],
+        [
+          47,
+          20
+        ]
+      ],
+      "alcanzables_ignorando_puertas": 50,
+      "alcanzables_con_llaves": 50,
+      "salida_alcanzable": true,
+      "llave_salida_obtenible": true,
+      "llaves_obtenibles": [
+        "itm_llave_bronce",
+        "itm_llave_hierro",
+        "itm_llave_negra"
+      ],
+      "llaves_ubicacion_erronea": [],
+      "contenidos_disponibles": 50
+    },
+    {
+      "id": "cripta-05",
+      "version": "48bfa3b75055",
+      "salas": 24,
+      "salidas": 48,
+      "errores": [],
+      "sin_retorno": [],
+      "costos_distintos": [],
+      "puertas_distintas": [
+        [
+          5,
+          21
+        ],
+        [
+          7,
+          22
+        ],
+        [
+          12,
+          24
+        ],
+        [
+          19,
+          20
+        ],
+        [
+          20,
+          19
+        ],
+        [
+          21,
+          5
+        ],
+        [
+          22,
+          7
+        ],
+        [
+          24,
+          12
+        ]
+      ],
+      "alcanzables_ignorando_puertas": 24,
+      "alcanzables_con_llaves": 20,
+      "salida_alcanzable": false,
+      "llave_salida_obtenible": false,
+      "llaves_obtenibles": [
+        "itm_llave_bronce"
+      ],
+      "llaves_ubicacion_erronea": [],
+      "contenidos_disponibles": 24
+    }
+  ],
+  "limites": [
+    "picos de viaje en incrementos anteriores conservados",
+    "PDF original P1 vacio; extraccion textual sin autenticar",
+    "dos finales de prompts historicos incompletos",
+    "audicion por altavoces no verificada",
+    "defensa y evaluacion humanas no verificadas"
+  ]
+}

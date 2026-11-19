@@ -1,4 +1,4 @@
-"""Historia pura por deltas; integración con el motor pendiente.
+"""Historia pura por deltas, integrada con el motor mediante modelo.partida.
 
 Arreglos e índices binarios propios. Solo se retienen estados completos para
 el presente y los checkpoints. Consultar crea un estado de trabajo independiente.

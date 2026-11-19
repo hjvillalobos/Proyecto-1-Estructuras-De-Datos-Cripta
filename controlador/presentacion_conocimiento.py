@@ -2,6 +2,10 @@ from modelo.conocimiento import AVISTADA, EXPLORADA
 from modelo.errores_historia import CambioHistoriaIncoherente
 
 
+def _sala_avistada(identificador):
+    return f"Sala {identificador}: avistada (?)"
+
+
 def lineas_mapa(proyeccion):
     lineas = []
     for registro in proyeccion:
@@ -10,7 +14,7 @@ def lineas_mapa(proyeccion):
             continue
         identificador, estado, nombre, salidas = registro
         if estado == AVISTADA:
-            lineas.append(f"Sala {identificador}: avistada")
+            lineas.append(_sala_avistada(identificador))
         elif estado == EXPLORADA:
             lineas.append(f"Sala {identificador} · {nombre}: explorada")
             for direccion, destino, costo, puerta, recuerdo in salidas:
@@ -54,7 +58,7 @@ def mapa_historico(estado):
         if clave.startswith("conocimiento:sala:"):
             identificador = clave.removeprefix("conocimiento:sala:")
             if valor == AVISTADA:
-                lineas.append(f"Sala {identificador}: avistada")
+                lineas.append(_sala_avistada(identificador))
             elif valor == EXPLORADA:
                 lineas.append(f"Sala {identificador}: explorada")
         elif clave.startswith("conocimiento:puerta:"):

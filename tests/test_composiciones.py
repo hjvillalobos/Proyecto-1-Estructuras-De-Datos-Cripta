@@ -52,6 +52,23 @@ class TestComposiciones(unittest.TestCase):
                 self.assertEqual(len(primera), cantidad)
                 self.assertEqual(subir.call_count, cantidad)
 
+    def test_respaldo_sin_atlas_reutiliza_accion_y_limita_cache(self):
+        root = tk.Tk()
+        root.withdraw()
+        self.addCleanup(root.destroy)
+        with tempfile.TemporaryDirectory() as carpeta:
+            r = RecursosGraficos(root)
+            r._cache_visual = CacheVisual(r.carpeta, carpeta)
+            r._preparadas.habilitada = False
+            with patch.object(r._cache_visual, 'leer', return_value=None):
+                primera = r.fotogramas_accion('atacar', 290, 196)
+                self.assertEqual(len(primera), 2)
+                with patch.object(r, 'fotogramas_jugador', side_effect=AssertionError('Recompuso')):
+                    self.assertIs(r.fotogramas_accion('atacar', 290, 196), primera)
+                for ancho in range(291, 301):
+                    r.fotogramas_accion('atacar', ancho, 196)
+                self.assertLessEqual(len(r._acciones), 8)
+
     def test_paquete_nativo_conserva_pixeles_en_todas_las_combinaciones(self):
         original = RecursosGraficos(None)
         original._preparadas.habilitada = False
