@@ -1,5 +1,49 @@
 # Bitácora de uso de LLM
 
+## 2026-11-18 — consolidación de prompts y cierre de pendientes documentales
+
+- **Herramienta/modelo:** Codex; variante exacta no confirmada. PowerShell, Git, Python/unittest y benchmarks del proyecto.
+- **Solicitudes literales:** «la solicitud de regulacion no es necesaria y pon todo en los prompts normales. las decisiones, manejo de errores, prompy y eso esta completo?» y «todo lo que este pendiente arreglalo o lo que este mal».
+- **Uso:** conservar los dos textos completos RP-A01/RP-A02 dentro de PROMPTS_LLM.md, retirar el duplicado y el borrador local, completar trazabilidad y decisiones heredadas, actualizar el manejo de errores integrado y medir la bitácora de pantalla mediante --bench.
+- **Especificación previa:** CD-01..05, plan, análisis y tareas confirmados en `30d89a3` antes de modificar producción; CD-06 y su plan/tarea se confirmaron en `cf85272` antes de corregir mensajes. No se invoca un comando de spec-kit ni se alteran reglas de partida o el historial anterior.
+- **Solicitud posterior literal:** «tambien revisa que si mi profe mete nuevas criptas o objetos no se caiga y salgan con el signo de pregunta». Uso: comprobar IDs inéditos, clases de catálogo del contrato, recursos ausentes y acciones/renderizado reales; añadir dos regresiones de siete clases sin alterar producción.
+- **Procedencia:** las reconstrucciones siguen identificadas como textos nuevos; los dos fragmentos originales no se sustituyen. Las menciones anteriores al borrador describen su preparación histórica; no indican que el archivo siga disponible ni que deba enviarse.
+- **Medición nueva:** cinco series de 100.000 operaciones por carga de bitácora: circular 0,287139 µs/agregado y 2,960212 µs/agregado-consulta; 280 B superficiales. La lista desplazada gana en tiempo en las muestras, pero incumple la restricción de no desplazar mensajes y permanece solo como alternativa de benchmark. Ordenamiento repetido con 10.000 operaciones, tamaños 8/16/32/256 y cinco series; resultados completos y límites en DECISIONES.md. Sin repetir otros benchmarks ni API real.
+- **Validación final:** 905 pruebas/238.658 s, cero fallos/errores y cuatro omisiones opcionales; copia sin cachés/partidas, 20/6.324 s, OK. Tras la suite se añadieron dos pruebas nuevas RE-02, ejecutadas en conjunto dirigido de 17/14.170 s, OK sin omisiones: cripta/IDs inéditos, siete clases con acciones reales, signo ? en suelo/inventario/equipo, respaldo visual, selector y partidas inéditas. Los conjuntos se solapan y no se suman; no se atribuye a la suite de 905 la ejecución de esas dos pruebas posteriores. Resultados en ESTADO_ENTREGA.md. No se repitieron API real ni los cuatro benchmarks de procesamiento del motor, cuyos algoritmos y reglas se conservan.
+- **Cierre:** decisiones, matriz de errores y README actualizados; enlaces locales comprobados y fragmentos originales conservados. Borrador y duplicado retirados por instrucción de Belén. Cambios guardados localmente, sin envío al profesor ni nueva publicación en GitHub.
+
+## 2026-11-18 — auditoría integral y reconstrucción autorizada de dos prompts
+
+- **Herramienta/modelo:** Codex; variante exacta no confirmada. PowerShell, Git, Python 3.14/unittest e inspección de registros locales.
+- **Fuente de las solicitudes:** mensajes del usuario de este chat, sesión `01a1f109-cc07-7553-a9a6-006b886063f6`; horas en America/Costa_Rica.
+
+### Solicitud literal, 17:41:57
+
+```text
+1\. Terreno y cazadores. Las salidas tienen costo de tránsito y aparece un enemigo que calcula la ruta más corta \
+hacia el jugador. \
+2\. Niebla de guerra. El jugador solo conoce la parte del mapa que ha explorado, y puede viajar \
+automáticamente dentro de ella. \
+3\. Verificación de resolubilidad. Antes de jugar, el programa determina si la cripta puede ganarse y, si no, \
+explica por qué. \
+4\. Línea de tiempo. Se puede consultar el estado de la partida en cualquier instante pasado, sin copiar el \
+estado completo en cada acción.  eso lo hace ?
+```
+
+- **Solicitud literal, 17:43:40:** «haz un analisis de todo el enunciado y dime si cumple, te puse en ultra solo dime si cumple por aca».
+
+- **Solicitud literal, 17:51:38:** «y no puedes arreglar esos puntos faltantes tu???».
+
+- **Solicitud literal, 17:51:50:** «si revisaste el enunciado verdad».
+
+- **Solicitud literal, 17:53:31:** «si no hay originales hazlos tu ».
+
+- **Uso:** contrastar el enunciado completo de Parte II y la extracción conservada de Parte I con código, pruebas, documentación y Git; buscar originales de dos fragmentos y, al no encontrarlos, preparar versiones completas por reconstrucción según la última instrucción.
+- **Validación técnica:** suite integral nueva, 897 pruebas/281.220 s, cero fallos y errores, cuatro omisiones opcionales. Paquete oficial ejecutado aparte: 2 pruebas/4.504 s, OK; comparación de rutas: 41 pruebas/0.408 s, OK. Los subconjuntos se solapan y no se suman a la suite. No se repitieron API real ni benchmarks; se contrastaron sus evidencias existentes.
+- **Búsqueda de originales:** las coincidencias en registros recientes reproducen documentos o salidas de herramientas. Las sesiones comprimidas locales, incluidas las del 6 de noviembre, no aportan los mensajes originales. No se afirma que el texto enviado originalmente estuviera completo ni que fuera inconcluso.
+- **Resultado documental vigente:** los dos prompts completos se conservan directamente en esta bitácora como [RP-A01](#rp-a01) y [RP-A02](#rp-a02), con su procedencia declarada y los fragmentos históricos intactos. Por instrucción posterior de Belén se retiran el duplicado separado y la solicitud de regularización; no se requiere ese borrador para ejecutar ni entregar el proyecto.
+- **Límite:** reconstruir textos no recupera evidencia histórica. `33d97ac` continúa reuniendo especificación y código; no se revierte ni reescribe el historial para atribuirle otro orden. Sin cambios de producción ni nuevas operaciones de publicación.
+
 ## 2026-11-18 — replay con ambos personajes, offline, rendimiento y documentación
 
 - **Herramienta/modelo:** Codex; variante exacta no confirmada. Git, PowerShell, Python/unittest, Tk/Pillow y benchmarks existentes.
@@ -27,6 +71,8 @@
 - **Validación de cierre:** comparación histórica, 41 pruebas/0.449 s; copia limpia, 20/7.389 s; paquete oficial, 2/4.552 s; API oficial, 1/88.401 s, cinco criptas fría/caliente dentro de presupuesto. Todas OK sin omisiones en esas ejecuciones. Se conserva la suite integral de 881 pruebas, sin sumar subconjuntos. Fuentes y evidencias enlazadas en ESTADO_ENTREGA.md; los fragmentos históricos originales mantienen sus hashes. El ZIP se obtiene de Git, con manifiesto externo y prueba desde su extracción; solo se publican archivos versionados expresamente, sin el borrador para el profesor ni datos personales.
 - **Procedencia de los textos siguientes:** reconstrucciones nuevas de Codex, creadas el 17 de noviembre por solicitud de Belén. **No son recuperación literal ni mensajes originales enviados por Persona A el 6 de noviembre. No prueban que la bitácora histórica estuviera completa.** No se ejecutan como instrucciones nuevas de Git. Los fragmentos originales se conservan intactos.
 
+<a id="rp-a01"></a>
+
 ### RP-A01 — reconstrucción orientativa: Posponer la consolidación de prompts
 
 ```text
@@ -49,6 +95,8 @@ Presenta únicamente el diagnóstico del estado actual y el procedimiento propue
 ```
 
 La última oración es una propuesta nueva para el final ausente «Presenta únicamente e».
+
+<a id="rp-a02"></a>
 
 ### RP-A02 — reconstrucción orientativa: Revertir solo la incorporación local pendiente
 

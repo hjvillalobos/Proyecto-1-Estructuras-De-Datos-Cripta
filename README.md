@@ -91,8 +91,11 @@ python main.py --bench --subsistemas ciclo-historia --paquete .cache/entrega --c
 python main.py --bench --subsistemas terreno-cazador --salas 40 --repeticiones 3
 python main.py --bench --subsistemas resolubilidad --paquete .cache/entrega --cripta cripta-06 --repeticiones 10
 python main.py --bench --subsistemas historia --operaciones 5000 --salas 100 --repeticiones 5
+python main.py --bench --subsistemas bitacora --operaciones 100000 --repeticiones 5 --semilla 20261001
 Remove-Item Env:CRIPTA_SIN_AUDIO -ErrorAction SilentlyContinue
 ```
+
+`bitacora` compara el buffer circular real con una lista que desplaza los mensajes anteriores; valida el mismo sufijo de 20 y mide agregar y agregar/consultar, sin red ni vista. Informa memoria superficial de estructura/arreglo, excluyendo textos compartidos. La lista es una alternativa de medición, no el almacenamiento del juego. [Decisión, resultados y límites](DECISIONES.md).
 
 `parte-dos` incluye comparación pareada del heap anterior/optimizado con decisiones iguales, estrategias de rutas, puertas estables/cambiantes, ciclo con 30 cazadores y pasos sobre mapa conocido completo. La preparación queda fuera del intervalo medido. Las inyecciones sintéticas se identifican; no se presentan como población natural de la cripta. Los benchmarks no usan HTTP ni renderizado.
 

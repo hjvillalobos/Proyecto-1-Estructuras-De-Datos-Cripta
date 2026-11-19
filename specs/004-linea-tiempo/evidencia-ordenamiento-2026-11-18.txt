@@ -1,0 +1,39 @@
+Python 3.14.6 | Windows-11-10.0.26200-SP0
+Operaciones/carga=10000, repeticiones=5, semilla=20261001
+Tiempos en us/operacion: promedio [min, max]. Sin red ni vista.
+orden/8/aleatorio/insercion (us/lista): n=1250 promedio=7.497 min=7.414 max=7.680 us/op
+orden/8/aleatorio/fusion (us/lista): n=1250 promedio=11.968 min=11.777 max=12.374 us/op
+orden/8/aleatorio/automatico (us/lista): n=1250 promedio=7.922 min=7.775 max=8.247 us/op
+orden/8/casi_ordenado/insercion (us/lista): n=1250 promedio=5.118 min=4.720 max=5.779 us/op
+orden/8/casi_ordenado/fusion (us/lista): n=1250 promedio=12.774 min=12.407 max=13.595 us/op
+orden/8/casi_ordenado/automatico (us/lista): n=1250 promedio=5.452 min=5.313 max=5.636 us/op
+orden/8/comparacion_costosa/insercion (us/lista): n=1250 promedio=35.952 min=34.099 max=39.338 us/op
+orden/8/comparacion_costosa/fusion (us/lista): n=1250 promedio=38.529 min=36.487 max=42.271 us/op
+orden/8/comparacion_costosa/automatico (us/lista): n=1250 promedio=36.802 min=35.750 max=37.816 us/op
+orden/16/aleatorio/insercion (us/lista): n=625 promedio=21.954 min=21.172 max=23.211 us/op
+orden/16/aleatorio/fusion (us/lista): n=625 promedio=26.791 min=26.016 max=27.497 us/op
+orden/16/aleatorio/automatico (us/lista): n=625 promedio=22.557 min=22.136 max=22.871 us/op
+orden/16/casi_ordenado/insercion (us/lista): n=625 promedio=8.481 min=7.878 max=9.683 us/op
+orden/16/casi_ordenado/fusion (us/lista): n=625 promedio=25.557 min=23.940 max=27.097 us/op
+orden/16/casi_ordenado/automatico (us/lista): n=625 promedio=8.685 min=8.167 max=9.412 us/op
+orden/16/comparacion_costosa/insercion (us/lista): n=625 promedio=136.316 min=125.272 max=161.586 us/op
+orden/16/comparacion_costosa/fusion (us/lista): n=625 promedio=99.366 min=96.769 max=104.645 us/op
+orden/16/comparacion_costosa/automatico (us/lista): n=625 promedio=130.286 min=120.897 max=143.618 us/op
+orden/32/aleatorio/insercion (us/lista): n=312 promedio=84.873 min=82.046 max=90.676 us/op
+orden/32/aleatorio/fusion (us/lista): n=312 promedio=68.180 min=59.375 max=89.936 us/op
+orden/32/aleatorio/automatico (us/lista): n=312 promedio=71.900 min=67.323 max=87.092 us/op
+orden/32/casi_ordenado/insercion (us/lista): n=312 promedio=14.557 min=13.923 max=16.374 us/op
+orden/32/casi_ordenado/fusion (us/lista): n=312 promedio=68.181 min=51.864 max=84.968 us/op
+orden/32/casi_ordenado/automatico (us/lista): n=312 promedio=26.087 min=24.315 max=29.034 us/op
+orden/32/comparacion_costosa/insercion (us/lista): n=312 promedio=561.362 min=535.413 max=583.681 us/op
+orden/32/comparacion_costosa/fusion (us/lista): n=312 promedio=270.937 min=261.150 max=290.916 us/op
+orden/32/comparacion_costosa/automatico (us/lista): n=312 promedio=301.676 min=287.221 max=317.551 us/op
+orden/256/aleatorio/insercion (us/lista): n=39 promedio=4062.792 min=4001.921 max=4114.890 us/op
+orden/256/aleatorio/fusion (us/lista): n=39 promedio=764.225 min=682.969 max=952.274 us/op
+orden/256/aleatorio/automatico (us/lista): n=39 promedio=795.367 min=760.185 max=833.221 us/op
+orden/256/casi_ordenado/insercion (us/lista): n=39 promedio=119.824 min=103.077 max=139.221 us/op
+orden/256/casi_ordenado/fusion (us/lista): n=39 promedio=558.462 min=531.131 max=575.705 us/op
+orden/256/casi_ordenado/automatico (us/lista): n=39 promedio=179.235 min=170.785 max=196.828 us/op
+orden/256/comparacion_costosa/insercion (us/lista): n=39 promedio=28104.537 min=27753.626 max=28731.497 us/op
+orden/256/comparacion_costosa/fusion (us/lista): n=39 promedio=3376.432 min=3252.928 max=3552.938 us/op
+orden/256/comparacion_costosa/automatico (us/lista): n=39 promedio=3731.852 min=3657.359 max=3902.021 us/op

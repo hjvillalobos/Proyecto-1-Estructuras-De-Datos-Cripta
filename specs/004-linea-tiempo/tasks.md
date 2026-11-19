@@ -307,13 +307,17 @@ RC-01 cerrado: 818 pruebas en 181.531 s, cero fallos/errores y dos opciones omit
 
 ## Cierre CD-01..05 — 2026-11-18
 
-- [ ] CD-T01 (CD-01/02): confirmar especificación/plan/tareas antes del código; conservar importación pública del buffer y añadir medición comparable sin vista/red.
-- [ ] CD-T02 (CD-01/02): verificar orden, límite, vaciado y comando del benchmark con ambas alternativas; ejecutar carga reproducible y guardar resultados reales.
-- [ ] CD-T03 (CD-03): completar decisiones de bitácora/ordenamiento y enlaces spec/plan A/B/C/D con resultados, alternativas y límites.
-- [ ] CD-T04 (CD-04): publicar matriz vigente de errores y distinguir antecedentes sin prometer atomicidad universal.
-- [ ] CD-T05 (CD-05): consolidar reconstrucciones en PROMPTS_LLM, registrar solicitudes actuales, quitar duplicado y solicitud local, comprobar fragmentos intactos y enlaces.
-- [ ] CD-T06 (CD-01..05): regresión del flujo que usa el buffer y suite integral; validar documentación y estado final sin publicar.
+- [x] CD-T01 (CD-01/02): confirmar especificación/plan/tareas antes del código; conservar importación pública del buffer y añadir medición comparable sin vista/red.
+- [x] CD-T02 (CD-01/02): verificar orden, límite, vaciado y comando del benchmark con ambas alternativas; ejecutar carga reproducible y guardar resultados reales.
+- [x] CD-T03 (CD-03): completar decisiones de bitácora/ordenamiento y enlaces spec/plan A/B/C/D con resultados, alternativas y límites.
+- [x] CD-T04 (CD-04): publicar matriz vigente de errores y distinguir antecedentes sin prometer atomicidad universal.
+- [x] CD-T05 (CD-05): consolidar reconstrucciones en PROMPTS_LLM, registrar solicitudes actuales, quitar duplicado y solicitud local, comprobar fragmentos intactos y enlaces.
+- [x] CD-T06 (CD-01..05): regresión del flujo que usa el buffer y suite integral; validar documentación y estado final sin publicar.
 
 ## Mensajes de grabación CD-06 — 2026-11-18
 
-- [ ] CD-T07 (CD-06; FR-011/013/019): confirmar especificación/plan/tarea antes del código; distinguir los mensajes de inicio, acción realizada, carga completada, restauración fallida y comentario de viaje sin nuevo movimiento, conservando la política de detención. Ampliar `tests/test_replay_reinicio.py` con fallos inyectados y comprobación del estado; ejecutar ese módulo y registrar el resultado al cerrar el incremento.
+- [x] CD-T07 (CD-06; FR-011/013/019): confirmar especificación/plan/tarea antes del código; distinguir los mensajes de inicio, acción realizada, carga completada, restauración fallida y comentario de viaje sin nuevo movimiento, conservando la política de detención. Ampliar `tests/test_replay_reinicio.py` con fallos inyectados y comprobación del estado; ejecutar ese módulo y registrar el resultado al cerrar el incremento.
+
+Cierre CD del 18 de noviembre: previos `30d89a3`/`cf85272`; benchmark de bitácora 100.000 operaciones/carga y cinco series, ordenamiento 10.000 operaciones/carga y cinco series, resultados completos en DECISIONES.md. Suite integral905/238.658 s, cero fallos/errores, cuatro omisiones opcionales; copia limpia20/6.324 s, OK. Se verifican enlaces y conservación de los fragmentos históricos; no se declara reparación retrospectiva de `33d97ac`. Sin publicación nueva.
+
+- [x] CD-T08 (RE-02/IA-01): dos regresiones adicionales para cripta y objetos inéditos: siete clases del contrato con IDs nuevos, acciones completas e iconos ? en GUI sin modificar el estado. Ejecutadas después de la suite en conjunto dirigido17/14.170 s, OK sin omisiones; no se suman los conjuntos ni se anuncia suite907. Ver `tests/test_criptas_objetos_ineditos.py` y `evidencia-objetos-ineditos-2026-11-18.txt`.
